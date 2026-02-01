@@ -41,7 +41,7 @@ export function useKPIOverview() {
             .eq('granularity', 'national')
             .order('period_end', { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle();
 
           // Get data sources for this KPI
           const { data: sourceMappings } = await supabase
