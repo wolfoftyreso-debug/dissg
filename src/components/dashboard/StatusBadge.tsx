@@ -37,7 +37,7 @@ export function StatusBadge({ status, className, compact }: StatusBadgeProps) {
     return (
       <div 
         className={cn(
-          'h-2 w-2 rounded-full',
+          'h-2.5 w-2.5 rounded-sm',
           config.dotClass,
           status === 'critical' && 'animate-pulse',
           className
@@ -50,12 +50,12 @@ export function StatusBadge({ status, className, compact }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-xs font-medium',
+        'inline-flex items-center gap-1.5 rounded-sm px-2 py-0.5 text-xs font-semibold',
         config.bgClass,
         className
       )}
     >
-      <span className={cn('h-1.5 w-1.5 rounded-full', config.dotClass)} />
+      <span className={cn('h-1.5 w-1.5 rounded-sm', config.dotClass)} />
       {config.label}
     </span>
   );

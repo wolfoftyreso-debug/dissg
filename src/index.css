@@ -8,75 +8,82 @@
   :root {
     /* 
      * NATIONELLT LEDNINGSSYSTEM - MYNDIGHETSPALETT
-     * Referens: telia.se krisighet, svensk myndighet
+     * Referens: telia.se krispighet, svensk myndighet
      * Vit bakgrund, myndighetsblå accenter, tre signalfärger
+     * 
+     * Grundprinciper:
+     * - Funktion > form
+     * - Inga "wow-effekter"
+     * - Myndighet, inte startup
+     * - Tryggt, stabilt, seriöst
      */
     
-    /* Ljus bakgrund */
+    /* Bakgrund - Ren vit, ljusgrå sekundär */
     --background: 0 0% 100%;
-    --foreground: 215 25% 15%;
+    --foreground: 210 20% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 210 20% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 210 20% 14%;
 
-    /* Myndighetsblå som primär */
-    --primary: 211 60% 35%;
+    /* Myndighetsblå som primär - Mörkare, seriös */
+    --primary: 210 65% 32%;
     --primary-foreground: 0 0% 100%;
 
-    /* Grå sekundär */
-    --secondary: 215 15% 96%;
-    --secondary-foreground: 215 25% 35%;
+    /* Grå sekundär - Diskret, professionell */
+    --secondary: 210 12% 97%;
+    --secondary-foreground: 210 15% 35%;
 
-    --muted: 215 15% 95%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 210 12% 95%;
+    --muted-foreground: 210 10% 45%;
 
-    --accent: 211 50% 95%;
-    --accent-foreground: 211 60% 30%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 210 65% 28%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 72% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borderns och inputs - subtila grå */
-    --border: 215 20% 88%;
-    --input: 215 20% 88%;
-    --ring: 211 60% 50%;
+    /* Borderns och inputs - Diskreta grå */
+    --border: 210 15% 90%;
+    --input: 210 15% 90%;
+    --ring: 210 65% 45%;
 
-    --radius: 0.375rem;
+    /* Minimal radie - Ingen rundning alls */
+    --radius: 0.25rem;
 
     /* 
      * ENDAST TRE SIGNALFÄRGER
      * Grön = stabil/förbättring
-     * Gul = avvikelse
+     * Gul = avvikelse  
      * Röd = negativ trend / varning
      */
-    --status-positive: 152 60% 40%;
+    --status-positive: 145 55% 38%;
     --status-positive-foreground: 0 0% 100%;
-    --status-warning: 38 95% 50%;
-    --status-warning-foreground: 38 95% 15%;
-    --status-critical: 0 72% 50%;
+    --status-warning: 40 95% 48%;
+    --status-warning-foreground: 40 95% 12%;
+    --status-critical: 0 75% 48%;
     --status-critical-foreground: 0 0% 100%;
-    --status-neutral: 215 15% 55%;
+    --status-neutral: 210 10% 55%;
 
-    /* Trend */
-    --trend-up: 152 60% 40%;
-    --trend-down: 0 72% 50%;
-    --trend-stable: 215 15% 55%;
+    /* Trend - Samma som status */
+    --trend-up: 145 55% 38%;
+    --trend-down: 0 75% 48%;
+    --trend-stable: 210 10% 55%;
 
-    /* Typography */
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    /* Typography - System font stack för snabbhet */
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
-    /* Sidebar */
+    /* Sidebar - Diskret */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 215 25% 35%;
-    --sidebar-primary: 211 60% 35%;
+    --sidebar-foreground: 210 15% 35%;
+    --sidebar-primary: 210 65% 32%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 211 50% 95%;
-    --sidebar-accent-foreground: 211 60% 30%;
-    --sidebar-border: 215 20% 88%;
-    --sidebar-ring: 211 60% 50%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 210 65% 28%;
+    --sidebar-border: 210 15% 90%;
+    --sidebar-ring: 210 65% 45%;
   }
 }
 
@@ -95,7 +102,7 @@
     @apply bg-background text-foreground;
   }
 
-  /* Monospace for data elements */
+  /* Tabular numbers for data - CRITICAL for dashboards */
   .font-data {
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum";
@@ -103,7 +110,7 @@
 
   /* Status indicator base */
   .status-indicator {
-    @apply inline-flex items-center justify-center rounded px-2 py-1 text-xs font-medium;
+    @apply inline-flex items-center justify-center rounded-sm px-2 py-1 text-xs font-medium;
   }
 
   .status-positive {
@@ -113,7 +120,7 @@
 
   .status-warning {
     background-color: hsl(var(--status-warning) / 0.12);
-    color: hsl(38 95% 35%);
+    color: hsl(40 95% 28%);
   }
 
   .status-critical {
@@ -133,5 +140,24 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Myndighets-stil: Knappar med minimal styling */
+  .btn-myndighet {
+    @apply rounded-sm border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted;
+  }
+
+  .btn-myndighet-primary {
+    @apply rounded-sm bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90;
+  }
+
+  /* Data cards - Ingen skugga, minimal border */
+  .data-card {
+    @apply rounded-sm border border-border bg-card;
+  }
+
+  /* Section headers - Versaler, liten storlek */
+  .section-header {
+    @apply text-[10px] font-semibold uppercase tracking-widest text-muted-foreground;
   }
 }

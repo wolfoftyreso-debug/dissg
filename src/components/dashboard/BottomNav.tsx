@@ -26,14 +26,14 @@ export function BottomNav({ active, onNavigate }: BottomNavProps) {
             key={id}
             onClick={() => onNavigate(id)}
             className={cn(
-              'flex flex-1 flex-col items-center gap-1 py-3 transition-colors',
+              'flex flex-1 flex-col items-center gap-0.5 py-2 transition-colors',
               active === id
                 ? 'text-primary'
                 : 'text-muted-foreground hover:text-foreground'
             )}
           >
             <Icon className="h-5 w-5" />
-            <span className="text-[10px] font-medium">{label}</span>
+            <span className="text-[9px] font-medium uppercase tracking-wide">{label}</span>
           </button>
         ))}
       </div>
