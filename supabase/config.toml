@@ -1,1 +1,10 @@
 project_id = "fopcwyxqsimidisvakam"
+
+[functions.kpi-api]
+verify_jwt = false
+
+[functions.kpi-ingest]
+verify_jwt = false
+
+[functions.kpi-forecast]
+verify_jwt = false
