@@ -12,10 +12,7 @@ import { DecisionsTimelinePanel } from '@/components/dashboard/DecisionsTimeline
 import { ResponsibilityPanel } from '@/components/dashboard/ResponsibilityPanel';
 import { AnalysisPanel } from '@/components/dashboard/AnalysisPanel';
 import { useKPIOverview } from '@/hooks/useKPIData';
-import { Loader2, Settings as SettingsIcon } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
 
 const Index = () => {
   const [selectedKPI, setSelectedKPI] = useState<KPI | null>(null);
@@ -89,56 +86,6 @@ const Index = () => {
         
         {activeNav === 'analysis' && (
           <AnalysisPanel kpis={kpis} />
-        )}
-        
-        {activeNav === 'settings' && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold flex items-center gap-2">
-                <SettingsIcon className="h-6 w-6 text-primary" />
-                Inställningar
-              </h2>
-              <p className="text-muted-foreground mt-1">
-                Konfigurera systemet efter dina preferenser
-              </p>
-            </div>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Visning</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="dark-mode">Mörkt läge</Label>
-                  <Switch id="dark-mode" />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="compact">Kompakt vy</Label>
-                  <Switch id="compact" />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="notifications">Push-notifikationer</Label>
-                  <Switch id="notifications" defaultChecked />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Data & Uppdateringar</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="auto-refresh">Automatisk uppdatering</Label>
-                  <Switch id="auto-refresh" defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="show-provisional">Visa provisoriska data</Label>
-                  <Switch id="show-provisional" defaultChecked />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         )}
       </main>
 
