@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.kpi-forecast]
 verify_jwt = false
+
+[functions.kpi-decisions]
+verify_jwt = false
