@@ -24,64 +24,22 @@ interface TableConfig {
   aggregation?: 'sum' | 'average' | 'latest';
 }
 
-// Expanded table configurations for all population-related KPIs
+// Expanded table configurations mapping to actual kpi_definitions codes
 const TABLE_CONFIGS: Record<string, TableConfig> = {
   // ═══════════════════════════════════════════════════════════════
-  // BEFOLKNINGSDATA
-  // ═══════════════════════════════════════════════════════════════
-  
-  // Folkmängd per månad - aktuell befolkningsnivå
-  population_monthly: {
-    path: "BE/BE0101/BE0101A/BefolkManad",
-    description: "Folkmängden i Sverige per månad",
-    kpiCode: "population_total",
-    dataSourceCode: "scb_px",
-    query: {
-      query: [
-        { code: "Region", selection: { filter: "item", values: ["00"] } },
-        { code: "Kon", selection: { filter: "item", values: ["1", "2"] } },
-        { code: "ContentsCode", selection: { filter: "item", values: ["000003O5"] } },
-        { code: "Tid", selection: { filter: "top", values: ["12"] } },
-      ],
-      response: { format: "json" }
-    },
-    valueMultiplier: 0.000001,
-    unit: "miljoner",
-    aggregation: 'sum',
-  },
-
-  // Folkmängd per år - långsiktig trend
-  population_yearly: {
-    path: "BE/BE0101/BE0101A/BefolkningR1860N",
-    description: "Folkmängden i Sverige per år (historisk)",
-    kpiCode: "population_total",
-    dataSourceCode: "scb_px",
-    query: {
-      query: [
-        { code: "Kon", selection: { filter: "item", values: ["1", "2"] } },
-        { code: "ContentsCode", selection: { filter: "item", values: ["000005IY"] } },
-        { code: "Tid", selection: { filter: "top", values: ["10"] } },
-      ],
-      response: { format: "json" }
-    },
-    valueMultiplier: 0.000001,
-    unit: "miljoner",
-    aggregation: 'sum',
-  },
-
-  // ═══════════════════════════════════════════════════════════════
-  // KPI 1: FÖRVÄNTAD LIVSLÄNGD
+  // KPI 1: FÖRVÄNTAD LIVSLÄNGD (life_expectancy -> kpi_definitions.code)
   // ═══════════════════════════════════════════════════════════════
   
   life_expectancy: {
     path: "BE/BE0101/BE0101I/Medellivsl",
-    description: "Medellivslängd vid födelsen",
+    description: "Återstående medellivslängd vid födelsen",
     kpiCode: "life_expectancy",
     dataSourceCode: "scb_px",
     query: {
       query: [
-        { code: "Kon", selection: { filter: "item", values: ["1", "2"] } },
-        { code: "ContentsCode", selection: { filter: "item", values: ["BE0101N1"] } },
+        { code: "Region", selection: { filter: "item", values: ["00"] } },  // Riket
+        { code: "Kon", selection: { filter: "item", values: ["1", "2"] } }, // Män och kvinnor
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000NH"] } },
         { code: "Tid", selection: { filter: "top", values: ["10"] } },
       ],
       response: { format: "json" }
@@ -91,37 +49,36 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // KPI 2: ÖVERDÖDLIGHET
+  // KPI 2: ÖVERDÖDLIGHET (excess_mortality) - döda per månad
   // ═══════════════════════════════════════════════════════════════
   
-  mortality_rate: {
-    path: "BE/BE0101/BE0101I/Dodstal",
-    description: "Dödstal per 1000 invånare",
+  excess_mortality: {
+    path: "BE/BE0101/BE0101G/ManadBefStat",
+    description: "Antal döda per månad",
     kpiCode: "excess_mortality",
     dataSourceCode: "scb_px",
     query: {
       query: [
-        { code: "Region", selection: { filter: "item", values: ["00"] } },
-        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
-        { code: "Alder", selection: { filter: "item", values: ["tot"] } },
-        { code: "ContentsCode", selection: { filter: "item", values: ["BE0101AC"] } },
-        { code: "Tid", selection: { filter: "top", values: ["12"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } }, // Totalt
+        { code: "Manad", selection: { filter: "item", values: ["01","02","03","04","05","06","07","08","09","10","11","12"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000001S4"] } }, // Döda
+        { code: "Tid", selection: { filter: "top", values: ["5"] } },
       ],
       response: { format: "json" }
     },
-    unit: "per 1000",
-    granularity: "monthly",
-    aggregation: 'average',
+    unit: "% över baslinjen",
+    granularity: "yearly",
+    aggregation: 'sum',
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // KPI 3: SYSSELSÄTTNINGSGRAD
+  // KPI 4: SYSSELSÄTTNINGSGRAD (employment_rate_net)
   // ═══════════════════════════════════════════════════════════════
   
   employment_rate: {
     path: "AM/AM0401/AM0401A/NAKUBeijkaraHusar",
     description: "Sysselsättningsgrad 20-64 år",
-    kpiCode: "employment_rate",
+    kpiCode: "employment_rate_net",  // matches kpi_definitions.code
     dataSourceCode: "scb_px",
     query: {
       query: [
@@ -138,12 +95,34 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // KPI 4: ARBETSLÖSHET
+  // KPI 5: PRODUKTIVITET PER TIMME (productivity_per_hour)
   // ═══════════════════════════════════════════════════════════════
   
-  unemployment_rate: {
+  productivity: {
+    path: "NR/NR0103/NR0103B/NR0103ENS2010T04Kv",
+    description: "BNP per arbetad timme (produktivitet)",
+    kpiCode: "productivity_per_hour",
+    dataSourceCode: "scb_px",
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["TOT"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000003X"] } },
+        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "index (2020=100)",
+    granularity: "quarterly",
+    aggregation: 'latest',
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // KPI 6: LÅNGVARIGT UTANFÖRSKAP (long_term_exclusion)
+  // ═══════════════════════════════════════════════════════════════
+  
+  long_term_exclusion: {
     path: "AM/AM0401/AM0401A/NAKUBeijkaraHusar",
-    description: "Arbetslöshet 15-74 år",
+    description: "Arbetslöshet 15-74 år (proxy för utanförskap)",
     kpiCode: "long_term_exclusion",
     dataSourceCode: "scb_px",
     query: {
@@ -155,41 +134,19 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
       ],
       response: { format: "json" }
     },
-    unit: "%",
+    unit: "% av arbetskraft",
     granularity: "monthly",
     aggregation: 'latest',
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // KPI 5: PRODUKTIVITET (BNP per arbetad timme)
+  // KPI 7: SKATTEBASENS REALA TILLVÄXT (tax_base_growth)
   // ═══════════════════════════════════════════════════════════════
   
-  productivity: {
-    path: "NR/NR0103/NR0103B/NR0103ENS2010T04Kv",
-    description: "BNP per arbetad timme (produktivitet)",
-    kpiCode: "productivity",
-    dataSourceCode: "scb_px",
-    query: {
-      query: [
-        { code: "SNI2007", selection: { filter: "item", values: ["TOT"] } },
-        { code: "ContentsCode", selection: { filter: "item", values: ["0000003X"] } },
-        { code: "Tid", selection: { filter: "top", values: ["20"] } },
-      ],
-      response: { format: "json" }
-    },
-    unit: "index",
-    granularity: "quarterly",
-    aggregation: 'latest',
-  },
-
-  // ═══════════════════════════════════════════════════════════════
-  // KPI 7: SKATTEBAS PER CAPITA
-  // ═══════════════════════════════════════════════════════════════
-  
-  tax_revenue: {
+  tax_base_growth: {
     path: "OE/OE0107/OE0107A/SkijRegLanK",
     description: "Beskattningsbar förvärvsinkomst per invånare",
-    kpiCode: "tax_base_per_capita",
+    kpiCode: "tax_base_growth",
     dataSourceCode: "scb_px",
     query: {
       query: [
@@ -200,24 +157,26 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
       response: { format: "json" }
     },
     valueMultiplier: 0.001,
-    unit: "tkr/invånare",
+    unit: "% årlig",
     granularity: "yearly",
     aggregation: 'latest',
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // KPI 9: DEMOGRAFISK FÖRSÖRJNINGSKVOT
+  // KPI 9: FÖRSÖRJNINGSKVOT (dependency_ratio)
   // ═══════════════════════════════════════════════════════════════
   
   dependency_ratio: {
-    path: "BE/BE0101/BE0101C/BefijForsbalans",
-    description: "Demografisk försörjningsbalans",
+    path: "BE/BE0101/BE0101C/BefArld662140Ar",
+    description: "Befolkning efter ålder för försörjningsberäkning",
     kpiCode: "dependency_ratio",
     dataSourceCode: "scb_px",
     query: {
       query: [
         { code: "Region", selection: { filter: "item", values: ["00"] } },
-        { code: "ContentsCode", selection: { filter: "item", values: ["BE0101K1"] } },
+        { code: "Alder", selection: { filter: "item", values: ["tot"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000LB"] } },
         { code: "Tid", selection: { filter: "top", values: ["20"] } },
       ],
       response: { format: "json" }
@@ -228,13 +187,13 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // KPI 16: BOSTADSBYGGANDE
+  // KPI 16: BOSTADSOMSÄTTNING (housing_turnover)
   // ═══════════════════════════════════════════════════════════════
   
   housing_construction: {
     path: "BO/BO0101/BO0101A/LaijFardBoAr",
     description: "Färdigställda bostäder per år",
-    kpiCode: "housing_construction_rate",
+    kpiCode: "housing_turnover",
     dataSourceCode: "scb_px",
     query: {
       query: [
@@ -245,30 +204,34 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
       ],
       response: { format: "json" }
     },
-    unit: "antal",
+    unit: "antal/1000 inv",
     granularity: "yearly",
     aggregation: 'sum',
   },
 
   // ═══════════════════════════════════════════════════════════════
-  // KPI 18: INFRASTRUKTURINVESTERINGAR
+  // BEFOLKNINGSDATA (för referens - arbetsför befolkning 18-64)
   // ═══════════════════════════════════════════════════════════════
   
-  infrastructure_investment: {
-    path: "NR/NR0103/NR0103B/NR0103ENS2010T14Kv",
-    description: "Fasta bruttoinvesteringar offentlig sektor",
-    kpiCode: "infrastructure_investment_rate",
+  population_monthly: {
+    path: "BE/BE0101/BE0101A/BefolkManad",
+    description: "Folkmängden i Sverige per månad (arbetsför ålder)",
+    kpiCode: "working_age_functional",
     dataSourceCode: "scb_px",
     query: {
       query: [
-        { code: "Sektor", selection: { filter: "item", values: ["S13"] } },
-        { code: "ContentsCode", selection: { filter: "item", values: ["0000003C"] } },
-        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+        { code: "Region", selection: { filter: "item", values: ["00"] } },
+        // Åldrar 18-64 (arbetsför ålder)
+        { code: "Alder", selection: { filter: "item", values: ["18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1", "2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000003O5"] } },
+        { code: "Tid", selection: { filter: "top", values: ["12"] } },
       ],
       response: { format: "json" }
     },
-    unit: "mnkr",
-    granularity: "quarterly",
+    valueMultiplier: 0.000001,
+    unit: "miljoner",
+    granularity: "monthly",
     aggregation: 'sum',
   },
 };
