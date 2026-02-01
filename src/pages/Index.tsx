@@ -7,6 +7,7 @@ import { OverviewHeader } from '@/components/dashboard/OverviewHeader';
 import { CategorySection } from '@/components/dashboard/CategorySection';
 import { KPIDetailPanel } from '@/components/dashboard/KPIDetailPanel';
 import { DecisionPriorityPanel } from '@/components/dashboard/DecisionPriorityPanel';
+import { SCBDataFetcher } from '@/components/dashboard/SCBDataFetcher';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { Loader2 } from 'lucide-react';
 
@@ -73,8 +74,8 @@ const Index = () => {
         )}
         
         {activeNav === 'indicators' && (
-          <div className="text-center py-12 text-muted-foreground">
-            Indikatorvyn kommer snart
+          <div className="space-y-6">
+            <SCBDataFetcher />
           </div>
         )}
       </main>

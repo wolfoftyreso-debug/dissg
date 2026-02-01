@@ -1,5 +1,8 @@
 project_id = "fopcwyxqsimidisvakam"
 
+[functions.scb-fetch]
+verify_jwt = false
+
 [functions.kpi-api]
 verify_jwt = false
 
