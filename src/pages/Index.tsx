@@ -9,6 +9,7 @@ import { KPIDetailPanel } from '@/components/dashboard/KPIDetailPanel';
 import { DecisionPriorityPanel } from '@/components/dashboard/DecisionPriorityPanel';
 import { SCBDataFetcher } from '@/components/dashboard/SCBDataFetcher';
 import { HistoricalBacktest } from '@/components/dashboard/HistoricalBacktest';
+import { ObservationsPanel } from '@/components/observations/ObservationsPanel';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { Loader2 } from 'lucide-react';
 
@@ -76,6 +77,7 @@ const Index = () => {
         
         {activeNav === 'indicators' && (
           <div className="space-y-6">
+            <ObservationsPanel />
             <SCBDataFetcher />
             <HistoricalBacktest />
           </div>

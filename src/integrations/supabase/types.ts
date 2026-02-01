@@ -148,6 +148,90 @@ export type Database = {
         }
         Relationships: []
       }
+      analysis_audit_log: {
+        Row: {
+          action: string
+          actor: string | null
+          context: Json | null
+          entity_id: string
+          entity_snapshot: Json
+          entity_type: string
+          id: string
+          logged_at: string
+        }
+        Insert: {
+          action: string
+          actor?: string | null
+          context?: Json | null
+          entity_id: string
+          entity_snapshot: Json
+          entity_type: string
+          id?: string
+          logged_at?: string
+        }
+        Update: {
+          action?: string
+          actor?: string | null
+          context?: Json | null
+          entity_id?: string
+          entity_snapshot?: Json
+          entity_type?: string
+          id?: string
+          logged_at?: string
+        }
+        Relationships: []
+      }
+      analysis_chains: {
+        Row: {
+          alternatives_tested: Json | null
+          analysis_method: Database["public"]["Enums"]["analysis_method"] | null
+          created_at: string
+          id: string
+          level: number
+          level_content: Json
+          level_title: string
+          method_rationale: string | null
+          observation_id: string
+          sequence_order: number
+        }
+        Insert: {
+          alternatives_tested?: Json | null
+          analysis_method?:
+            | Database["public"]["Enums"]["analysis_method"]
+            | null
+          created_at?: string
+          id?: string
+          level: number
+          level_content: Json
+          level_title: string
+          method_rationale?: string | null
+          observation_id: string
+          sequence_order?: number
+        }
+        Update: {
+          alternatives_tested?: Json | null
+          analysis_method?:
+            | Database["public"]["Enums"]["analysis_method"]
+            | null
+          created_at?: string
+          id?: string
+          level?: number
+          level_content?: Json
+          level_title?: string
+          method_rationale?: string | null
+          observation_id?: string
+          sequence_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_chains_observation_id_fkey"
+            columns: ["observation_id"]
+            isOneToOne: false
+            referencedRelation: "observations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calculated_indicators: {
         Row: {
           created_at: string
@@ -182,6 +266,101 @@ export type Database = {
             columns: ["kpi_id"]
             isOneToOne: false
             referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_lineage: {
+        Row: {
+          aggregation_level: string
+          analysis_chain_id: string | null
+          checksum: string
+          collected_at: string
+          collection_interval: string
+          collection_method: string
+          corrections_applied: Json | null
+          created_at: string
+          data_cleaning_notes: string | null
+          data_source_id: string
+          id: string
+          kpi_value_id: string | null
+          methodology_changes: Json | null
+          missing_data_count: number | null
+          observation_id: string | null
+          original_source: string
+          raw_values: Json
+          transformations_applied: Json
+          version: number
+        }
+        Insert: {
+          aggregation_level: string
+          analysis_chain_id?: string | null
+          checksum: string
+          collected_at: string
+          collection_interval: string
+          collection_method: string
+          corrections_applied?: Json | null
+          created_at?: string
+          data_cleaning_notes?: string | null
+          data_source_id: string
+          id?: string
+          kpi_value_id?: string | null
+          methodology_changes?: Json | null
+          missing_data_count?: number | null
+          observation_id?: string | null
+          original_source: string
+          raw_values: Json
+          transformations_applied?: Json
+          version?: number
+        }
+        Update: {
+          aggregation_level?: string
+          analysis_chain_id?: string | null
+          checksum?: string
+          collected_at?: string
+          collection_interval?: string
+          collection_method?: string
+          corrections_applied?: Json | null
+          created_at?: string
+          data_cleaning_notes?: string | null
+          data_source_id?: string
+          id?: string
+          kpi_value_id?: string | null
+          methodology_changes?: Json | null
+          missing_data_count?: number | null
+          observation_id?: string | null
+          original_source?: string
+          raw_values?: Json
+          transformations_applied?: Json
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_lineage_analysis_chain_id_fkey"
+            columns: ["analysis_chain_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_chains"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_lineage_data_source_id_fkey"
+            columns: ["data_source_id"]
+            isOneToOne: false
+            referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_lineage_kpi_value_id_fkey"
+            columns: ["kpi_value_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_values"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_lineage_observation_id_fkey"
+            columns: ["observation_id"]
+            isOneToOne: false
+            referencedRelation: "observations"
             referencedColumns: ["id"]
           },
         ]
@@ -246,6 +425,72 @@ export type Database = {
         }
         Relationships: []
       }
+      decision_timeline: {
+        Row: {
+          action_id: string | null
+          affected_kpi_ids: string[]
+          created_at: string
+          decision_id: string | null
+          event_date: string
+          event_description: string | null
+          event_timestamp: string | null
+          event_title: string
+          event_type: string | null
+          id: string
+          responsible_entity: string | null
+          responsible_level: string | null
+          source_document: string | null
+          source_url: string | null
+        }
+        Insert: {
+          action_id?: string | null
+          affected_kpi_ids?: string[]
+          created_at?: string
+          decision_id?: string | null
+          event_date: string
+          event_description?: string | null
+          event_timestamp?: string | null
+          event_title: string
+          event_type?: string | null
+          id?: string
+          responsible_entity?: string | null
+          responsible_level?: string | null
+          source_document?: string | null
+          source_url?: string | null
+        }
+        Update: {
+          action_id?: string | null
+          affected_kpi_ids?: string[]
+          created_at?: string
+          decision_id?: string | null
+          event_date?: string
+          event_description?: string | null
+          event_timestamp?: string | null
+          event_title?: string
+          event_type?: string | null
+          id?: string
+          responsible_entity?: string | null
+          responsible_level?: string | null
+          source_document?: string | null
+          source_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decision_timeline_action_id_fkey"
+            columns: ["action_id"]
+            isOneToOne: false
+            referencedRelation: "action_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "decision_timeline_decision_id_fkey"
+            columns: ["decision_id"]
+            isOneToOne: false
+            referencedRelation: "policy_decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evaluation_weights: {
         Row: {
           cost_weight: number
@@ -284,6 +529,69 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      factor_contributions: {
+        Row: {
+          analysis_chain_id: string
+          contribution_strength: number
+          created_at: string
+          description: string
+          evidence_periods: number
+          evidence_total_periods: number
+          factor_kpi_id: string | null
+          factor_name: string
+          id: string
+          sequence_order: number
+          stability_score: number
+          time_relation: string
+          uncertainty: number
+        }
+        Insert: {
+          analysis_chain_id: string
+          contribution_strength: number
+          created_at?: string
+          description: string
+          evidence_periods: number
+          evidence_total_periods: number
+          factor_kpi_id?: string | null
+          factor_name: string
+          id?: string
+          sequence_order?: number
+          stability_score: number
+          time_relation: string
+          uncertainty: number
+        }
+        Update: {
+          analysis_chain_id?: string
+          contribution_strength?: number
+          created_at?: string
+          description?: string
+          evidence_periods?: number
+          evidence_total_periods?: number
+          factor_kpi_id?: string | null
+          factor_name?: string
+          id?: string
+          sequence_order?: number
+          stability_score?: number
+          time_relation?: string
+          uncertainty?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "factor_contributions_analysis_chain_id_fkey"
+            columns: ["analysis_chain_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_chains"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "factor_contributions_factor_kpi_id_fkey"
+            columns: ["factor_kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ingest_log: {
         Row: {
@@ -569,6 +877,81 @@ export type Database = {
           },
         ]
       }
+      observations: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          analysis_version: string
+          confidence_level: number
+          created_at: string
+          description: string
+          detected_at: string
+          id: string
+          kpi_id: string
+          kpi_value_id: string | null
+          model_version: string
+          observation_period_end: string
+          observation_period_start: string
+          observation_type: Database["public"]["Enums"]["observation_type"]
+          signal_strength: number
+          status: Database["public"]["Enums"]["analysis_status"]
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          analysis_version?: string
+          confidence_level: number
+          created_at?: string
+          description: string
+          detected_at?: string
+          id?: string
+          kpi_id: string
+          kpi_value_id?: string | null
+          model_version?: string
+          observation_period_end: string
+          observation_period_start: string
+          observation_type: Database["public"]["Enums"]["observation_type"]
+          signal_strength: number
+          status?: Database["public"]["Enums"]["analysis_status"]
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          analysis_version?: string
+          confidence_level?: number
+          created_at?: string
+          description?: string
+          detected_at?: string
+          id?: string
+          kpi_id?: string
+          kpi_value_id?: string | null
+          model_version?: string
+          observation_period_end?: string
+          observation_period_start?: string
+          observation_type?: Database["public"]["Enums"]["observation_type"]
+          signal_strength?: number
+          status?: Database["public"]["Enums"]["analysis_status"]
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "observations_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "observations_kpi_value_id_fkey"
+            columns: ["kpi_value_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_values"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       policy_decisions: {
         Row: {
           created_at: string
@@ -627,6 +1010,15 @@ export type Database = {
         | "completed"
         | "rejected"
         | "deferred"
+      analysis_method:
+        | "trend_detection"
+        | "change_point_detection"
+        | "correlation_analysis"
+        | "lag_analysis"
+        | "regression"
+        | "decomposition"
+        | "anomaly_detection"
+      analysis_status: "pending" | "in_progress" | "completed" | "verified"
       data_source_type: "api" | "file_feed" | "manual" | "calculated"
       kpi_category:
         | "demografi_halsa"
@@ -637,6 +1029,13 @@ export type Database = {
         | "infrastruktur"
         | "systemrisk_styrning"
       kpi_status: "positive" | "warning" | "critical" | "neutral"
+      observation_type:
+        | "trend_deviation"
+        | "threshold_breach"
+        | "correlation_detected"
+        | "pattern_match"
+        | "lag_signal"
+        | "anomaly"
       priority_level: "critical" | "high" | "medium" | "low" | "monitor"
       trend_direction: "up" | "down" | "stable"
       update_frequency:
@@ -782,6 +1181,16 @@ export const Constants = {
         "rejected",
         "deferred",
       ],
+      analysis_method: [
+        "trend_detection",
+        "change_point_detection",
+        "correlation_analysis",
+        "lag_analysis",
+        "regression",
+        "decomposition",
+        "anomaly_detection",
+      ],
+      analysis_status: ["pending", "in_progress", "completed", "verified"],
       data_source_type: ["api", "file_feed", "manual", "calculated"],
       kpi_category: [
         "demografi_halsa",
@@ -793,6 +1202,14 @@ export const Constants = {
         "systemrisk_styrning",
       ],
       kpi_status: ["positive", "warning", "critical", "neutral"],
+      observation_type: [
+        "trend_deviation",
+        "threshold_breach",
+        "correlation_detected",
+        "pattern_match",
+        "lag_signal",
+        "anomaly",
+      ],
       priority_level: ["critical", "high", "medium", "low", "monitor"],
       trend_direction: ["up", "down", "stable"],
       update_frequency: [
