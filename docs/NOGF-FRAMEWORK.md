@@ -403,6 +403,62 @@ evaluation_weights       →  Viktkonfiguration för prioritering
 | Spårbar analyskedja | ✅ Implementerad | 5-nivåsdjup |
 | Beslut-utfall-koppling | ⚠️ Delvis | UI finns, databasintegration pågår |
 | Kontinuerlig feedback | ⚠️ Delvis | Manuell uppdatering, automation saknas |
+| **Rollbaserad behörighet** | ✅ Implementerad | 6 roller med RLS-policies |
+| **Publik vy** | ✅ Implementerad | 5-stegs pedagogisk användarresa |
+
+---
+
+## Del VI — Rollmodell & Behörighet
+
+### Rollhierarki
+
+| Roll | Databasroll | Rättigheter |
+|------|-------------|-------------|
+| Publik | `public` | 20 KPI:er, trender, historik, analyser, källor |
+| Forskare | `researcher` | + Fler nedbrytningar, export, längre historik |
+| Departementsansvarig | `department_lead` | + Sina ansvars-KPI:er, logga beslut, anteckningar |
+| Statsråd | `minister` | + Departementets hela vy |
+| Statsminister | `prime_minister` | Allt, syntes, systemöversikt |
+| Systemadmin | `system_admin` | Teknisk administration, rollhantering |
+
+### Säkerhetsprinciper
+
+- Roller lagras i separat tabell (`user_roles`) med RLS
+- SECURITY DEFINER-funktioner för rollkontroller
+- Alla rollförändringar loggas i `role_audit_log`
+- Ingen kan ändra historiska data
+
+---
+
+## Del VII — Lanseringsstrategi
+
+### Positionering
+
+> **En öppen samhällsöversikt baserad på offentlig data.**
+
+**Inte**: granskning, reform, kritik, ansvarsutkrävande  
+**Utan**: informationsinfrastruktur, faktaredovisning, transparent lägesbild
+
+### Beta-scope (10 indikatorer)
+
+| # | Indikator | Varför först |
+|---|-----------|--------------|
+| 1 | Förväntad livslängd | Lätt att förstå |
+| 4 | Sysselsättningsgrad | Hög relevans |
+| 7 | Skattebas per capita | Ekonomisk grund |
+| 10 | Skjutningar per 100k | Aktuellt |
+| 11 | Tillit till myndigheter | Systemrelevant |
+| 13 | Vårdköer | Direkt påverkan |
+| 14 | PISA-resultat | Framtidsfokus |
+| 16 | Bostadsbrist | Vardagsrelevant |
+| 17 | Elkapacitet | Aktuellt |
+| 19 | Reformtakt | Styrbarometer |
+
+### Timing
+
+- ❌ Ingen politisk kampanj
+- ❌ Ingen koppling till val
+- ✅ Släpps som teknisk plattform
 
 ---
 
@@ -411,6 +467,7 @@ evaluation_weights       →  Viktkonfiguration för prioritering
 | Version | Datum | Förändring |
 |---------|-------|------------|
 | 1.0 | 2026-02-01 | Initial formalisering |
+| 1.1 | 2026-02-01 | Rollmodell, lansering, publik vy |
 
 ---
 

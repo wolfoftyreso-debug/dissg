@@ -643,6 +643,64 @@ export type Database = {
           },
         ]
       }
+      internal_notes: {
+        Row: {
+          action_id: string | null
+          author_id: string
+          content: string
+          created_at: string
+          id: string
+          is_private: boolean
+          kpi_id: string | null
+          observation_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          action_id?: string | null
+          author_id: string
+          content: string
+          created_at?: string
+          id?: string
+          is_private?: boolean
+          kpi_id?: string | null
+          observation_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          action_id?: string | null
+          author_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_private?: boolean
+          kpi_id?: string | null
+          observation_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_notes_action_id_fkey"
+            columns: ["action_id"]
+            isOneToOne: false
+            referencedRelation: "action_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internal_notes_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internal_notes_observation_id_fkey"
+            columns: ["observation_id"]
+            isOneToOne: false
+            referencedRelation: "observations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kpi_alerts: {
         Row: {
           acknowledged_at: string | null
@@ -994,12 +1052,118 @@ export type Database = {
         }
         Relationships: []
       }
+      role_audit_log: {
+        Row: {
+          action: string
+          id: string
+          performed_at: string
+          performed_by: string | null
+          reason: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          action: string
+          id?: string
+          performed_at?: string
+          performed_by?: string | null
+          reason?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          action?: string
+          id?: string
+          performed_at?: string
+          performed_by?: string | null
+          reason?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      role_responsibilities: {
+        Row: {
+          assigned_at: string
+          id: string
+          kpi_id: string
+          responsibility_level: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          id?: string
+          kpi_id: string
+          responsibility_level: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          id?: string
+          kpi_id?: string
+          responsibility_level?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_responsibilities_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          notes: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          notes?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          notes?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_any_role: {
+        Args: {
+          _roles: Database["public"]["Enums"]["app_role"][]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      has_kpi_responsibility: {
+        Args: { _kpi_id: string; _user_id: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       action_status:
@@ -1019,6 +1183,13 @@ export type Database = {
         | "decomposition"
         | "anomaly_detection"
       analysis_status: "pending" | "in_progress" | "completed" | "verified"
+      app_role:
+        | "public"
+        | "researcher"
+        | "department_lead"
+        | "minister"
+        | "prime_minister"
+        | "system_admin"
       data_source_type: "api" | "file_feed" | "manual" | "calculated"
       kpi_category:
         | "demografi_halsa"
@@ -1191,6 +1362,14 @@ export const Constants = {
         "anomaly_detection",
       ],
       analysis_status: ["pending", "in_progress", "completed", "verified"],
+      app_role: [
+        "public",
+        "researcher",
+        "department_lead",
+        "minister",
+        "prime_minister",
+        "system_admin",
+      ],
       data_source_type: ["api", "file_feed", "manual", "calculated"],
       kpi_category: [
         "demografi_halsa",
