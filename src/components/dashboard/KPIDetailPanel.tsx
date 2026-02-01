@@ -4,62 +4,16 @@ import { TrendIndicator } from './TrendIndicator';
 import { ConfidenceBar } from './ConfidenceBar';
 import { ForecastPanel } from './ForecastPanel';
 import { DecisionSupportPanel } from './DecisionSupportPanel';
+import { HistoryPanel } from './HistoryPanel';
 import { X, AlertTriangle, Database, Clock, MapPin, Users, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, ReferenceLine, Tooltip } from 'recharts';
 
 interface KPIDetailPanelProps {
   kpi: KPI;
   onClose: () => void;
 }
 
-// Mock decision for demonstration
-const MOCK_DECISIONS = [
-  {
-    id: '1',
-    date: '2025-01-15',
-    title: 'Utökad vårdkapacitet',
-    expectedEffect: 'Minska väntetider med 15%',
-    actualEffect: null,
-  },
-];
-
-// Generate mock time series data
-function generateTimeSeriesData(value: number, trend: string, percent: number) {
-  const data: { date: string; value: number; decision?: string }[] = [];
-  const now = new Date();
-  let current = value;
-  const changePerPoint = (value * (percent / 100)) / 12;
-
-  for (let i = 11; i >= 0; i--) {
-    const date = new Date(now);
-    date.setMonth(date.getMonth() - i);
-    
-    const noise = (Math.random() - 0.5) * changePerPoint * 0.3;
-    const point: { date: string; value: number; decision?: string } = {
-      date: date.toLocaleDateString('sv-SE', { month: 'short', year: '2-digit' }),
-      value: Math.round((current + noise) * 10) / 10,
-    };
-    
-    // Add decision marker
-    if (i === 9) {
-      point.decision = 'Beslut: Utökad kapacitet';
-    }
-    
-    data.push(point);
-    
-    if (trend === 'up') {
-      current -= changePerPoint;
-    } else if (trend === 'down') {
-      current += changePerPoint;
-    }
-  }
-  
-  return data;
-}
-
 export function KPIDetailPanel({ kpi, onClose }: KPIDetailPanelProps) {
-  const chartData = generateTimeSeriesData(kpi.value, kpi.trend, kpi.trendPercent);
 
   return (
     <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg overflow-y-auto border-l border-border bg-card shadow-xl">
@@ -131,69 +85,8 @@ export function KPIDetailPanel({ kpi, onClose }: KPIDetailPanelProps) {
           </div>
         </section>
 
-        {/* B. Time series chart with decision markers */}
-        <section className="space-y-2">
-          <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Utveckling över tid
-          </h3>
-          <div className="rounded-lg border border-border bg-card p-4">
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
-                  <XAxis 
-                    dataKey="date" 
-                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                    axisLine={{ stroke: 'hsl(var(--border))' }}
-                    tickLine={false}
-                  />
-                  <YAxis 
-                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                    axisLine={false}
-                    tickLine={false}
-                    width={40}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '6px',
-                      fontSize: '12px',
-                    }}
-                    labelStyle={{ color: 'hsl(var(--foreground))' }}
-                  />
-                  {/* Decision marker line */}
-                  <ReferenceLine 
-                    x="apr 24" 
-                    stroke="hsl(var(--primary))" 
-                    strokeDasharray="3 3"
-                    label={{ 
-                      value: '⬇ Beslut', 
-                      position: 'top', 
-                      fontSize: 10,
-                      fill: 'hsl(var(--primary))'
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke={
-                      kpi.status === 'critical' ? 'hsl(var(--status-critical))' :
-                      kpi.status === 'warning' ? 'hsl(var(--status-warning))' :
-                      kpi.status === 'positive' ? 'hsl(var(--status-positive))' :
-                      'hsl(var(--muted-foreground))'
-                    }
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              ↓ Lodräta linjer markerar registrerade beslut
-            </p>
-          </div>
-        </section>
+        {/* B. History Panel with time series */}
+        <HistoryPanel kpi={kpi} />
 
         {/* C. AI Explanation */}
         <section className="space-y-2">
