@@ -15,11 +15,16 @@ export function CategorySection({ category, kpis, onKPIClick }: CategorySectionP
     <section className="space-y-3">
       {/* Category Header */}
       <div className="flex items-center justify-between border-b border-border pb-2">
-        <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground">
-            {category.name}
-          </h2>
-          <p className="text-xs text-muted-foreground">{category.description}</p>
+        <div className="flex items-baseline gap-3">
+          <span className="font-mono text-lg font-bold text-muted-foreground">
+            {category.code}
+          </span>
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground">
+              {category.name}
+            </h2>
+            <p className="text-xs text-muted-foreground">{category.description}</p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {criticalCount > 0 && (
@@ -30,6 +35,11 @@ export function CategorySection({ category, kpis, onKPIClick }: CategorySectionP
           {warningCount > 0 && (
             <span className="status-indicator status-warning font-mono">
               {warningCount} AVVIKELSE
+            </span>
+          )}
+          {criticalCount === 0 && warningCount === 0 && (
+            <span className="status-indicator status-positive font-mono">
+              STABIL
             </span>
           )}
         </div>

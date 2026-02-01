@@ -9,6 +9,10 @@ export function SystemHeader({ kpis, lastUpdate }: SystemHeaderProps) {
   const criticalCount = kpis.filter(k => k.status === 'critical').length;
   const warningCount = kpis.filter(k => k.status === 'warning').length;
   const positiveCount = kpis.filter(k => k.status === 'positive').length;
+  const totalKpis = kpis.length;
+
+  // Calculate overall system status
+  const systemStatus = criticalCount > 3 ? 'critical' : criticalCount > 0 ? 'elevated' : 'nominal';
 
   return (
     <header className="border-b border-border bg-card/50 px-6 py-4">
@@ -19,7 +23,7 @@ export function SystemHeader({ kpis, lastUpdate }: SystemHeaderProps) {
             Nationellt Ledningssystem
           </h1>
           <p className="text-xs text-muted-foreground">
-            NIVÅ 1 — Översikt • Senast uppdaterad: {lastUpdate}
+            NIVÅ 1 — Översikt • {totalKpis} indikatorer • Senast: {lastUpdate}
           </p>
         </div>
 
@@ -50,10 +54,28 @@ export function SystemHeader({ kpis, lastUpdate }: SystemHeaderProps) {
           </div>
 
           {/* System Status */}
-          <div className="flex items-center gap-2 rounded border border-status-positive/30 bg-status-positive/10 px-3 py-2">
-            <div className="h-2 w-2 animate-pulse rounded-full bg-status-positive" />
-            <span className="font-mono text-xs uppercase text-status-positive">
-              System aktivt
+          <div className={`flex items-center gap-2 rounded border px-3 py-2 ${
+            systemStatus === 'critical' 
+              ? 'border-status-critical/30 bg-status-critical/10' 
+              : systemStatus === 'elevated'
+              ? 'border-status-warning/30 bg-status-warning/10'
+              : 'border-status-positive/30 bg-status-positive/10'
+          }`}>
+            <div className={`h-2 w-2 animate-pulse rounded-full ${
+              systemStatus === 'critical' 
+                ? 'bg-status-critical' 
+                : systemStatus === 'elevated'
+                ? 'bg-status-warning'
+                : 'bg-status-positive'
+            }`} />
+            <span className={`font-mono text-xs uppercase ${
+              systemStatus === 'critical' 
+                ? 'text-status-critical' 
+                : systemStatus === 'elevated'
+                ? 'text-status-warning'
+                : 'text-status-positive'
+            }`}>
+              {systemStatus === 'critical' ? 'Förhöjd risk' : systemStatus === 'elevated' ? 'Avvikelser' : 'Nominellt'}
             </span>
           </div>
         </div>
