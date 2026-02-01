@@ -1,8 +1,20 @@
 export type KPIStatus = 'positive' | 'warning' | 'critical' | 'neutral';
 export type TrendDirection = 'up' | 'down' | 'stable';
 
+export interface DataSource {
+  name: string;
+  updateFrequency: 'daily' | 'weekly' | 'monthly' | 'quarterly';
+  reliability: number; // 0-100
+}
+
+export interface RedFlag {
+  condition: string;
+  threshold?: string;
+}
+
 export interface KPI {
   id: string;
+  index: number; // 1-20
   name: string;
   category: KPICategory;
   value: number;
@@ -15,28 +27,36 @@ export interface KPI {
   lastUpdated: string;
   shortTermTrend: string; // 4-12 weeks
   longTermTrend: string; // 6-12 months
-  description?: string;
+  description: string;
+  rationale: string; // Why this KPI matters
+  dataSources: DataSource[];
+  redFlags: RedFlag[];
+  breakdownAvailable: ('region' | 'age' | 'time' | 'gender')[];
+  inverted?: boolean; // True if decrease is positive
 }
 
 export type KPICategory = 
   | 'demografi_halsa'
-  | 'arbetsformaga_produktivitet'
-  | 'offentliga_karnfunktioner'
-  | 'social_stabilitet'
+  | 'arbete_produktivitet'
   | 'ekonomisk_barkraft'
-  | 'systemrisker';
+  | 'social_stabilitet'
+  | 'karnsystem_funktion'
+  | 'infrastruktur'
+  | 'systemrisk_styrning';
 
 export interface CategoryMeta {
   id: KPICategory;
+  code: string;
   name: string;
   description: string;
 }
 
 export const CATEGORIES: CategoryMeta[] = [
-  { id: 'demografi_halsa', name: 'Demografi & Hälsa', description: 'Befolkningsutveckling och folkhälsa' },
-  { id: 'arbetsformaga_produktivitet', name: 'Arbetsförmåga & Produktivitet', description: 'Arbetskraft och ekonomisk aktivitet' },
-  { id: 'offentliga_karnfunktioner', name: 'Offentliga Kärnfunktioner', description: 'Statens grundläggande funktioner' },
-  { id: 'social_stabilitet', name: 'Social Stabilitet', description: 'Samhällssammanhållning och trygghet' },
-  { id: 'ekonomisk_barkraft', name: 'Ekonomisk Bärkraft', description: 'Finansiell hållbarhet och tillväxt' },
-  { id: 'systemrisker', name: 'Systemrisker', description: 'Strukturella hot och sårbarheter' },
+  { id: 'demografi_halsa', code: 'A', name: 'Demografi & Hälsa', description: 'Systemets bottenplatta' },
+  { id: 'arbete_produktivitet', code: 'B', name: 'Arbete & Produktivitet', description: 'Välståndsmotorn' },
+  { id: 'ekonomisk_barkraft', code: 'C', name: 'Ekonomisk Bärkraft', description: 'Bränslet' },
+  { id: 'social_stabilitet', code: 'D', name: 'Social Stabilitet', description: 'Friktion & Risk' },
+  { id: 'karnsystem_funktion', code: 'E', name: 'Kärnsystemens Funktion', description: 'Statens kompetens' },
+  { id: 'infrastruktur', code: 'F', name: 'Bostad, Energi, Infrastruktur', description: 'Flöden' },
+  { id: 'systemrisk_styrning', code: 'G', name: 'Systemrisk & Styrning', description: 'Ledningens spegel' },
 ];

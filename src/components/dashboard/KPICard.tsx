@@ -9,21 +9,7 @@ interface KPICardProps {
   onClick?: () => void;
 }
 
-// Metrics where a decrease is positive
-const invertedMetrics = [
-  'psychiatric_care_queue',
-  'sick_leave_rate',
-  'shootings',
-  'segregation_index',
-  'inflation',
-  'energy_dependency',
-  'cyber_incidents',
-  'supply_chain_risk',
-];
-
 export function KPICard({ kpi, onClick }: KPICardProps) {
-  const isInverted = invertedMetrics.includes(kpi.id);
-
   return (
     <button
       onClick={onClick}
@@ -36,16 +22,23 @@ export function KPICard({ kpi, onClick }: KPICardProps) {
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-sm font-medium leading-tight text-foreground">
-          {kpi.name}
-        </h3>
+        <div className="flex items-baseline gap-2">
+          <span className="font-mono text-xs text-muted-foreground">
+            {kpi.index.toString().padStart(2, '0')}
+          </span>
+          <h3 className="text-sm font-medium leading-tight text-foreground">
+            {kpi.name}
+          </h3>
+        </div>
         <StatusBadge status={kpi.status} />
       </div>
 
       {/* Main Value */}
       <div className="flex items-baseline gap-2">
         <span className="font-mono text-2xl font-semibold tabular-nums tracking-tight text-foreground">
-          {kpi.value.toLocaleString('sv-SE')}
+          {typeof kpi.value === 'number' && kpi.value >= 1000 
+            ? kpi.value.toLocaleString('sv-SE') 
+            : kpi.value}
         </span>
         <span className="text-xs text-muted-foreground">{kpi.unit}</span>
       </div>
@@ -55,7 +48,7 @@ export function KPICard({ kpi, onClick }: KPICardProps) {
         <TrendIndicator
           direction={kpi.trend}
           percent={kpi.trendPercent}
-          inverted={isInverted}
+          inverted={kpi.inverted}
         />
         <span className="font-mono text-xs text-muted-foreground">
           {kpi.shortTermTrend}
@@ -68,12 +61,11 @@ export function KPICard({ kpi, onClick }: KPICardProps) {
         <ConfidenceBar value={kpi.confidence} />
       </div>
 
-      {/* Description tooltip on hover */}
-      {kpi.description && (
-        <div className="absolute -bottom-1 left-0 right-0 translate-y-full opacity-0 transition-opacity group-hover:opacity-100">
-          <div className="mx-2 rounded border bg-popover p-2 text-xs text-popover-foreground shadow-lg">
-            {kpi.description}
-          </div>
+      {/* Red flag indicator if applicable */}
+      {kpi.status === 'critical' && kpi.redFlags.length > 0 && (
+        <div className="absolute -top-1 -right-1 flex h-3 w-3">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-status-critical opacity-75" />
+          <span className="relative inline-flex h-3 w-3 rounded-full bg-status-critical" />
         </div>
       )}
     </button>
