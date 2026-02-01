@@ -69,22 +69,22 @@ function NationalStatusBadge({ status, summary }: {
       <div className={cn(
         "w-28 h-28 rounded-full flex items-center justify-center mb-4 transition-all duration-500",
         "ring-4 ring-offset-4 ring-offset-background",
-        status === 'positive' && "ring-emerald-500/30 bg-emerald-500/10",
-        status === 'warning' && "ring-amber-500/30 bg-amber-500/10",
-        status === 'critical' && "ring-red-500/30 bg-red-500/10"
+        status === 'positive' && "ring-status-positive/30 bg-status-positive/10",
+        status === 'warning' && "ring-status-warning/30 bg-status-warning/10",
+        status === 'critical' && "ring-status-critical/30 bg-status-critical/10"
       )}>
         <div className={cn(
           "w-16 h-16 rounded-full transition-colors",
-          status === 'positive' && "bg-emerald-500",
-          status === 'warning' && "bg-amber-500",
-          status === 'critical' && "bg-red-500"
+          status === 'positive' && "bg-status-positive",
+          status === 'warning' && "bg-status-warning",
+          status === 'critical' && "bg-status-critical"
         )} />
       </div>
       <h2 className={cn(
         "text-xl font-bold uppercase tracking-wide",
-        status === 'positive' && "text-emerald-600",
-        status === 'warning' && "text-amber-600",
-        status === 'critical' && "text-red-600"
+        status === 'positive' && "text-status-positive",
+        status === 'warning' && "text-status-warning",
+        status === 'critical' && "text-status-critical"
       )}>
         {status === 'positive' && 'Sverige förbättras'}
         {status === 'warning' && 'Stabilt men med risker'}
