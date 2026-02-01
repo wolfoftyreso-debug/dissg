@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScoreRadar } from './ScoreRadar';
 import { 
   Target, 
   Scale, 
@@ -456,33 +457,47 @@ function ActionDetailPanel({
 
         {eval_ && (
           <>
-            {/* Poängmatris */}
-            <div className="grid grid-cols-2 gap-3">
-              <ScoreCard 
-                label="Effekt" 
-                score={eval_.effect_score} 
-                rationale={eval_.effect_rationale}
-                icon={Target}
-              />
-              <ScoreCard 
-                label="Kostnadseffektivitet" 
-                score={eval_.cost_score} 
-                rationale={eval_.cost_rationale}
-                icon={Scale}
-              />
-              <ScoreCard 
-                label="Risk" 
-                score={eval_.risk_score} 
-                rationale={eval_.risk_rationale}
-                icon={AlertTriangle}
-                inverted
-              />
-              <ScoreCard 
-                label="Reversibilitet" 
-                score={eval_.reversibility_score} 
-                rationale={eval_.reversibility_rationale}
-                icon={RotateCcw}
-              />
+            {/* Radar + poängmatris */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Radar chart */}
+              <div className="flex items-center justify-center p-4 bg-muted/30 rounded-lg">
+                <ScoreRadar
+                  effect={eval_.effect_score}
+                  cost={eval_.cost_score}
+                  risk={eval_.risk_score}
+                  reversibility={eval_.reversibility_score}
+                  size={180}
+                />
+              </div>
+              
+              {/* Score cards */}
+              <div className="md:col-span-2 grid grid-cols-2 gap-3">
+                <ScoreCard 
+                  label="Effekt" 
+                  score={eval_.effect_score} 
+                  rationale={eval_.effect_rationale}
+                  icon={Target}
+                />
+                <ScoreCard 
+                  label="Kostnadseffektivitet" 
+                  score={eval_.cost_score} 
+                  rationale={eval_.cost_rationale}
+                  icon={Scale}
+                />
+                <ScoreCard 
+                  label="Risk" 
+                  score={eval_.risk_score} 
+                  rationale={eval_.risk_rationale}
+                  icon={AlertTriangle}
+                  inverted
+                />
+                <ScoreCard 
+                  label="Reversibilitet" 
+                  score={eval_.reversibility_score} 
+                  rationale={eval_.reversibility_rationale}
+                  icon={RotateCcw}
+                />
+              </div>
             </div>
 
             {/* Sammanfattning */}
