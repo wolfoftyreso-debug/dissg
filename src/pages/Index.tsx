@@ -6,6 +6,7 @@ import { BottomNav, NavItem } from '@/components/dashboard/BottomNav';
 import { OverviewHeader } from '@/components/dashboard/OverviewHeader';
 import { CategorySection } from '@/components/dashboard/CategorySection';
 import { KPIDetailPanel } from '@/components/dashboard/KPIDetailPanel';
+import { DecisionPriorityPanel } from '@/components/dashboard/DecisionPriorityPanel';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { Loader2 } from 'lucide-react';
 
@@ -56,16 +57,26 @@ const Index = () => {
       />
 
       {/* Main Content */}
-      <main className="space-y-6 pb-6">
-        {kpisByCategory.map(({ category, kpis }, index) => (
+      <main className="space-y-6 pb-6 px-4">
+        {activeNav === 'overview' && kpisByCategory.map(({ category, kpis }, index) => (
           <CategorySection
             key={category.id}
             category={category}
             kpis={kpis}
             onKPIClick={setSelectedKPI}
-            defaultExpanded={index < 2} // Expand first two categories by default
+            defaultExpanded={index < 2}
           />
         ))}
+        
+        {activeNav === 'decisions' && (
+          <DecisionPriorityPanel />
+        )}
+        
+        {activeNav === 'indicators' && (
+          <div className="text-center py-12 text-muted-foreground">
+            Indikatorvyn kommer snart
+          </div>
+        )}
       </main>
 
       {/* Bottom Navigation */}
