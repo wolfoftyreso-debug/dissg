@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.kpi-decisions]
 verify_jwt = false
+
+[functions.prioritize-actions]
+verify_jwt = false

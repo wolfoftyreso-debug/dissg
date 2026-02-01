@@ -14,6 +14,140 @@ export type Database = {
   }
   public: {
     Tables: {
+      action_evaluations: {
+        Row: {
+          action_id: string
+          confidence_level: number
+          cost_rationale: string
+          cost_score: number
+          dependencies: string[] | null
+          effect_rationale: string
+          effect_score: number
+          evaluated_at: string
+          evaluation_context: Json | null
+          id: string
+          kpi_impact_forecast: Json | null
+          model_used: string
+          potential_side_effects: string[] | null
+          priority: Database["public"]["Enums"]["priority_level"]
+          recommendation: string
+          reversibility_rationale: string
+          reversibility_score: number
+          risk_rationale: string
+          risk_score: number
+          summary: string
+          weighted_score: number
+        }
+        Insert: {
+          action_id: string
+          confidence_level?: number
+          cost_rationale: string
+          cost_score: number
+          dependencies?: string[] | null
+          effect_rationale: string
+          effect_score: number
+          evaluated_at?: string
+          evaluation_context?: Json | null
+          id?: string
+          kpi_impact_forecast?: Json | null
+          model_used?: string
+          potential_side_effects?: string[] | null
+          priority: Database["public"]["Enums"]["priority_level"]
+          recommendation: string
+          reversibility_rationale: string
+          reversibility_score: number
+          risk_rationale: string
+          risk_score: number
+          summary: string
+          weighted_score: number
+        }
+        Update: {
+          action_id?: string
+          confidence_level?: number
+          cost_rationale?: string
+          cost_score?: number
+          dependencies?: string[] | null
+          effect_rationale?: string
+          effect_score?: number
+          evaluated_at?: string
+          evaluation_context?: Json | null
+          id?: string
+          kpi_impact_forecast?: Json | null
+          model_used?: string
+          potential_side_effects?: string[] | null
+          priority?: Database["public"]["Enums"]["priority_level"]
+          recommendation?: string
+          reversibility_rationale?: string
+          reversibility_score?: number
+          risk_rationale?: string
+          risk_score?: number
+          summary?: string
+          weighted_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "action_evaluations_action_id_fkey"
+            columns: ["action_id"]
+            isOneToOne: false
+            referencedRelation: "action_options"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      action_options: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          estimated_cost_sek: number | null
+          estimated_timeframe_months: number | null
+          external_references: Json | null
+          id: string
+          proposed_at: string
+          proposed_by: string | null
+          responsible_department: string
+          source_document: string | null
+          status: Database["public"]["Enums"]["action_status"]
+          target_kpi_ids: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          estimated_cost_sek?: number | null
+          estimated_timeframe_months?: number | null
+          external_references?: Json | null
+          id?: string
+          proposed_at?: string
+          proposed_by?: string | null
+          responsible_department: string
+          source_document?: string | null
+          status?: Database["public"]["Enums"]["action_status"]
+          target_kpi_ids?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          estimated_cost_sek?: number | null
+          estimated_timeframe_months?: number | null
+          external_references?: Json | null
+          id?: string
+          proposed_at?: string
+          proposed_by?: string | null
+          responsible_department?: string
+          source_document?: string | null
+          status?: Database["public"]["Enums"]["action_status"]
+          target_kpi_ids?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       calculated_indicators: {
         Row: {
           created_at: string
@@ -108,6 +242,45 @@ export type Database = {
           requires_auth?: boolean
           source_type?: Database["public"]["Enums"]["data_source_type"]
           update_frequency?: Database["public"]["Enums"]["update_frequency"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      evaluation_weights: {
+        Row: {
+          cost_weight: number
+          created_at: string
+          description: string | null
+          effect_weight: number
+          id: string
+          is_active: boolean
+          name: string
+          reversibility_weight: number
+          risk_weight: number
+          updated_at: string
+        }
+        Insert: {
+          cost_weight?: number
+          created_at?: string
+          description?: string | null
+          effect_weight?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          reversibility_weight?: number
+          risk_weight?: number
+          updated_at?: string
+        }
+        Update: {
+          cost_weight?: number
+          created_at?: string
+          description?: string | null
+          effect_weight?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          reversibility_weight?: number
+          risk_weight?: number
           updated_at?: string
         }
         Relationships: []
@@ -446,6 +619,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      action_status:
+        | "proposed"
+        | "under_review"
+        | "approved"
+        | "in_progress"
+        | "completed"
+        | "rejected"
+        | "deferred"
       data_source_type: "api" | "file_feed" | "manual" | "calculated"
       kpi_category:
         | "demografi_halsa"
@@ -456,6 +637,7 @@ export type Database = {
         | "infrastruktur"
         | "systemrisk_styrning"
       kpi_status: "positive" | "warning" | "critical" | "neutral"
+      priority_level: "critical" | "high" | "medium" | "low" | "monitor"
       trend_direction: "up" | "down" | "stable"
       update_frequency:
         | "realtime"
@@ -591,6 +773,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      action_status: [
+        "proposed",
+        "under_review",
+        "approved",
+        "in_progress",
+        "completed",
+        "rejected",
+        "deferred",
+      ],
       data_source_type: ["api", "file_feed", "manual", "calculated"],
       kpi_category: [
         "demografi_halsa",
@@ -602,6 +793,7 @@ export const Constants = {
         "systemrisk_styrning",
       ],
       kpi_status: ["positive", "warning", "critical", "neutral"],
+      priority_level: ["critical", "high", "medium", "low", "monitor"],
       trend_direction: ["up", "down", "stable"],
       update_frequency: [
         "realtime",
