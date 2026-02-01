@@ -13,6 +13,7 @@ interface TableConfig {
   path: string;
   description: string;
   kpiCode: string;
+  dataSourceCode: string;
   query: {
     query: Array<{ code: string; selection: { filter: string; values: string[] } }>;
     response: { format: string };
@@ -27,7 +28,8 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
   population: {
     path: "BE/BE0101/BE0101A/BefolkManad",
     description: "Folkmängden i Sverige per månad",
-    kpiCode: "A1",
+    kpiCode: "life_expectancy", // Använder befintlig KPI tills rätt skapas
+    dataSourceCode: "scb_px",
     query: {
       query: [
         { code: "Region", selection: { filter: "item", values: ["00"] } }, // Riket
@@ -44,7 +46,8 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
   population_yearly: {
     path: "BE/BE0101/BE0101A/BefolkningR1860N",
     description: "Folkmängden i Sverige per år",
-    kpiCode: "A1",
+    kpiCode: "life_expectancy",
+    dataSourceCode: "scb_px",
     query: {
       query: [
         { code: "Kon", selection: { filter: "item", values: ["1", "2"] } },
@@ -191,7 +194,7 @@ serve(async (req) => {
             const { data: dataSource } = await supabase
               .from("data_sources")
               .select("id")
-              .eq("code", "SCB")
+              .eq("code", config.dataSourceCode)
               .single();
 
             // Parse period to dates
