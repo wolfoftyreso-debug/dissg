@@ -2,6 +2,7 @@ import { KPI, CategoryMeta } from '@/types/kpi';
 import { KPICard } from './KPICard';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 interface CategorySectionProps {
   category: CategoryMeta;
@@ -20,13 +21,14 @@ export function CategorySection({
   
   const criticalCount = kpis.filter(k => k.status === 'critical').length;
   const warningCount = kpis.filter(k => k.status === 'warning').length;
+  const allGood = criticalCount === 0 && warningCount === 0;
 
   return (
     <section className="space-y-2">
-      {/* Category Header - Clickable to expand/collapse */}
+      {/* Category Header - Klickbar för att expandera/kollapa */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex w-full items-center justify-between px-4 py-2 text-left hover:bg-muted/50 transition-colors rounded-lg"
+        className="flex w-full items-center justify-between px-4 py-2 text-left hover:bg-muted/30 transition-colors"
       >
         <div className="flex items-center gap-3">
           {isExpanded ? (
@@ -36,36 +38,45 @@ export function CategorySection({
           )}
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-primary">{category.code}</span>
+              <span className="text-xs font-semibold text-primary uppercase tracking-wide">{category.code}</span>
               <h3 className="text-sm font-semibold text-foreground">{category.name}</h3>
             </div>
-            <p className="text-xs text-muted-foreground">{category.description}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{category.description}</p>
           </div>
         </div>
         
-        {/* Status indicators */}
+        {/* Status indicators - Endast tre färger */}
         <div className="flex items-center gap-2">
           {criticalCount > 0 && (
-            <span className="flex items-center gap-1 rounded bg-status-critical/10 px-2 py-0.5 text-xs font-medium text-status-critical">
+            <span className={cn(
+              "flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold",
+              "bg-status-critical/10 text-status-critical"
+            )}>
               {criticalCount}
             </span>
           )}
           {warningCount > 0 && (
-            <span className="flex items-center gap-1 rounded bg-status-warning/12 px-2 py-0.5 text-xs font-medium text-amber-700">
+            <span className={cn(
+              "flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold",
+              "bg-status-warning/12 text-amber-700"
+            )}>
               {warningCount}
             </span>
           )}
-          {criticalCount === 0 && warningCount === 0 && (
-            <span className="flex items-center gap-1 rounded bg-status-positive/10 px-2 py-0.5 text-xs font-medium text-status-positive">
+          {allGood && (
+            <span className={cn(
+              "flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold",
+              "bg-status-positive/10 text-status-positive"
+            )}>
               OK
             </span>
           )}
         </div>
       </button>
 
-      {/* KPI Grid */}
+      {/* KPI Grid - Responsiv */}
       {isExpanded && (
-        <div className="grid gap-3 px-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-2 px-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {kpis.map((kpi) => (
             <KPICard
               key={kpi.id}

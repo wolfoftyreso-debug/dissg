@@ -1,14 +1,16 @@
 import { KPI } from '@/types/kpi';
+import { cn } from '@/lib/utils';
 
 interface ComparisonPeriod {
   label: string;
   key: 'week' | 'month3' | 'month12';
+  description: string;
 }
 
 const PERIODS: ComparisonPeriod[] = [
-  { label: '1v', key: 'week' },
-  { label: '3m', key: 'month3' },
-  { label: '12m', key: 'month12' },
+  { label: '1 vecka', key: 'week', description: 'vs förra veckan' },
+  { label: '3 månader', key: 'month3', description: 'vs 3 månader sedan' },
+  { label: '12 månader', key: 'month12', description: 'vs 12 månader sedan' },
 ];
 
 interface OverviewHeaderProps {
@@ -21,36 +23,30 @@ export function OverviewHeader({ kpis, selectedPeriod, onPeriodChange }: Overvie
   const criticalCount = kpis.filter(k => k.status === 'critical').length;
   const warningCount = kpis.filter(k => k.status === 'warning').length;
   const positiveCount = kpis.filter(k => k.status === 'positive').length;
-
-  const today = new Date().toLocaleDateString('sv-SE', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-
   return (
-    <div className="space-y-4 px-4 py-4">
-      {/* Title */}
+    <div className="space-y-4 px-4 py-5 border-b border-border">
+      {/* Title - just nu */}
       <div>
-        <h2 className="text-lg font-semibold text-foreground">
+        <h2 className="text-lg font-semibold text-foreground tracking-tight">
           Nationell lägesbild
         </h2>
-        <p className="text-sm text-muted-foreground">{today}</p>
+        <p className="text-sm text-muted-foreground mt-0.5">just nu</p>
       </div>
 
-      {/* Period selector */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-muted-foreground">Jämför mot:</span>
-        <div className="inline-flex rounded-lg border border-border bg-muted/50 p-0.5">
+      {/* Period selector - tydlig jämförelse */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Jämför:</span>
+        <div className="flex gap-1">
           {PERIODS.map((period) => (
             <button
               key={period.key}
               onClick={() => onPeriodChange(period.key)}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+              className={cn(
+                "px-3 py-1.5 text-xs font-medium rounded-sm border transition-colors",
                 selectedPeriod === period.key
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card text-muted-foreground border-border hover:bg-muted hover:text-foreground"
+              )}
             >
               {period.label}
             </button>
@@ -58,22 +54,32 @@ export function OverviewHeader({ kpis, selectedPeriod, onPeriodChange }: Overvie
         </div>
       </div>
 
-      {/* Status summary */}
-      <div className="flex items-center gap-4 text-sm">
-        <div className="flex items-center gap-1.5">
-          <div className="h-2 w-2 rounded-full bg-status-critical" />
-          <span className="font-medium text-foreground">{criticalCount}</span>
-          <span className="text-muted-foreground">kritiska</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="h-2 w-2 rounded-full bg-status-warning" />
-          <span className="font-medium text-foreground">{warningCount}</span>
-          <span className="text-muted-foreground">avvikelser</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="h-2 w-2 rounded-full bg-status-positive" />
-          <span className="font-medium text-foreground">{positiveCount}</span>
-          <span className="text-muted-foreground">stabila</span>
+      {/* Status summary - tre signalfärger, tydliga siffror */}
+      <div className="flex items-center gap-6">
+        {criticalCount > 0 && (
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded-sm bg-status-critical" />
+            <div>
+              <span className="text-lg font-semibold text-foreground tabular-nums">{criticalCount}</span>
+              <span className="text-sm text-muted-foreground ml-1.5">kritiska</span>
+            </div>
+          </div>
+        )}
+        {warningCount > 0 && (
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded-sm bg-status-warning" />
+            <div>
+              <span className="text-lg font-semibold text-foreground tabular-nums">{warningCount}</span>
+              <span className="text-sm text-muted-foreground ml-1.5">avvikelser</span>
+            </div>
+          </div>
+        )}
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-3 rounded-sm bg-status-positive" />
+          <div>
+            <span className="text-lg font-semibold text-foreground tabular-nums">{positiveCount}</span>
+            <span className="text-sm text-muted-foreground ml-1.5">stabila</span>
+          </div>
         </div>
       </div>
     </div>
