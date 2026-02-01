@@ -18,9 +18,11 @@ import {
   ArrowRight,
   Star,
   FileText,
-  Users
+  Users,
+  Columns
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ActionComparisonMatrix, ComparisonAction } from './ActionComparisonMatrix';
 
 interface DecisionSupportPanelProps {
   kpi: KPI;
@@ -123,6 +125,7 @@ export function DecisionSupportPanel({ kpi, forecastData }: DecisionSupportPanel
   const [decisions, setDecisions] = useState<DecisionData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expandedAction, setExpandedAction] = useState<string | null>(null);
+  const [showComparison, setShowComparison] = useState(false);
 
   const generateDecisions = async () => {
     setIsLoading(true);
@@ -262,19 +265,53 @@ export function DecisionSupportPanel({ kpi, forecastData }: DecisionSupportPanel
 
   const recommendedAction = decisions.actions?.find(a => a.id === decisions.summary?.recommended_action);
 
+  // Convert actions to comparison format
+  const comparisonActions: ComparisonAction[] = decisions.actions?.map(action => ({
+    ...action,
+    reversibility: action.risk?.score ? 10 - action.risk.score : 5,
+  })) || [];
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Beslutsstöd (Nivå 4)
         </h3>
-        <button
-          onClick={generateDecisions}
-          className="text-xs text-primary hover:underline"
-        >
-          Uppdatera
-        </button>
+        <div className="flex items-center gap-2">
+          {decisions.actions?.length >= 2 && (
+            <button
+              onClick={() => setShowComparison(!showComparison)}
+              className={cn(
+                "flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors",
+                showComparison 
+                  ? "bg-primary text-primary-foreground" 
+                  : "text-primary hover:bg-primary/10"
+              )}
+            >
+              <Columns className="h-3 w-3" />
+              Jämför
+            </button>
+          )}
+          <button
+            onClick={generateDecisions}
+            className="text-xs text-primary hover:underline"
+          >
+            Uppdatera
+          </button>
+        </div>
       </div>
+
+      {/* Comparison Matrix */}
+      {showComparison && decisions.actions?.length >= 2 && (
+        <ActionComparisonMatrix 
+          actions={comparisonActions}
+          recommendedActionId={decisions.summary?.recommended_action}
+          onSelectAction={(actionId) => {
+            setExpandedAction(actionId);
+            setShowComparison(false);
+          }}
+        />
+      )}
 
       {/* Recommendation Summary */}
       {decisions.summary && (
