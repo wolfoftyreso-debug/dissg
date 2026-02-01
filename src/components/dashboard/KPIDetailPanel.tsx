@@ -3,6 +3,7 @@ import { StatusBadge } from './StatusBadge';
 import { TrendIndicator } from './TrendIndicator';
 import { ConfidenceBar } from './ConfidenceBar';
 import { ForecastPanel } from './ForecastPanel';
+import { DecisionSupportPanel } from './DecisionSupportPanel';
 import { X, AlertTriangle, Database, Clock, MapPin, Users, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, ReferenceLine, Tooltip } from 'recharts';
@@ -226,6 +227,9 @@ export function KPIDetailPanel({ kpi, onClose }: KPIDetailPanelProps) {
 
         {/* NIVÅ 3: Konsekvensanalys med prognos */}
         <ForecastPanel kpi={kpi} />
+
+        {/* NIVÅ 4: Beslutsstöd med åtgärdsförslag */}
+        <DecisionSupportPanel kpi={kpi} />
 
         {/* D. Responsibility */}
         <section className="space-y-2">
