@@ -2,6 +2,8 @@
  * SEO Components Index
  * 
  * Block 45: Canonical Fact Page — AI + Google Dominance
+ * Block 48: Auto Internal Link Engine
+ * 
  * Components optimized for search engines and AI agents.
  * 
  * CRITICAL RULES:
@@ -10,6 +12,7 @@
  */
 
 export { FactPageTemplate, type FactPageData } from './FactPageTemplate';
+export { SemanticLinkSection, InlineSemanticLinks } from './SemanticLinkSection';
 
 // Re-export config utilities
 export { 
