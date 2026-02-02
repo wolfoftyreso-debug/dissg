@@ -9,6 +9,7 @@ import GlobalCompact from "./pages/GlobalCompact";
 import Admin from "./pages/Admin";
 import PublicProfiles from "./pages/PublicProfiles";
 import ProfileDemo from "./pages/ProfileDemo";
+import DepthDemo from "./pages/DepthDemo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/profiles" element={<PublicProfiles />} />
           <Route path="/profile-demo" element={<ProfileDemo />} />
+          <Route path="/depth-demo" element={<DepthDemo />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
