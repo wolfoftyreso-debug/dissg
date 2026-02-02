@@ -1,7 +1,7 @@
 /**
- * LICENSE TIER CARD
+ * LICENSE TIER CARD — Final Form
  * 
- * Displays a single license tier with features and limitations.
+ * Displays license tiers: Observer, Analyst, Institutional.
  */
 
 import React from 'react';
@@ -23,9 +23,14 @@ export function LicenseTierCard({
   className = '',
 }: LicenseTierCardProps) {
   const labels = {
-    en: { features: 'Features', limitations: 'Limitations', select: 'Select', contact: 'Contact us' },
-    sv: { features: 'Funktioner', limitations: 'Begränsningar', select: 'Välj', contact: 'Kontakta oss' },
+    en: { features: 'Features', limitations: 'Limitations', select: 'Select', contact: 'Contact us', layer: 'Layer' },
+    sv: { features: 'Funktioner', limitations: 'Begränsningar', select: 'Välj', contact: 'Kontakta oss', layer: 'Lager' },
   }[language];
+
+  const layerLabels = {
+    open_reference: { en: 'Open Reference', sv: 'Öppet referenslager' },
+    professional_analysis: { en: 'Professional Analysis', sv: 'Professionellt analyslager' },
+  };
 
   return (
     <div
@@ -39,7 +44,10 @@ export function LicenseTierCard({
       </div>
 
       <div className="text-center py-4 border-y border-border">
-        <span className="text-3xl font-bold">{tier.price.display[language]}</span>
+        <span className="text-2xl font-bold">{tier.price.display[language]}</span>
+        <p className="text-xs text-muted-foreground mt-1">
+          {layerLabels[tier.layer][language]}
+        </p>
       </div>
 
       <div className="flex-1 mt-4">
@@ -75,7 +83,7 @@ export function LicenseTierCard({
             highlighted ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'border border-border hover:bg-muted'
           }`}
         >
-          {tier.price.value === null ? labels.contact : labels.select}
+          {tier.price.level === 'high' ? labels.contact : labels.select}
         </button>
       )}
     </div>
@@ -96,7 +104,7 @@ export function LicenseTierGrid({
   className?: string;
 }) {
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ${className}`}>
+    <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${className}`}>
       {tiers.map((tier) => (
         <LicenseTierCard
           key={tier.id}
