@@ -1,488 +1,930 @@
 # NOGF Technical Blueprint
+## Complete API Specification & Data Flow Architecture
 
-**Version 1.0**  
-**Status: Byggbar specifikation**  
-**Målgrupp: Arkitektteam, utvecklare**
-
----
-
-## Sammanfattning
-
-Detta dokument beskriver den tekniska arkitekturen för en referensimplementation av National Operational Governance Framework (NOGF). Det är ett operativt systemrecept – inte en produktbeskrivning.
+**Version:** 2.0  
+**Status:** Production Ready  
+**Last Updated:** 2026-02-02
 
 ---
 
-## 1. Arkitekturprinciper
-
-### Kärnprincip
-
-> **Event-driven, read-heavy, spårbar, deterministisk.**
-
-### Systemet ska alltid kunna svara
-
-| Fråga | Källa |
-|-------|-------|
-| Vad vet vi? | TimeSeries + Observations |
-| Varför vet vi det? | AnalysisChain |
-| Hur kom vi fram till det? | DataLineage |
-
-### Huvudlager
+## 1. System Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                              UI (rollbaserat)                           │
-├─────────────────────────────────────────────────────────────────────────┤
-│                              Read-API                                   │
-├─────────────────────────────────────────────────────────────────────────┤
-│  Analysmotor          │  Spårbarhetslager     │  Faktalager             │
-│  (observations)       │  (lineage)            │  (timeseries)           │
-├─────────────────────────────────────────────────────────────────────────┤
-│                    Normalisering & Semantik                             │
-├─────────────────────────────────────────────────────────────────────────┤
-│                    Datainhämtning (Ingest)                              │
-├─────────────────────────────────────────────────────────────────────────┤
-│                    Externa datakällor                                   │
-└─────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           INFINITY ANALYTICS SYSTEM                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
+│  │   PUBLIC    │  │  ANALYTICS  │  │    FEEDS    │  │    ADMIN    │        │
+│  │   LAYER     │  │   ENGINE    │  │   SERVICE   │  │   CONSOLE   │        │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘        │
+│         │                │                │                │               │
+│         └────────────────┴────────────────┴────────────────┘               │
+│                                   │                                         │
+│                          ┌────────▼────────┐                               │
+│                          │   API GATEWAY   │                               │
+│                          │  (Rate Limit,   │                               │
+│                          │   Auth, Cache)  │                               │
+│                          └────────┬────────┘                               │
+│                                   │                                         │
+│         ┌─────────────────────────┼─────────────────────────┐              │
+│         │                         │                         │              │
+│  ┌──────▼──────┐  ┌──────────────▼──────────────┐  ┌───────▼───────┐      │
+│  │   QUERY     │  │      SEMANTIC CORE          │  │    SIGNAL     │      │
+│  │   ENGINE    │  │  (KPI Dictionary, Geo,      │  │    ENGINE     │      │
+│  │             │  │   Demographics, Mapping)    │  │               │      │
+│  └──────┬──────┘  └──────────────┬──────────────┘  └───────┬───────┘      │
+│         │                         │                         │              │
+│         └─────────────────────────┼─────────────────────────┘              │
+│                                   │                                         │
+│                          ┌────────▼────────┐                               │
+│                          │   DATA LAYER    │                               │
+│                          │  (PostgreSQL +  │                               │
+│                          │   TimescaleDB)  │                               │
+│                          └────────┬────────┘                               │
+│                                   │                                         │
+│         ┌─────────────────────────┼─────────────────────────┐              │
+│         │                         │                         │              │
+│  ┌──────▼──────┐  ┌──────────────▼──────────────┐  ┌───────▼───────┐      │
+│  │   INGEST    │  │      EVENT GRAPH            │  │    NEWS       │      │
+│  │   PIPELINE  │  │   (Global Events,           │  │    INGEST     │      │
+│  │             │  │    Correlations)            │  │               │      │
+│  └──────┬──────┘  └─────────────────────────────┘  └───────┬───────┘      │
+│         │                                                   │              │
+│         └───────────────────────┬───────────────────────────┘              │
+│                                 │                                          │
+│                    ┌────────────▼────────────┐                             │
+│                    │    EXTERNAL SOURCES     │                             │
+│                    │  (1000+ APIs, 200+      │                             │
+│                    │   Countries, Real-time) │                             │
+│                    └─────────────────────────┘                             │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Datamodell – Kärnobjekt
+## 2. Data Flow Architecture
 
-> **Dessa objekt måste låsas tidigt. Allt annat bygger på dem.**
+### 2.1 Ingest Pipeline Flow
 
-### 2.1 Indicator (kpi_definitions)
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         INGEST PIPELINE FLOW                              │
+└──────────────────────────────────────────────────────────────────────────┘
 
-```sql
-CREATE TABLE kpi_definitions (
-  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  code            TEXT NOT NULL UNIQUE,
-  name            TEXT NOT NULL,
-  description     TEXT NOT NULL,
-  unit            TEXT NOT NULL,
-  category        kpi_category NOT NULL,
-  kpi_index       INTEGER NOT NULL,
-  is_inverted     BOOLEAN DEFAULT false,
-  is_active       BOOLEAN DEFAULT true,
-  rationale       TEXT NOT NULL,
-  breakdown_dimensions TEXT[] DEFAULT '{}',
-  calculation_formula TEXT,
-  red_flag_conditions JSONB DEFAULT '[]',
-  created_at      TIMESTAMPTZ DEFAULT now(),
-  updated_at      TIMESTAMPTZ DEFAULT now()
-);
+  EXTERNAL SOURCES                    PROCESSING                    STORAGE
+  ════════════════                    ══════════                    ═══════
+
+  ┌─────────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐
+  │  Eurostat   │────▶│  Fetch  │────▶│Checksum │────▶│  Raw    │
+  │  API        │     │         │     │  Check  │     │  Store  │
+  └─────────────┘     └─────────┘     └────┬────┘     └────┬────┘
+                                           │               │
+  ┌─────────────┐     ┌─────────┐     ┌────▼────┐     ┌────▼────┐
+  │  World Bank │────▶│  Fetch  │────▶│ Schema  │────▶│ Version │
+  │  WDI        │     │         │     │ Detect  │     │   Tag   │
+  └─────────────┘     └─────────┘     └────┬────┘     └────┬────┘
+                                           │               │
+  ┌─────────────┐     ┌─────────┐     ┌────▼────┐     ┌────▼────┐
+  │    OECD     │────▶│  Fetch  │────▶│Transform│────▶│Semantic │
+  │  SDMX-JSON  │     │         │     │  Apply  │     │  Map    │
+  └─────────────┘     └─────────┘     └────┬────┘     └────┬────┘
+                                           │               │
+  ┌─────────────┐     ┌─────────┐     ┌────▼────┐     ┌────▼────┐
+  │    IMF      │────▶│  Fetch  │────▶│Validate │────▶│  Emit   │
+  │  DataMapper │     │         │     │  Stats  │     │  Event  │
+  └─────────────┘     └─────────┘     └────┬────┘     └────┬────┘
+                                           │               │
+  ┌─────────────┐     ┌─────────┐     ┌────▼────┐     ┌────▼────┐
+  │  National   │────▶│  Fetch  │────▶│Lineage  │────▶│  Store  │
+  │  Stats APIs │     │         │     │  Log    │     │  Final  │
+  └─────────────┘     └─────────┘     └─────────┘     └─────────┘
 ```
 
-**Regel**: Allt i systemet knyts till en Indicator.
+### 2.2 Query Execution Flow
 
-### 2.2 TimeSeries (kpi_values)
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         QUERY EXECUTION FLOW                              │
+└──────────────────────────────────────────────────────────────────────────┘
 
-```sql
-CREATE TABLE kpi_values (
-  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  kpi_id          UUID REFERENCES kpi_definitions(id) NOT NULL,
-  period_start    DATE NOT NULL,
-  period_end      DATE NOT NULL,
-  value           NUMERIC NOT NULL,
-  previous_value  NUMERIC,
-  trend           trend_direction DEFAULT 'stable',
-  trend_percent   NUMERIC,
-  status          kpi_status DEFAULT 'neutral',
-  confidence      INTEGER DEFAULT 80,
-  is_provisional  BOOLEAN DEFAULT false,
-  granularity     TEXT DEFAULT 'national',
-  region_code     TEXT,
-  data_source_id  UUID REFERENCES data_sources(id),
-  raw_data        JSONB,
-  created_at      TIMESTAMPTZ DEFAULT now(),
-  updated_at      TIMESTAMPTZ DEFAULT now(),
-  
-  UNIQUE(kpi_id, period_start, period_end, granularity, region_code)
-);
+  USER REQUEST          PROCESSING           EXECUTION           RESPONSE
+  ════════════          ══════════           ═════════           ════════
+
+  ┌─────────────┐
+  │  Query DSL  │
+  │  Request    │
+  └──────┬──────┘
+         │
+         ▼
+  ┌─────────────┐     ┌─────────────┐
+  │   Parse &   │────▶│   Safety    │
+  │   Validate  │     │   Check     │
+  └─────────────┘     └──────┬──────┘
+                             │
+                    ┌────────┴────────┐
+                    │                 │
+                    ▼                 ▼
+             ┌─────────────┐   ┌─────────────┐
+             │   PASSED    │   │   BLOCKED   │
+             └──────┬──────┘   └──────┬──────┘
+                    │                 │
+                    ▼                 ▼
+             ┌─────────────┐   ┌─────────────┐
+             │   Build     │   │   Return    │
+             │   Query     │   │   Error     │
+             │   Plan      │   │   + Reason  │
+             └──────┬──────┘   └─────────────┘
+                    │
+         ┌──────────┼──────────┐
+         │          │          │
+         ▼          ▼          ▼
+  ┌───────────┐ ┌───────────┐ ┌───────────┐
+  │   Cache   │ │   Join    │ │ Aggregate │
+  │   Check   │ │   Tables  │ │   Data    │
+  └─────┬─────┘ └─────┬─────┘ └─────┬─────┘
+        │             │             │
+        ▼             ▼             ▼
+  ┌───────────────────────────────────────┐
+  │          Result Assembly              │
+  └───────────────────┬───────────────────┘
+                      │
+         ┌────────────┼────────────┐
+         │            │            │
+         ▼            ▼            ▼
+  ┌───────────┐ ┌───────────┐ ┌───────────┐
+  │   Add     │ │   Add     │ │   Add     │
+  │ Metadata  │ │ Confidence│ │ Warnings  │
+  └─────┬─────┘ └─────┬─────┘ └─────┬─────┘
+        │             │             │
+        └─────────────┼─────────────┘
+                      │
+                      ▼
+               ┌─────────────┐
+               │   Return    │
+               │   Response  │
+               └─────────────┘
 ```
 
-**Regel**: Endast tidsserier. Inga "aktuella siffror" utan historik.
+### 2.3 Relevance Engine Flow
 
-### 2.3 Observation (observations)
-
-```sql
-CREATE TABLE observations (
-  id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  kpi_id                  UUID REFERENCES kpi_definitions(id) NOT NULL,
-  kpi_value_id            UUID REFERENCES kpi_values(id),
-  observation_type        observation_type NOT NULL,
-  title                   TEXT NOT NULL,
-  description             TEXT NOT NULL,
-  observation_period_start DATE NOT NULL,
-  observation_period_end   DATE NOT NULL,
-  detected_at             TIMESTAMPTZ DEFAULT now(),
-  signal_strength         NUMERIC NOT NULL,
-  confidence_level        NUMERIC NOT NULL,
-  status                  analysis_status DEFAULT 'pending',
-  model_version           TEXT DEFAULT '1.0',
-  analysis_version        TEXT DEFAULT '1.0',
-  acknowledged_at         TIMESTAMPTZ,
-  acknowledged_by         TEXT,
-  created_at              TIMESTAMPTZ DEFAULT now()
-);
 ```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                      RELEVANCE ENGINE FLOW                                │
+└──────────────────────────────────────────────────────────────────────────┘
 
-**Observationstyper (ENUM)**:
-- `trend_deviation` – Avvikelse från långsiktig trend
-- `threshold_breach` – Tröskelvärde överskridet
-- `correlation_detected` – Samband identifierat
-- `pattern_match` – Mönsterigenkänning
-- `lag_signal` – Tidsförskjuten signal
-- `anomaly` – Statistisk anomali
+    SIGNAL COLLECTION                FUSION                    OUTPUT
+    ═════════════════                ══════                    ══════
 
-**Regel**: Observationer är systemets röst. De är inte beslut.
-
-### 2.4 AnalysisChain (analysis_chains + factor_contributions)
-
-```sql
-CREATE TABLE analysis_chains (
-  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  observation_id  UUID REFERENCES observations(id) NOT NULL,
-  level           INTEGER NOT NULL,
-  level_title     TEXT NOT NULL,
-  level_content   JSONB NOT NULL,
-  analysis_method analysis_method,
-  method_rationale TEXT,
-  alternatives_tested JSONB,
-  sequence_order  INTEGER DEFAULT 0,
-  created_at      TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE TABLE factor_contributions (
-  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  analysis_chain_id     UUID REFERENCES analysis_chains(id) NOT NULL,
-  factor_name           TEXT NOT NULL,
-  factor_kpi_id         UUID REFERENCES kpi_definitions(id),
-  contribution_strength NUMERIC NOT NULL,
-  time_relation         TEXT NOT NULL,
-  description           TEXT NOT NULL,
-  stability_score       NUMERIC NOT NULL,
-  uncertainty           NUMERIC NOT NULL,
-  evidence_periods      INTEGER NOT NULL,
-  evidence_total_periods INTEGER NOT NULL,
-  sequence_order        INTEGER DEFAULT 0,
-  created_at            TIMESTAMPTZ DEFAULT now()
-);
+    ┌─────────────────┐
+    │   KPI DATA      │
+    │  • Value        │──────┐
+    │  • Change %     │      │
+    │  • Trend        │      │
+    │  • Coverage     │      │
+    └─────────────────┘      │
+                             │
+    ┌─────────────────┐      │      ┌─────────────────┐
+    │   EVENT GRAPH   │      │      │                 │
+    │  • Severity     │──────┼─────▶│   MULTI-SIGNAL  │
+    │  • Recency      │      │      │     FUSION      │
+    │  • Connections  │      │      │                 │
+    └─────────────────┘      │      │  Weighted       │
+                             │      │  Combination    │
+    ┌─────────────────┐      │      │                 │
+    │   NEWS VOLUME   │      │      │  Signal scores: │
+    │  • Articles/24h │──────┼─────▶│  • Impact: 20%  │
+    │  • Acceleration │      │      │  • Accel: 15%   │
+    │  • Diversity    │      │      │  • Breadth: 12% │
+    └─────────────────┘      │      │  • Persist: 10% │
+                             │      │  • Conf: 8%     │
+    ┌─────────────────┐      │      │  • Events: 15%  │
+    │   USER BEHAVIOR │      │      │  • News: 13%    │
+    │  • Views        │──────┼─────▶│  • User: 5%     │
+    │  • Saves        │      │      │  • Search: 2%   │
+    │  • Shares       │      │      │                 │
+    └─────────────────┘      │      └────────┬────────┘
+                             │               │
+    ┌─────────────────┐      │               ▼
+    │   SEARCH TREND  │      │      ┌─────────────────┐
+    │  • Volume       │──────┘      │   TIER ASSIGN   │
+    │  • Trend        │             │                 │
+    └─────────────────┘             │  ≥80: Critical  │
+                                    │  ≥65: High      │
+                                    │  ≥50: Medium    │
+                                    │  ≥35: Low       │
+                                    │  <35: Background│
+                                    └────────┬────────┘
+                                             │
+                                             ▼
+                                    ┌─────────────────┐
+                                    │   FRONT PAGE    │
+                                    │                 │
+                                    │  3 Critical     │
+                                    │  7 High         │
+                                    │  10 Medium      │
+                                    └─────────────────┘
 ```
-
-**Analysmetoder (ENUM)**:
-- `trend_detection`
-- `change_point_detection`
-- `correlation_analysis`
-- `lag_analysis`
-- `regression`
-- `decomposition`
-- `anomaly_detection`
-
-**Regel**: Detta är klickkedjan bakåt. Varje steg måste vara reproducerbart.
-
-### 2.5 DataSource (data_sources)
-
-```sql
-CREATE TABLE data_sources (
-  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  code                  TEXT NOT NULL UNIQUE,
-  name                  TEXT NOT NULL,
-  description           TEXT,
-  source_type           data_source_type DEFAULT 'api',
-  base_url              TEXT,
-  api_endpoint          TEXT,
-  update_frequency      update_frequency NOT NULL,
-  requires_auth         BOOLEAN DEFAULT false,
-  auth_type             TEXT,
-  reliability_score     INTEGER DEFAULT 80,
-  is_active             BOOLEAN DEFAULT true,
-  last_successful_fetch TIMESTAMPTZ,
-  last_fetch_error      TEXT,
-  metadata              JSONB DEFAULT '{}',
-  created_at            TIMESTAMPTZ DEFAULT now(),
-  updated_at            TIMESTAMPTZ DEFAULT now()
-);
-```
-
-### 2.6 DataLineage (data_lineage)
-
-```sql
-CREATE TABLE data_lineage (
-  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  data_source_id        UUID REFERENCES data_sources(id) NOT NULL,
-  kpi_value_id          UUID REFERENCES kpi_values(id),
-  observation_id        UUID REFERENCES observations(id),
-  analysis_chain_id     UUID REFERENCES analysis_chains(id),
-  original_source       TEXT NOT NULL,
-  collection_method     TEXT NOT NULL,
-  collection_interval   TEXT NOT NULL,
-  collected_at          TIMESTAMPTZ NOT NULL,
-  aggregation_level     TEXT NOT NULL,
-  raw_values            JSONB NOT NULL,
-  transformations_applied JSONB DEFAULT '[]',
-  corrections_applied   JSONB DEFAULT '[]',
-  methodology_changes   JSONB DEFAULT '[]',
-  data_cleaning_notes   TEXT,
-  missing_data_count    INTEGER DEFAULT 0,
-  checksum              TEXT NOT NULL,
-  version               INTEGER DEFAULT 1,
-  created_at            TIMESTAMPTZ DEFAULT now()
-);
-```
-
-**Regel**: Inget skrivs över. Allt versioneras.
-
-### 2.7 Decision (policy_decisions + decision_timeline)
-
-```sql
-CREATE TABLE policy_decisions (
-  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title               TEXT NOT NULL,
-  description         TEXT,
-  decision_date       DATE NOT NULL,
-  target_kpis         UUID[] DEFAULT '{}',
-  expected_effect     TEXT,
-  measured_effect     TEXT,
-  effectiveness_score INTEGER,
-  status              TEXT DEFAULT 'active',
-  created_at          TIMESTAMPTZ DEFAULT now(),
-  updated_at          TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE TABLE decision_timeline (
-  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  decision_id         UUID REFERENCES policy_decisions(id),
-  action_id           UUID REFERENCES action_options(id),
-  event_title         TEXT NOT NULL,
-  event_description   TEXT,
-  event_type          TEXT,
-  event_date          DATE NOT NULL,
-  event_timestamp     TIMESTAMPTZ,
-  affected_kpi_ids    UUID[] DEFAULT '{}',
-  responsible_entity  TEXT,
-  responsible_level   TEXT,
-  source_document     TEXT,
-  source_url          TEXT,
-  created_at          TIMESTAMPTZ DEFAULT now()
-);
-```
-
-**Regel**: Systemet dömer inte beslutet. Systemet följer upp det.
 
 ---
 
-## 3. Datainhämtning (Ingest)
+## 3. Complete API Specification
 
-### Principer
+### 3.1 Base Configuration
 
-| Princip | Implementation |
-|---------|----------------|
-| Pull-baserad | Schemalagda jobb, ej push |
-| Idempotent | Samma input → samma output |
-| Tidsstämplad vid källa | Bevarar ursprunglig timestamp |
-| Validerad vid ingest | Schemakontroll före insert |
-
-### Ingestflöde
-
-```
-┌────────────┐    ┌────────────┐    ┌────────────┐    ┌────────────┐    ┌────────────┐
-│ Extern API │ → │  Ingestor  │ → │  Validator │ → │ Normalizer │ → │ TimeSeries │
-└────────────┘    └────────────┘    └────────────┘    └────────────┘    │   Store    │
-                                                                        └────────────┘
-                        │                 │
-                        ▼                 ▼
-                 ┌────────────┐    ┌────────────┐
-                 │ Ingest Log │    │ Error Log  │
-                 └────────────┘    └────────────┘
+```yaml
+base_url: https://api.infinityanalytics.io/v1
+content_type: application/json
+authentication: Bearer token OR API key
+rate_limits:
+  free: 100 requests/day
+  plus: 1000 requests/day
+  pro: 10000 requests/day
+  enterprise: unlimited
 ```
 
-### Ingest Log Schema
+### 3.2 Core Endpoints
 
-```sql
-CREATE TABLE ingest_log (
-  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  data_source_id  UUID REFERENCES data_sources(id) NOT NULL,
-  started_at      TIMESTAMPTZ DEFAULT now(),
-  completed_at    TIMESTAMPTZ,
-  status          TEXT DEFAULT 'running',
-  records_fetched INTEGER DEFAULT 0,
-  records_inserted INTEGER DEFAULT 0,
-  records_updated INTEGER DEFAULT 0,
-  records_failed  INTEGER DEFAULT 0,
-  error_message   TEXT,
-  metadata        JSONB DEFAULT '{}'
-);
+#### 3.2.1 KPI Endpoints
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                           KPI ENDPOINTS                                   │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  GET /kpis                         List all available KPIs               │
+│  GET /kpis/{kpi_code}              Get KPI definition                    │
+│  GET /kpis/{kpi_code}/values       Get KPI values (time series)          │
+│  GET /kpis/{kpi_code}/latest       Get latest value                      │
+│  GET /kpis/{kpi_code}/trend        Get trend analysis                    │
+│  GET /kpis/{kpi_code}/forecast     Get forecast (Pro+)                   │
+│  GET /kpis/{kpi_code}/correlations Get correlated KPIs                   │
+│  GET /kpis/search                  Search KPIs by keyword                │
+│  GET /kpis/categories              List KPI categories                   │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Edge Function: kpi-ingest
+**GET /kpis/{kpi_code}/values**
+
+Request:
+```json
+{
+  "kpi_code": "unemployment_rate_total",
+  "geo_codes": ["SE", "DE", "FR"],
+  "period": {
+    "start": "2020-01-01",
+    "end": "2024-12-31"
+  },
+  "demographics": {
+    "age_group": ["15-24", "25-54"],
+    "sex": ["total"]
+  },
+  "frequency": "monthly",
+  "include_metadata": true
+}
+```
+
+Response:
+```json
+{
+  "kpi": {
+    "code": "unemployment_rate_total",
+    "name": "Unemployment Rate",
+    "unit": "percent",
+    "direction": "lower_is_better"
+  },
+  "data": [
+    {
+      "geo_code": "SE",
+      "geo_name": "Sweden",
+      "period": "2024-01",
+      "value": 7.4,
+      "previous_value": 7.6,
+      "change_percent": -2.6,
+      "trend": "improving",
+      "confidence": 0.95,
+      "source": "Eurostat"
+    }
+  ],
+  "metadata": {
+    "total_observations": 180,
+    "coverage": 0.98,
+    "last_updated": "2024-02-01T00:00:00Z",
+    "methodology_url": "https://docs.infinityanalytics.io/kpi/unemployment"
+  },
+  "query_info": {
+    "execution_time_ms": 45,
+    "cache_hit": true
+  }
+}
+```
+
+#### 3.2.2 Geographic Endpoints
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                        GEOGRAPHIC ENDPOINTS                               │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  GET /geo/countries                List all countries                    │
+│  GET /geo/countries/{code}         Get country details                   │
+│  GET /geo/regions                  List regions (NUTS)                   │
+│  GET /geo/regions/{code}           Get region details                    │
+│  GET /geo/clusters                 List geographic clusters              │
+│  GET /geo/compare                  Compare multiple geos                 │
+│  GET /geo/hierarchy/{code}         Get geo hierarchy                     │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+**GET /geo/compare**
+
+Request:
+```json
+{
+  "geo_codes": ["SE", "NO", "DK", "FI"],
+  "kpi_codes": ["gdp_per_capita", "unemployment_rate", "life_expectancy"],
+  "period": "latest",
+  "include_ranking": true,
+  "include_eu_average": true
+}
+```
+
+Response:
+```json
+{
+  "comparison": [
+    {
+      "geo_code": "NO",
+      "geo_name": "Norway",
+      "values": {
+        "gdp_per_capita": { "value": 89154, "rank": 1, "vs_eu_avg": "+142%" },
+        "unemployment_rate": { "value": 3.5, "rank": 2, "vs_eu_avg": "-45%" },
+        "life_expectancy": { "value": 83.2, "rank": 1, "vs_eu_avg": "+3.1y" }
+      },
+      "composite_score": 94.2
+    }
+  ],
+  "eu_averages": {
+    "gdp_per_capita": 36850,
+    "unemployment_rate": 6.4,
+    "life_expectancy": 80.1
+  }
+}
+```
+
+#### 3.2.3 Index Endpoints
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                          INDEX ENDPOINTS                                  │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  GET /indexes                      List all indexes                      │
+│  GET /indexes/{index_id}           Get index definition                  │
+│  GET /indexes/{index_id}/values    Get index values                      │
+│  GET /indexes/{index_id}/ranking   Get country ranking                   │
+│  GET /indexes/{index_id}/pillars   Get pillar breakdown                  │
+│  GET /indexes/{index_id}/simulate  Simulate weight changes (Pro+)        │
+│  GET /indexes/gmi                  Global Master Index                   │
+│  GET /indexes/gmi/components       GMI component analysis                │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 3.2.4 Query DSL Endpoint
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         QUERY DSL ENDPOINT                                │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  POST /query                       Execute declarative query             │
+│  POST /query/validate              Validate query without executing      │
+│  POST /query/explain               Get query execution plan              │
+│  GET  /query/history               Get query history (authenticated)     │
+│  POST /query/save                  Save query template (Pro+)            │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+**POST /query**
+
+Request:
+```json
+{
+  "what": {
+    "kpis": ["unemployment_rate_total", "gdp_growth_real"],
+    "indexes": ["gmi"]
+  },
+  "where": {
+    "geo_codes": ["SE", "DE", "FR", "IT", "ES"],
+    "geo_level": "country"
+  },
+  "when": {
+    "start": "2019-01-01",
+    "end": "2024-12-31",
+    "frequency": "quarterly"
+  },
+  "who": {
+    "age_group": ["25-54"],
+    "sex": ["total"]
+  },
+  "ops": [
+    { "operation": "delta_percent", "periods": 4 },
+    { "operation": "correlation", "pairs": [["unemployment_rate_total", "gdp_growth_real"]] }
+  ],
+  "output": {
+    "format": "json",
+    "include_metadata": true,
+    "include_confidence": true,
+    "include_sources": true
+  }
+}
+```
+
+Response:
+```json
+{
+  "query_id": "q_abc123",
+  "results": {
+    "time_series": [],
+    "correlations": [
+      {
+        "kpi_a": "unemployment_rate_total",
+        "kpi_b": "gdp_growth_real",
+        "coefficient": -0.72,
+        "p_value": 0.001,
+        "interpretation": "Strong negative correlation",
+        "lag_months": 3
+      }
+    ]
+  },
+  "metadata": {
+    "observations": 240,
+    "coverage": 0.95,
+    "confidence": 0.88
+  },
+  "warnings": [],
+  "sources": ["Eurostat", "OECD", "National Statistics"],
+  "execution": {
+    "time_ms": 234,
+    "cache_hit": false,
+    "complexity_score": 45
+  }
+}
+```
+
+#### 3.2.5 Event Endpoints
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                          EVENT ENDPOINTS                                  │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  GET /events                       List recent events                    │
+│  GET /events/{event_id}            Get event details                     │
+│  GET /events/search                Search events                         │
+│  GET /events/types                 List event types                      │
+│  GET /events/timeline              Event timeline                        │
+│  GET /events/by-kpi/{kpi_code}     Events affecting KPI                  │
+│  GET /events/by-geo/{geo_code}     Events in geography                   │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 3.2.6 Feed Endpoints
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                          FEED ENDPOINTS                                   │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  GET  /feeds                       List available feeds                  │
+│  GET  /feeds/{feed_id}             Get feed definition                   │
+│  GET  /feeds/{feed_id}/events      Get feed events                       │
+│  POST /feeds/subscribe             Subscribe to feed (Pro+)              │
+│  GET  /feeds/subscriptions         List subscriptions                    │
+│  DELETE /feeds/subscriptions/{id}  Unsubscribe                           │
+│  GET  /feeds/stream                SSE stream (Enterprise)               │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+**GET /feeds/stream (Server-Sent Events)**
+
+```
+event: kpi_update
+data: {"kpi":"unemployment_rate","geo":"SE","value":7.2,"change":-0.2}
+
+event: signal
+data: {"type":"threshold_crossed","kpi":"inflation","geo":"DE","severity":"high"}
+
+event: event
+data: {"type":"policy.rate_decision","geo":"EU","description":"ECB raises rates"}
+```
+
+#### 3.2.7 Search Endpoints
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         SEARCH ENDPOINTS                                  │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  GET /search                       Global search                         │
+│  GET /search/autocomplete          Autocomplete suggestions              │
+│  GET /search/facets                Get search facets                     │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 4. Data Models
+
+### 4.1 Core Data Models
 
 ```typescript
-// supabase/functions/kpi-ingest/index.ts
-// Handles:
-// - Schema validation
-// - Data normalization
-// - Duplicate detection
-// - Version management
-// - Lineage tracking
+// KPI Definition
+interface KPIDefinition {
+  code: string;
+  name: string;
+  name_local?: Record<string, string>;
+  description: string;
+  category: string;
+  subcategory: string;
+  unit: string;
+  direction: 'higher_is_better' | 'lower_is_better' | 'neutral';
+  preferred_sources: string[];
+  geo_levels_supported: ('country' | 'nuts1' | 'nuts2' | 'nuts3' | 'municipality')[];
+  demographic_dimensions: string[];
+  update_frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+  normalization_method: 'z_score' | 'min_max' | 'percentile';
+  is_active: boolean;
+}
+
+// KPI Value
+interface KPIValue {
+  id: string;
+  kpi_code: string;
+  geo_code: string;
+  period_start: string;
+  period_end: string;
+  value: number;
+  previous_value?: number;
+  status: 'provisional' | 'confirmed' | 'revised';
+  trend: 'improving' | 'declining' | 'stable';
+  trend_percent?: number;
+  confidence: number;
+  source_id: string;
+  checksum: string;
+  revision: number;
+}
+
+// Global Event
+interface GlobalEvent {
+  id: string;
+  event_type_id: string;
+  occurred_at: string;
+  detected_at: string;
+  ongoing: boolean;
+  geo_codes: string[];
+  title: string;
+  description: string;
+  severity: number; // 1-10
+  related_kpis: string[];
+  related_events: string[];
+  news_volume: {
+    last_24h: number;
+    last_7d: number;
+    sources: number;
+  };
+  confidence: number;
+  verification_status: 'unverified' | 'partially_verified' | 'verified';
+}
+
+// Relevance Score
+interface RelevanceScore {
+  object_id: string;
+  object_type: 'kpi' | 'country' | 'region' | 'index' | 'event';
+  signal_scores: Record<string, number>;
+  total_score: number; // 0-100
+  percentile: number;
+  tier: 'critical' | 'high' | 'medium' | 'low' | 'background';
+  top_factors: {
+    signal: string;
+    contribution: number;
+    explanation: string;
+  }[];
+}
+```
+
+### 4.2 Database Schema
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     DATABASE SCHEMA                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  kpi_definitions        KPI metadata and configuration           │
+│  kpi_values             Time-series KPI data (TimescaleDB)       │
+│  kpi_value_revisions    Immutable revision history               │
+│                                                                  │
+│  countries              Country metadata                         │
+│  regions                NUTS region hierarchy                    │
+│  geo_clusters           Dynamic geographic clusters              │
+│                                                                  │
+│  data_sources           External source registry                 │
+│  data_lineage           Full data provenance                     │
+│                                                                  │
+│  global_events          Event graph nodes                        │
+│  event_kpi_links        Event-KPI relationships                  │
+│                                                                  │
+│  observations           AI-generated insights                    │
+│  analysis_chains        Deep analysis trees                      │
+│                                                                  │
+│  indexes                Index definitions                        │
+│  index_values           Computed index scores                    │
+│                                                                  │
+│  feed_definitions       Feed configuration                       │
+│  feed_events            Published feed events                    │
+│  feed_subscriptions     User subscriptions                       │
+│                                                                  │
+│  api_keys               API authentication                       │
+│  api_usage_log          Usage tracking                           │
+│                                                                  │
+│  relevance_scores       Calculated relevance (hypertable)        │
+│  daily_priority_snapshots  Daily rankings                        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 4. Normalisering & Semantik
+## 5. Authentication & Authorization
 
-> **Detta är där de flesta system misslyckas.**
+### 5.1 Authentication Flow
 
-### Regler
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                      AUTHENTICATION FLOW                                  │
+└──────────────────────────────────────────────────────────────────────────┘
 
-| Regel | Beskrivning |
-|-------|-------------|
-| Enhetliga tidsintervall | Allt normaliseras till månad/kvartal/år |
-| Konsekvent aggregation | Samma metod för alla perioder |
-| Samma definition över tid | Metodologiändringar loggas explicit |
-| Metadatadriven omräkning | Formler i metadata, ej i kod |
+  API KEY FLOW                          OAUTH FLOW
+  ════════════                          ══════════
 
-### Metodologiändringar
+  ┌─────────┐                          ┌─────────┐
+  │ Request │                          │ Request │
+  │ + API   │                          │ Login   │
+  │ Key     │                          └────┬────┘
+  └────┬────┘                               │
+       │                                    ▼
+       ▼                              ┌─────────┐
+  ┌─────────┐                         │ Auth    │
+  │ Validate│                         │ Provider│
+  │ Key     │                         └────┬────┘
+  └────┬────┘                               │
+       │                                    ▼
+       ▼                              ┌─────────┐
+  ┌─────────┐                         │ Token   │
+  │ Check   │                         │ Issued  │
+  │ Limits  │                         └────┬────┘
+  └────┬────┘                               │
+       │                                    ▼
+       ▼                              ┌─────────┐
+  ┌─────────┐                         │ Request │
+  │ Process │                         │ + Token │
+  │ Request │                         └────┬────┘
+  └─────────┘                               │
+                                            ▼
+                                      ┌─────────┐
+                                      │ Validate│
+                                      │ Token   │
+                                      └────┬────┘
+                                            │
+                                            ▼
+                                      ┌─────────┐
+                                      │ Process │
+                                      │ Request │
+                                      └─────────┘
+```
 
-Alla förändringar i definition:
-1. **Versioneras** – Ny version skapas
-2. **Loggas** – I methodology_changes array
-3. **Visas i UI** – Varning vid tidsseriebrott
+### 5.2 License Tiers
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         LICENSE TIERS                                     │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  TIER        RATE LIMIT    FEATURES                     PRICE           │
+│  ────        ──────────    ────────                     ─────           │
+│                                                                          │
+│  Free        100/day       • Basic KPIs                 €0/mo           │
+│                            • 5 years history                             │
+│                            • Country level only                          │
+│                            • JSON format                                 │
+│                                                                          │
+│  Plus        1,000/day     • All KPIs                   €49/mo          │
+│                            • 20 years history                            │
+│                            • NUTS2 regions                               │
+│                            • CSV/JSON formats                            │
+│                            • Basic alerts                                │
+│                                                                          │
+│  Pro         10,000/day    • All features               €199/mo         │
+│                            • Full history                                │
+│                            • All geo levels                              │
+│                            • All formats                                 │
+│                            • Forecasting                                 │
+│                            • Feed subscriptions                          │
+│                            • Query templates                             │
+│                                                                          │
+│  Enterprise  Unlimited     • Everything                 Custom          │
+│                            • SSE streams                                 │
+│                            • White-label                                 │
+│                            • Custom indexes                              │
+│                            • SLA guarantee                               │
+│                            • Dedicated support                           │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 6. Error Handling
+
+### 6.1 Error Response Format
 
 ```json
 {
-  "methodology_changes": [
-    {
-      "effective_date": "2020-01-01",
-      "description": "Ny beräkningsmetod för arbetsför befolkning",
-      "impact": "Ökade andelen med ca 2 procentenheter",
-      "source_document": "SCB metoddokument 2019-12"
-    }
-  ]
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Rate limit exceeded. Upgrade to Pro for higher limits.",
+    "details": {
+      "limit": 100,
+      "used": 100,
+      "resets_at": "2024-02-01T00:00:00Z"
+    },
+    "documentation_url": "https://docs.infinityanalytics.io/errors/rate-limit"
+  },
+  "request_id": "req_xyz789"
 }
 ```
 
----
+### 6.2 Error Codes
 
-## 5. Analysmotor
-
-### Analysklasser (Version 1)
-
-Endast tre klasser i första versionen:
-
-#### 5.1 Trendanalys
-
-| Typ | Beräkning | Tröskel |
-|-----|-----------|---------|
-| Långsam försämring | Linjär regression, 12+ mån | R² > 0.7, lutning < -0.5σ |
-| Acceleration | Andra derivatan | > 2σ förändring |
-
-#### 5.2 Brytpunktsdetektering
-
-| Metod | Implementation |
-|-------|----------------|
-| CUSUM | Kumulativ summa av avvikelser |
-| PELT | Pruned Exact Linear Time |
-
-**Tröskel**: Brytpunkt om signal > 3σ från baslinje.
-
-#### 5.3 Sambandsanalys
-
-| Typ | Beräkning |
-|-----|-----------|
-| Lead/Lag | Korskorrelation med tidsförskjutning |
-| Styrka | Pearson-korrelation |
-
-**Tröskel**: r > 0.6 med p < 0.05
-
-### Vad analysmotorn INTE gör
-
-- ❌ Ingen prediktiv galenskap
-- ❌ Ingen besluts-AI
-- ❌ Inga rekommendationer
-
-### Vad analysmotorn gör
-
-- ✅ Deterministisk analys
-- ✅ Reproducerbarhet
-- ✅ Konfidensintervall
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                          ERROR CODES                                      │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  CODE                        HTTP    DESCRIPTION                         │
+│  ────                        ────    ───────────                         │
+│                                                                          │
+│  UNAUTHORIZED                401     Invalid or missing API key          │
+│  FORBIDDEN                   403     Insufficient permissions            │
+│  NOT_FOUND                   404     Resource not found                  │
+│  RATE_LIMIT_EXCEEDED         429     Rate limit exceeded                 │
+│  INVALID_REQUEST             400     Malformed request                   │
+│  INVALID_PARAMETER           400     Invalid parameter value             │
+│  QUERY_TOO_COMPLEX           400     Query exceeds complexity limit      │
+│  PRIVACY_VIOLATION           403     Query would violate privacy rules   │
+│  INSUFFICIENT_DATA           404     Not enough data for operation       │
+│  SERVICE_UNAVAILABLE         503     Temporary service issue             │
+│  INTERNAL_ERROR              500     Internal server error               │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 6. Spårbarhet & Lineage
-
-### Krav
-
-Varje observation måste kunna visa:
+## 7. Caching Strategy
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│ Observation: "Överdödligheten har ökat 4,2%"                            │
-├─────────────────────────────────────────────────────────────────────────┤
-│ Nivå 1: Sammanfattning                                                  │
-│   └── "Observerad ökning sedan Q3 2023"                                 │
-│                                                                         │
-│ Nivå 2: Analysmetod                                                     │
-│   └── trend_detection, 12-månaders rullande medelvärde                  │
-│                                                                         │
-│ Nivå 3: Bidragande faktorer                                             │
-│   └── Åldersgrupp 65+: 78%, Åldersgrupp 45-64: 15%                      │
-│                                                                         │
-│ Nivå 4: Datakällor                                                      │
-│   └── Socialstyrelsen dödsorsaksregister (reliability: 95%)             │
-│                                                                         │
-│ Nivå 5: Rådata                                                          │
-│   └── Aggregerad månadsdata, checksum: a7f3b2c1...                      │
-└─────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│                        CACHING STRATEGY                                   │
+└──────────────────────────────────────────────────────────────────────────┘
+
+  LAYER 1: CDN EDGE
+  ═════════════════
+  • Static responses: 24h
+  • KPI latest values: 5 min
+  • Index rankings: 1h
+  • Geographic data: 24h
+
+  LAYER 2: API GATEWAY (Redis)
+  ════════════════════════════
+  • Query results: 15 min
+  • Search results: 5 min
+  • Aggregations: 1h
+  • Rate limit counters: 1 min
+
+  LAYER 3: APPLICATION (In-Memory)
+  ════════════════════════════════
+  • KPI definitions: 24h
+  • Geographic hierarchy: 24h
+  • User sessions: 30 min
+
+  CACHE INVALIDATION
+  ══════════════════
+  • On data ingest: Invalidate affected KPIs
+  • On event detection: Invalidate related views
+  • On schema change: Full invalidation
+  • Manual: Admin trigger
 ```
-
-### Tekniska krav
-
-| Krav | Implementation |
-|------|----------------|
-| Immutable logs | INSERT-only tables, soft delete |
-| Hashad analyskedja | SHA-256 av input + parametrar |
-| Reproducible runs | Samma seed → samma resultat |
-
-### Lineage-hashning
-
-```typescript
-function computeAnalysisHash(input: AnalysisInput): string {
-  const canonical = JSON.stringify({
-    kpiId: input.kpiId,
-    periodStart: input.periodStart,
-    periodEnd: input.periodEnd,
-    method: input.method,
-    parameters: input.parameters,
-    inputChecksum: input.dataChecksum
-  });
-  return sha256(canonical);
-}
-```
-
-> **Regel**: Om du inte kan återskapa analysen exakt – då är den ogiltig.
 
 ---
 
-## 7. Read-API
+## 8. Security Measures
 
-### Principer
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                       SECURITY MEASURES                                   │
+└──────────────────────────────────────────────────────────────────────────┘
 
-| Princip | Implementation |
-|---------|----------------|
-| Read-only | Ingen mutation via API |
-| Rollfiltrerat | JWT-baserad access |
-| Cache-optimerat | Stale-while-revalidate |
+  TRANSPORT
+  ═════════
+  • TLS 1.3 only
+  • Certificate pinning for mobile
+  • HSTS enabled
 
-### Edge Functions
+  AUTHENTICATION
+  ══════════════
+  • API keys (hashed, rotatable)
+  • OAuth 2.0 + PKCE
+  • JWT tokens (RS256)
+  • Rate limiting per key
 
-| Endpoint | Metod | Beskrivning |
-|----------|-------|-------------|
-| `kpi-api` | GET | KPI-definitioner och aktuella värden |
-| `analyze-kpi` | POST | Trigga djupanalys |
-| `kpi-forecast` | POST | Generera prognos |
-| `kpi-decisions` | GET/POST | Läs/registrera beslut |
-| `prioritize-actions` | POST | Beräkna åtgärdsprioritering |
+  AUTHORIZATION
+  ═════════════
+  • Role-based access control
+  • Endpoint-level permissions
+  • Data-level restrictions
+  • Geographic restrictions
+
+  DATA PROTECTION
+  ═══════════════
+  • Min-N aggregation (n≥5)
+  • Demographic combination limits
+  • Blocked cross-tabulations
+  • Audit logging
+
+  INFRASTRUCTURE
+  ══════════════
+  • WAF protection
+  • DDoS mitigation
+  • SOC 2 compliance
+  • GDPR compliance
+```
+
+---
+
+## 9. Deployment Architecture
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                     DEPLOYMENT ARCHITECTURE                               │
+└──────────────────────────────────────────────────────────────────────────┘
+
+                              USERS
+                                │
+                                ▼
+                    ┌───────────────────────┐
+                    │      Cloudflare       │
+                    │    (CDN + WAF)        │
+                    └───────────┬───────────┘
+                                │
+                    ┌───────────▼───────────┐
+                    │    Load Balancer      │
+                    └───────────┬───────────┘
+                                │
+         ┌──────────────────────┼──────────────────────┐
+         │                      │                      │
+         ▼                      ▼                      ▼
+  ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
+  │  API Pod 1  │       │  API Pod 2  │       │  API Pod N  │
+  │  (K8s)      │       │  (K8s)      │       │  (K8s)      │
+  └──────┬──────┘       └──────┬──────┘       └──────┬──────┘
+         │                     │                     │
+         └──────────────┬──────┴─────────────────────┘
+                        │
+         ┌──────────────┼──────────────┐
+         │              │              │
+         ▼              ▼              ▼
+  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+  │   Redis     │ │  PostgreSQL │ │   Kafka     │
+  │   Cluster   │ │  + Timescale│ │   Cluster   │
+  └─────────────┘ └─────────────┘ └─────────────┘
+
+  REGIONS: EU-WEST-1 (Primary), EU-CENTRAL-1 (DR)
+```
+
+---
+
+**Document Version:** 2.0  
+**Classification:** Internal Technical Reference  
+**Maintainer:** Platform Architecture Team
 | `scb-fetch` | POST | Hämta SCB-data |
 | `kpi-ingest` | POST | Ingest-pipeline |
 
