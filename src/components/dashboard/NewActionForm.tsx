@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHasRole, useUserRoles } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,7 +23,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Plus, Loader2, Lock, LogIn } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Loader2, Lock, LogIn, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 
@@ -55,6 +57,8 @@ const DEPARTMENTS = [
 
 export function NewActionForm({ kpiIds = [], onSuccess }: NewActionFormProps) {
   const { user, loading: authLoading } = useAuth();
+  const hasAuthorizedRole = useHasRole('researcher'); // researcher or higher
+  const { data: roleData, isLoading: rolesLoading } = useUserRoles();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -67,6 +71,8 @@ export function NewActionForm({ kpiIds = [], onSuccess }: NewActionFormProps) {
   });
 
   const queryClient = useQueryClient();
+  
+  const isLoading = authLoading || rolesLoading;
 
   const createMutation = useMutation({
     mutationFn: async () => {
@@ -144,7 +150,7 @@ export function NewActionForm({ kpiIds = [], onSuccess }: NewActionFormProps) {
   };
 
   // Visa låst knapp om ej inloggad
-  if (!authLoading && !user) {
+  if (!isLoading && !user) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
@@ -188,11 +194,53 @@ export function NewActionForm({ kpiIds = [], onSuccess }: NewActionFormProps) {
     );
   }
 
+  // Visa meddelande om inloggad men saknar rätt roll
+  if (!isLoading && user && !hasAuthorizedRole) {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className="opacity-70">
+            <ShieldAlert className="w-4 h-4 mr-2" />
+            Nytt åtgärdsförslag
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5 text-warning" />
+              Behörighet saknas
+            </DialogTitle>
+            <DialogDescription>
+              Du är inloggad men saknar nödvändig behörighet för att skapa åtgärdsförslag.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Alert>
+            <AlertDescription className="space-y-3">
+              <p>
+                För att skapa åtgärdsförslag krävs minst rollen <strong>Researcher</strong>.
+              </p>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>Din nuvarande roll: <Badge variant="outline">{roleData?.highestRole || 'public'}</Badge></p>
+                <p className="text-xs">
+                  Behöriga roller: Researcher, Department Lead, Minister, Prime Minister, System Admin
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Kontakta en systemadministratör om du behöver utökad behörighet.
+              </p>
+            </AlertDescription>
+          </Alert>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <Plus className="w-4 h-4 mr-2" />
+          <ShieldCheck className="w-4 h-4 mr-2" />
           Nytt åtgärdsförslag
         </Button>
       </DialogTrigger>
