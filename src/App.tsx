@@ -30,6 +30,9 @@ import LearningPaths from "./pages/LearningPaths";
 import StoriesDemo from "./pages/StoriesDemo";
 import ResilienceDemo from "./pages/ResilienceDemo";
 import InsightBuilderDemo from "./pages/InsightBuilderDemo";
+import CollectiveLearningDemo from "./pages/CollectiveLearningDemo";
+import MisuseDetectionDemo from "./pages/MisuseDetectionDemo";
+import SystemMemoryDemo from "./pages/SystemMemoryDemo";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +66,9 @@ const App = () => (
               <Route path="/stories" element={<StoriesDemo />} />
               <Route path="/resilience" element={<ResilienceDemo />} />
               <Route path="/insights" element={<InsightBuilderDemo />} />
+              <Route path="/collective-learning" element={<CollectiveLearningDemo />} />
+              <Route path="/misuse-detection" element={<MisuseDetectionDemo />} />
+              <Route path="/system-memory" element={<SystemMemoryDemo />} />
               
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={

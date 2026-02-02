@@ -9,3 +9,6 @@ export { LearningStepView } from './LearningStepView';
 export { MicroInsightCard } from './MicroInsightCard';
 export { ReflectionPromptView } from './ReflectionPromptView';
 export { MisinterpretationGuide } from './MisinterpretationGuide';
+
+// Collective Learning Tracker (CLT)
+export { CollectiveLearningTracker } from './CollectiveLearningTracker';

@@ -68,3 +68,6 @@ export { SystemFooter } from './SystemFooter';
 // WAVE 12: License Tiers
 export { LicenseTierCard } from './LicenseTierCard';
 export { AttributionBadge } from './AttributionBadge';
+
+// Misuse Detection Layer (MDL)
+export { MisuseDetectionPanel } from './MisuseDetectionPanel';
