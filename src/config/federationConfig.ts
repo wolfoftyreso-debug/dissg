@@ -325,3 +325,246 @@ export function validateFederatedNode(node: Partial<FederatedNode>): NodeValidat
     recommendations
   };
 }
+
+// ============================================================
+// WAVE 16: BLOCK ED, EE, EF, EG, EH — EXTENDED FEDERATION
+// ============================================================
+
+// BLOCK ED: FEDERATED SEARCH & DISCOVERY
+export type SearchDomain = 
+  | 'kpi'
+  | 'index'
+  | 'events'
+  | 'learnings'
+  | 'methods'
+  | 'dashboards'
+  | 'external_nodes';
+
+export interface FederatedSearchQuery {
+  query_id: string;
+  submitted_at: string;
+  query: {
+    text: string;
+    domains: SearchDomain[];
+    regions: string[];
+    time_range?: { start: string; end: string };
+    min_confidence?: number;
+  };
+  federation: {
+    nodes_queried: string[];
+    timeout_ms: number;
+    merge_strategy: 'relevance' | 'recency' | 'transparency';
+  };
+}
+
+export interface FederatedSearchResult {
+  query_id: string;
+  completed_at: string;
+  results: Array<{
+    result_id: string;
+    node_id: string;
+    node_name: string;
+    domain: SearchDomain;
+    title: string;
+    description: string;
+    relevance_score: number;
+    transparency_score: number;
+    combined_score: number;
+    url: string;
+  }>;
+  federation_stats: {
+    nodes_responded: number;
+    nodes_failed: number;
+    total_results: number;
+    query_time_ms: number;
+  };
+}
+
+export const FEDERATED_SEARCH_CONFIG = {
+  domains: {
+    kpi: { name: 'KPI', description: 'Key Performance Indicators' },
+    index: { name: 'Index', description: 'Sammansatta index och mått' },
+    events: { name: 'Events', description: 'Händelser och förändringar' },
+    learnings: { name: 'Learnings', description: 'Lärdomar och mönster' },
+    methods: { name: 'Methods', description: 'Metoder och beräkningar' },
+    dashboards: { name: 'Dashboards', description: 'Visualiseringar och rapporter' },
+    external_nodes: { name: 'External Nodes', description: 'Federerade externa system' },
+  },
+  ranking: {
+    factors: { relevance: 0.50, transparency: 0.30, recency: 0.20 },
+    principle: 'Resultat rankas på transparens + relevans',
+  },
+  federation: {
+    defaultTimeoutMs: 5000,
+    maxNodesPerQuery: 50,
+    mergeStrategy: 'relevance' as const,
+  },
+} as const;
+
+// BLOCK EE: CROSS-NODE LEARNING EXCHANGE
+export interface LearningPublication {
+  learning_id: string;
+  published_at: string;
+  source_node: string;
+  learning: {
+    title: string;
+    description: string;
+    pattern_type: 'correlation' | 'trend' | 'anomaly' | 'causal_hypothesis';
+    domains: string[];
+    regions: string[];
+    time_period: { start: string; end: string };
+    confidence: number;
+  };
+  evidence: {
+    sample_size: number;
+    replications: number;
+    methodology: string;
+    limitations: string[];
+  };
+  propagation: {
+    published_to: string[];
+    replicated_by: string[];
+    context_differences: Array<{ node_id: string; difference: string }>;
+  };
+}
+
+export const LEARNING_EXCHANGE_CONFIG = {
+  publication: {
+    format: 'json_ld',
+    required_fields: ['title', 'methodology', 'confidence', 'limitations', 'sample_size'],
+    validation: 'schema_based',
+  },
+  replication: {
+    automatic: false,
+    human_review_required: true,
+    context_comparison_required: true,
+    minimum_sample_for_confirmation: 3,
+  },
+  principle: 'Globalt lärande utan central skola.',
+} as const;
+
+// BLOCK EF: PLANETARY CONSISTENCY METRICS
+export interface ConsistencyMetrics {
+  calculated_at: string;
+  period: { start: string; end: string };
+  global: {
+    overall_agreement_percent: number;
+    nodes_reporting: number;
+    domains_covered: number;
+  };
+  by_domain: Array<{
+    domain: string;
+    agreement_percent: number;
+    divergence_count: number;
+    most_uncertain_topics: string[];
+  }>;
+  top_disagreements: Array<{
+    subject: string;
+    disagreement_percent: number;
+    nodes_involved: string[];
+    reason: string;
+  }>;
+}
+
+export const CONSISTENCY_METRICS_CONFIG = {
+  metrics: {
+    agreement_percent: { name: '% överensstämmelse mellan noder' },
+    divergence_location: { name: 'Var skiljer sig analyser mest?' },
+    uncertainty_domains: { name: 'Vilka domäner är mest osäkra?' },
+  },
+  display: {
+    show_disagreement: true,
+    principle: 'Oenighet är synlig – inte sopad',
+  },
+} as const;
+
+// BLOCK EG: GLOBAL FAILOVER & CONTINUITY
+export const GLOBAL_FAILOVER_CONFIG = {
+  strategy: 'region_to_region_mirroring',
+  regions: [
+    { primary: 'eu-west', mirrors: ['eu-north', 'eu-central'], failover_priority: 1 },
+    { primary: 'us-east', mirrors: ['us-west', 'ca-central'], failover_priority: 2 },
+    { primary: 'asia-pacific', mirrors: ['asia-south', 'oceania'], failover_priority: 3 },
+  ],
+  fallback: {
+    read_only_mode: true,
+    public_snapshots: true,
+    decentral_storage: true,
+  },
+  guarantee: 'Alltid åtkomligt, alltid läsbart',
+} as const;
+
+// BLOCK EH: ORCHESTRATION GOVERNANCE
+export const ORCHESTRATION_GOVERNANCE = {
+  principles: {
+    no_veto: 'Ingen nod har veto',
+    rfc_based: 'Alla ändringar RFC-baserade',
+    transparency_ranking: 'Transparensrankning styr förtroende',
+  },
+  voting: {
+    quorum_percent: 50,
+    approval_threshold: 66,
+    voting_period_days: 14,
+  },
+  legitimacy: 'Legitimitet genom öppenhet',
+} as const;
+
+// WAVE 16 COMPLETE STATUS
+export const WAVE_16_STATUS = {
+  version: '2.0',
+  wave: 16,
+  name: 'Federated Orchestration',
+  capabilities: {
+    planetaryOrchestration: true,
+    noCentralControlPoint: true,
+    divergenceVisible: true,
+    globalResilience: true,
+  },
+  blocks: {
+    DZ: 'orchestration_layer_v1',
+    EA: 'interop_layer_v1',
+    EB: 'divergence_engine_v1',
+    EC: 'signal_broker_v1',
+    ED: 'federated_search_v1',
+    EE: 'learning_exchange_v1',
+    EF: 'consistency_metrics_v1',
+    EG: 'global_failover_v1',
+    EH: 'orchestration_governance_v1',
+  },
+  corePrinciple: 'Orkestrering utan centrum. Samverkan utan makt.',
+  finalStatement: 'Ingen äger sanningen. Alla kan visa sin version – och världen kan jämföra dem.',
+} as const;
+
+// Helper functions
+export function createFederatedQuery(
+  queryText: string,
+  domains: SearchDomain[],
+  regions: string[],
+  nodes: string[]
+): FederatedSearchQuery {
+  return {
+    query_id: `query_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    submitted_at: new Date().toISOString(),
+    query: { text: queryText, domains, regions, min_confidence: 0.5 },
+    federation: {
+      nodes_queried: nodes,
+      timeout_ms: FEDERATED_SEARCH_CONFIG.federation.defaultTimeoutMs,
+      merge_strategy: 'relevance',
+    },
+  };
+}
+
+export function publishLearning(
+  sourceNode: string,
+  learning: LearningPublication['learning'],
+  evidence: LearningPublication['evidence']
+): LearningPublication {
+  return {
+    learning_id: `learn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    published_at: new Date().toISOString(),
+    source_node: sourceNode,
+    learning,
+    evidence,
+    propagation: { published_to: [], replicated_by: [], context_differences: [] },
+  };
+}
