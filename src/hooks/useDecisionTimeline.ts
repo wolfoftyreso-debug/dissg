@@ -1,4 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface TimelineEvent {
@@ -26,6 +27,12 @@ export interface PolicyDecision {
   expected_effect: string | null;
   measured_effect: string | null;
   effectiveness_score: number | null;
+  responsible_department: string | null;
+  responsible_minister: string | null;
+  budget_sek: number | null;
+  implementation_start: string | null;
+  implementation_end: string | null;
+  category: string | null;
 }
 
 export interface KpiChangePoint {
@@ -46,60 +53,98 @@ export interface TimelineData {
   kpiChanges: KpiChangePoint[];
 }
 
-// Fetch complete timeline data
+// Fetch complete timeline data with realtime subscription
 export function useDecisionTimeline(fromDate?: string, toDate?: string) {
+  const queryClient = useQueryClient();
+  const queryKey = ['decision-timeline', fromDate, toDate];
+
+  // Set up realtime subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('decision-timeline-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'policy_decisions',
+        },
+        () => {
+          // Invalidate query on any change
+          queryClient.invalidateQueries({ queryKey });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'decision_timeline',
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient, fromDate, toDate]);
+
   return useQuery({
-    queryKey: ['decision-timeline', fromDate, toDate],
+    queryKey,
     queryFn: async (): Promise<TimelineData> => {
       const dateFilter = {
         from: fromDate || '2010-01-01',
         to: toDate || new Date().toISOString().split('T')[0],
       };
 
-      // Fetch timeline events
-      const { data: events, error: eventsError } = await supabase
-        .from('decision_timeline')
-        .select('*')
-        .gte('event_date', dateFilter.from)
-        .lte('event_date', dateFilter.to)
-        .order('event_date', { ascending: true });
+      // Fetch all data in parallel
+      const [eventsResult, decisionsResult, kpiResult] = await Promise.all([
+        // Fetch timeline events
+        supabase
+          .from('decision_timeline')
+          .select('*')
+          .gte('event_date', dateFilter.from)
+          .lte('event_date', dateFilter.to)
+          .order('event_date', { ascending: false }),
 
-      if (eventsError) throw eventsError;
+        // Fetch policy decisions with all fields
+        supabase
+          .from('policy_decisions')
+          .select('*')
+          .gte('decision_date', dateFilter.from)
+          .lte('decision_date', dateFilter.to)
+          .order('decision_date', { ascending: false }),
 
-      // Fetch policy decisions
-      const { data: decisions, error: decisionsError } = await supabase
-        .from('policy_decisions')
-        .select('*')
-        .gte('decision_date', dateFilter.from)
-        .lte('decision_date', dateFilter.to)
-        .order('decision_date', { ascending: true });
+        // Fetch KPI values with significant changes
+        supabase
+          .from('kpi_values')
+          .select(`
+            id,
+            kpi_id,
+            period_start,
+            value,
+            previous_value,
+            trend,
+            trend_percent,
+            status,
+            kpi_definitions!inner(name, code)
+          `)
+          .gte('period_start', dateFilter.from)
+          .lte('period_start', dateFilter.to)
+          .not('trend_percent', 'is', null)
+          .order('period_start', { ascending: false }),
+      ]);
 
-      if (decisionsError) throw decisionsError;
+      if (eventsResult.error) throw eventsResult.error;
+      if (decisionsResult.error) throw decisionsResult.error;
+      if (kpiResult.error) throw kpiResult.error;
 
-      // Fetch KPI values with significant changes
-      const { data: kpiValues, error: kpiError } = await supabase
-        .from('kpi_values')
-        .select(`
-          id,
-          kpi_id,
-          period_start,
-          value,
-          previous_value,
-          trend,
-          trend_percent,
-          status,
-          kpi_definitions!inner(name, code)
-        `)
-        .gte('period_start', dateFilter.from)
-        .lte('period_start', dateFilter.to)
-        .not('trend_percent', 'is', null)
-        .order('period_start', { ascending: true });
-
-      if (kpiError) throw kpiError;
-
-      // Transform KPI values
-      const kpiChanges: KpiChangePoint[] = (kpiValues || [])
-        .filter((v: any) => Math.abs(v.trend_percent || 0) > 2) // Only significant changes
+      // Transform KPI values - only significant changes (>2%)
+      const kpiChanges: KpiChangePoint[] = (kpiResult.data || [])
+        .filter((v: any) => Math.abs(v.trend_percent || 0) > 2)
         .map((v: any) => ({
           kpi_id: v.kpi_id,
           kpi_name: v.kpi_definitions?.name || 'Okänd',
@@ -113,11 +158,13 @@ export function useDecisionTimeline(fromDate?: string, toDate?: string) {
         }));
 
       return {
-        events: events || [],
-        decisions: decisions || [],
+        events: eventsResult.data || [],
+        decisions: decisionsResult.data || [],
         kpiChanges,
       };
     },
+    staleTime: 1000 * 60, // Consider fresh for 1 minute
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -128,7 +175,6 @@ export function useKpiDecisions(kpiId: string | null) {
     queryFn: async () => {
       if (!kpiId) return [];
 
-      // Find timeline events affecting this KPI
       const { data: events, error } = await supabase
         .from('decision_timeline')
         .select('*')
@@ -142,14 +188,53 @@ export function useKpiDecisions(kpiId: string | null) {
   });
 }
 
+// Fetch single decision with milestones and outcomes
+export function useDecisionDetail(decisionId: string | null) {
+  return useQuery({
+    queryKey: ['decision-detail', decisionId],
+    queryFn: async () => {
+      if (!decisionId) return null;
+
+      const [decisionResult, milestonesResult, outcomesResult] = await Promise.all([
+        supabase
+          .from('policy_decisions')
+          .select('*')
+          .eq('id', decisionId)
+          .single(),
+        supabase
+          .from('decision_milestones')
+          .select('*')
+          .eq('decision_id', decisionId)
+          .order('target_date', { ascending: true }),
+        supabase
+          .from('decision_outcomes')
+          .select('*, kpi_definitions(name, code)')
+          .eq('decision_id', decisionId)
+          .order('measurement_date', { ascending: false }),
+      ]);
+
+      if (decisionResult.error) throw decisionResult.error;
+
+      return {
+        decision: decisionResult.data,
+        milestones: milestonesResult.data || [],
+        outcomes: outcomesResult.data || [],
+      };
+    },
+    enabled: !!decisionId,
+  });
+}
+
 // Calculate decision effectiveness
 export function calculateEffectiveness(
   decision: PolicyDecision,
   kpiChanges: KpiChangePoint[]
 ): { score: number; analysis: string } {
+  const targetKpis = decision.target_kpis || [];
+  
   const relevantChanges = kpiChanges.filter(
     (change) =>
-      decision.target_kpis.includes(change.kpi_id) &&
+      targetKpis.includes(change.kpi_id) &&
       new Date(change.period_start) > new Date(decision.decision_date)
   );
 
@@ -168,7 +253,7 @@ export function calculateEffectiveness(
 
   let analysis = '';
   if (score >= 70) {
-    analysis = `Positiv utveckling observerad i ${improvements.length} av ${relevantChanges.length} mätpunkter`;
+    analysis = `Positiv utveckling i ${improvements.length} av ${relevantChanges.length} mätpunkter`;
   } else if (score >= 40) {
     analysis = `Blandad utveckling: ${improvements.length} förbättringar, ${declines.length} försämringar`;
   } else {
