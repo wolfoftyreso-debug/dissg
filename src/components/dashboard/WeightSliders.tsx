@@ -11,8 +11,16 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useEvaluationWeights, EvaluationWeights } from '@/hooks/useEvaluationWeights';
+import { WeightScoreChart } from './WeightScoreChart';
 
-interface Weights {
+export interface Weights {
+  effect: number;
+  cost: number;
+  risk: number;
+  reversibility: number;
+}
+
+interface ScoreInputs {
   effect: number;
   cost: number;
   risk: number;
@@ -24,6 +32,8 @@ interface WeightSlidersProps {
   onChange?: (weights: Weights) => void;
   showFormula?: boolean;
   enablePersistence?: boolean;
+  showChart?: boolean;
+  exampleScores?: ScoreInputs;
 }
 
 const DEFAULT_WEIGHTS: Weights = {
@@ -31,6 +41,13 @@ const DEFAULT_WEIGHTS: Weights = {
   cost: 25,
   risk: 20,
   reversibility: 15,
+};
+
+const DEFAULT_EXAMPLE_SCORES: ScoreInputs = {
+  effect: 65,
+  cost: 80,
+  risk: 35,
+  reversibility: 75,
 };
 
 const DIMENSION_CONFIG = {
@@ -69,6 +86,8 @@ export function WeightSliders({
   onChange,
   showFormula = true,
   enablePersistence = true,
+  showChart = true,
+  exampleScores = DEFAULT_EXAMPLE_SCORES,
 }: WeightSlidersProps) {
   const [weights, setWeights] = useState<Weights>(initialWeights);
   const [isModified, setIsModified] = useState(false);
@@ -271,23 +290,23 @@ export function WeightSliders({
               <FormulaComponent 
                 label="E" 
                 weight={weights.effect} 
-                color="text-emerald-600" 
+                color="text-chart-1" 
               />
               <span className="text-muted-foreground">+</span>
               <FormulaComponent 
                 label="K" 
                 weight={weights.cost} 
-                color="text-blue-600" 
+                color="text-chart-2" 
               />
               <span className="text-muted-foreground">+</span>
-              <span className="text-amber-600">(100 - R)</span>
+              <span className="text-chart-3">(100 - R)</span>
               <span className="text-muted-foreground">×</span>
               <span className="font-bold">{(weights.risk / 100).toFixed(2)}</span>
               <span className="text-muted-foreground">+</span>
               <FormulaComponent 
                 label="Rev" 
                 weight={weights.reversibility} 
-                color="text-purple-600" 
+                color="text-chart-4" 
               />
             </div>
           </div>
@@ -328,6 +347,11 @@ export function WeightSliders({
             }
           )}
         </div>
+
+        {/* Chart visualization */}
+        {showChart && total === 100 && (
+          <WeightScoreChart weights={weights} scores={exampleScores} />
+        )}
 
         {/* Total indicator */}
         <div className={`flex items-center justify-between p-3 rounded-lg border ${
