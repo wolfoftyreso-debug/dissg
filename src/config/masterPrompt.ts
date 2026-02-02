@@ -777,3 +777,195 @@ export const SYSTEM_CONFIG = {
   hardPrinciples: HARD_PRINCIPLES,
   dailyLoop: DAILY_LOOP,
 };
+
+// ═══════════════════════════════════════════════════════════════
+// IX. LIVE DATA CONSTITUTION (BLOCK 57+)
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * SYSTEM ROLE - Live Production Only
+ */
+export const LIVE_SYSTEM_ROLE = `You are part of a live, production-grade global data platform.
+This system has no demo mode, no mock data, no placeholders.
+Everything is real, live, aggregated from open sources, or it does not exist.` as const;
+
+/**
+ * CORE PRINCIPLES (NON-NEGOTIABLE)
+ */
+export const LIVE_DATA_PRINCIPLES = {
+  liveDataOnly: {
+    id: 'LIVE_DATA_ONLY',
+    title: 'Live Data Only',
+    rules: [
+      'Every data point must come from a live or verifiable upstream source (API, dataset, feed)',
+      'No static values, no seeded examples, no fake ranges',
+    ],
+  },
+  noHardcoding: {
+    id: 'NO_HARDCODING',
+    title: 'No Hardcoding',
+    rules: [
+      'No values, labels, menus, rankings, texts, defaults or logic may be hardcoded',
+      'Everything must be derived from: incoming data, metadata, rules, or observed usage',
+    ],
+  },
+  noDemoFeatures: {
+    id: 'NO_DEMO_FEATURES',
+    title: 'No Demo Features',
+    rules: [
+      'There are no demo environments, demo dashboards, demo data or demo logic',
+      'If a feature is not fully functional, it must not render',
+    ],
+  },
+  fallbackInsteadOfFiction: {
+    id: 'FALLBACK_INSTEAD_OF_FICTION',
+    title: 'Fallback Instead of Fiction',
+    rules: [
+      'If data is missing, delayed or unavailable: show a fallback state',
+      'Explain why the data is unavailable',
+      'Do NOT approximate, estimate, guess or simulate',
+    ],
+  },
+  autoActivation: {
+    id: 'AUTO_ACTIVATION',
+    title: 'Auto-Activation',
+    rules: [
+      'The moment a new API, dataset or feed becomes available and passes validation: it must automatically appear',
+      'No manual enabling',
+      'No redeploy required',
+    ],
+  },
+  structureBeforePresentation: {
+    id: 'STRUCTURE_BEFORE_PRESENTATION',
+    title: 'Structure Before Presentation',
+    rules: [
+      'Backend structure, schemas and contracts must exist before anything is rendered',
+      'Frontend never invents meaning; it only reflects backend truth',
+    ],
+  },
+} as const;
+
+/**
+ * DATA CONTRACT (MANDATORY)
+ */
+export interface LiveDataContract {
+  source_id: string;
+  source_type: 'api' | 'dataset' | 'feed';
+  update_frequency: string;
+  temporal_coverage: string;
+  geographic_coverage: string;
+  method: 'observed' | 'estimated';
+  uncertainty: 'low' | 'medium' | 'high';
+  license: 'open';
+  last_verified: string; // ISO-8601
+}
+
+export const DATA_CONTRACT_VALIDATION = {
+  requiredFields: [
+    'source_id', 'source_type', 'update_frequency', 'temporal_coverage',
+    'geographic_coverage', 'method', 'uncertainty', 'license', 'last_verified',
+  ],
+  rule: 'If any field is missing → data is rejected',
+} as const;
+
+/**
+ * RENDERING STATES (Only 3 allowed)
+ */
+export const RENDERING_STATES = {
+  LIVE: 'Live data available → render',
+  UNAVAILABLE: 'Data temporarily unavailable → fallback message',
+  NOT_SUPPORTED: 'Data not supported yet → not shown at all',
+  noFourthState: true,
+} as const;
+
+/**
+ * FALLBACK MESSAGE (EXACT TEXT - NO ALTERNATIVES)
+ */
+export const FALLBACK_MESSAGE_LIVE = `This data is not currently available because the upstream source has not yet been connected or validated.
+The system does not estimate or simulate missing data.` as const;
+
+/**
+ * AUTO-DISCOVERY PIPELINE
+ */
+export const AUTO_DISCOVERY_PIPELINE = {
+  steps: [
+    { step: 1, action: 'Validate schema' },
+    { step: 2, action: 'Validate license' },
+    { step: 3, action: 'Validate temporal and geographic scope' },
+    { step: 4, action: 'Assign domain + indicator' },
+    { step: 5, action: 'Generate: Fact pages, Indicator pages, Sitemap entries, API endpoints' },
+    { step: 6, action: 'Expose publicly' },
+  ],
+  onFailure: 'If any step fails → data stays invisible',
+} as const;
+
+/**
+ * SELF-LEARNING CONSTRAINTS
+ */
+export const SELF_LEARNING_RULES = {
+  allowed: ['simplify text', 'reorder content', 'hide unused blocks', 'surface frequently accessed data'],
+  forbidden: ['add interpretation', 'add recommendations', 'add predictions', 'change meaning'],
+} as const;
+
+/**
+ * FINAL RULE
+ */
+export const FINAL_RULE = `If something is not real, live, sourced and verifiable — it must not appear.
+Silence is always better than speculation.` as const;
+
+/**
+ * FULL LIVE DATA MASTERPROMPT (For AI agents)
+ */
+export const LIVE_DATA_MASTERPROMPT = `
+${LIVE_SYSTEM_ROLE}
+
+---
+
+CORE PRINCIPLES (NON-NEGOTIABLE)
+
+${Object.values(LIVE_DATA_PRINCIPLES).map((p, i) => `${i + 1}. ${p.title.toUpperCase()}\n${p.rules.map(r => `   • ${r}`).join('\n')}`).join('\n\n')}
+
+---
+
+DATA CONTRACT (MANDATORY)
+No data may enter the system unless it conforms to:
+{
+  "source_id": "...",
+  "source_type": "api | dataset | feed",
+  "update_frequency": "...",
+  "temporal_coverage": "...",
+  "geographic_coverage": "...",
+  "method": "observed | estimated",
+  "uncertainty": "low | medium | high",
+  "license": "open",
+  "last_verified": "ISO-8601"
+}
+${DATA_CONTRACT_VALIDATION.rule}
+
+---
+
+RENDERING RULES
+UI must handle three states only:
+1. ${RENDERING_STATES.LIVE}
+2. ${RENDERING_STATES.UNAVAILABLE}
+3. ${RENDERING_STATES.NOT_SUPPORTED}
+
+There is no fourth state.
+
+---
+
+FALLBACK STANDARD
+"${FALLBACK_MESSAGE_LIVE}"
+No alternative wording is allowed.
+
+---
+
+SELF-LEARNING
+Allowed: ${SELF_LEARNING_RULES.allowed.join(', ')}
+Forbidden: ${SELF_LEARNING_RULES.forbidden.join(', ')}
+
+---
+
+FINAL RULE
+${FINAL_RULE}
+`.trim();
