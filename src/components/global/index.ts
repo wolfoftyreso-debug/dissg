@@ -42,3 +42,6 @@ export { SourceTransparencyPanel } from './SourceTransparencyPanel';
 // WAVE 12: All Data In – Simple Out (Block 41)
 export { SimpleOverviewCard, SimpleOverviewGrid } from './SimpleOverviewCard';
 export { LayeredViewContainer } from './LayeredViewContainer';
+
+// WAVE 12: Master Prompt & Core Indicators (Block 42)
+export { CoreIndicatorGrid } from './CoreIndicatorGrid';
