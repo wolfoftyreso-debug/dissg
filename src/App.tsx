@@ -50,6 +50,7 @@ import IndexEngineDemo from "./pages/IndexEngineDemo";
 import CorrelationDemo from "./pages/CorrelationDemo";
 import SmokeTestPage from "./pages/SmokeTest";
 import TrustLogPage from "./pages/TrustLogPage";
+import CharterPage from "./pages/CharterPage";
 import BigQuestionsPage from "./pages/BigQuestionsPage";
 import BigQuestionDetailPage from "./pages/BigQuestionDetailPage";
 import AIGroundingPage from "./pages/AIGroundingPage";
@@ -107,6 +108,7 @@ const App = () => (
               <Route path="/correlation" element={<CorrelationDemo />} />
               <Route path="/smoke-test" element={<SmokeTestPage />} />
               <Route path="/trust-log" element={<TrustLogPage />} />
+              <Route path="/charter" element={<CharterPage />} />
               <Route path="/big-questions" element={<BigQuestionsPage />} />
               <Route path="/big-questions/:code" element={<BigQuestionDetailPage />} />
               <Route path="/ai/grounding" element={<AIGroundingPage />} />
