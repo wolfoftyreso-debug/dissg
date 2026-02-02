@@ -71,3 +71,19 @@ export { AttributionBadge } from './AttributionBadge';
 
 // Misuse Detection Layer (MDL)
 export { MisuseDetectionPanel } from './MisuseDetectionPanel';
+
+// MONSTER-MASTERPROMPT PART II: Operationalization, Legitimacy, Adoption
+export { SystemLimitationsDisclosure } from './SystemLimitationsDisclosure';
+export { WhatWeCannotSay } from './WhatWeCannotSay';
+export { MethodologyPanel } from './MethodologyPanel';
+export { LegalMoralShield } from './LegalMoralShield';
+export { DisagreementFramework } from './DisagreementFramework';
+export { InstitutionalPositioning } from './InstitutionalPositioning';
+
+// Re-export prompt configuration
+export {
+  TRANSPARENCY_LAYER_PROMPT,
+  TRANSPARENCY_LAYER_PROMPT_PART_II,
+  generateCompleteAISystemPrompt,
+  validateOutput,
+} from '@/config/masterPromptConfig';
