@@ -64,3 +64,7 @@ export {
 
 // WAVE 7: System Footer (BC/BI)
 export { SystemFooter } from './SystemFooter';
+
+// WAVE 12: License Tiers
+export { LicenseTierCard } from './LicenseTierCard';
+export { AttributionBadge } from './AttributionBadge';

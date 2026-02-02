@@ -202,3 +202,86 @@ export function isFeatureAvailable(dataDepth: DataDepthLevel, feature: string): 
   };
   return depthOrder.indexOf(dataDepth) >= depthOrder.indexOf(requiredDepth[feature] || 'global_baseline');
 }
+
+// ============================================================
+// WAVE 12: BLOCK CQ — GLOBAL ADOPTION PLAYBOOK
+// BLOCK CR — FEDERATION EXPANSION (1000 NODES)
+// BLOCK CS — GLOBAL CURATION (UTAN CENTRAL MAKT)
+// ============================================================
+
+export type UserCategory = 'journalists' | 'researchers' | 'policy_analysts' | 'ngos' | 'enterprises';
+
+export interface AdoptionTarget {
+  priority: number;
+  category: UserCategory;
+  label_sv: string;
+  entry_point: 'free' | 'api' | 'enterprise';
+  value_proposition: string;
+  conversion_path: string;
+}
+
+export const ADOPTION_TARGETS: AdoptionTarget[] = [
+  { priority: 1, category: 'journalists', label_sv: 'Journalister & redaktioner', entry_point: 'free', value_proposition: 'Snabb faktakoll med full källtransparens', conversion_path: 'Gratis → Embed SDK → API' },
+  { priority: 2, category: 'researchers', label_sv: 'Forskare & universitet', entry_point: 'free', value_proposition: 'Reproducerbar data med metoddokumentation', conversion_path: 'Gratis → API → Institutionslicens' },
+  { priority: 3, category: 'policy_analysts', label_sv: 'Policyanalytiker & myndigheter', entry_point: 'free', value_proposition: 'Tvärsektoriell analys med jämförbarhetsflaggor', conversion_path: 'Gratis → Feeds → Enterprise SLA' },
+  { priority: 4, category: 'ngos', label_sv: 'NGOs & civilsamhälle', entry_point: 'free', value_proposition: 'Oberoende data för opinionsbildning', conversion_path: 'Gratis → Embed → White-label' },
+  { priority: 5, category: 'enterprises', label_sv: 'Företag & investerare', entry_point: 'api', value_proposition: 'Kontextuell data utan bias', conversion_path: 'API trial → Enterprise' }
+];
+
+export interface AdoptionLeverage {
+  id: string;
+  type: 'content' | 'tool' | 'education' | 'event';
+  name_sv: string;
+  target_audience: UserCategory[];
+  frequency: 'daily' | 'weekly' | 'monthly' | 'ongoing';
+  cost: 'free';
+}
+
+export const ADOPTION_LEVERAGES: AdoptionLeverage[] = [
+  { id: 'al_01', type: 'content', name_sv: 'What Changed Today?-feeds', target_audience: ['journalists', 'policy_analysts'], frequency: 'daily', cost: 'free' },
+  { id: 'al_02', type: 'tool', name_sv: 'Embed SDK till medier', target_audience: ['journalists', 'ngos'], frequency: 'ongoing', cost: 'free' },
+  { id: 'al_03', type: 'education', name_sv: 'Kursmaterial för universitet', target_audience: ['researchers'], frequency: 'ongoing', cost: 'free' },
+  { id: 'al_04', type: 'event', name_sv: 'Öppna seminarier om metod', target_audience: ['researchers', 'policy_analysts'], frequency: 'monthly', cost: 'free' }
+];
+
+// CR1: Federation Node Types
+export type FederatedNodeType = 'university' | 'national_statistics' | 'regional_hub' | 'media_house' | 'research_institute';
+
+export interface FederatedNodeSpec {
+  type: FederatedNodeType;
+  label_sv: string;
+  min_transparency_score: number;
+  verification_requirements: string[];
+}
+
+export const FEDERATED_NODE_SPECS: FederatedNodeSpec[] = [
+  { type: 'university', label_sv: 'Universitet', min_transparency_score: 0.8, verification_requirements: ['Institutional affiliation'] },
+  { type: 'national_statistics', label_sv: 'Nationell statistikbyrå', min_transparency_score: 0.9, verification_requirements: ['Government registration'] },
+  { type: 'regional_hub', label_sv: 'Regional datahubb', min_transparency_score: 0.7, verification_requirements: ['Regional authority'] },
+  { type: 'media_house', label_sv: 'Mediehus', min_transparency_score: 0.75, verification_requirements: ['Press credentials'] },
+  { type: 'research_institute', label_sv: 'Forskningsinstitut', min_transparency_score: 0.85, verification_requirements: ['Research track record'] }
+];
+
+export const FEDERATION_TARGETS = { year_1: 100, year_3: 500, year_5: 1000, year_10: 5000 } as const;
+
+// CS1: Curation Signals — No Central Power
+export interface CurationSignal {
+  id: string;
+  name_sv: string;
+  weight: number;
+  higher_is_better: boolean;
+}
+
+export const CURATION_SIGNALS: CurationSignal[] = [
+  { id: 'cs_transparency', name_sv: 'Transparensscore', weight: 0.25, higher_is_better: true },
+  { id: 'cs_reproducibility', name_sv: 'Reproducerbarhet', weight: 0.25, higher_is_better: true },
+  { id: 'cs_method_clarity', name_sv: 'Metodklarhet', weight: 0.20, higher_is_better: true },
+  { id: 'cs_coverage', name_sv: 'Datatäckning', weight: 0.15, higher_is_better: true },
+  { id: 'cs_user_verification', name_sv: 'Användarverifiering', weight: 0.15, higher_is_better: true }
+];
+
+export const CURATION_POLICY = {
+  removal_allowed: false,
+  downranking_allowed: true,
+  reason: 'Algoritmisk prioritering, aldrig borttagning'
+} as const;

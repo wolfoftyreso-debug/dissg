@@ -340,3 +340,40 @@ export const platformIdentity = {
     'Historik är oföränderlig',
   ],
 };
+
+// ============================================================
+// WAVE 12: BLOCK CU — ECONOMIC SUSTAINABILITY
+// BLOCK CV — LEGAL & IMMUNITY HARDENING
+// ============================================================
+
+export interface RevenueStream {
+  id: string;
+  name_sv: string;
+  type: 'usage' | 'subscription' | 'enterprise' | 'value_add';
+  gates_public_data: false; // Never gates public data
+  target_segment: string;
+}
+
+export const REVENUE_STREAMS: RevenueStream[] = [
+  { id: 'rs_api_volume', name_sv: 'API-anrop (volym)', type: 'usage', gates_public_data: false, target_segment: 'Developers' },
+  { id: 'rs_automation', name_sv: 'Automation & feeds', type: 'subscription', gates_public_data: false, target_segment: 'Newsrooms' },
+  { id: 'rs_whitelabel', name_sv: 'White-label', type: 'value_add', gates_public_data: false, target_segment: 'Organizations' },
+  { id: 'rs_enterprise_sla', name_sv: 'Enterprise SLA', type: 'enterprise', gates_public_data: false, target_segment: 'Governments' }
+];
+
+// CV1: Legal Core Clauses — Immunity Hardening
+export interface LegalClause {
+  id: string;
+  name_sv: string;
+  principle: string;
+  implementation: string;
+}
+
+export const LEGAL_CORE_CLAUSES: LegalClause[] = [
+  { id: 'lc_non_ownership', name_sv: 'Non-ownership av data', principle: 'Systemet äger aldrig data som passerar genom det', implementation: 'All data behåller ursprunglig licens' },
+  { id: 'lc_attribution', name_sv: 'Attribution by design', principle: 'Alla datapunkter kräver källhänvisning', implementation: 'Data utan källa visas inte' },
+  { id: 'lc_no_advisory', name_sv: 'No advisory', principle: 'Systemet ger aldrig råd eller rekommendationer', implementation: 'All output märkt som observation' },
+  { id: 'lc_jurisdiction_neutral', name_sv: 'Jurisdiction-neutral API', principle: 'API fungerar oavsett lokal lagstiftning', implementation: 'Ingen data kräver specifik jurisdiktion' }
+];
+
+export const LEGAL_CORE_STATEMENT = 'Systemet pekar. Användaren tolkar.' as const;
