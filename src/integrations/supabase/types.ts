@@ -298,6 +298,142 @@ export type Database = {
           },
         ]
       }
+      api_keys: {
+        Row: {
+          allowed_countries: string[] | null
+          allowed_endpoints: string[] | null
+          allowed_nuts_levels: number[] | null
+          can_access_correlations: boolean | null
+          can_access_feeds: boolean | null
+          can_bulk_export: boolean | null
+          can_white_label: boolean | null
+          created_at: string | null
+          description: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          key_hash: string
+          key_prefix: string
+          last_used_at: string | null
+          license_tier: string
+          organization_name: string | null
+          query_complexity_limit: number | null
+          rate_limit_per_day: number | null
+          rate_limit_per_minute: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          allowed_countries?: string[] | null
+          allowed_endpoints?: string[] | null
+          allowed_nuts_levels?: number[] | null
+          can_access_correlations?: boolean | null
+          can_access_feeds?: boolean | null
+          can_bulk_export?: boolean | null
+          can_white_label?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          key_hash: string
+          key_prefix: string
+          last_used_at?: string | null
+          license_tier?: string
+          organization_name?: string | null
+          query_complexity_limit?: number | null
+          rate_limit_per_day?: number | null
+          rate_limit_per_minute?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          allowed_countries?: string[] | null
+          allowed_endpoints?: string[] | null
+          allowed_nuts_levels?: number[] | null
+          can_access_correlations?: boolean | null
+          can_access_feeds?: boolean | null
+          can_bulk_export?: boolean | null
+          can_white_label?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          key_hash?: string
+          key_prefix?: string
+          last_used_at?: string | null
+          license_tier?: string
+          organization_name?: string | null
+          query_complexity_limit?: number | null
+          rate_limit_per_day?: number | null
+          rate_limit_per_minute?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      api_usage_log: {
+        Row: {
+          api_key_id: string | null
+          country_code: string | null
+          created_at: string | null
+          endpoint: string
+          id: string
+          ip_address: unknown
+          method: string
+          query_complexity: number | null
+          query_params: Json | null
+          response_status: number | null
+          response_time_ms: number | null
+          user_agent: string | null
+        }
+        Insert: {
+          api_key_id?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          ip_address?: unknown
+          method?: string
+          query_complexity?: number | null
+          query_params?: Json | null
+          response_status?: number | null
+          response_time_ms?: number | null
+          user_agent?: string | null
+        }
+        Update: {
+          api_key_id?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          ip_address?: unknown
+          method?: string
+          query_complexity?: number | null
+          query_params?: Json | null
+          response_status?: number | null
+          response_time_ms?: number | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_usage_log_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assignment_kpi_relevance: {
         Row: {
           assignment_id: string
@@ -398,6 +534,47 @@ export type Database = {
             columns: ["assignment_id"]
             isOneToOne: false
             referencedRelation: "public_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attribution_log: {
+        Row: {
+          api_key_id: string | null
+          attribution_provided: boolean | null
+          attribution_required: boolean | null
+          checked_at: string | null
+          content_id: string | null
+          content_type: string
+          id: string
+          publication_url: string | null
+        }
+        Insert: {
+          api_key_id?: string | null
+          attribution_provided?: boolean | null
+          attribution_required?: boolean | null
+          checked_at?: string | null
+          content_id?: string | null
+          content_type: string
+          id?: string
+          publication_url?: string | null
+        }
+        Update: {
+          api_key_id?: string | null
+          attribution_provided?: boolean | null
+          attribution_required?: boolean | null
+          checked_at?: string | null
+          content_id?: string | null
+          content_type?: string
+          id?: string
+          publication_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attribution_log_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
             referencedColumns: ["id"]
           },
         ]
@@ -2718,6 +2895,72 @@ export type Database = {
           },
         ]
       }
+      license_agreements: {
+        Row: {
+          accepted_from_ip: unknown
+          api_key_id: string | null
+          billing_contact_email: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          license_tier: string
+          license_version: string
+          organization_country: string | null
+          organization_name: string | null
+          special_terms: Json | null
+          terms_accepted_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          accepted_from_ip?: unknown
+          api_key_id?: string | null
+          billing_contact_email?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          license_tier: string
+          license_version?: string
+          organization_country?: string | null
+          organization_name?: string | null
+          special_terms?: Json | null
+          terms_accepted_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          accepted_from_ip?: unknown
+          api_key_id?: string | null
+          billing_contact_email?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          license_tier?: string
+          license_version?: string
+          organization_country?: string | null
+          organization_name?: string | null
+          special_terms?: Json | null
+          terms_accepted_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "license_agreements_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "license_agreements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lineage_chain_links: {
         Row: {
           created_at: string
@@ -3190,6 +3433,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      policy_violations: {
+        Row: {
+          action_taken: string | null
+          api_key_id: string | null
+          created_at: string | null
+          description: string | null
+          evidence: Json | null
+          id: string
+          resolved_at: string | null
+          severity: string
+          violation_type: string
+        }
+        Insert: {
+          action_taken?: string | null
+          api_key_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          evidence?: Json | null
+          id?: string
+          resolved_at?: string | null
+          severity?: string
+          violation_type: string
+        }
+        Update: {
+          action_taken?: string | null
+          api_key_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          evidence?: Json | null
+          id?: string
+          resolved_at?: string | null
+          severity?: string
+          violation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_violations_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
