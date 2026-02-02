@@ -2452,6 +2452,124 @@ export type Database = {
           },
         ]
       }
+      explanation_analytics: {
+        Row: {
+          clicked_back: boolean | null
+          clicked_deeper: boolean | null
+          confusion_signals: number | null
+          created_at: string
+          entry_level: number
+          exit_level: number | null
+          id: string
+          max_depth_reached: number
+          node_id: string
+          session_id: string | null
+          time_on_level_ms: number | null
+        }
+        Insert: {
+          clicked_back?: boolean | null
+          clicked_deeper?: boolean | null
+          confusion_signals?: number | null
+          created_at?: string
+          entry_level: number
+          exit_level?: number | null
+          id?: string
+          max_depth_reached?: number
+          node_id: string
+          session_id?: string | null
+          time_on_level_ms?: number | null
+        }
+        Update: {
+          clicked_back?: boolean | null
+          clicked_deeper?: boolean | null
+          confusion_signals?: number | null
+          created_at?: string
+          entry_level?: number
+          exit_level?: number | null
+          id?: string
+          max_depth_reached?: number
+          node_id?: string
+          session_id?: string | null
+          time_on_level_ms?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "explanation_analytics_node_id_fkey"
+            columns: ["node_id"]
+            isOneToOne: false
+            referencedRelation: "explanation_nodes"
+            referencedColumns: ["node_id"]
+          },
+        ]
+      }
+      explanation_nodes: {
+        Row: {
+          back_click_count: number | null
+          children: string[] | null
+          content: string
+          created_at: string
+          deeper_click_count: number | null
+          explains: string | null
+          id: string
+          is_active: boolean
+          level: number
+          limitations: string[] | null
+          node_id: string
+          scope: string
+          sources: string[] | null
+          updated_at: string
+          url: string
+          version: number
+          view_count: number | null
+        }
+        Insert: {
+          back_click_count?: number | null
+          children?: string[] | null
+          content: string
+          created_at?: string
+          deeper_click_count?: number | null
+          explains?: string | null
+          id?: string
+          is_active?: boolean
+          level: number
+          limitations?: string[] | null
+          node_id: string
+          scope: string
+          sources?: string[] | null
+          updated_at?: string
+          url: string
+          version?: number
+          view_count?: number | null
+        }
+        Update: {
+          back_click_count?: number | null
+          children?: string[] | null
+          content?: string
+          created_at?: string
+          deeper_click_count?: number | null
+          explains?: string | null
+          id?: string
+          is_active?: boolean
+          level?: number
+          limitations?: string[] | null
+          node_id?: string
+          scope?: string
+          sources?: string[] | null
+          updated_at?: string
+          url?: string
+          version?: number
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "explanation_nodes_explains_fkey"
+            columns: ["explains"]
+            isOneToOne: false
+            referencedRelation: "explanation_nodes"
+            referencedColumns: ["node_id"]
+          },
+        ]
+      }
       fact_sources: {
         Row: {
           contribution_weight: number | null
@@ -7823,6 +7941,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_node_view: { Args: { p_node_id: string }; Returns: undefined }
+      track_deeper_click: { Args: { p_node_id: string }; Returns: undefined }
       validate_data_contract: { Args: { p_data: Json }; Returns: Json }
     }
     Enums: {
