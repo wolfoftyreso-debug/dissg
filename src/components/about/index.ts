@@ -1,0 +1,1 @@
+export { InstitutionalAbout } from './InstitutionalAbout';
