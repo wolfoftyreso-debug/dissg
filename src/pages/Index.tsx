@@ -6,18 +6,26 @@ import { BottomNav, NavItem } from '@/components/dashboard/BottomNav';
 import { OverviewHeader } from '@/components/dashboard/OverviewHeader';
 import { CategorySection } from '@/components/dashboard/CategorySection';
 import { KPIDetailPanel } from '@/components/dashboard/KPIDetailPanel';
-import { DecisionPriorityPanel } from '@/components/dashboard/DecisionPriorityPanel';
 import { IndicatorsPanel } from '@/components/dashboard/IndicatorsPanel';
 import { DecisionsTimelinePanel } from '@/components/dashboard/DecisionsTimelinePanel';
 import { ResponsibilityPanel } from '@/components/dashboard/ResponsibilityPanel';
 import { AnalysisPanel } from '@/components/dashboard/AnalysisPanel';
+import { RoleBasedDashboard } from '@/components/dashboard/RoleBasedDashboard';
 import { useKPIOverview } from '@/hooks/useKPIData';
+import { useUserRoles } from '@/hooks/useUserRole';
+import { getRoleConfig } from '@/config/roleViewConfig';
 import { Loader2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Index = () => {
   const [selectedKPI, setSelectedKPI] = useState<KPI | null>(null);
   const [activeNav, setActiveNav] = useState<NavItem>('overview');
   const [comparisonPeriod, setComparisonPeriod] = useState<'week' | 'month3' | 'month12'>('week');
+  const [viewMode, setViewMode] = useState<'standard' | 'role'>('role');
+  
+  const { data: roleData } = useUserRoles();
+  const currentRole = roleData?.highestRole || 'public';
+  const roleConfig = getRoleConfig(currentRole);
   
   // Try to fetch from database first
   const { data: dbKPIs, isLoading, error } = useKPIOverview();
@@ -43,7 +51,17 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* App Header - Discrete */}
-      <AppHeader kpis={kpis} role="Statsminister" />
+      <AppHeader kpis={kpis} role={roleConfig.displayName} />
+
+      {/* View Mode Tabs */}
+      <div className="px-4 py-2 border-b">
+        <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'standard' | 'role')}>
+          <TabsList className="grid w-full grid-cols-2 max-w-xs">
+            <TabsTrigger value="role">Rollbaserad vy</TabsTrigger>
+            <TabsTrigger value="standard">Standardvy</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
       {/* Loading State */}
       {isLoading && (
@@ -63,35 +81,43 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="space-y-6 pb-6 px-4">
-        {activeNav === 'overview' && kpisByCategory.map(({ category, kpis }, index) => (
-          <CategorySection
-            key={category.id}
-            category={category}
-            kpis={kpis}
-            onKPIClick={setSelectedKPI}
-            defaultExpanded={index < 2}
-          />
-        ))}
-        
-        {activeNav === 'decisions' && (
-          <DecisionsTimelinePanel />
-        )}
-        
-        {activeNav === 'indicators' && (
-          <IndicatorsPanel kpis={kpis} onKPIClick={setSelectedKPI} />
-        )}
-        
-        {activeNav === 'responsibility' && (
-          <ResponsibilityPanel kpis={kpis} />
-        )}
-        
-        {activeNav === 'analysis' && (
-          <AnalysisPanel kpis={kpis} />
+        {viewMode === 'role' ? (
+          <RoleBasedDashboard kpis={kpis} onKPIClick={setSelectedKPI} />
+        ) : (
+          <>
+            {activeNav === 'overview' && kpisByCategory.map(({ category, kpis }, index) => (
+              <CategorySection
+                key={category.id}
+                category={category}
+                kpis={kpis}
+                onKPIClick={setSelectedKPI}
+                defaultExpanded={index < 2}
+              />
+            ))}
+            
+            {activeNav === 'decisions' && (
+              <DecisionsTimelinePanel />
+            )}
+            
+            {activeNav === 'indicators' && (
+              <IndicatorsPanel kpis={kpis} onKPIClick={setSelectedKPI} />
+            )}
+            
+            {activeNav === 'responsibility' && (
+              <ResponsibilityPanel kpis={kpis} />
+            )}
+            
+            {activeNav === 'analysis' && (
+              <AnalysisPanel kpis={kpis} />
+            )}
+          </>
         )}
       </main>
 
-      {/* Bottom Navigation */}
-      <BottomNav active={activeNav} onNavigate={setActiveNav} />
+      {/* Bottom Navigation - only show in standard mode */}
+      {viewMode === 'standard' && (
+        <BottomNav active={activeNav} onNavigate={setActiveNav} />
+      )}
 
       {/* Detail Panel */}
       {selectedKPI && (
