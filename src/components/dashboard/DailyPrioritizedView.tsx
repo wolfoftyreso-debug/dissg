@@ -1,17 +1,14 @@
 // Daglig "editorless" startsida - auto-prioritering baserat på relevans
 // Visar vad som är mest relevant idag
 
-import { useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   TrendingUp, TrendingDown, Minus, ChevronRight, 
   Sparkles, Clock, AlertTriangle, ArrowRight 
 } from 'lucide-react';
 import { useRelevanceRanking, useWhatsNewToday } from '@/hooks/useRelevanceRanking';
-import { formatResponsibilityText } from '@/config/responsibilityMatrixConfig';
 import type { KPI } from '@/types/kpi';
 import { cn } from '@/lib/utils';
 
@@ -20,13 +17,28 @@ interface DailyPrioritizedViewProps {
   onKPISelect: (kpi: KPI) => void;
 }
 
-function RelevanceScoreBadge({ score }: { score: number }) {
-  const color = score >= 75 ? 'destructive' : score >= 50 ? 'default' : 'secondary';
+function RelevanceScoreBadge({ score, urgencyLevel }: { score: number; urgencyLevel?: string }) {
+  const color = urgencyLevel === 'critical' ? 'destructive' 
+    : urgencyLevel === 'high' ? 'default'
+    : score >= 75 ? 'destructive' 
+    : score >= 50 ? 'default' 
+    : 'secondary';
+  
+  const urgencyLabel = urgencyLevel === 'critical' ? 'Kritisk' 
+    : urgencyLevel === 'high' ? 'Hög brådska'
+    : null;
   
   return (
-    <Badge variant={color} className="text-xs">
-      Relevans: {score.toFixed(0)}
-    </Badge>
+    <div className="flex flex-col items-end gap-1">
+      {urgencyLabel && (
+        <Badge variant={color} className="text-xs">
+          {urgencyLabel}
+        </Badge>
+      )}
+      <Badge variant="outline" className="text-xs">
+        Relevans: {score.toFixed(0)}
+      </Badge>
+    </div>
   );
 }
 
@@ -34,11 +46,13 @@ function HighlightCard({
   kpi, 
   reason,
   relevanceScore,
+  urgencyLevel,
   onClick 
 }: { 
   kpi: KPI; 
   reason: string;
   relevanceScore: number;
+  urgencyLevel?: string;
   onClick: () => void;
 }) {
   const TrendIcon = kpi.trend === 'up' ? TrendingUp : kpi.trend === 'down' ? TrendingDown : Minus;
@@ -48,8 +62,10 @@ function HighlightCard({
     <Card 
       className={cn(
         "cursor-pointer transition-all hover:shadow-md",
-        kpi.status === 'critical' && "border-status-critical/50",
-        kpi.status === 'warning' && "border-status-warning/50"
+        urgencyLevel === 'critical' && "border-l-4 border-l-status-critical bg-status-critical/5",
+        urgencyLevel === 'high' && "border-l-4 border-l-orange-500 bg-orange-50/50",
+        kpi.status === 'critical' && urgencyLevel !== 'critical' && urgencyLevel !== 'high' && "border-status-critical/50",
+        kpi.status === 'warning' && urgencyLevel !== 'critical' && urgencyLevel !== 'high' && "border-status-warning/50"
       )}
       onClick={onClick}
     >
@@ -90,7 +106,7 @@ function HighlightCard({
           </div>
 
           <div className="flex flex-col items-end gap-2">
-            <RelevanceScoreBadge score={relevanceScore} />
+            <RelevanceScoreBadge score={relevanceScore} urgencyLevel={urgencyLevel} />
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </div>
         </div>
@@ -100,9 +116,17 @@ function HighlightCard({
 }
 
 export function DailyPrioritizedView({ kpis, onKPISelect }: DailyPrioritizedViewProps) {
-  const { rankedKPIs, highlights, todaysSummary, lastCalculated } = useRelevanceRanking({
+  const { 
+    rankedKPIs, 
+    highlights, 
+    todaysSummary, 
+    lastCalculated,
+    criticalUrgencyCount,
+    highUrgencyCount
+  } = useRelevanceRanking({
     kpis,
     maxHighlights: 5,
+    viewType: 'homepage',
   });
 
   const { newItems, summary: whatsnewSummary } = useWhatsNewToday(kpis);
@@ -147,29 +171,35 @@ export function DailyPrioritizedView({ kpis, onKPISelect }: DailyPrioritizedView
         </Alert>
       )}
 
-      {/* Systemstatus */}
+      {/* Systemstatus med urgency */}
       <Card className={cn(
         "border-2",
-        criticalCount > 0 && "border-status-critical/50 bg-status-critical/5",
-        criticalCount === 0 && warningCount > 0 && "border-status-warning/50 bg-status-warning/5",
-        criticalCount === 0 && warningCount === 0 && "border-status-positive/50 bg-status-positive/5"
+        criticalUrgencyCount > 0 && "border-status-critical/50 bg-status-critical/5",
+        criticalUrgencyCount === 0 && highUrgencyCount > 0 && "border-orange-500/50 bg-orange-50/50",
+        criticalUrgencyCount === 0 && highUrgencyCount === 0 && criticalCount > 0 && "border-status-critical/50 bg-status-critical/5",
+        criticalUrgencyCount === 0 && highUrgencyCount === 0 && criticalCount === 0 && warningCount > 0 && "border-status-warning/50 bg-status-warning/5",
+        criticalUrgencyCount === 0 && highUrgencyCount === 0 && criticalCount === 0 && warningCount === 0 && "border-status-positive/50 bg-status-positive/5"
       )}>
         <CardContent className="py-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">
-                {criticalCount > 0 
-                  ? `${criticalCount} kritiska indikatorer`
-                  : warningCount > 0
-                    ? `${warningCount} varningar`
-                    : 'Alla system stabila'
+                {criticalUrgencyCount > 0 
+                  ? `${criticalUrgencyCount} kräver omedelbar åtgärd`
+                  : highUrgencyCount > 0
+                    ? `${highUrgencyCount} med hög brådska`
+                    : criticalCount > 0 
+                      ? `${criticalCount} kritiska indikatorer`
+                      : warningCount > 0
+                        ? `${warningCount} varningar`
+                        : 'Alla system stabila'
                 }
               </p>
               <p className="text-sm text-muted-foreground">
                 {todaysSummary}
               </p>
             </div>
-            {criticalCount > 0 && (
+            {(criticalUrgencyCount > 0 || criticalCount > 0) && (
               <AlertTriangle className="h-6 w-6 text-status-critical" />
             )}
           </div>
@@ -184,7 +214,6 @@ export function DailyPrioritizedView({ kpis, onKPISelect }: DailyPrioritizedView
             Sorterat efter relevans
           </Badge>
         </div>
-
         <div className="space-y-3">
           {highlights.map((item) => (
             <HighlightCard
@@ -192,6 +221,7 @@ export function DailyPrioritizedView({ kpis, onKPISelect }: DailyPrioritizedView
               kpi={item}
               reason={item.relevance.reason}
               relevanceScore={item.relevance.totalScore}
+              urgencyLevel={item.relevance.urgencyLevel}
               onClick={() => onKPISelect(item)}
             />
           ))}
