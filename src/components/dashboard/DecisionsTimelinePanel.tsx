@@ -2,16 +2,17 @@ import { useState, useMemo } from 'react';
 import { FileCheck, Calendar, Search, ChevronRight, Building2, Target, CheckCircle2, XCircle, Clock, BarChart2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { sv } from 'date-fns/locale';
+import { useDecisionsWithOutcomes } from '@/hooks/useDecisionOutcomes';
+import { DecisionOutcomeTracker } from './DecisionOutcomeTracker';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -25,6 +26,9 @@ interface PolicyDecision {
   measured_effect: string | null;
   effectiveness_score: number | null;
   target_kpis: string[];
+  responsible_department?: string | null;
+  category?: string | null;
+  milestones?: { total: number; completed: number };
 }
 
 interface TimelineEvent {
@@ -181,10 +185,14 @@ const MOCK_TIMELINE: TimelineEvent[] = [
 export function DecisionsTimelinePanel() {
   const [search, setSearch] = useState('');
   const [selectedDecision, setSelectedDecision] = useState<PolicyDecision | null>(null);
+  const [detailTab, setDetailTab] = useState<'info' | 'outcomes'>('info');
   const [view, setView] = useState<'decisions' | 'timeline' | 'effectiveness'>('decisions');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('all');
 
-  // Try to fetch from database
+  // Fetch decisions with outcomes from database
+  const { data: decisionsWithOutcomes } = useDecisionsWithOutcomes();
+
+  // Fallback to direct query if hook returns nothing
   const { data: dbDecisions } = useQuery({
     queryKey: ['policy_decisions'],
     queryFn: async () => {
@@ -195,6 +203,7 @@ export function DecisionsTimelinePanel() {
       if (error) throw error;
       return data;
     },
+    enabled: !decisionsWithOutcomes || decisionsWithOutcomes.length === 0,
   });
 
   const { data: dbTimeline } = useQuery({
@@ -209,8 +218,14 @@ export function DecisionsTimelinePanel() {
     },
   });
 
-  // Use database data if available, otherwise mock
+  // Use database data with outcomes if available
   const decisions = useMemo(() => {
+    if (decisionsWithOutcomes && decisionsWithOutcomes.length > 0) {
+      return decisionsWithOutcomes.map(d => ({
+        ...d,
+        target_kpis: d.target_kpis || [],
+      })) as PolicyDecision[];
+    }
     if (dbDecisions && dbDecisions.length > 0) {
       return dbDecisions.map(d => ({
         ...d,
@@ -218,7 +233,7 @@ export function DecisionsTimelinePanel() {
       })) as PolicyDecision[];
     }
     return MOCK_DECISIONS;
-  }, [dbDecisions]);
+  }, [decisionsWithOutcomes, dbDecisions]);
 
   const timeline = useMemo(() => {
     if (dbTimeline && dbTimeline.length > 0) {
@@ -630,8 +645,8 @@ export function DecisionsTimelinePanel() {
 
       {/* Detail Dialog */}
       {selectedDecision && (
-        <Dialog open={!!selectedDecision} onOpenChange={() => setSelectedDecision(null)}>
-          <DialogContent className="max-w-2xl">
+        <Dialog open={!!selectedDecision} onOpenChange={() => { setSelectedDecision(null); setDetailTab('info'); }}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 {getStatusIcon(selectedDecision.status)}
@@ -639,78 +654,113 @@ export function DecisionsTimelinePanel() {
               </DialogTitle>
             </DialogHeader>
             
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-1">Beskrivning</h4>
-                <p className="text-sm text-muted-foreground">
-                  {selectedDecision.description || 'Ingen beskrivning tillgänglig.'}
-                </p>
-              </div>
+            <Tabs value={detailTab} onValueChange={(v) => setDetailTab(v as 'info' | 'outcomes')}>
+              <TabsList className="mb-4">
+                <TabsTrigger value="info">Detaljer</TabsTrigger>
+                <TabsTrigger value="outcomes">Utfall & Milstolpar</TabsTrigger>
+              </TabsList>
               
-              <Separator />
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-medium mb-1">Beslutsdatum</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {format(new Date(selectedDecision.decision_date), 'd MMMM yyyy', { locale: sv })}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-1">Status</h4>
-                  <Badge variant="outline" className="capitalize">
-                    {selectedDecision.status === 'active' ? 'Aktiv' : 
-                     selectedDecision.status === 'completed' ? 'Genomförd' : selectedDecision.status}
-                  </Badge>
-                </div>
-              </div>
-              
-              <Separator />
-              
-              <div>
-                <h4 className="font-medium mb-2">Förväntat utfall</h4>
-                <p className="text-sm bg-muted/50 p-3 rounded-lg">
-                  {selectedDecision.expected_effect || 'Ej definierat'}
-                </p>
-              </div>
-              
-              {selectedDecision.measured_effect && (
-                <div>
-                  <h4 className="font-medium mb-2">Uppmätt effekt</h4>
-                  <p className="text-sm bg-muted/50 p-3 rounded-lg">
-                    {selectedDecision.measured_effect}
-                  </p>
-                </div>
-              )}
-              
-              {selectedDecision.effectiveness_score !== null && (
-                <div>
-                  <h4 className="font-medium mb-2">Effektivitetspoäng</h4>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className={cn(
-                          "h-full transition-all",
-                          selectedDecision.effectiveness_score >= 60 ? 'bg-emerald-500' :
-                          selectedDecision.effectiveness_score >= 40 ? 'bg-amber-500' : 'bg-red-500'
-                        )}
-                        style={{ width: `${selectedDecision.effectiveness_score}%` }}
-                      />
-                    </div>
-                    <span className="font-mono text-sm">{selectedDecision.effectiveness_score}%</span>
+              <TabsContent value="info">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium mb-1">Beskrivning</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedDecision.description || 'Ingen beskrivning tillgänglig.'}
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {selectedDecision.effectiveness_score >= 60 ? 'God måluppfyllelse' :
-                     selectedDecision.effectiveness_score >= 40 ? 'Delvis måluppfyllelse' : 'Låg måluppfyllelse'}
-                  </p>
+                  
+                  <Separator />
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium mb-1">Beslutsdatum</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {format(new Date(selectedDecision.decision_date), 'd MMMM yyyy', { locale: sv })}
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-1">Status</h4>
+                      <Badge variant="outline" className="capitalize">
+                        {selectedDecision.status === 'active' ? 'Aktiv' : 
+                         selectedDecision.status === 'completed' ? 'Genomförd' : selectedDecision.status}
+                      </Badge>
+                    </div>
+                    {selectedDecision.responsible_department && (
+                      <div>
+                        <h4 className="font-medium mb-1">Ansvarigt departement</h4>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Building2 className="h-3 w-3" />
+                          {selectedDecision.responsible_department}
+                        </p>
+                      </div>
+                    )}
+                    {selectedDecision.category && (
+                      <div>
+                        <h4 className="font-medium mb-1">Kategori</h4>
+                        <Badge variant="secondary" className="capitalize">
+                          {selectedDecision.category}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div>
+                    <h4 className="font-medium mb-2">Förväntat utfall</h4>
+                    <p className="text-sm bg-muted/50 p-3 rounded-lg">
+                      {selectedDecision.expected_effect || 'Ej definierat'}
+                    </p>
+                  </div>
+                  
+                  {selectedDecision.measured_effect && (
+                    <div>
+                      <h4 className="font-medium mb-2">Uppmätt effekt</h4>
+                      <p className="text-sm bg-muted/50 p-3 rounded-lg">
+                        {selectedDecision.measured_effect}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {selectedDecision.effectiveness_score !== null && (
+                    <div>
+                      <h4 className="font-medium mb-2">Effektivitetspoäng</h4>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className={cn(
+                              "h-full transition-all",
+                              selectedDecision.effectiveness_score >= 60 ? 'bg-emerald-500' :
+                              selectedDecision.effectiveness_score >= 40 ? 'bg-amber-500' : 'bg-red-500'
+                            )}
+                            style={{ width: `${selectedDecision.effectiveness_score}%` }}
+                          />
+                        </div>
+                        <span className="font-mono text-sm">{selectedDecision.effectiveness_score}%</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {selectedDecision.effectiveness_score >= 60 ? 'God måluppfyllelse' :
+                         selectedDecision.effectiveness_score >= 40 ? 'Delvis måluppfyllelse' : 'Låg måluppfyllelse'}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {selectedDecision.milestones && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground pt-4 border-t">
+                      <Target className="h-4 w-4" />
+                      {selectedDecision.milestones.completed} av {selectedDecision.milestones.total} milstolpar slutförda
+                    </div>
+                  )}
                 </div>
-              )}
+              </TabsContent>
               
-              <div className="text-xs text-muted-foreground pt-4 border-t">
-                Berör {selectedDecision.target_kpis.length} nyckeltal. 
-                Klicka på respektive KPI för att se dess utveckling före och efter beslutet.
-              </div>
-            </div>
+              <TabsContent value="outcomes">
+                <DecisionOutcomeTracker 
+                  decisionId={selectedDecision.id} 
+                  decisionTitle={selectedDecision.title} 
+                />
+              </TabsContent>
+            </Tabs>
           </DialogContent>
         </Dialog>
       )}
