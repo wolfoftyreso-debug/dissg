@@ -12,6 +12,15 @@ export interface RedFlag {
   threshold?: string;
 }
 
+// Simple explanation for the "Explain Simply" feature
+export interface SimpleExplanation {
+  oneLiner: string; // Single sentence a 12-year-old can understand
+  icon: string; // Emoji icon for the KPI
+  goodDirection: 'up' | 'down'; // Which direction is good for this KPI
+  whatItMeasures: string; // Clear description of what's being measured
+  whyItMatters: string; // Why this matters for society
+}
+
 export interface KPI {
   id: string;
   index: number; // 1-20
@@ -33,6 +42,7 @@ export interface KPI {
   redFlags: RedFlag[];
   breakdownAvailable: ('region' | 'age' | 'time' | 'gender')[];
   inverted?: boolean; // True if decrease is positive
+  simpleExplanation?: SimpleExplanation; // For "Explain Simply" feature
 }
 
 export type KPICategory = 
