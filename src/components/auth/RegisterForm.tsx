@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Shield, UserPlus, CheckCircle2, Mail } from 'lucide-react';
 
 export function RegisterForm() {
   const [displayName, setDisplayName] = useState('');
@@ -50,11 +49,6 @@ export function RegisterForm() {
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-full bg-primary/10">
-              <Mail className="h-8 w-8 text-primary" />
-            </div>
-          </div>
           <CardTitle className="text-xl">Bekräfta din e-post</CardTitle>
           <CardDescription>
             Vi har skickat ett verifieringsmail till <strong>{email}</strong>
@@ -62,14 +56,11 @@ export function RegisterForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="p-4 rounded-lg bg-muted space-y-2">
-            <div className="flex items-start gap-2">
-              <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
-              <div>
-                <p className="text-sm font-medium">Nästa steg:</p>
-                <p className="text-xs text-muted-foreground">
-                  Klicka på länken i mailet för att aktivera ditt konto och logga in.
-                </p>
-              </div>
+            <div>
+              <p className="text-sm font-medium">Nästa steg:</p>
+              <p className="text-xs text-muted-foreground">
+                Klicka på länken i mailet för att aktivera ditt konto och logga in.
+              </p>
             </div>
           </div>
           
@@ -95,11 +86,6 @@ export function RegisterForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
-        <div className="flex justify-center mb-4">
-          <div className="p-3 rounded-full bg-primary/10">
-            <Shield className="h-8 w-8 text-primary" />
-          </div>
-        </div>
         <CardTitle className="text-xl">Skapa konto</CardTitle>
         <CardDescription>
           Registrera dig för åtkomst till ledningssystemet
@@ -173,17 +159,7 @@ export function RegisterForm() {
         
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Registrerar...
-              </>
-            ) : (
-              <>
-                <UserPlus className="mr-2 h-4 w-4" />
-                Skapa konto
-              </>
-            )}
+            {isLoading ? 'Registrerar...' : 'Skapa konto'}
           </Button>
           
           <p className="text-xs text-muted-foreground text-center">
