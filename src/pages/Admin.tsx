@@ -5,10 +5,11 @@ import { useUserRoles, useHasRole } from '@/hooks/useUserRole';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Shield, Key, Database, Users, Loader2 } from 'lucide-react';
+import { ArrowLeft, Shield, Key, Database, Users, Loader2, Layers } from 'lucide-react';
 import { APIKeyManager } from '@/components/admin/APIKeyManager';
 import { ManualDataEntry } from '@/components/admin/ManualDataEntry';
 import { DataSourceManager } from '@/components/admin/DataSourceManager';
+import { IngestPipelineMonitor } from '@/components/admin/IngestPipelineMonitor';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -126,7 +127,7 @@ const Admin = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <Tabs defaultValue="api-keys" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-lg">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
             <TabsTrigger value="api-keys" className="flex items-center gap-2">
               <Key className="h-4 w-4" />
               API-nycklar
@@ -138,6 +139,10 @@ const Admin = () => {
             <TabsTrigger value="data-sources" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
               Datakällor
+            </TabsTrigger>
+            <TabsTrigger value="ingest" className="flex items-center gap-2">
+              <Layers className="h-4 w-4" />
+              Global Ingest
             </TabsTrigger>
           </TabsList>
 
@@ -151,6 +156,10 @@ const Admin = () => {
 
           <TabsContent value="data-sources">
             <DataSourceManager />
+          </TabsContent>
+
+          <TabsContent value="ingest">
+            <IngestPipelineMonitor />
           </TabsContent>
         </Tabs>
       </main>
