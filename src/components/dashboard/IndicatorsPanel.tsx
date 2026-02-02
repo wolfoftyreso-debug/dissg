@@ -10,6 +10,8 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CATEGORIES, KPI, KPICategory } from '@/types/kpi';
 import { Sparkline } from './Sparkline';
+import { HistoricalTimelineChart } from './HistoricalTimelineChart';
+import { MultiKPITimelineChart } from './MultiKPITimelineChart';
 import { cn } from '@/lib/utils';
 
 interface IndicatorsPanelProps {
@@ -23,7 +25,7 @@ export function IndicatorsPanel({ kpis, onKPIClick }: IndicatorsPanelProps) {
   const [statusFilter, setStatusFilter] = useState<'all' | 'positive' | 'warning' | 'critical'>('all');
   const [sortBy, setSortBy] = useState<'index' | 'name' | 'value' | 'trend' | 'confidence'>('index');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [viewMode, setViewMode] = useState<'table' | 'cards' | 'compact'>('table');
+  const [viewMode, setViewMode] = useState<'table' | 'cards' | 'compact' | 'timeline'>('table');
 
   const filteredKPIs = useMemo(() => {
     let result = [...kpis];
@@ -260,6 +262,7 @@ export function IndicatorsPanel({ kpis, onKPIClick }: IndicatorsPanelProps) {
                 <TabsTrigger value="table" className="text-xs">Tabell</TabsTrigger>
                 <TabsTrigger value="cards" className="text-xs">Kort</TabsTrigger>
                 <TabsTrigger value="compact" className="text-xs">Kompakt</TabsTrigger>
+                <TabsTrigger value="timeline" className="text-xs">Tidslinje</TabsTrigger>
               </TabsList>
             </Tabs>
             
@@ -270,6 +273,28 @@ export function IndicatorsPanel({ kpis, onKPIClick }: IndicatorsPanelProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Timeline View */}
+      {viewMode === 'timeline' && (
+        <div className="space-y-6">
+          {/* Multi-KPI comparison chart */}
+          <MultiKPITimelineChart 
+            kpis={filteredKPIs} 
+            defaultSelected={filteredKPIs.slice(0, 3).map(k => k.id)}
+          />
+          
+          {/* Individual KPI timeline */}
+          {filteredKPIs.length > 0 && (
+            <HistoricalTimelineChart
+              kpiId={filteredKPIs[0].id}
+              kpiName={filteredKPIs[0].name}
+              baseValue={filteredKPIs[0].value}
+              showEvents={true}
+              showProjection={true}
+            />
+          )}
+        </div>
+      )}
 
       {/* Content based on view mode */}
       {viewMode === 'table' && (
