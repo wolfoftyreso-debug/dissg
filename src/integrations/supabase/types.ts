@@ -374,6 +374,53 @@ export type Database = {
           },
         ]
       }
+      daily_priority_snapshots: {
+        Row: {
+          calculation_duration_ms: number | null
+          created_at: string
+          full_ranking: Json
+          id: string
+          snapshot_date: string
+          top_declines: Json
+          top_improvements: Json
+          top_relevant: Json
+          total_objects_scored: number
+          weight_version_id: string | null
+        }
+        Insert: {
+          calculation_duration_ms?: number | null
+          created_at?: string
+          full_ranking?: Json
+          id?: string
+          snapshot_date: string
+          top_declines?: Json
+          top_improvements?: Json
+          top_relevant?: Json
+          total_objects_scored?: number
+          weight_version_id?: string | null
+        }
+        Update: {
+          calculation_duration_ms?: number | null
+          created_at?: string
+          full_ranking?: Json
+          id?: string
+          snapshot_date?: string
+          top_declines?: Json
+          top_improvements?: Json
+          top_relevant?: Json
+          total_objects_scored?: number
+          weight_version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_priority_snapshots_weight_version_id_fkey"
+            columns: ["weight_version_id"]
+            isOneToOne: false
+            referencedRelation: "relevance_weight_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       data_lineage: {
         Row: {
           aggregation_level: string
@@ -1580,6 +1627,149 @@ export type Database = {
         }
         Relationships: []
       }
+      relevance_scores: {
+        Row: {
+          acceleration_raw: number
+          acceleration_weighted: number
+          breadth_raw: number
+          breadth_weighted: number
+          calculated_at: string
+          calculation_details: Json
+          data_confidence_contribution: number
+          data_confidence_raw: number
+          id: string
+          impact_raw: number
+          impact_weighted: number
+          object_code: string | null
+          object_id: string
+          object_type: string
+          persistence_raw: number
+          persistence_weighted: number
+          primary_reason: string
+          rank: number | null
+          responsibility_raw: number
+          responsibility_weighted: number
+          secondary_reasons: string[] | null
+          should_highlight: boolean
+          total_score: number
+          valid_until: string | null
+          weight_version_id: string | null
+        }
+        Insert: {
+          acceleration_raw: number
+          acceleration_weighted: number
+          breadth_raw: number
+          breadth_weighted: number
+          calculated_at?: string
+          calculation_details?: Json
+          data_confidence_contribution: number
+          data_confidence_raw: number
+          id?: string
+          impact_raw: number
+          impact_weighted: number
+          object_code?: string | null
+          object_id: string
+          object_type: string
+          persistence_raw: number
+          persistence_weighted: number
+          primary_reason: string
+          rank?: number | null
+          responsibility_raw: number
+          responsibility_weighted: number
+          secondary_reasons?: string[] | null
+          should_highlight?: boolean
+          total_score: number
+          valid_until?: string | null
+          weight_version_id?: string | null
+        }
+        Update: {
+          acceleration_raw?: number
+          acceleration_weighted?: number
+          breadth_raw?: number
+          breadth_weighted?: number
+          calculated_at?: string
+          calculation_details?: Json
+          data_confidence_contribution?: number
+          data_confidence_raw?: number
+          id?: string
+          impact_raw?: number
+          impact_weighted?: number
+          object_code?: string | null
+          object_id?: string
+          object_type?: string
+          persistence_raw?: number
+          persistence_weighted?: number
+          primary_reason?: string
+          rank?: number | null
+          responsibility_raw?: number
+          responsibility_weighted?: number
+          secondary_reasons?: string[] | null
+          should_highlight?: boolean
+          total_score?: number
+          valid_until?: string | null
+          weight_version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "relevance_scores_weight_version_id_fkey"
+            columns: ["weight_version_id"]
+            isOneToOne: false
+            referencedRelation: "relevance_weight_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      relevance_weight_versions: {
+        Row: {
+          acceleration_weight: number
+          breadth_weight: number
+          change_reason: string | null
+          created_at: string
+          created_by: string | null
+          data_confidence_weight: number
+          description: string | null
+          id: string
+          impact_weight: number
+          is_active: boolean
+          name: string
+          persistence_weight: number
+          responsibility_weight: number
+          version: number
+        }
+        Insert: {
+          acceleration_weight?: number
+          breadth_weight?: number
+          change_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_confidence_weight?: number
+          description?: string | null
+          id?: string
+          impact_weight?: number
+          is_active?: boolean
+          name: string
+          persistence_weight?: number
+          responsibility_weight?: number
+          version: number
+        }
+        Update: {
+          acceleration_weight?: number
+          breadth_weight?: number
+          change_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_confidence_weight?: number
+          description?: string | null
+          id?: string
+          impact_weight?: number
+          is_active?: boolean
+          name?: string
+          persistence_weight?: number
+          responsibility_weight?: number
+          version?: number
+        }
+        Relationships: []
+      }
       role_audit_log: {
         Row: {
           action: string
@@ -1641,6 +1831,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_relevance_preferences: {
+        Row: {
+          boost_factor: number
+          boost_local: boolean
+          created_at: string
+          id: string
+          preferred_demographics: string[] | null
+          preferred_regions: string[] | null
+          preferred_responsibility_areas: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          boost_factor?: number
+          boost_local?: boolean
+          created_at?: string
+          id?: string
+          preferred_demographics?: string[] | null
+          preferred_regions?: string[] | null
+          preferred_responsibility_areas?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          boost_factor?: number
+          boost_local?: boolean
+          created_at?: string
+          id?: string
+          preferred_demographics?: string[] | null
+          preferred_regions?: string[] | null
+          preferred_responsibility_areas?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
