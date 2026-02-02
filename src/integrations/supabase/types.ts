@@ -2068,6 +2068,125 @@ export type Database = {
         }
         Relationships: []
       }
+      global_feed_definitions: {
+        Row: {
+          category: string
+          code: string
+          created_at: string | null
+          data_depth_required:
+            | Database["public"]["Enums"]["data_depth_level"]
+            | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          max_countries_per_event: number | null
+          max_events_per_day: number | null
+          min_gmi_change: number | null
+          name: string
+          regions: string[] | null
+          tier: Database["public"]["Enums"]["feed_tier"]
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string | null
+          data_depth_required?:
+            | Database["public"]["Enums"]["data_depth_level"]
+            | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_countries_per_event?: number | null
+          max_events_per_day?: number | null
+          min_gmi_change?: number | null
+          name: string
+          regions?: string[] | null
+          tier?: Database["public"]["Enums"]["feed_tier"]
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string | null
+          data_depth_required?:
+            | Database["public"]["Enums"]["data_depth_level"]
+            | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_countries_per_event?: number | null
+          max_events_per_day?: number | null
+          min_gmi_change?: number | null
+          name?: string
+          regions?: string[] | null
+          tier?: Database["public"]["Enums"]["feed_tier"]
+        }
+        Relationships: []
+      }
+      global_feed_events: {
+        Row: {
+          checksum: string
+          countries: string[]
+          data_sources: string[] | null
+          event_type: string
+          feed_id: string
+          generated_at: string | null
+          gmi_changes: Json | null
+          id: string
+          kpi_codes: string[] | null
+          metrics: Json
+          region: string | null
+          severity: Database["public"]["Enums"]["feed_severity"]
+          summary: string
+          title: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          checksum: string
+          countries: string[]
+          data_sources?: string[] | null
+          event_type: string
+          feed_id: string
+          generated_at?: string | null
+          gmi_changes?: Json | null
+          id?: string
+          kpi_codes?: string[] | null
+          metrics?: Json
+          region?: string | null
+          severity?: Database["public"]["Enums"]["feed_severity"]
+          summary: string
+          title: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          checksum?: string
+          countries?: string[]
+          data_sources?: string[] | null
+          event_type?: string
+          feed_id?: string
+          generated_at?: string | null
+          gmi_changes?: Json | null
+          id?: string
+          kpi_codes?: string[] | null
+          metrics?: Json
+          region?: string | null
+          severity?: Database["public"]["Enums"]["feed_severity"]
+          summary?: string
+          title?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "global_feed_events_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "global_feed_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       global_kpi_mappings: {
         Row: {
           created_at: string
@@ -2221,6 +2340,7 @@ export type Database = {
           components: Json
           created_at: string
           default_weights: Json
+          description: string | null
           id: string
           is_active: boolean
           missing_data_handling: string
@@ -2233,6 +2353,7 @@ export type Database = {
           components?: Json
           created_at?: string
           default_weights?: Json
+          description?: string | null
           id?: string
           is_active?: boolean
           missing_data_handling?: string
@@ -2245,6 +2366,7 @@ export type Database = {
           components?: Json
           created_at?: string
           default_weights?: Json
+          description?: string | null
           id?: string
           is_active?: boolean
           missing_data_handling?: string
@@ -2326,6 +2448,99 @@ export type Database = {
           },
           {
             foreignKeyName: "global_master_index_values_gmi_version_fkey"
+            columns: ["gmi_version"]
+            isOneToOne: false
+            referencedRelation: "global_master_index_config"
+            referencedColumns: ["version"]
+          },
+        ]
+      }
+      gmi_scores: {
+        Row: {
+          calculated_at: string | null
+          calculation_notes: string | null
+          comparability_level: Database["public"]["Enums"]["comparability_level"]
+          country_code: string
+          data_completeness: number | null
+          data_freshness_months: number | null
+          demographics_score: number | null
+          economy_score: number | null
+          education_score: number | null
+          employment_score: number | null
+          environment_score: number | null
+          gmi_rank: number | null
+          gmi_score: number
+          gmi_version: string
+          governance_score: number | null
+          health_score: number | null
+          id: string
+          indicators_available: number
+          indicators_total: number
+          period_year: number
+          previous_score: number | null
+          trend: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent: number | null
+        }
+        Insert: {
+          calculated_at?: string | null
+          calculation_notes?: string | null
+          comparability_level?: Database["public"]["Enums"]["comparability_level"]
+          country_code: string
+          data_completeness?: number | null
+          data_freshness_months?: number | null
+          demographics_score?: number | null
+          economy_score?: number | null
+          education_score?: number | null
+          employment_score?: number | null
+          environment_score?: number | null
+          gmi_rank?: number | null
+          gmi_score: number
+          gmi_version: string
+          governance_score?: number | null
+          health_score?: number | null
+          id?: string
+          indicators_available: number
+          indicators_total: number
+          period_year: number
+          previous_score?: number | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent?: number | null
+        }
+        Update: {
+          calculated_at?: string | null
+          calculation_notes?: string | null
+          comparability_level?: Database["public"]["Enums"]["comparability_level"]
+          country_code?: string
+          data_completeness?: number | null
+          data_freshness_months?: number | null
+          demographics_score?: number | null
+          economy_score?: number | null
+          education_score?: number | null
+          employment_score?: number | null
+          environment_score?: number | null
+          gmi_rank?: number | null
+          gmi_score?: number
+          gmi_version?: string
+          governance_score?: number | null
+          health_score?: number | null
+          id?: string
+          indicators_available?: number
+          indicators_total?: number
+          period_year?: number
+          previous_score?: number | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gmi_scores_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "gmi_scores_gmi_version_fkey"
             columns: ["gmi_version"]
             isOneToOne: false
             referencedRelation: "global_master_index_config"

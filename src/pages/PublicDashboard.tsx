@@ -626,6 +626,11 @@ export default function PublicDashboard() {
                 </Link>
               </Button>
               <Button variant="outline" size="sm" asChild>
+                <Link to="/gmi" className="gap-2">
+                  🌍 Global Master Index
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
                 <Link to="/api-policy" className="gap-2">
                   📜 API & Licenser
                 </Link>
