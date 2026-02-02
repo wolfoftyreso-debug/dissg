@@ -457,6 +457,283 @@ export const TRACEABILITY_CONFIG = {
 };
 
 // ═══════════════════════════════════════════════════════════════
+// VIII. ROLE-BASED EXECUTION PROMPTS
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Hård princip (SÄTT PÅ VÄGGEN)
+ */
+export const HARD_PRINCIPLES = {
+  display: 'wall',
+  rules: [
+    { statement: 'Om något kan misstolkas – är det ett bug.', type: 'quality' },
+    { statement: 'Om något kräver expertkunskap för att förstå – är det ett UX-fel.', type: 'ux' },
+    { statement: 'Om något visas utan relevansnivå – är det trasigt.', type: 'relevance' },
+  ],
+} as const;
+
+/**
+ * Daglig loop (ALLA TEAM)
+ */
+export const DAILY_LOOP = {
+  name: 'Daglig förbättringsloop',
+  frequency: 'daily',
+  applies_to: 'all_teams',
+  steps: [
+    { order: 1, name: 'Status', question: 'Vad finns?' },
+    { order: 2, name: 'Klarhet', question: 'Vad är otydligt?' },
+    { order: 3, name: 'Förenkling', question: 'Hur gör vi det begripligare?' },
+    { order: 4, name: 'Implementering', question: 'Vad ändrar vi?' },
+    { order: 5, name: 'Test mot feltolkning', question: 'Kan detta missförstås?' },
+    { order: 6, name: 'Nästa förbättring', question: 'Vad blir bättre imorgon?' },
+  ],
+  continuous: true,
+} as const;
+
+export type AgentRole = 'frontend_ux' | 'data_pipeline' | 'ai_analysis' | 'relevance_priority' | 'accountability_governance';
+
+/**
+ * 1. FRONTEND / UX AGENT
+ * Mål: Total begriplighet. Noll feltolkning.
+ */
+export const FRONTEND_UX_PROMPT = {
+  role: 'frontend_ux' as AgentRole,
+  title: 'Frontend / UX Engineer',
+  color: 'blue',
+  goal: 'Total begriplighet. Noll feltolkning.',
+  full_prompt: `ROLE: Frontend / UX Engineer – Global Reality OS
+
+STATUSCHECK
+1. Vilka vyer, dashboards och komponenter finns idag?
+2. Vilka används mest / minst?
+3. Var uppstår missförstånd (pilar, %, färg, ord)?
+
+KOGNITIV TEST
+Simulera:
+• 18-åring utan förkunskap
+• Journalist under tidspress
+• Statssekreterare
+
+Vad förstår de på 5–10 sek?
+Vad tolkar de fel?
+
+FÖRBÄTTRING
+Designa UI-förändringar som:
+• minskar tolkning
+• gör nivå (L0–L4) omedelbart synlig
+• ersätter symboler med förklarande text där det behövs
+
+IMPLEMENTERA
+• Förenkla, ta bort, tydliggör
+• Inga nya features
+
+VERIFIERA
+• Kan detta missförstås politiskt eller statistiskt?
+• Om ja: justera igen.
+
+OUTPUT:
+– UI diff
+– före/efter-skärmbeskrivning
+– risker som eliminerats`,
+  output: ['UI diff', 'Före/efter-skärmbeskrivning', 'Risker som eliminerats'],
+};
+
+/**
+ * 2. DATA / PIPELINE AGENT
+ * Mål: Absolut spårbarhet. Ingen "magisk" data.
+ */
+export const DATA_PIPELINE_PROMPT = {
+  role: 'data_pipeline' as AgentRole,
+  title: 'Data / Pipeline Engineer',
+  color: 'green',
+  goal: 'Absolut spårbarhet. Ingen "magisk" data.',
+  full_prompt: `ROLE: Data / Pipeline Engineer – Global Reality OS
+
+STATUSCHECK
+1. Vilka datakällor är inkopplade?
+2. Hur ofta uppdateras de?
+3. Finns datapunkter utan tydlig källa eller metod?
+
+KVALITETSGRANSKNING
+För varje aggregering:
+• Vad summeras / normaliseras?
+• Kan detta misstolkas som kausalitet?
+• Är osäkerhet tydlig?
+
+FÖRBÄTTRING
+Föreslå:
+• bättre metadata
+• tydligare lagg-markering
+• borttag av falsk precision
+
+IMPLEMENTERA
+• förbättra schema
+• förbättra lineage
+• förbättra versionering
+
+VERIFIERA
+• Kan en extern användare reproducera siffran?
+
+OUTPUT:
+– schemaändringar
+– lineage-exempel
+– borttagna risker`,
+  output: ['Schemaändringar', 'Lineage-exempel', 'Borttagna risker'],
+};
+
+/**
+ * 3. AI / ANALYSIS AGENT
+ * Mål: Förklara, inte dra slutsatser.
+ */
+export const AI_ANALYSIS_PROMPT = {
+  role: 'ai_analysis' as AgentRole,
+  title: 'Analysis / AI Agent',
+  color: 'purple',
+  goal: 'Förklara, inte dra slutsatser.',
+  full_prompt: `ROLE: Analysis / AI Agent – Global Reality OS
+
+STATUSCHECK
+1. Vilka analyser, sammanfattningar och samband genereras idag?
+2. Var finns risk för normativa formuleringar?
+
+REALITY CHECK
+För varje analys:
+• Beskriver den eller föreslår den?
+• Är språket strikt deskriptivt?
+
+FÖRBÄTTRING
+Skriv om analyser så att de:
+• alltid svarar på vad, när, var, hur säkert
+• aldrig svarar på borde
+
+IMPLEMENTERA
+• justera prompts
+• justera output-format
+
+VERIFIERA
+• Kan detta citeras utan att bli propaganda?
+
+OUTPUT:
+– förbättrade prompts
+– före/efter-texter
+– borttagna bias-risker`,
+  output: ['Förbättrade prompts', 'Före/efter-texter', 'Borttagna bias-risker'],
+};
+
+/**
+ * 4. RELEVANS / PRIORITERINGS-AGENT
+ * Mål: Visa rätt saker överst. Alltid.
+ */
+export const RELEVANCE_PRIORITY_PROMPT = {
+  role: 'relevance_priority' as AgentRole,
+  title: 'Relevance & Priority Agent',
+  color: 'orange',
+  goal: 'Visa rätt saker överst. Alltid.',
+  full_prompt: `ROLE: Relevance & Priority Agent – Global Reality OS
+
+STATUSCHECK
+1. Vad visas högst upp idag?
+2. Är det L3–L4 eller bara populärt?
+
+ANALYS
+Identifiera:
+• överexponerade L1-frågor
+• underexponerade L3–L4-frågor
+
+FÖRBÄTTRING
+Justera prioriteringslogik så att:
+• påverkan > uppmärksamhet
+• lång sikt > kort brus
+
+IMPLEMENTERA
+• ändra ranking
+• tydliggör nivå visuellt
+
+VERIFIERA
+• Kan användaren direkt se varför detta visas?
+
+OUTPUT:
+– ny prioriteringsordning
+– motivering per objekt`,
+  output: ['Ny prioriteringsordning', 'Motivering per objekt'],
+};
+
+/**
+ * 5. ACCOUNTABILITY / GOVERNANCE AGENT
+ * Mål: Ansvar utan skuldbeläggning.
+ */
+export const ACCOUNTABILITY_GOVERNANCE_PROMPT = {
+  role: 'accountability_governance' as AgentRole,
+  title: 'Accountability & Governance Agent',
+  color: 'red',
+  goal: 'Ansvar utan skuldbeläggning.',
+  full_prompt: `ROLE: Accountability & Governance Agent – Global Reality OS
+
+STATUSCHECK
+1. Vilka mätvärden saknar tydlig ansvarskedja?
+2. Var är lagg otydlig?
+
+FÖRBÄTTRING
+För varje brist:
+• koppla till roll (inte person)
+• ange tidsperiod
+• visa osäkerhet
+
+IMPLEMENTERA
+• förbättra ansvarsgraf
+• förbättra tidslinjer
+
+VERIFIERA
+• Kan detta tolkas juridiskt korrekt?
+
+OUTPUT:
+– tydligare ansvarskartor
+– borttagna tolkningsrisker`,
+  output: ['Tydligare ansvarskartor', 'Borttagna tolkningsrisker'],
+};
+
+/**
+ * All role prompts registry
+ */
+export const ALL_ROLE_PROMPTS = {
+  frontend_ux: FRONTEND_UX_PROMPT,
+  data_pipeline: DATA_PIPELINE_PROMPT,
+  ai_analysis: AI_ANALYSIS_PROMPT,
+  relevance_priority: RELEVANCE_PRIORITY_PROMPT,
+  accountability_governance: ACCOUNTABILITY_GOVERNANCE_PROMPT,
+} as const;
+
+export function getPromptForRole(role: AgentRole): string {
+  return ALL_ROLE_PROMPTS[role].full_prompt;
+}
+
+export function getRoleGoal(role: AgentRole): string {
+  return ALL_ROLE_PROMPTS[role].goal;
+}
+
+/**
+ * Role prompt system status
+ */
+export const ROLE_PROMPT_SYSTEM = {
+  name: 'Role-Based Execution Prompts',
+  version: '1.0',
+  roles: ['frontend_ux', 'data_pipeline', 'ai_analysis', 'relevance_priority', 'accountability_governance'] as AgentRole[],
+  daily_loop: DAILY_LOOP,
+  hard_principles: HARD_PRINCIPLES,
+  capabilities: {
+    self_improving_organization: true,
+    ai_driven_quality_loop: true,
+    never_finished_only_better: true,
+    can_replace_aggregated_analysis_layers: true,
+  },
+  scale: '200+ personer utan kaos',
+  next_levels: [
+    'Dagliga sprint-checklistor',
+    'Automatiserade AI-reviewers som kör dessa prompts själva',
+  ],
+} as const;
+
+// ═══════════════════════════════════════════════════════════════
 // SAMLAD EXPORT
 // ═══════════════════════════════════════════════════════════════
 
@@ -494,4 +771,9 @@ export const SYSTEM_CONFIG = {
   nationalStatus: NATIONAL_STATUS_CONFIG,
   outcomeAnalysis: OUTCOME_ANALYSIS_CONFIG,
   traceability: TRACEABILITY_CONFIG,
+  
+  // Rollbaserade prompts
+  rolePrompts: ROLE_PROMPT_SYSTEM,
+  hardPrinciples: HARD_PRINCIPLES,
+  dailyLoop: DAILY_LOOP,
 };
