@@ -3,13 +3,55 @@ import { StatusBadge } from './StatusBadge';
 import { ClearTrendIndicator } from './ClearTrendIndicator';
 import { SimpleExplanationButton } from './SimpleExplanationButton';
 import { Sparkline } from './Sparkline';
+import { ConfidenceBar } from './ConfidenceBar';
 import { cn } from '@/lib/utils';
-import { AlertTriangle, TrendingUp, TrendingDown, Minus, HelpCircle } from 'lucide-react';
+import { AlertTriangle, TrendingUp, TrendingDown, Minus, ShieldCheck, ShieldAlert, Shield } from 'lucide-react';
 import { getSimpleExplanation } from '@/config/simpleExplanations';
 import { HowWeKnowLink } from '@/components/transparency/HowWeKnowSection';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+
 interface ClearKPICardProps {
   kpi: KPI;
   onClick?: () => void;
+}
+
+// Get confidence level label and styling
+function getConfidenceLevel(confidence: number): { 
+  label: string; 
+  shortLabel: string;
+  description: string;
+  Icon: typeof ShieldCheck;
+  className: string;
+  bgClassName: string;
+} {
+  if (confidence >= 90) {
+    return {
+      label: 'Hög datakvalitet',
+      shortLabel: 'Hög',
+      description: 'Verifierad data från officiella källor med full täckning',
+      Icon: ShieldCheck,
+      className: 'text-status-positive',
+      bgClassName: 'bg-status-positive/10'
+    };
+  }
+  if (confidence >= 70) {
+    return {
+      label: 'Medelhög datakvalitet',
+      shortLabel: 'Medel',
+      description: 'Data från pålitliga källor, viss osäkerhet kan förekomma',
+      Icon: Shield,
+      className: 'text-status-warning',
+      bgClassName: 'bg-status-warning/10'
+    };
+  }
+  return {
+    label: 'Låg datakvalitet',
+    shortLabel: 'Låg',
+    description: 'Preliminär eller ofullständig data, tolka med försiktighet',
+    Icon: ShieldAlert,
+    className: 'text-status-critical',
+    bgClassName: 'bg-status-critical/10'
+  };
 }
 
 /**
@@ -117,6 +159,8 @@ export function ClearKPICard({ kpi, onClick }: ClearKPICardProps) {
   const hasActiveWarning = isCritical && kpi.redFlags.length > 0;
   const explanation = getSimpleExplanation(kpi.id);
   const change = calculateChange(kpi.value, kpi.previousValue, kpi.unit, kpi.id);
+  const confidenceLevel = getConfidenceLevel(kpi.confidence);
+  const ConfidenceIcon = confidenceLevel.Icon;
   
   // Format value nicely
   const formattedValue = typeof kpi.value === 'number' && kpi.value >= 1000 
@@ -156,9 +200,40 @@ export function ClearKPICard({ kpi, onClick }: ClearKPICardProps) {
 
       {/* Current Value Section - Clearly labeled as "NULÄGE" */}
       <div className="bg-muted/30 rounded-md p-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-          Nuläge
-        </p>
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Nuläge
+          </p>
+          {/* Confidence badge inline */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className={cn(
+                'flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium cursor-help',
+                confidenceLevel.bgClassName,
+                confidenceLevel.className
+              )}>
+                <ConfidenceIcon className="h-3 w-3" />
+                <span>{kpi.confidence}%</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs">
+              <div className="space-y-2">
+                <div className="font-semibold flex items-center gap-1.5">
+                  <ConfidenceIcon className={cn('h-4 w-4', confidenceLevel.className)} />
+                  {confidenceLevel.label}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {confidenceLevel.description}
+                </p>
+                <ConfidenceBar value={kpi.confidence} className="mt-2" />
+                <div className="text-xs text-muted-foreground pt-1 border-t">
+                  <span className="font-medium">Källor:</span>{' '}
+                  {kpi.dataSources.map(s => s.name).join(', ')}
+                </div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </div>
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
             <span className="text-3xl font-bold tabular-nums tracking-tight text-foreground">
