@@ -246,6 +246,45 @@ export type Database = {
           },
         ]
       }
+      ai_response_templates: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          never_use_when: string[]
+          required_placeholders: string[]
+          template_code: string
+          template_name: string
+          template_text: string
+          translations: Json
+          use_when: string[]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          never_use_when?: string[]
+          required_placeholders?: string[]
+          template_code: string
+          template_name: string
+          template_text: string
+          translations?: Json
+          use_when?: string[]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          never_use_when?: string[]
+          required_placeholders?: string[]
+          template_code?: string
+          template_name?: string
+          template_text?: string
+          translations?: Json
+          use_when?: string[]
+        }
+        Relationships: []
+      }
       analysis_audit_log: {
         Row: {
           action: string
@@ -422,6 +461,75 @@ export type Database = {
           id?: string
         }
         Relationships: []
+      }
+      api_compliance_log: {
+        Row: {
+          api_key_id: string | null
+          block_reason: string | null
+          created_at: string
+          endpoint: string
+          id: string
+          ip_address: unknown
+          method: string
+          query_blocked: boolean
+          request_hash: string | null
+          response_included_disclaimers: boolean
+          scope_accepted: boolean
+          scope_declaration_id: string | null
+          usage_declaration: string | null
+          user_agent: string | null
+          warnings_issued: string[]
+        }
+        Insert: {
+          api_key_id?: string | null
+          block_reason?: string | null
+          created_at?: string
+          endpoint: string
+          id?: string
+          ip_address?: unknown
+          method: string
+          query_blocked?: boolean
+          request_hash?: string | null
+          response_included_disclaimers?: boolean
+          scope_accepted?: boolean
+          scope_declaration_id?: string | null
+          usage_declaration?: string | null
+          user_agent?: string | null
+          warnings_issued?: string[]
+        }
+        Update: {
+          api_key_id?: string | null
+          block_reason?: string | null
+          created_at?: string
+          endpoint?: string
+          id?: string
+          ip_address?: unknown
+          method?: string
+          query_blocked?: boolean
+          request_hash?: string | null
+          response_included_disclaimers?: boolean
+          scope_accepted?: boolean
+          scope_declaration_id?: string | null
+          usage_declaration?: string | null
+          user_agent?: string | null
+          warnings_issued?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_compliance_log_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "api_compliance_log_scope_declaration_id_fkey"
+            columns: ["scope_declaration_id"]
+            isOneToOne: false
+            referencedRelation: "scope_declarations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       api_keys: {
         Row: {
@@ -914,6 +1022,45 @@ export type Database = {
           updated_at?: string
           what_this_does_not_show?: string[]
           what_this_shows?: string
+        }
+        Relationships: []
+      }
+      blocked_query_patterns: {
+        Row: {
+          block_response_template: string
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          pattern_keywords: string[]
+          pattern_regex: string
+          pattern_type: string
+          redirect_suggestion: string | null
+          severity: string
+        }
+        Insert: {
+          block_response_template: string
+          category: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          pattern_keywords?: string[]
+          pattern_regex: string
+          pattern_type: string
+          redirect_suggestion?: string | null
+          severity?: string
+        }
+        Update: {
+          block_response_template?: string
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          pattern_keywords?: string[]
+          pattern_regex?: string
+          pattern_type?: string
+          redirect_suggestion?: string | null
+          severity?: string
         }
         Relationships: []
       }
@@ -2017,6 +2164,45 @@ export type Database = {
           yld_per_100k?: number | null
           yll?: number | null
           yll_per_100k?: number | null
+        }
+        Relationships: []
+      }
+      ethics_constraints: {
+        Row: {
+          constraint_code: string
+          constraint_description: string
+          constraint_name: string
+          created_at: string
+          enforcement_type: string
+          id: string
+          is_active: boolean
+          minimum_group_size: number | null
+          prevents: string[]
+          rationale: string
+        }
+        Insert: {
+          constraint_code: string
+          constraint_description: string
+          constraint_name: string
+          created_at?: string
+          enforcement_type: string
+          id?: string
+          is_active?: boolean
+          minimum_group_size?: number | null
+          prevents?: string[]
+          rationale: string
+        }
+        Update: {
+          constraint_code?: string
+          constraint_description?: string
+          constraint_name?: string
+          created_at?: string
+          enforcement_type?: string
+          id?: string
+          is_active?: boolean
+          minimum_group_size?: number | null
+          prevents?: string[]
+          rationale?: string
         }
         Relationships: []
       }
@@ -5610,6 +5796,48 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_classifications: {
+        Row: {
+          compliance_notes: string | null
+          created_at: string
+          effective_date: string
+          id: string
+          is_active: boolean
+          jurisdiction: string
+          not_classified_as: string[]
+          platform_classification: string
+          regulatory_framework: string | null
+          required_disclaimers: string[]
+          review_date: string | null
+        }
+        Insert: {
+          compliance_notes?: string | null
+          created_at?: string
+          effective_date?: string
+          id?: string
+          is_active?: boolean
+          jurisdiction: string
+          not_classified_as?: string[]
+          platform_classification: string
+          regulatory_framework?: string | null
+          required_disclaimers?: string[]
+          review_date?: string | null
+        }
+        Update: {
+          compliance_notes?: string | null
+          created_at?: string
+          effective_date?: string
+          id?: string
+          is_active?: boolean
+          jurisdiction?: string
+          not_classified_as?: string[]
+          platform_classification?: string
+          regulatory_framework?: string | null
+          required_disclaimers?: string[]
+          review_date?: string | null
+        }
+        Relationships: []
+      }
       license_agreements: {
         Row: {
           accepted_from_ip: unknown
@@ -6360,6 +6588,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      misuse_detection_log: {
+        Row: {
+          action_taken: string | null
+          api_log_ids: string[]
+          detected_at: string
+          detection_type: string
+          evidence_summary: string
+          id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          severity: string
+        }
+        Insert: {
+          action_taken?: string | null
+          api_log_ids?: string[]
+          detected_at?: string
+          detection_type: string
+          evidence_summary: string
+          id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity?: string
+        }
+        Update: {
+          action_taken?: string | null
+          api_log_ids?: string[]
+          detected_at?: string
+          detection_type?: string
+          evidence_summary?: string
+          id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity?: string
+        }
+        Relationships: []
       }
       misuse_flags: {
         Row: {
@@ -7727,6 +7991,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      scope_declarations: {
+        Row: {
+          ai_blocked_actions: string[]
+          ai_must_cite: boolean
+          ai_required_disclaimers: string[]
+          confidence_level: string
+          confidence_rationale: string | null
+          covers: string[]
+          created_at: string
+          does_not_cover: string[]
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          geographic_scope: string[]
+          id: string
+          invalid_uses: string[]
+          temporal_validity_end: string | null
+          temporal_validity_start: string | null
+          updated_at: string
+          valid_comparisons: string[]
+          version: number
+        }
+        Insert: {
+          ai_blocked_actions?: string[]
+          ai_must_cite?: boolean
+          ai_required_disclaimers?: string[]
+          confidence_level?: string
+          confidence_rationale?: string | null
+          covers?: string[]
+          created_at?: string
+          does_not_cover?: string[]
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          geographic_scope?: string[]
+          id?: string
+          invalid_uses?: string[]
+          temporal_validity_end?: string | null
+          temporal_validity_start?: string | null
+          updated_at?: string
+          valid_comparisons?: string[]
+          version?: number
+        }
+        Update: {
+          ai_blocked_actions?: string[]
+          ai_must_cite?: boolean
+          ai_required_disclaimers?: string[]
+          confidence_level?: string
+          confidence_rationale?: string | null
+          covers?: string[]
+          created_at?: string
+          does_not_cover?: string[]
+          entity_id?: string
+          entity_name?: string
+          entity_type?: string
+          geographic_scope?: string[]
+          id?: string
+          invalid_uses?: string[]
+          temporal_validity_end?: string | null
+          temporal_validity_start?: string | null
+          updated_at?: string
+          valid_comparisons?: string[]
+          version?: number
+        }
+        Relationships: []
       }
       semantic_concepts: {
         Row: {
