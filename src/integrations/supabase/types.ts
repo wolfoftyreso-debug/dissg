@@ -5138,6 +5138,94 @@ export type Database = {
         }
         Relationships: []
       }
+      mission_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          mission_id: string
+          read_at: string | null
+          related_data: Json | null
+          severity: string
+          title: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          mission_id: string
+          read_at?: string | null
+          related_data?: Json | null
+          severity?: string
+          title: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          mission_id?: string
+          read_at?: string | null
+          related_data?: Json | null
+          severity?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_alerts_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "user_missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mission_snapshots: {
+        Row: {
+          created_at: string
+          direction: string
+          direction_score: number | null
+          id: string
+          key_indicators: Json | null
+          mission_id: string
+          snapshot_date: string
+          summary_text: string | null
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          direction_score?: number | null
+          id?: string
+          key_indicators?: Json | null
+          mission_id: string
+          snapshot_date: string
+          summary_text?: string | null
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          direction_score?: number | null
+          id?: string
+          key_indicators?: Json | null
+          mission_id?: string
+          snapshot_date?: string
+          summary_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_snapshots_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "user_missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       misuse_flags: {
         Row: {
           flagged_at: string | null
@@ -6766,6 +6854,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_missions: {
+        Row: {
+          created_at: string
+          description: string | null
+          focus_id: string
+          focus_name: string
+          focus_type: string
+          id: string
+          is_active: boolean
+          notification_frequency: string | null
+          title: string | null
+          tracked_question_ids: string[] | null
+          tracking_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          focus_id: string
+          focus_name: string
+          focus_type: string
+          id?: string
+          is_active?: boolean
+          notification_frequency?: string | null
+          title?: string | null
+          tracked_question_ids?: string[] | null
+          tracking_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          focus_id?: string
+          focus_name?: string
+          focus_type?: string
+          id?: string
+          is_active?: boolean
+          notification_frequency?: string | null
+          title?: string | null
+          tracked_question_ids?: string[] | null
+          tracking_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_relevance_preferences: {
         Row: {

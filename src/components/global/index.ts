@@ -21,3 +21,7 @@ export { NeutralSummaryGenerator, NeutralSummaryText } from './NeutralSummaryGen
 
 // WAVE 11: Global Reality Index
 export { GlobalRealityIndex } from './GlobalRealityIndex';
+
+// WAVE 12: Big Questions Layer & Missions
+export { BigQuestionsLayer } from './BigQuestionsLayer';
+export { UserMissions } from './UserMissions';
