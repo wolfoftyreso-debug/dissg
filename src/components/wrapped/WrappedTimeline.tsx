@@ -1,10 +1,12 @@
 // Wrapped Step 3: Timeline - "När hände det?"
 
+import { useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { format, parseISO } from 'date-fns';
 import { sv } from 'date-fns/locale';
 import type { WrappedOutput, WrappedTimelineMarker } from '@/types/wrapped';
 import { cn } from '@/lib/utils';
+import { ChartExportButton } from '@/components/export';
 
 interface WrappedTimelineProps {
   data: WrappedOutput['timeline'];
@@ -50,6 +52,7 @@ function TimelineMarker({
 }
 
 export function WrappedTimeline({ data }: WrappedTimelineProps) {
+  const chartRef = useRef<HTMLDivElement>(null);
   const periodStart = format(parseISO(data.periodStart), 'd MMM yyyy', { locale: sv });
   const periodEnd = format(parseISO(data.periodEnd), 'd MMM yyyy', { locale: sv });
 
@@ -63,8 +66,19 @@ export function WrappedTimeline({ data }: WrappedTimelineProps) {
       </div>
 
       <Card>
-        <CardContent className="pt-8 pb-12">
-          {/* Timeline visualization */}
+        <CardContent className="pt-4 pb-12">
+          {/* Export button */}
+          <div className="flex justify-end mb-4">
+            <ChartExportButton
+              chartRef={chartRef}
+              filename={`tidslinje-${data.periodStart}-${data.periodEnd}`}
+              size="sm"
+              variant="ghost"
+            />
+          </div>
+          
+          {/* Timeline visualization (exportable) */}
+          <div ref={chartRef} className="bg-background p-4 rounded-lg">
           <div className="relative">
             {/* Timeline line */}
             <div className="h-0.5 bg-border w-full" />
@@ -86,6 +100,7 @@ export function WrappedTimeline({ data }: WrappedTimelineProps) {
               <span className="text-sm text-muted-foreground">Start</span>
               <span className="text-sm text-muted-foreground">Slut</span>
             </div>
+          </div>
           </div>
         </CardContent>
       </Card>
