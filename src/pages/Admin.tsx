@@ -6,12 +6,13 @@ import { useIsStatsminister } from '@/hooks/useGovRole';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Shield, Key, Database, Users, Loader2, Layers } from 'lucide-react';
+import { ArrowLeft, Shield, Key, Database, Users, Loader2, Layers, Target } from 'lucide-react';
 import { APIKeyManager } from '@/components/admin/APIKeyManager';
 import { ManualDataEntry } from '@/components/admin/ManualDataEntry';
 import { DataSourceManager } from '@/components/admin/DataSourceManager';
 import { IngestPipelineMonitor } from '@/components/admin/IngestPipelineMonitor';
 import { RoleManager } from '@/components/admin/RoleManager';
+import { KPIThresholdManager } from '@/components/admin/KPIThresholdManager';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -131,10 +132,14 @@ const Admin = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <Tabs defaultValue="roles" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 max-w-3xl">
+          <TabsList className="grid w-full grid-cols-6 max-w-4xl">
             <TabsTrigger value="roles" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Roller
+            </TabsTrigger>
+            <TabsTrigger value="thresholds" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Tröskelvärden
             </TabsTrigger>
             <TabsTrigger value="api-keys" className="flex items-center gap-2">
               <Key className="h-4 w-4" />
@@ -156,6 +161,10 @@ const Admin = () => {
 
           <TabsContent value="roles">
             <RoleManager />
+          </TabsContent>
+
+          <TabsContent value="thresholds">
+            <KPIThresholdManager />
           </TabsContent>
 
           <TabsContent value="api-keys">
