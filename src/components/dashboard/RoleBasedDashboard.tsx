@@ -3,7 +3,8 @@ import { AppRole } from '@/hooks/useUserRole';
 import { getRoleConfig, DEPARTMENT_CATEGORIES } from '@/config/roleViewConfig';
 import { KPI, CATEGORIES } from '@/types/kpi';
 import { RoleSwitcher, FeatureComparison } from './RoleSwitcher';
-import { RoleBadge, FeatureGate } from './RoleBasedView';
+import { RoleBadge } from './RoleBasedView';
+import { ArchitectureVisualization } from './ArchitectureVisualization';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,7 +18,8 @@ import {
   FileText,
   Users,
   Activity,
-  Clock
+  Clock,
+  Layers
 } from 'lucide-react';
 
 interface RoleBasedDashboardProps {
@@ -118,6 +120,10 @@ export function RoleBasedDashboard({ kpis, onKPIClick }: RoleBasedDashboardProps
           {config.allowedNavItems.includes('decisions') && (
             <TabsTrigger value="decisions">Beslut</TabsTrigger>
           )}
+          <TabsTrigger value="architecture" className="flex items-center gap-1">
+            <Layers className="h-3 w-3" />
+            Arkitektur
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-4">
@@ -138,6 +144,10 @@ export function RoleBasedDashboard({ kpis, onKPIClick }: RoleBasedDashboardProps
 
         <TabsContent value="decisions" className="mt-4">
           <RoleDecisionsContent role={demoRole} />
+        </TabsContent>
+
+        <TabsContent value="architecture" className="mt-4">
+          <ArchitectureVisualization />
         </TabsContent>
       </Tabs>
     </div>
