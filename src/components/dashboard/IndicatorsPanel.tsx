@@ -279,7 +279,6 @@ export function IndicatorsPanel({ kpis, onKPIClick }: IndicatorsPanelProps) {
         <div className="space-y-6">
           {/* Multi-KPI comparison chart */}
           <MultiKPITimelineChart 
-            kpis={filteredKPIs} 
             defaultSelected={filteredKPIs.slice(0, 3).map(k => k.id)}
           />
           
@@ -288,9 +287,7 @@ export function IndicatorsPanel({ kpis, onKPIClick }: IndicatorsPanelProps) {
             <HistoricalTimelineChart
               kpiId={filteredKPIs[0].id}
               kpiName={filteredKPIs[0].name}
-              baseValue={filteredKPIs[0].value}
               showEvents={true}
-              showProjection={true}
             />
           )}
         </div>
