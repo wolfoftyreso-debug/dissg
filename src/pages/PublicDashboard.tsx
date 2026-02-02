@@ -15,6 +15,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Link } from 'react-router-dom';
 import { PublicOnboarding } from '@/components/onboarding';
+import { calculateKPIStatus } from '@/config/kpiThresholds';
 
 // Category groupings with human-readable names and descriptions
 const AREA_GROUPS = [
@@ -476,27 +477,40 @@ export default function PublicDashboard() {
   const [selectedKPI, setSelectedKPI] = useState<SelectedKPI | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   
-  const kpis = useMemo(() => {
-    if (dbKPIs && dbKPIs.length > 0) {
-      const hasValues = dbKPIs.some(k => k.value !== 0);
-      if (hasValues) return dbKPIs;
-    }
-    return mockKPIs;
+  // Beräkna status dynamiskt för alla KPIs
+  const kpisWithCalculatedStatus = useMemo(() => {
+    const baseKpis = (dbKPIs && dbKPIs.length > 0 && dbKPIs.some(k => k.value !== 0)) 
+      ? dbKPIs 
+      : mockKPIs;
+    
+    // Beräkna status automatiskt baserat på trösklar
+    return baseKpis.map(kpi => {
+      const { status } = calculateKPIStatus(
+        kpi.id,
+        kpi.value,
+        kpi.inverted,
+        kpi.trendPercent
+      );
+      return { ...kpi, status };
+    });
   }, [dbKPIs]);
+
+  const kpis = kpisWithCalculatedStatus;
 
   const { nationalStatus, summary, areaData } = useMemo(() => {
     const warnings = kpis.filter(k => k.status === 'warning').length;
     const critical = kpis.filter(k => k.status === 'critical').length;
+    const positive = kpis.filter(k => k.status === 'positive').length;
     
     let status: 'positive' | 'warning' | 'critical' = 'positive';
-    let summaryText = 'De flesta områden visar stabil utveckling.';
+    let summaryText = `${positive} av ${kpis.length} indikatorer visar positiv utveckling.`;
     
     if (critical > 1) {
       status = 'critical';
       summaryText = `${critical} centrala indikatorer visar kritisk nivå. Situationen kräver uppmärksamhet.`;
     } else if (warnings > 2 || critical === 1) {
       status = 'warning';
-      summaryText = `${warnings + critical} indikatorer visar varning. Flera områden kräver uppmärksamhet.`;
+      summaryText = `${warnings + critical} indikatorer avviker. Flera områden kräver uppmärksamhet.`;
     }
 
     const areas = AREA_GROUPS.map(group => ({
