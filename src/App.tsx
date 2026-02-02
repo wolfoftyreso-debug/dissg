@@ -46,6 +46,8 @@ import CivilizationDemo from "./pages/CivilizationDemo";
 import GlobalMapDemo from "./pages/GlobalMapDemo";
 import ExplainDemo from "./pages/ExplainDemo";
 import GlobalRealityDemo from "./pages/GlobalRealityDemo";
+import IndexEngineDemo from "./pages/IndexEngineDemo";
+import CorrelationDemo from "./pages/CorrelationDemo";
 
 const queryClient = new QueryClient();
 
@@ -95,6 +97,8 @@ const App = () => (
               <Route path="/map" element={<GlobalMapDemo />} />
               <Route path="/explain" element={<ExplainDemo />} />
               <Route path="/reality" element={<GlobalRealityDemo />} />
+              <Route path="/indices" element={<IndexEngineDemo />} />
+              <Route path="/correlation" element={<CorrelationDemo />} />
               
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={
