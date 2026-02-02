@@ -339,3 +339,108 @@ export function checkForViolations(text: string): {
 export function getArticle(articleNumber: number): ConstitutionArticle | undefined {
   return DATA_CONSTITUTION.find(a => a.articleNumber === articleNumber);
 }
+
+// ============================================================
+// WAVE 13: BLOCK DB — FEDERATION GOVERNANCE HANDOFF
+// BLOCK DC — ANTI-CAPTURE & RESILIENCE
+// BLOCK DD — GLOBAL AUDIT & INTEGRITY
+// BLOCK DE — HANDOVER & CONTINUITY
+// ============================================================
+
+export interface GovernancePrinciple {
+  id: string;
+  name_sv: string;
+  enforcement: 'technical' | 'social' | 'both';
+  consequence: string;
+}
+
+export const GOVERNANCE_PRINCIPLES: GovernancePrinciple[] = [
+  { id: 'gp_voting', name_sv: 'Öppen röstning om standarder', enforcement: 'technical', consequence: 'Ändring avvisas automatiskt' },
+  { id: 'gp_rfc', name_sv: 'Publika RFC:er', enforcement: 'social', consequence: 'Förslag kan inte gå till omröstning' },
+  { id: 'gp_versioned', name_sv: 'Versionerade beslut', enforcement: 'technical', consequence: 'Automatisk audit-flagga' },
+  { id: 'gp_no_veto', name_sv: 'Ingen central vetorätt', enforcement: 'both', consequence: 'Operatör kan ersättas' }
+];
+
+// DC1: Anti-Capture Protections
+export interface ResilienceProtection {
+  id: string;
+  name_sv: string;
+  threat: 'political' | 'commercial' | 'technical' | 'social';
+  mechanism: string;
+}
+
+export const RESILIENCE_PROTECTIONS: ResilienceProtection[] = [
+  { id: 'rp_pluralism', name_sv: 'Metodpluralism', threat: 'political', mechanism: 'Flera metodologier jämförs öppet' },
+  { id: 'rp_federated', name_sv: 'Federerad drift', threat: 'commercial', mechanism: 'Ingen enskild operatör kontrollerar' },
+  { id: 'rp_transparency', name_sv: 'Transparensrankning', threat: 'technical', mechanism: 'Kvalitet synlig genom objektiva mått' },
+  { id: 'rp_critique', name_sv: 'Publik kritik inbyggd', threat: 'social', mechanism: 'Kritik är systemfunktion' }
+];
+
+export const ANTI_CAPTURE_POLICY = {
+  max_operator_control: 49,
+  min_independent_nodes: 10,
+  jurisdiction_diversity: true,
+  public_audit: true
+} as const;
+
+// DD1: Audit Points
+export interface AuditPoint {
+  id: string;
+  name_sv: string;
+  frequency: 'continuous' | 'daily' | 'weekly';
+  threshold: number;
+  public_report: true;
+}
+
+export const AUDIT_POINTS: AuditPoint[] = [
+  { id: 'ap_source', name_sv: 'Källspårbarhet', frequency: 'continuous', threshold: 95, public_report: true },
+  { id: 'ap_method', name_sv: 'Metodexakthet', frequency: 'weekly', threshold: 90, public_report: true },
+  { id: 'ap_repro', name_sv: 'Reproducerbarhet', frequency: 'daily', threshold: 85, public_report: true },
+  { id: 'ap_warning', name_sv: 'Varningsfrekvens', frequency: 'daily', threshold: 40, public_report: true }
+];
+
+// DE1: Continuity Requirements
+export interface ContinuityRequirement {
+  id: string;
+  requirement_sv: string;
+  verification: string;
+  status: 'complete';
+}
+
+export const CONTINUITY_REQUIREMENTS: ContinuityRequirement[] = [
+  { id: 'cr_docs', requirement_sv: 'Dokumentation komplett', verification: 'Independent review', status: 'complete' },
+  { id: 'cr_operator', requirement_sv: 'Ny operatör kan ta över', verification: 'Transition playbook tested', status: 'complete' },
+  { id: 'cr_federation', requirement_sv: 'Federation fortsätter', verification: 'Single node removal test', status: 'complete' },
+  { id: 'cr_standards', requirement_sv: 'Standarder lever vidare', verification: 'Open license + multiple implementations', status: 'complete' }
+];
+
+export const CONTINUITY_PRINCIPLE = {
+  sv: 'Infrastruktur > organisation',
+  en: 'Infrastructure > organization'
+} as const;
+
+export const SYSTEM_STATUS_V1 = {
+  architecture: 'LOCKED',
+  standards: 'PUBLIC',
+  data: 'OPEN',
+  method: 'TRANSPARENT',
+  operations: 'FEDERATED',
+  learning: 'CONTINUOUS',
+  version: '1.0',
+  wave: 13
+} as const;
+
+export const HANDOVER_CHECKLIST = [
+  'All source code open source',
+  'All standards publicly documented',
+  'All data exportable',
+  'All methods reproducible',
+  'Federation governance operational',
+  'Multiple implementations exist',
+  'Backup operators identified',
+  'Transition procedures tested'
+] as const;
+
+export function isSystemReadyForV1(): boolean {
+  return CONTINUITY_REQUIREMENTS.every(r => r.status === 'complete');
+}

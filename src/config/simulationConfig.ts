@@ -228,3 +228,71 @@ export function validateSimulationInputs(
   
   return { valid: errors.length === 0, errors };
 }
+
+// ============================================================
+// WAVE 13: BLOCK CX — PLANETARY STRESS & SCENARIO ENGINE
+// BLOCK CY — COUNTERFACTUAL & ROBUSTNESS LAB
+// ============================================================
+
+export type ScenarioCategory = 
+  | 'energy_shock' | 'interest_inflation' | 'demographic_shift' 
+  | 'climate_stress' | 'migration_pressure' | 'institutional_change' | 'health_burden';
+
+export interface PlanetaryScenario {
+  id: string;
+  category: ScenarioCategory;
+  name_sv: string;
+  triggers: string[];
+  affected_kpis: string[];
+  time_horizon: 'short' | 'medium' | 'long';
+}
+
+export const PLANETARY_SCENARIOS: PlanetaryScenario[] = [
+  { id: 'ps_energy_spike', category: 'energy_shock', name_sv: 'Energipris-chock', triggers: ['Geopolitisk konflikt', 'Utbudsavbrott'], affected_kpis: ['economy', 'industry', 'transport'], time_horizon: 'short' },
+  { id: 'ps_rate_regime', category: 'interest_inflation', name_sv: 'Ränteregim-skifte', triggers: ['Inflationsspik', 'Centralbanks-policy'], affected_kpis: ['finance', 'housing', 'business'], time_horizon: 'medium' },
+  { id: 'ps_aging', category: 'demographic_shift', name_sv: 'Åldrings-acceleration', triggers: ['Födelsetal-nedgång', 'Emigration'], affected_kpis: ['healthcare', 'pensions', 'labor'], time_horizon: 'long' },
+  { id: 'ps_climate_extreme', category: 'climate_stress', name_sv: 'Klimatextrem', triggers: ['Värmebölja', 'Översvämning', 'Torka'], affected_kpis: ['agriculture', 'health', 'infrastructure'], time_horizon: 'medium' },
+  { id: 'ps_migration', category: 'migration_pressure', name_sv: 'Migrationsvåg', triggers: ['Konflikt', 'Klimat', 'Ekonomi'], affected_kpis: ['labor', 'housing', 'education'], time_horizon: 'medium' },
+  { id: 'ps_trust', category: 'institutional_change', name_sv: 'Institutionell förtroendeförändring', triggers: ['Skandaler', 'Policyfel'], affected_kpis: ['governance', 'compliance'], time_horizon: 'medium' },
+  { id: 'ps_pandemic', category: 'health_burden', name_sv: 'Pandemi-stress', triggers: ['Ny patogen', 'Variantemergency'], affected_kpis: ['health', 'labor', 'economy'], time_horizon: 'short' }
+];
+
+export const SCENARIO_DISCLOSURE_POLICY = {
+  always_mark_simulation: true,
+  show_assumptions: true,
+  show_historical_sensitivity: true,
+  show_uncertainty: true,
+  show_alternatives: true,
+  provides_recommendations: false,
+  disclaimer_sv: 'Detta är en simulering, inte en prediktion. Systemet ger inga råd.'
+} as const;
+
+// CY1: Robustness Tests
+export type RobustnessTestType = 'time_window' | 'sample_selection' | 'weight_variation' | 'method_switch';
+
+export interface RobustnessTest {
+  id: string;
+  type: RobustnessTestType;
+  name_sv: string;
+  interpretation: string;
+}
+
+export const ROBUSTNESS_TESTS: RobustnessTest[] = [
+  { id: 'rt_time', type: 'time_window', name_sv: 'Ändra tidsfönster', interpretation: 'Stabilt mönster håller över minst 3 olika tidsfönster' },
+  { id: 'rt_sample', type: 'sample_selection', name_sv: 'Ändra urval', interpretation: 'Stabilt mönster håller vid 80% slumpmässigt urval' },
+  { id: 'rt_weights', type: 'weight_variation', name_sv: 'Ändra vikter', interpretation: 'Stabilt mönster håller vid ±20% viktjustering' },
+  { id: 'rt_method', type: 'method_switch', name_sv: 'Byt metod', interpretation: 'Stabilt mönster bekräftas av minst 2 oberoende metoder' }
+];
+
+export interface RobustnessResult {
+  test_id: string;
+  result: 'holds' | 'falls' | 'partial';
+  holds_in_percent: number;
+  key_sensitivity: string;
+}
+
+export function interpretRobustness(result: RobustnessResult): string {
+  if (result.result === 'holds') return `Mönstret håller (${result.holds_in_percent}% bekräftade).`;
+  if (result.result === 'falls') return `Mönstret faller. Känsligt för: ${result.key_sensitivity}.`;
+  return `Delvis stabilt (${result.holds_in_percent}%). Känsligt för: ${result.key_sensitivity}.`;
+}
