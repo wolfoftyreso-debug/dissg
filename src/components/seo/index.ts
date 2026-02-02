@@ -3,6 +3,7 @@
  * 
  * Block 45: Canonical Fact Page — AI + Google Dominance
  * Block 48: Auto Internal Link Engine
+ * Block 49: Indicator Page — Definition, method, usage
  * 
  * Components optimized for search engines and AI agents.
  * 
@@ -12,6 +13,7 @@
  */
 
 export { FactPageTemplate, type FactPageData } from './FactPageTemplate';
+export { IndicatorPageTemplate, type IndicatorPageData } from './IndicatorPageTemplate';
 export { SemanticLinkSection, InlineSemanticLinks } from './SemanticLinkSection';
 
 // Re-export config utilities
