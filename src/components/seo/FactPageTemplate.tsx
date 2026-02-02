@@ -1,313 +1,273 @@
 /**
- * 📄 FACT PAGE TEMPLATE
+ * 🧱 MASTER EXECUTION BLOCK 45
  * 
- * Block 44: AI + Google optimized fact page structure
+ * CANONICAL FACT PAGE — HTML / SEO / AI TEMPLATE (FINAL)
  * 
- * This is the canonical template for all fact pages.
- * Every element is intentional for SEO and AI discoverability.
+ * Purpose:
+ * - Contains one verifiable claim
+ * - Machine and human readable
+ * - Can be cited in isolation
+ * - Stable over time
+ * - Works without JS, CSS, or images
+ * 
+ * 📌 1 page = 1 fact statement
+ * 
+ * CRITICAL RULES (NEVER BREAK):
+ * ❌ No images
+ * ❌ No graphs in HTML (graphs via API separately)
+ * ❌ No value words
+ * ❌ No CTAs
+ * ❌ No forms
+ * ✅ Text
+ * ✅ Structure
+ * ✅ Links
+ * ✅ Sources
  */
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, ExternalLink, AlertCircle, Clock, MapPin, BookOpen } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { 
-  createDatasetSchema, 
-  createBreadcrumbSchema,
-  generateCitations,
-  type FactPageStructure 
-} from '@/config/seoFactStructureConfig';
+import { Helmet } from 'react-helmet-async';
 
-interface FactPageProps {
-  fact: FactPageStructure;
-  value: number | string;
-  unit?: string;
-  trend?: 'up' | 'down' | 'stable';
+// ============================================================
+// TYPES
+// ============================================================
+
+export interface FactPageData {
+  // Core identifiers
+  factId: string;
+  topic: string;
+  scope: 'global' | 'country' | 'region' | 'municipality';
+  location: string;
+  locationCode: string; // ISO code
+  timeRange: string; // "1990-2024"
+  
+  // Content
+  title: string; // H1 text
+  description: string; // Meta description
+  summary: string; // Main paragraph (2-4 sentences)
+  whatThisDescribes: string; // Explanation paragraph
+  
+  // Metadata
+  sources: Array<{
+    name: string;
+    type: 'observed' | 'estimated' | 'calculated';
+    url?: string;
+  }>;
+  
+  uncertainty: string; // Explicit limitations text
+  
+  // Links
+  relatedFacts: Array<{
+    url: string;
+    title: string;
+  }>;
+  
+  parentUrl?: string;
+  
+  // Technical
+  canonicalUrl: string;
   lastUpdated: string;
+  version: string;
 }
 
-/**
- * Structured Data Component
- * Renders JSON-LD for Google/AI understanding
- */
-function StructuredData({ fact, value }: { fact: FactPageStructure; value: number | string }) {
-  const datasetSchema = createDatasetSchema({
-    name: fact.h1,
-    description: fact.summary,
-    startYear: parseInt(fact.timeSpan.split('–')[0]),
-    endYear: parseInt(fact.timeSpan.split('–')[1]),
-    spatialCoverage: fact.geographicLevel,
+// ============================================================
+// STRUCTURED DATA (SCHEMA.ORG)
+// ============================================================
+
+function generateDatasetSchema(fact: FactPageData) {
+  const [startYear, endYear] = fact.timeRange.split('-');
+  
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: fact.title,
+    description: fact.description,
+    temporalCoverage: `${startYear}/${endYear}`,
+    spatialCoverage: fact.locationCode,
     license: 'https://creativecommons.org/licenses/by/4.0/',
-    contentUrl: fact.citationUrl,
-  });
-
-  const breadcrumbItems = [
-    { name: 'Facts', url: '/facts/' },
-    { name: fact.geographicLevel, url: fact.links.parent },
-  ];
-
-  const breadcrumbSchema = createBreadcrumbSchema(breadcrumbItems);
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-    </>
-  );
-}
-
-/**
- * Breadcrumb Navigation
- * Semantic hierarchy visible to users and crawlers
- */
-function Breadcrumbs({ fact }: { fact: FactPageStructure }) {
-  return (
-    <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground mb-4">
-      <ol className="flex items-center gap-1 flex-wrap">
-        <li>
-          <Link to="/facts/" className="hover:text-foreground transition-colors">
-            Facts
-          </Link>
-        </li>
-        <ChevronRight className="h-3 w-3" />
-        <li>
-          <Link to={fact.links.parent} className="hover:text-foreground transition-colors">
-            {fact.geographicLevel}
-          </Link>
-        </li>
-        <ChevronRight className="h-3 w-3" />
-        <li className="text-foreground font-medium" aria-current="page">
-          {fact.h1}
-        </li>
-      </ol>
-    </nav>
-  );
-}
-
-/**
- * Uncertainty Badge
- * Always visible, always honest
- */
-function UncertaintyBadge({ level }: { level: 'low' | 'medium' | 'high' }) {
-  const config = {
-    low: { label: 'High confidence', className: 'bg-emerald-100 text-emerald-800' },
-    medium: { label: 'Moderate confidence', className: 'bg-amber-100 text-amber-800' },
-    high: { label: 'Significant uncertainty', className: 'bg-rose-100 text-rose-800' },
+    creator: {
+      '@type': 'Organization',
+      name: 'Global Reality Index',
+    },
+    dateModified: fact.lastUpdated,
+    version: fact.version,
   };
+}
 
-  const { label, className } = config[level];
+function generateBreadcrumbSchema(fact: FactPageData, baseUrl: string) {
+  const items = [
+    { name: 'Facts', url: `${baseUrl}/facts/` },
+    { name: fact.topic, url: `${baseUrl}/facts/${fact.topic}/` },
+    { name: fact.scope, url: `${baseUrl}/facts/${fact.topic}/${fact.scope}/` },
+    { name: fact.location, url: fact.canonicalUrl },
+  ];
+  
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
 
-  return (
-    <Badge variant="outline" className={className}>
-      <AlertCircle className="h-3 w-3 mr-1" />
-      {label}
-    </Badge>
-  );
+// ============================================================
+// MAIN COMPONENT
+// ============================================================
+
+interface FactPageTemplateProps {
+  fact: FactPageData;
+  baseUrl?: string;
 }
 
 /**
- * Source Attribution
- * Prominent, clickable, verifiable
- */
-function SourceAttribution({ sources }: { sources: string[] }) {
-  return (
-    <div className="border-l-2 border-muted pl-4 py-2">
-      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Sources</p>
-      <ul className="space-y-1">
-        {sources.map((source, i) => (
-          <li key={i}>
-            <Link 
-              to={`/sources/${source.toLowerCase().replace(/\s+/g, '-')}/`}
-              className="text-sm text-primary hover:underline inline-flex items-center gap-1"
-            >
-              {source}
-              <ExternalLink className="h-3 w-3" />
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-/**
- * Citation Block
- * Makes it trivially easy for AI/humans to cite
- */
-function CitationBlock({ fact }: { fact: FactPageStructure }) {
-  const citations = generateCitations({
-    statement: fact.h1,
-    source: fact.sources[0],
-    year: parseInt(fact.timeSpan.split('–')[1]),
-    url: fact.citationUrl,
-    accessDate: new Date().toISOString().split('T')[0],
-  });
-
-  return (
-    <Card className="bg-muted/50">
-      <CardContent className="pt-4">
-        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
-          Cite this fact
-        </p>
-        <code className="block text-xs bg-background p-2 rounded border overflow-x-auto">
-          {citations.apa}
-        </code>
-        <p className="text-xs text-muted-foreground mt-2">
-          Permanent URL: <a href={fact.citationUrl} className="text-primary">{fact.citationUrl}</a>
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-
-/**
- * Related Links
- * Semantic connections, not decorative
- */
-function RelatedLinks({ fact }: { fact: FactPageStructure }) {
-  return (
-    <nav aria-label="Related content">
-      <h2 className="text-sm font-semibold mb-3">Related</h2>
-      <ul className="space-y-2 text-sm">
-        <li>
-          <Link 
-            to={fact.links.indicator}
-            className="text-primary hover:underline inline-flex items-center gap-1"
-          >
-            <BookOpen className="h-3 w-3" />
-            View indicator time series
-          </Link>
-        </li>
-        <li>
-          <Link 
-            to={fact.links.question}
-            className="text-primary hover:underline inline-flex items-center gap-1"
-          >
-            <BookOpen className="h-3 w-3" />
-            Related Big Question
-          </Link>
-        </li>
-        <li>
-          <Link 
-            to={fact.links.history}
-            className="text-primary hover:underline inline-flex items-center gap-1"
-          >
-            <Clock className="h-3 w-3" />
-            Historical context
-          </Link>
-        </li>
-        {fact.links.children?.map((child, i) => (
-          <li key={i}>
-            <Link 
-              to={child}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ChevronRight className="h-3 w-3 inline" />
-              View sub-regions
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
-}
-
-/**
- * Main Fact Page Component
+ * Canonical Fact Page Template
  * 
- * Structure optimized for:
- * - Google crawlers (semantic HTML, structured data)
- * - AI agents (clear statement, sources, citability)
- * - Human readers (scannable, trustworthy)
+ * Ultra-minimal, semantic HTML optimized for:
+ * - Google indexing (< 100ms load)
+ * - AI agent citation (stable, quotable)
+ * - Human understanding (clear, honest)
+ * 
+ * NO: images, graphs, CTAs, forms, value words
+ * YES: text, structure, links, sources
  */
-export function FactPageTemplate({ fact, value, unit, trend, lastUpdated }: FactPageProps) {
+export function FactPageTemplate({ fact, baseUrl = '' }: FactPageTemplateProps) {
+  const datasetSchema = generateDatasetSchema(fact);
+  const breadcrumbSchema = generateBreadcrumbSchema(fact, baseUrl);
+  
   return (
     <>
-      {/* Structured Data (invisible to users, visible to crawlers) */}
-      <StructuredData fact={fact} value={value} />
+      {/* HEAD - Meta tags and structured data */}
+      <Helmet>
+        <html lang="en" />
+        <title>{fact.title} – Verified data overview</title>
+        <meta name="description" content={fact.description} />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href={fact.canonicalUrl} />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(datasetSchema)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
+      </Helmet>
 
-      <article className="max-w-3xl mx-auto px-4 py-8">
-        {/* Breadcrumbs */}
-        <Breadcrumbs fact={fact} />
-
-        {/* Main Heading (H1) - The fact statement */}
-        <h1 className="text-2xl font-bold text-foreground mb-4 leading-tight">
-          {fact.h1}
+      {/* BODY - Pure semantic HTML */}
+      <main className="max-w-2xl mx-auto px-4 py-8">
+        
+        {/* H1 - The fact statement */}
+        <h1 className="text-xl font-semibold text-foreground mb-4">
+          {fact.title}
         </h1>
 
-        {/* Meta badges */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <Badge variant="outline" className="text-xs">
-            <MapPin className="h-3 w-3 mr-1" />
-            {fact.geographicLevel}
-          </Badge>
-          <Badge variant="outline" className="text-xs">
-            <Clock className="h-3 w-3 mr-1" />
-            {fact.timeSpan}
-          </Badge>
-          <UncertaintyBadge level={fact.uncertainty} />
-        </div>
-
-        {/* Summary - 2-4 sentences */}
-        <p className="text-base text-foreground/90 leading-relaxed mb-6">
+        {/* Summary - 2-4 sentences, neutral, descriptive */}
+        <p className="text-base text-foreground/90 mb-6 leading-relaxed">
           {fact.summary}
         </p>
 
-        {/* Current value (if applicable) */}
-        {value !== undefined && (
-          <div className="bg-muted/30 rounded-lg p-4 mb-6">
-            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-              Current value
-            </p>
-            <p className="text-3xl font-bold text-foreground">
-              {typeof value === 'number' ? value.toLocaleString() : value}
-              {unit && <span className="text-lg font-normal text-muted-foreground ml-1">{unit}</span>}
-            </p>
-            {trend && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Trend: {trend === 'up' ? '↑ Increasing' : trend === 'down' ? '↓ Decreasing' : '→ Stable'}
-              </p>
-            )}
-          </div>
-        )}
+        {/* What this fact describes */}
+        <section className="mb-6">
+          <h2 className="text-base font-medium text-foreground mb-2">
+            What this fact describes
+          </h2>
+          <p className="text-sm text-foreground/80 leading-relaxed">
+            {fact.whatThisDescribes}
+          </p>
+        </section>
+
+        {/* Time span */}
+        <section className="mb-6">
+          <h2 className="text-base font-medium text-foreground mb-2">
+            Time span
+          </h2>
+          <p className="text-sm text-foreground/80">
+            {fact.timeRange.replace('-', '–')}
+          </p>
+        </section>
+
+        {/* Geographic scope */}
+        <section className="mb-6">
+          <h2 className="text-base font-medium text-foreground mb-2">
+            Geographic scope
+          </h2>
+          <p className="text-sm text-foreground/80">
+            {fact.scope.charAt(0).toUpperCase() + fact.scope.slice(1)}: {fact.location}
+          </p>
+        </section>
 
         {/* Sources */}
-        <div className="mb-6">
-          <SourceAttribution sources={fact.sources} />
-        </div>
+        <section className="mb-6">
+          <h2 className="text-base font-medium text-foreground mb-2">
+            Sources
+          </h2>
+          <ul className="list-disc list-inside text-sm text-foreground/80 space-y-1">
+            {fact.sources.map((source, index) => (
+              <li key={index}>
+                {source.url ? (
+                  <a 
+                    href={source.url} 
+                    className="text-primary hover:underline"
+                    rel="noopener noreferrer"
+                  >
+                    {source.name}
+                  </a>
+                ) : (
+                  source.name
+                )}
+                {' '}({source.type} data)
+              </li>
+            ))}
+          </ul>
+        </section>
 
-        {/* Citation block */}
-        <div className="mb-6">
-          <CitationBlock fact={fact} />
-        </div>
+        {/* Uncertainty and limitations */}
+        <section className="mb-6">
+          <h2 className="text-base font-medium text-foreground mb-2">
+            Uncertainty and limitations
+          </h2>
+          <p className="text-sm text-foreground/80 leading-relaxed">
+            {fact.uncertainty}
+          </p>
+        </section>
 
-        {/* Related content */}
-        <div className="border-t pt-6">
-          <RelatedLinks fact={fact} />
-        </div>
+        {/* Related facts */}
+        {fact.relatedFacts.length > 0 && (
+          <section className="mb-6">
+            <h2 className="text-base font-medium text-foreground mb-2">
+              Related facts
+            </h2>
+            <ul className="list-disc list-inside text-sm space-y-1">
+              {fact.relatedFacts.map((related, index) => (
+                <li key={index}>
+                  <Link 
+                    to={related.url}
+                    className="text-primary hover:underline"
+                  >
+                    {related.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
-        {/* Footer metadata */}
-        <footer className="mt-8 pt-4 border-t text-xs text-muted-foreground">
-          <p>
-            Fact ID: <code className="bg-muted px-1 rounded">{fact.factId}</code>
-          </p>
-          <p>
-            Last updated: {lastUpdated}
-          </p>
-          <p>
-            <Link to={fact.citationUrl} className="text-primary hover:underline">
-              Permanent citation URL
-            </Link>
-          </p>
-        </footer>
-      </article>
+      </main>
+
+      {/* FOOTER - Disclaimer */}
+      <footer className="max-w-2xl mx-auto px-4 py-6 border-t border-border">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          This page presents aggregated, open data for informational purposes only. 
+          No predictions or policy recommendations are made.
+        </p>
+        <p className="text-xs text-muted-foreground mt-2">
+          Fact ID: {fact.factId} · Version: {fact.version} · Updated: {fact.lastUpdated}
+        </p>
+      </footer>
     </>
   );
 }

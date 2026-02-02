@@ -1,11 +1,15 @@
 /**
  * SEO Components Index
  * 
- * Block 44: AI + Google Dominance
+ * Block 45: Canonical Fact Page — AI + Google Dominance
  * Components optimized for search engines and AI agents.
+ * 
+ * CRITICAL RULES:
+ * ❌ No images, graphs, CTAs, forms, value words
+ * ✅ Text, structure, links, sources
  */
 
-export { FactPageTemplate } from './FactPageTemplate';
+export { FactPageTemplate, type FactPageData } from './FactPageTemplate';
 
 // Re-export config utilities
 export { 
