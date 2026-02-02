@@ -1,5 +1,5 @@
 import { KPI, CategoryMeta } from '@/types/kpi';
-import { KPICard } from './KPICard';
+import { ClearKPICard } from './ClearKPICard';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -76,9 +76,9 @@ export function CategorySection({
 
       {/* KPI Grid - Responsiv */}
       {isExpanded && (
-        <div className="grid gap-2 px-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-3 px-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           {kpis.map((kpi) => (
-            <KPICard
+            <ClearKPICard
               key={kpi.id}
               kpi={kpi}
               onClick={() => onKPIClick?.(kpi)}
