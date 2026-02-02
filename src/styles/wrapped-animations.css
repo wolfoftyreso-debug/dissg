@@ -1,0 +1,445 @@
+/**
+ * REALITY WRAPPED - ANIMATION & COLOR SPECIFICATION
+ * ================================================
+ * Spotify-style soft transitions with disciplined execution
+ * 
+ * PRINCIPLES:
+ * - Clarity over effect
+ * - Motion with meaning
+ * - No animation without data
+ * - No color without legend
+ * 
+ * TIMING PHILOSOPHY:
+ * - Human-readable pace (800-1200ms per data reveal)
+ * - Easing that feels "confident, not rushed"
+ * - Staggered reveals for comprehension
+ */
+
+/* ===========================================
+   WRAPPED COLOR TOKENS (SEMANTIC)
+   =========================================== */
+
+:root {
+  /* Primary Wrapped Palette - Deep, confident tones */
+  --wrapped-bg-start: 210 35% 12%;
+  --wrapped-bg-end: 210 40% 8%;
+  --wrapped-surface: 210 30% 18%;
+  --wrapped-surface-elevated: 210 28% 22%;
+  
+  /* Text hierarchy */
+  --wrapped-text-primary: 0 0% 98%;
+  --wrapped-text-secondary: 210 15% 70%;
+  --wrapped-text-muted: 210 10% 50%;
+  
+  /* Accent - Reserved for verified data highlights */
+  --wrapped-accent: 210 65% 55%;
+  --wrapped-accent-glow: 210 80% 60%;
+  
+  /* Data-bound colors (only used with real values) */
+  --wrapped-data-positive: 145 55% 45%;
+  --wrapped-data-warning: 40 90% 55%;
+  --wrapped-data-critical: 0 70% 55%;
+  --wrapped-data-neutral: 210 15% 60%;
+  
+  /* Progress & sequence indicators */
+  --wrapped-progress-track: 210 20% 25%;
+  --wrapped-progress-fill: 210 65% 55%;
+  
+  /* Verification badge */
+  --wrapped-verified: 145 50% 50%;
+  --wrapped-unverified: 40 80% 50%;
+}
+
+/* ===========================================
+   KEYFRAME DEFINITIONS
+   =========================================== */
+
+/* Slide-up reveal - Primary entry animation */
+@keyframes wrapped-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade-in with scale - For emphasis moments */
+@keyframes wrapped-fade-scale {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Counter/number reveal - For data values */
+@keyframes wrapped-number-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(4px);
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Subtle pulse - For live data indicators */
+@keyframes wrapped-pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Progress bar fill */
+@keyframes wrapped-progress-fill {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: var(--progress-value, 0%);
+  }
+}
+
+/* Stagger container - Controls child delays */
+@keyframes wrapped-stagger-in {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gentle background gradient shift */
+@keyframes wrapped-bg-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Card entrance with depth */
+@keyframes wrapped-card-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Exit animation - slide down and fade */
+@keyframes wrapped-slide-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+}
+
+/* Verification checkmark */
+@keyframes wrapped-check-draw {
+  0% {
+    stroke-dashoffset: 24;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ===========================================
+   ANIMATION CLASSES
+   =========================================== */
+
+/* Base slide-up entry */
+.wrapped-animate-in {
+  animation: wrapped-slide-up 800ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+/* Fade with scale - hero moments */
+.wrapped-animate-hero {
+  animation: wrapped-fade-scale 1000ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+/* Number/data reveal */
+.wrapped-animate-number {
+  animation: wrapped-number-reveal 1000ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+/* Card entrance */
+.wrapped-animate-card {
+  animation: wrapped-card-enter 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+/* Exit animation */
+.wrapped-animate-out {
+  animation: wrapped-slide-out 500ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+/* Staggered children - apply to parent */
+.wrapped-stagger-children > * {
+  animation: wrapped-stagger-in 700ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.wrapped-stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.wrapped-stagger-children > *:nth-child(2) { animation-delay: 100ms; }
+.wrapped-stagger-children > *:nth-child(3) { animation-delay: 200ms; }
+.wrapped-stagger-children > *:nth-child(4) { animation-delay: 300ms; }
+.wrapped-stagger-children > *:nth-child(5) { animation-delay: 400ms; }
+.wrapped-stagger-children > *:nth-child(6) { animation-delay: 500ms; }
+
+/* Live data pulse indicator */
+.wrapped-pulse-live {
+  animation: wrapped-pulse-subtle 2s ease-in-out infinite;
+}
+
+/* Progress bar animation */
+.wrapped-progress-animated {
+  animation: wrapped-progress-fill 1200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Verification checkmark animation */
+.wrapped-check-animated {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: wrapped-check-draw 400ms ease-out 200ms forwards;
+}
+
+/* ===========================================
+   TIMING DELAYS (SEMANTIC)
+   =========================================== */
+
+.wrapped-delay-intro { animation-delay: 0ms; }
+.wrapped-delay-primary { animation-delay: 200ms; }
+.wrapped-delay-secondary { animation-delay: 400ms; }
+.wrapped-delay-tertiary { animation-delay: 600ms; }
+.wrapped-delay-data { animation-delay: 800ms; }
+.wrapped-delay-context { animation-delay: 1000ms; }
+.wrapped-delay-action { animation-delay: 1200ms; }
+
+/* ===========================================
+   BACKGROUND & SURFACE STYLES
+   =========================================== */
+
+.wrapped-bg {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--wrapped-bg-start)) 0%,
+    hsl(var(--wrapped-bg-end)) 100%
+  );
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.wrapped-bg-animated {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--wrapped-bg-start)) 0%,
+    hsl(var(--wrapped-bg-end)) 50%,
+    hsl(var(--wrapped-bg-start)) 100%
+  );
+  background-size: 200% 200%;
+  animation: wrapped-bg-shift 8s ease-in-out infinite;
+}
+
+.wrapped-surface {
+  background: hsl(var(--wrapped-surface));
+  border: 1px solid hsl(var(--wrapped-surface-elevated) / 0.5);
+  border-radius: 0.5rem;
+}
+
+.wrapped-surface-elevated {
+  background: hsl(var(--wrapped-surface-elevated));
+  border: 1px solid hsl(0 0% 100% / 0.05);
+  border-radius: 0.5rem;
+}
+
+/* ===========================================
+   TYPOGRAPHY STYLES
+   =========================================== */
+
+.wrapped-text-hero {
+  color: hsl(var(--wrapped-text-primary));
+  font-size: clamp(2rem, 8vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.wrapped-text-title {
+  color: hsl(var(--wrapped-text-primary));
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.wrapped-text-body {
+  color: hsl(var(--wrapped-text-secondary));
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.wrapped-text-caption {
+  color: hsl(var(--wrapped-text-muted));
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.wrapped-text-data {
+  color: hsl(var(--wrapped-accent));
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* ===========================================
+   DATA DISPLAY COMPONENTS
+   =========================================== */
+
+/* Large number display */
+.wrapped-number-large {
+  color: hsl(var(--wrapped-text-primary));
+  font-size: clamp(3rem, 12vw, 6rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* Trend indicator colors (only with data) */
+.wrapped-trend-positive {
+  color: hsl(var(--wrapped-data-positive));
+}
+
+.wrapped-trend-warning {
+  color: hsl(var(--wrapped-data-warning));
+}
+
+.wrapped-trend-critical {
+  color: hsl(var(--wrapped-data-critical));
+}
+
+.wrapped-trend-neutral {
+  color: hsl(var(--wrapped-data-neutral));
+}
+
+/* Progress bar */
+.wrapped-progress-track {
+  height: 4px;
+  background: hsl(var(--wrapped-progress-track));
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.wrapped-progress-bar {
+  height: 100%;
+  background: hsl(var(--wrapped-progress-fill));
+  border-radius: 2px;
+  width: var(--progress-value, 0%);
+}
+
+/* ===========================================
+   VERIFICATION & TRUST INDICATORS
+   =========================================== */
+
+.wrapped-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: hsl(var(--wrapped-verified) / 0.15);
+  color: hsl(var(--wrapped-verified));
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.wrapped-unverified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: hsl(var(--wrapped-unverified) / 0.15);
+  color: hsl(var(--wrapped-unverified));
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* ===========================================
+   TRANSITIONS (DISCIPLINED)
+   =========================================== */
+
+/* Standard transition - for interactive elements */
+.wrapped-transition {
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Slow transition - for page-level changes */
+.wrapped-transition-slow {
+  transition: all 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Color-only transition */
+.wrapped-transition-color {
+  transition: color 200ms ease, background-color 200ms ease;
+}
+
+/* Transform-only transition */
+.wrapped-transition-transform {
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ===========================================
+   REDUCED MOTION SUPPORT
+   =========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .wrapped-animate-in,
+  .wrapped-animate-hero,
+  .wrapped-animate-number,
+  .wrapped-animate-card,
+  .wrapped-animate-out,
+  .wrapped-stagger-children > *,
+  .wrapped-pulse-live,
+  .wrapped-progress-animated,
+  .wrapped-bg-animated {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  
+  .wrapped-progress-bar {
+    transition: none;
+  }
+}
