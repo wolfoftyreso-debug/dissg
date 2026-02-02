@@ -240,3 +240,76 @@ export function createMinimalDisclosure(entityType: string, reason: string): Tru
     caveats: ['Denna analys kan inte genomföras med tillgänglig data']
   };
 }
+
+// ============================================================
+// WAVE 11: BLOCK CK — GLOBAL STRESS TEST
+// BLOCK CL — ABUSE PREVENTION & KILL-SWITCHES
+// ============================================================
+
+export type ManipulationType = 
+  | 'cherry_picking'
+  | 'extreme_time_selection'
+  | 'method_manipulation'
+  | 'selective_comparison'
+  | 'context_stripping';
+
+export interface AdversarialTest {
+  id: string;
+  type: ManipulationType;
+  name: string;
+  description: string;
+  expected_system_response: string;
+  severity: 'critical' | 'high' | 'medium';
+}
+
+export const ADVERSARIAL_TESTS: AdversarialTest[] = [
+  { id: 'at_01', type: 'cherry_picking', name: 'Cherry-picking test', description: 'Användare väljer endast datapunkter som stödjer förutbestämd slutsats', expected_system_response: 'Varning: Delurval visat. Fullständig data visar annat mönster.', severity: 'critical' },
+  { id: 'at_02', type: 'extreme_time_selection', name: 'Extremt tidsurval', description: 'Väljer tidsperiod som maximerar önskad effekt', expected_system_response: 'Varning: Jämförelseperioder ej standardiserade.', severity: 'critical' },
+  { id: 'at_03', type: 'method_manipulation', name: 'Metodmanipulation', description: 'Byter metod mitt i analys', expected_system_response: 'Blockering: Samma metod krävs för jämförelse.', severity: 'critical' }
+];
+
+export interface HallOfFailureEntry {
+  id: string;
+  manipulation_type: ManipulationType;
+  title: string;
+  how_system_prevents: string;
+  educational_note: string;
+}
+
+export const HALL_OF_FAILURE: HallOfFailureEntry[] = [
+  { id: 'hof_01', manipulation_type: 'cherry_picking', title: 'Cherry-picking', how_system_prevents: 'Automatisk varning när <50% av data visas', educational_note: 'Att välja extrempunkter ger missvisande bild.' },
+  { id: 'hof_02', manipulation_type: 'extreme_time_selection', title: 'Strategiskt tidsval', how_system_prevents: 'Visar alltid standardperiod som jämförelse', educational_note: 'Startpunkt avgör trenden.' }
+];
+
+export type AbuseType = 'mass_scraping' | 'automated_propaganda' | 'misleading_embeds' | 'bot_manipulation';
+
+export interface KillSwitch {
+  id: string;
+  name: string;
+  scope: 'global' | 'per_key' | 'per_endpoint';
+  action: string;
+  reversible: boolean;
+  max_duration_hours: number;
+}
+
+export const KILL_SWITCHES: KillSwitch[] = [
+  { id: 'ks_01', name: 'Rate-limit override', scope: 'per_key', action: 'Reduce rate limit to 10%', reversible: true, max_duration_hours: 24 },
+  { id: 'ks_02', name: 'Query complexity cap', scope: 'per_endpoint', action: 'Reject complex queries', reversible: true, max_duration_hours: 12 },
+  { id: 'ks_03', name: 'Embed disable', scope: 'per_key', action: 'Disable embed functionality', reversible: true, max_duration_hours: 72 }
+];
+
+export const SHUTDOWN_POLICY = {
+  total_shutdown_possible: false,
+  rationale: 'Public infrastructure cannot be fully disabled. Only local dampening allowed.'
+} as const;
+
+export function detectCherryPicking(selectedCount: number, totalAvailable: number): { detected: boolean; message: string } | null {
+  const ratio = selectedCount / totalAvailable;
+  if (ratio < 0.5) {
+    return {
+      detected: true,
+      message: `Visar ${selectedCount} av ${totalAvailable} datapunkter (${(ratio * 100).toFixed(0)}%)`
+    };
+  }
+  return null;
+}

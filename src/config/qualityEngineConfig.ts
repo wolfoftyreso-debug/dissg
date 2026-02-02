@@ -285,3 +285,66 @@ export function getHighestSeverity(flags: Array<{ severity: 'info' | 'warning' |
   if (flags.some(f => f.severity === 'info')) return 'info';
   return null;
 }
+
+// ============================================================
+// WAVE 11: BLOCK CM — PUBLIC REPRODUCIBILITY ENGINE
+// BLOCK CN — PUBLIC FEEDBACK & CORRECTION LOOP
+// ============================================================
+
+export interface ReproducibilityPackage {
+  id: string;
+  analysis_type: 'single_value' | 'comparison' | 'trend' | 'correlation' | 'index';
+  title: string;
+  query: { kpi_ids: string[]; region_codes: string[]; period_start: string; period_end: string };
+  method: { method_id: string; method_version: string; formula?: string };
+  sources: { source_id: string; source_name: string; source_url: string; checksum: string }[];
+  original_result: { value: unknown; calculated_at: string; confidence: number };
+  reproducibility: { fully_reproducible: boolean; blockers?: string[] };
+}
+
+export const REPRODUCE_BUTTON_CONFIG = {
+  always_visible: true,
+  position: 'top-right' as const,
+  label: { sv: 'Återskapa analys', en: 'Reproduce analysis' }
+};
+
+export interface ForkedAnalysis {
+  id: string;
+  original_id: string;
+  forked_at: string;
+  forked_by: string;
+  changes: { field: string; original_value: unknown; new_value: unknown }[];
+  visibility: 'private' | 'public' | 'unlisted';
+}
+
+export type FeedbackType = 'error_report' | 'method_critique' | 'source_suggestion' | 'improvement_proposal' | 'data_correction';
+
+export interface FeedbackSubmission {
+  id: string;
+  type: FeedbackType;
+  submitted_at: string;
+  target_type: 'kpi' | 'method' | 'source' | 'visualization' | 'general';
+  target_id?: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'acknowledged' | 'investigating' | 'resolved' | 'rejected';
+  public: true; // Always public
+}
+
+export const CORRECTION_POLICIES = [
+  { rule: 'Inget tas bort', enforcement: 'strict' as const, rationale: 'Felaktig data märks som korrigerad, inte raderad.' },
+  { rule: 'Fel rättas via version', enforcement: 'strict' as const, rationale: 'Korrigeringar skapar ny version med länk till original.' },
+  { rule: 'Ändringslogg synlig', enforcement: 'strict' as const, rationale: 'Alla ändringar loggas med tidsstämpel och anledning.' }
+] as const;
+
+export interface RevisionEntry {
+  id: string;
+  entity_type: 'kpi_value' | 'method' | 'source' | 'analysis';
+  entity_id: string;
+  revision_number: number;
+  created_at: string;
+  change_type: 'correction' | 'update' | 'methodology_change';
+  change_summary: string;
+  reason: string;
+  previous_revision_id?: string;
+}
