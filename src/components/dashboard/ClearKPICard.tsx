@@ -44,58 +44,71 @@ function generateSparklineData(value: number, trend: string, percent: number): n
   return data;
 }
 
-// Calculate the actual change between current and previous value
-function calculateChange(current: number, previous: number, unit: string): { value: number; unit: string } {
-  const diff = current - previous;
-  
-  // For percentage units, the change is in percentage points
-  if (unit.includes('%')) {
-    return { value: Math.abs(diff), unit: 'procentenheter' };
+// Identify KPI type for special handling
+function getKPIType(kpiId: string, unit: string): 'baseline_deviation' | 'percentage' | 'absolute' | 'per_capita' | 'time' | 'index' | 'ratio' | 'currency' {
+  // Baseline deviation types (like excess mortality)
+  if (kpiId === 'excess_mortality' || unit.includes('baslinjen') || unit.includes('över baslinjen')) {
+    return 'baseline_deviation';
   }
-  
-  // For years
-  if (unit === 'år') {
-    return { value: Math.abs(diff), unit: 'år' };
+  // Percentage of population
+  if (unit.includes('%') && !unit.includes('baslinjen')) {
+    return 'percentage';
   }
-  
-  // For days
-  if (unit.includes('dagar')) {
-    return { value: Math.abs(diff), unit: 'dagar' };
+  // Per capita / per 100,000
+  if (unit.includes('100 000') || unit.includes('100000') || unit.includes('per 100')) {
+    return 'per_capita';
   }
-  
-  // For ratios
-  if (unit.includes('/')) {
-    return { value: Math.abs(diff), unit: 'enheter' };
+  // Time duration
+  if (unit.includes('dagar') || unit.includes('dag') || unit === 'dagar (brott→dom)' || unit.includes('median')) {
+    return 'time';
   }
-  
-  // For SEK
+  // Index values
+  if (unit.includes('index') || unit.includes('stabilitetsindex')) {
+    return 'index';
+  }
+  // Ratio
+  if (unit.includes('/') || unit.includes('försörjda')) {
+    return 'ratio';
+  }
+  // Currency
   if (unit.includes('SEK')) {
-    return { value: Math.abs(diff), unit: 'SEK' };
+    return 'currency';
   }
-  
-  // For index values
-  if (unit.includes('index')) {
-    return { value: Math.abs(diff), unit: 'indexenheter' };
-  }
-  
-  // For per 100,000
-  if (unit.includes('100 000') || unit.includes('100000')) {
-    return { value: Math.abs(diff), unit: 'fall per 100 000' };
-  }
-  
-  // Default
-  return { value: Math.abs(diff), unit: unit };
+  // Default to absolute
+  return 'absolute';
 }
 
-// Get trend text with direction
-function getTrendText(direction: 'up' | 'down' | 'stable', inverted?: boolean): string {
-  const isPositive = inverted ? direction === 'down' : direction === 'up';
-  const isNegative = inverted ? direction === 'up' : direction === 'down';
+// Calculate the actual change between current and previous value with proper unit handling
+function calculateChange(current: number, previous: number, unit: string, kpiId: string): { 
+  value: number; 
+  unit: string; 
+  clarification?: string;
+} {
+  const diff = current - previous;
+  const kpiType = getKPIType(kpiId, unit);
   
-  if (direction === 'stable') return 'Stabil trend';
-  if (isPositive) return 'Positiv utveckling';
-  if (isNegative) return 'Negativ utveckling';
-  return '';
+  switch (kpiType) {
+    case 'baseline_deviation':
+      return { 
+        value: Math.abs(diff), 
+        unit: 'procentenheter',
+        clarification: 'Detta visar hur avvikelsen från det normala har förändrats – inte den totala dödligheten.'
+      };
+    case 'percentage':
+      return { value: Math.abs(diff), unit: 'procentenheter' };
+    case 'per_capita':
+      return { value: Math.abs(diff), unit: 'fall per 100 000' };
+    case 'time':
+      return { value: Math.abs(Math.round(diff)), unit: 'dagar' };
+    case 'index':
+      return { value: Math.abs(Math.round(diff)), unit: 'indexenheter' };
+    case 'ratio':
+      return { value: Math.abs(diff), unit: 'enheter' };
+    case 'currency':
+      return { value: Math.abs(Math.round(diff)), unit: 'SEK' };
+    default:
+      return { value: Math.abs(diff), unit: unit };
+  }
 }
 
 export function ClearKPICard({ kpi, onClick }: ClearKPICardProps) {
@@ -103,10 +116,7 @@ export function ClearKPICard({ kpi, onClick }: ClearKPICardProps) {
   const isCritical = kpi.status === 'critical';
   const hasActiveWarning = isCritical && kpi.redFlags.length > 0;
   const explanation = getSimpleExplanation(kpi.id);
-  const change = calculateChange(kpi.value, kpi.previousValue, kpi.unit);
-  
-  // Determine if this is a percentage type value (showing %)
-  const isPercentageType = kpi.unit.includes('%');
+  const change = calculateChange(kpi.value, kpi.previousValue, kpi.unit, kpi.id);
   
   // Format value nicely
   const formattedValue = typeof kpi.value === 'number' && kpi.value >= 1000 
@@ -176,6 +186,7 @@ export function ClearKPICard({ kpi, onClick }: ClearKPICardProps) {
           changeUnit={change.unit}
           comparisonPeriod="samma period förra året"
           inverted={kpi.inverted}
+          clarification={change.clarification}
         />
         
         {/* Long-term trend */}
