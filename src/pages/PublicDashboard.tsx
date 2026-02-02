@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { 
   TrendingUp, TrendingDown, Minus, ChevronRight, Info, Shield, 
   ChevronDown, ExternalLink, ArrowLeft, BarChart3, Eye, Database,
-  HelpCircle
+  HelpCircle, Calendar
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -607,11 +607,17 @@ export default function PublicDashboard() {
             <NationalStatusBadge status={nationalStatus} summary={summary} />
 
             {/* Quick Links */}
-            <div className="flex justify-center gap-2 mt-4">
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
               <Button variant="outline" size="sm" asChild>
                 <Link to="/regional" className="gap-2">
                   <BarChart3 className="h-4 w-4" />
                   Jämför län
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/decisions" className="gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Beslutstidslinje
                 </Link>
               </Button>
             </div>
