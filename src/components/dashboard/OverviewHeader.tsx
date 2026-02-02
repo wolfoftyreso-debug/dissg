@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { KPI } from '@/types/kpi';
 import { cn } from '@/lib/utils';
+import { RootKPIDisplay } from './RootKPIDisplay';
+import { ChevronDown } from 'lucide-react';
 
 interface ComparisonPeriod {
   label: string;
@@ -17,15 +20,19 @@ interface OverviewHeaderProps {
   kpis: KPI[];
   selectedPeriod: 'week' | 'month3' | 'month12';
   onPeriodChange: (period: 'week' | 'month3' | 'month12') => void;
+  onKPIClick?: (kpi: KPI) => void;
 }
 
-export function OverviewHeader({ kpis, selectedPeriod, onPeriodChange }: OverviewHeaderProps) {
+export function OverviewHeader({ kpis, selectedPeriod, onPeriodChange, onKPIClick }: OverviewHeaderProps) {
+  const [showRootKPIDetails, setShowRootKPIDetails] = useState(false);
+  
   const criticalCount = kpis.filter(k => k.status === 'critical').length;
   const warningCount = kpis.filter(k => k.status === 'warning').length;
   const positiveCount = kpis.filter(k => k.status === 'positive').length;
+  
   return (
     <div className="space-y-4 px-4 py-5 border-b border-border">
-      {/* Title - just nu */}
+      {/* Title */}
       <div>
         <h2 className="text-lg font-semibold text-foreground tracking-tight">
           Nationell lägesbild
@@ -33,7 +40,26 @@ export function OverviewHeader({ kpis, selectedPeriod, onPeriodChange }: Overvie
         <p className="text-sm text-muted-foreground mt-0.5">just nu</p>
       </div>
 
-      {/* Period selector - tydlig jämförelse */}
+      {/* Root KPI - Compact view */}
+      <RootKPIDisplay kpis={kpis} onKPIClick={onKPIClick} compact />
+      
+      {/* Expandable root KPI details */}
+      <button
+        onClick={() => setShowRootKPIDetails(!showRootKPIDetails)}
+        className="flex w-full items-center justify-between rounded-md border border-border bg-card p-2 text-left hover:bg-muted/50 transition-colors"
+      >
+        <span className="text-xs font-medium text-foreground">Visa hierarki & bidrag</span>
+        <ChevronDown className={cn(
+          "h-4 w-4 text-muted-foreground transition-transform",
+          showRootKPIDetails && "rotate-180"
+        )} />
+      </button>
+      
+      {showRootKPIDetails && (
+        <RootKPIDisplay kpis={kpis} onKPIClick={onKPIClick} />
+      )}
+
+      {/* Period selector */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Jämför:</span>
         <div className="flex gap-1">
@@ -54,7 +80,7 @@ export function OverviewHeader({ kpis, selectedPeriod, onPeriodChange }: Overvie
         </div>
       </div>
 
-      {/* Status summary - tre signalfärger, tydliga siffror */}
+      {/* Status summary */}
       <div className="flex items-center gap-6">
         {criticalCount > 0 && (
           <div className="flex items-center gap-2">

@@ -15,12 +15,15 @@ import {
   Globe,
   Eye,
   GitBranch,
-  Sparkles
+  Sparkles,
+  FileSignature
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { PublicCommitmentCard } from '@/components/dashboard/PublicCommitmentCard';
+import { EXAMPLE_COMMITMENTS } from '@/config/publicCommitmentConfig';
 
 // Core principles (Block IA)
 const CORE_PRINCIPLES = [
@@ -597,6 +600,104 @@ export default function GlobalCompact() {
                     <span>Tillgång: ALLA</span>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Public Commitments Section */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+            <FileSignature className="h-8 w-8 text-primary" />
+            <div>
+              <h2 className="text-2xl font-bold">Offentliga Åtaganden</h2>
+              <p className="text-muted-foreground">Politiska aktörer som accepterat verklighetskontraktet</p>
+            </div>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-primary" />
+                Signatärprogram
+              </CardTitle>
+              <CardDescription>
+                Partier, regeringar och organisationer som frivilligt åtar sig att:
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-3">
+                <div className="flex items-start gap-3 rounded-lg bg-muted/50 p-3">
+                  <CheckCircle2 className="h-5 w-5 text-status-positive shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Acceptera data som referens</p>
+                    <p className="text-sm text-muted-foreground">
+                      "Vi utgår från dessa öppna indikatorer som gemensam verklighetsbeskrivning."
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 rounded-lg bg-muted/50 p-3">
+                  <CheckCircle2 className="h-5 w-5 text-status-positive shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Öppen uppföljning</p>
+                    <p className="text-sm text-muted-foreground">
+                      "Våra framsteg publiceras kvartalsvis. Bedöm oss på utfallet."
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 rounded-lg bg-muted/50 p-3">
+                  <CheckCircle2 className="h-5 w-5 text-status-positive shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Svara på varningsflaggor</p>
+                    <p className="text-sm text-muted-foreground">
+                      "Vid negativ utveckling svarar vi offentligt inom 14 dagar."
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <h4 className="text-sm font-semibold text-foreground mb-3">Kärnlöftet</h4>
+                <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground">
+                  "Vi lovar inte att lyckas. Vi lovar att mäta, visa och justera öppet."
+                </blockquote>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Example Commitments */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Aktiva Åtaganden (exempel)</h3>
+            {EXAMPLE_COMMITMENTS.map(commitment => (
+              <PublicCommitmentCard key={commitment.id} commitment={commitment} />
+            ))}
+          </div>
+
+          {/* How to Sign */}
+          <Card className="bg-primary/5 border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-primary">Bli signatär</CardTitle>
+              <CardDescription>
+                Politiska partier, kommuner, regioner och organisationer kan ansluta sig
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Att underteckna Global Reality Compact innebär:
+                </p>
+                <ol className="list-decimal list-inside space-y-2 text-sm">
+                  <li>Acceptera systemets indikatorer som gemensam verklighetsgrund</li>
+                  <li>Definiera vilka KPI:er ni tar primärt ansvar för</li>
+                  <li>Sätta mätbara mål med tidsramar</li>
+                  <li>Publicera framsteg öppet enligt överenskommen frekvens</li>
+                </ol>
+                <Button className="mt-4">
+                  <FileSignature className="mr-2 h-4 w-4" />
+                  Ansök om signatur
+                </Button>
               </div>
             </CardContent>
           </Card>
