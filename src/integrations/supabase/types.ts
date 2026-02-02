@@ -440,6 +440,195 @@ export type Database = {
           },
         ]
       }
+      countries: {
+        Row: {
+          bloc: string | null
+          code: string
+          code_alpha3: string | null
+          created_at: string
+          currency_code: string | null
+          data_depth: Database["public"]["Enums"]["data_depth_level"]
+          data_quality_score: number | null
+          gdp_per_capita: number | null
+          has_feeds_enabled: boolean
+          has_municipal_data: boolean
+          has_politician_profiles: boolean
+          has_regional_data: boolean
+          has_responsibility_model: boolean
+          has_simulation: boolean
+          id: string
+          is_active: boolean
+          languages: string[] | null
+          last_data_update: string | null
+          name: string
+          name_local: string | null
+          population: number | null
+          region: string
+          subregion: string | null
+          timezone: string | null
+          updated_at: string
+        }
+        Insert: {
+          bloc?: string | null
+          code: string
+          code_alpha3?: string | null
+          created_at?: string
+          currency_code?: string | null
+          data_depth?: Database["public"]["Enums"]["data_depth_level"]
+          data_quality_score?: number | null
+          gdp_per_capita?: number | null
+          has_feeds_enabled?: boolean
+          has_municipal_data?: boolean
+          has_politician_profiles?: boolean
+          has_regional_data?: boolean
+          has_responsibility_model?: boolean
+          has_simulation?: boolean
+          id?: string
+          is_active?: boolean
+          languages?: string[] | null
+          last_data_update?: string | null
+          name: string
+          name_local?: string | null
+          population?: number | null
+          region: string
+          subregion?: string | null
+          timezone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bloc?: string | null
+          code?: string
+          code_alpha3?: string | null
+          created_at?: string
+          currency_code?: string | null
+          data_depth?: Database["public"]["Enums"]["data_depth_level"]
+          data_quality_score?: number | null
+          gdp_per_capita?: number | null
+          has_feeds_enabled?: boolean
+          has_municipal_data?: boolean
+          has_politician_profiles?: boolean
+          has_regional_data?: boolean
+          has_responsibility_model?: boolean
+          has_simulation?: boolean
+          id?: string
+          is_active?: boolean
+          languages?: string[] | null
+          last_data_update?: string | null
+          name?: string
+          name_local?: string | null
+          population?: number | null
+          region?: string
+          subregion?: string | null
+          timezone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      country_comparability: {
+        Row: {
+          comparability_notes: string | null
+          country_a: string
+          country_b: string
+          coverage_match: number | null
+          definition_match: number | null
+          id: string
+          kpi_code: string | null
+          last_assessed: string
+          level: Database["public"]["Enums"]["comparability_level"]
+          limitations: string[] | null
+          methodology_match: number | null
+          score: number
+        }
+        Insert: {
+          comparability_notes?: string | null
+          country_a: string
+          country_b: string
+          coverage_match?: number | null
+          definition_match?: number | null
+          id?: string
+          kpi_code?: string | null
+          last_assessed?: string
+          level: Database["public"]["Enums"]["comparability_level"]
+          limitations?: string[] | null
+          methodology_match?: number | null
+          score?: number
+        }
+        Update: {
+          comparability_notes?: string | null
+          country_a?: string
+          country_b?: string
+          coverage_match?: number | null
+          definition_match?: number | null
+          id?: string
+          kpi_code?: string | null
+          last_assessed?: string
+          level?: Database["public"]["Enums"]["comparability_level"]
+          limitations?: string[] | null
+          methodology_match?: number | null
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "country_comparability_country_a_fkey"
+            columns: ["country_a"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "country_comparability_country_b_fkey"
+            columns: ["country_b"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      country_gmi_weights: {
+        Row: {
+          country_code: string
+          created_at: string
+          gmi_version: string
+          id: string
+          is_active: boolean
+          override_reason: string | null
+          weight_overrides: Json
+        }
+        Insert: {
+          country_code: string
+          created_at?: string
+          gmi_version: string
+          id?: string
+          is_active?: boolean
+          override_reason?: string | null
+          weight_overrides?: Json
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          gmi_version?: string
+          id?: string
+          is_active?: boolean
+          override_reason?: string | null
+          weight_overrides?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "country_gmi_weights_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "country_gmi_weights_gmi_version_fkey"
+            columns: ["gmi_version"]
+            isOneToOne: false
+            referencedRelation: "global_master_index_config"
+            referencedColumns: ["version"]
+          },
+        ]
+      }
       critical_signal_overrides: {
         Row: {
           created_at: string
@@ -1226,6 +1415,337 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "feed_definitions"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      global_data_sources: {
+        Row: {
+          api_base_url: string | null
+          api_documentation_url: string | null
+          code: string
+          countries_covered: string[] | null
+          created_at: string
+          data_depth: Database["public"]["Enums"]["data_depth_level"]
+          geographic_coverage: string
+          id: string
+          indicator_catalog_url: string | null
+          indicator_count: number | null
+          is_active: boolean
+          last_error: string | null
+          last_successful_fetch: string | null
+          name: string
+          reliability_score: number
+          requires_auth: boolean
+          typical_lag_days: number | null
+          update_frequency: Database["public"]["Enums"]["update_frequency"]
+          updated_at: string
+        }
+        Insert: {
+          api_base_url?: string | null
+          api_documentation_url?: string | null
+          code: string
+          countries_covered?: string[] | null
+          created_at?: string
+          data_depth: Database["public"]["Enums"]["data_depth_level"]
+          geographic_coverage: string
+          id?: string
+          indicator_catalog_url?: string | null
+          indicator_count?: number | null
+          is_active?: boolean
+          last_error?: string | null
+          last_successful_fetch?: string | null
+          name: string
+          reliability_score?: number
+          requires_auth?: boolean
+          typical_lag_days?: number | null
+          update_frequency: Database["public"]["Enums"]["update_frequency"]
+          updated_at?: string
+        }
+        Update: {
+          api_base_url?: string | null
+          api_documentation_url?: string | null
+          code?: string
+          countries_covered?: string[] | null
+          created_at?: string
+          data_depth?: Database["public"]["Enums"]["data_depth_level"]
+          geographic_coverage?: string
+          id?: string
+          indicator_catalog_url?: string | null
+          indicator_count?: number | null
+          is_active?: boolean
+          last_error?: string | null
+          last_successful_fetch?: string | null
+          name?: string
+          reliability_score?: number
+          requires_auth?: boolean
+          typical_lag_days?: number | null
+          update_frequency?: Database["public"]["Enums"]["update_frequency"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      global_kpi_mappings: {
+        Row: {
+          created_at: string
+          gmi_component: string | null
+          id: string
+          internal_kpi_code: string
+          internal_kpi_name: string
+          is_active: boolean
+          mapping_confidence: number
+          notes: string | null
+          source_code: string
+          source_indicator_code: string
+          source_indicator_name: string | null
+          transformation: string | null
+          transformation_formula: string | null
+          unit_conversion: number | null
+        }
+        Insert: {
+          created_at?: string
+          gmi_component?: string | null
+          id?: string
+          internal_kpi_code: string
+          internal_kpi_name: string
+          is_active?: boolean
+          mapping_confidence?: number
+          notes?: string | null
+          source_code: string
+          source_indicator_code: string
+          source_indicator_name?: string | null
+          transformation?: string | null
+          transformation_formula?: string | null
+          unit_conversion?: number | null
+        }
+        Update: {
+          created_at?: string
+          gmi_component?: string | null
+          id?: string
+          internal_kpi_code?: string
+          internal_kpi_name?: string
+          is_active?: boolean
+          mapping_confidence?: number
+          notes?: string | null
+          source_code?: string
+          source_indicator_code?: string
+          source_indicator_name?: string | null
+          transformation?: string | null
+          transformation_formula?: string | null
+          unit_conversion?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "global_kpi_mappings_source_code_fkey"
+            columns: ["source_code"]
+            isOneToOne: false
+            referencedRelation: "global_data_sources"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      global_kpi_values: {
+        Row: {
+          confidence: number
+          country_code: string
+          created_at: string
+          data_quality: Database["public"]["Enums"]["data_depth_level"]
+          data_source_code: string
+          estimation_method: string | null
+          gmi_component: string | null
+          granularity: string
+          id: string
+          is_estimated: boolean
+          kpi_code: string
+          period_end: string
+          period_start: string
+          previous_value: number | null
+          region_code: string | null
+          source_indicator_code: string | null
+          source_url: string | null
+          trend: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent: number | null
+          uncertainty_range: number | null
+          unit: string
+          updated_at: string
+          value: number
+          value_normalized: number | null
+        }
+        Insert: {
+          confidence?: number
+          country_code: string
+          created_at?: string
+          data_quality?: Database["public"]["Enums"]["data_depth_level"]
+          data_source_code: string
+          estimation_method?: string | null
+          gmi_component?: string | null
+          granularity?: string
+          id?: string
+          is_estimated?: boolean
+          kpi_code: string
+          period_end: string
+          period_start: string
+          previous_value?: number | null
+          region_code?: string | null
+          source_indicator_code?: string | null
+          source_url?: string | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent?: number | null
+          uncertainty_range?: number | null
+          unit: string
+          updated_at?: string
+          value: number
+          value_normalized?: number | null
+        }
+        Update: {
+          confidence?: number
+          country_code?: string
+          created_at?: string
+          data_quality?: Database["public"]["Enums"]["data_depth_level"]
+          data_source_code?: string
+          estimation_method?: string | null
+          gmi_component?: string | null
+          granularity?: string
+          id?: string
+          is_estimated?: boolean
+          kpi_code?: string
+          period_end?: string
+          period_start?: string
+          previous_value?: number | null
+          region_code?: string | null
+          source_indicator_code?: string | null
+          source_url?: string | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent?: number | null
+          uncertainty_range?: number | null
+          unit?: string
+          updated_at?: string
+          value?: number
+          value_normalized?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "global_kpi_values_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      global_master_index_config: {
+        Row: {
+          components: Json
+          created_at: string
+          default_weights: Json
+          id: string
+          is_active: boolean
+          missing_data_handling: string
+          normalization_method: string
+          valid_from: string
+          valid_until: string | null
+          version: string
+        }
+        Insert: {
+          components?: Json
+          created_at?: string
+          default_weights?: Json
+          id?: string
+          is_active?: boolean
+          missing_data_handling?: string
+          normalization_method?: string
+          valid_from?: string
+          valid_until?: string | null
+          version: string
+        }
+        Update: {
+          components?: Json
+          created_at?: string
+          default_weights?: Json
+          id?: string
+          is_active?: boolean
+          missing_data_handling?: string
+          normalization_method?: string
+          valid_from?: string
+          valid_until?: string | null
+          version?: string
+        }
+        Relationships: []
+      }
+      global_master_index_values: {
+        Row: {
+          average_confidence: number | null
+          bloc_rank: number | null
+          calculated_at: string
+          component_values: Json
+          country_code: string
+          data_completeness: number
+          data_gaps: string[] | null
+          global_rank: number | null
+          gmi_version: string
+          id: string
+          period_end: string
+          period_start: string
+          previous_value: number | null
+          region_code: string | null
+          regional_rank: number | null
+          trend: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent: number | null
+          value: number
+        }
+        Insert: {
+          average_confidence?: number | null
+          bloc_rank?: number | null
+          calculated_at?: string
+          component_values?: Json
+          country_code: string
+          data_completeness?: number
+          data_gaps?: string[] | null
+          global_rank?: number | null
+          gmi_version: string
+          id?: string
+          period_end: string
+          period_start: string
+          previous_value?: number | null
+          region_code?: string | null
+          regional_rank?: number | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent?: number | null
+          value: number
+        }
+        Update: {
+          average_confidence?: number | null
+          bloc_rank?: number | null
+          calculated_at?: string
+          component_values?: Json
+          country_code?: string
+          data_completeness?: number
+          data_gaps?: string[] | null
+          global_rank?: number | null
+          gmi_version?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          previous_value?: number | null
+          region_code?: string | null
+          regional_rank?: number | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent?: number | null
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "global_master_index_values_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "global_master_index_values_gmi_version_fkey"
+            columns: ["gmi_version"]
+            isOneToOne: false
+            referencedRelation: "global_master_index_config"
+            referencedColumns: ["version"]
           },
         ]
       }
@@ -2358,6 +2878,56 @@ export type Database = {
         }
         Relationships: []
       }
+      regional_subdivisions: {
+        Row: {
+          area_km2: number | null
+          code: string
+          country_code: string
+          created_at: string
+          data_quality_score: number | null
+          id: string
+          level: number
+          name: string
+          name_local: string | null
+          parent_code: string | null
+          population: number | null
+        }
+        Insert: {
+          area_km2?: number | null
+          code: string
+          country_code: string
+          created_at?: string
+          data_quality_score?: number | null
+          id?: string
+          level: number
+          name: string
+          name_local?: string | null
+          parent_code?: string | null
+          population?: number | null
+        }
+        Update: {
+          area_km2?: number | null
+          code?: string
+          country_code?: string
+          created_at?: string
+          data_quality_score?: number | null
+          id?: string
+          level?: number
+          name?: string
+          name_local?: string | null
+          parent_code?: string | null
+          population?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regional_subdivisions_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       relevance_scores: {
         Row: {
           acceleration_raw: number
@@ -2750,6 +3320,8 @@ export type Database = {
         | "minister"
         | "prime_minister"
         | "system_admin"
+      comparability_level: "full" | "partial" | "limited" | "none"
+      data_depth_level: "global_baseline" | "regional_bloc" | "national_deep"
       data_source_type: "api" | "file_feed" | "manual" | "calculated"
       delivery_method: "api" | "webhook" | "sse" | "kafka"
       feed_severity: "low" | "medium" | "high" | "critical"
@@ -2943,6 +3515,8 @@ export const Constants = {
         "prime_minister",
         "system_admin",
       ],
+      comparability_level: ["full", "partial", "limited", "none"],
+      data_depth_level: ["global_baseline", "regional_bloc", "national_deep"],
       data_source_type: ["api", "file_feed", "manual", "calculated"],
       delivery_method: ["api", "webhook", "sse", "kafka"],
       feed_severity: ["low", "medium", "high", "critical"],
