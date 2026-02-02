@@ -11,11 +11,12 @@ import { DecisionsTimelinePanel } from '@/components/dashboard/DecisionsTimeline
 import { ResponsibilityPanel } from '@/components/dashboard/ResponsibilityPanel';
 import { AnalysisPanel } from '@/components/dashboard/AnalysisPanel';
 import { RoleBasedDashboard } from '@/components/dashboard/RoleBasedDashboard';
+import { AlertNotificationPanel } from '@/components/dashboard/AlertNotificationPanel';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { useUserRoles } from '@/hooks/useUserRole';
 import { getRoleConfig } from '@/config/roleViewConfig';
 import { Loader2 } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Index = () => {
   const [selectedKPI, setSelectedKPI] = useState<KPI | null>(null);
@@ -81,6 +82,9 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="space-y-6 pb-6 px-4">
+        {/* Alert Notification Panel */}
+        <AlertNotificationPanel />
+
         {viewMode === 'role' ? (
           <RoleBasedDashboard kpis={kpis} onKPIClick={setSelectedKPI} />
         ) : (
