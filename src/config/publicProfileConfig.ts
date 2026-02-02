@@ -1,29 +1,66 @@
 /**
- * DEL XII & XIII — OFFENTLIGA POLITIKERPROFILER (ANSVAR & UTFALL)
+ * DEL XII, XIII & XIV — OFFENTLIGA POLITIKERPROFILER & ANSVARSMODELL
  * 
- * Konfiguration för språkliga skyddsräcken och juridiska disclaimers.
- * Alla formuleringar är exakta och får inte ändras utan juridisk granskning.
+ * NOGF (Nationellt Observationssystem för Grundläggande Funktioner)
  * 
- * DEL XIII: Faktabaserat katalogsystem med Wikipedia-separation
+ * Konfiguration för:
+ * - Tre-lager-separation (Källfakta, Aggregering, Presentation)
+ * - Juridiska disclaimers och språkliga skyddsräcken
+ * - Metodtransparens
+ * 
+ * ⚠️ KRITISKT: Alla formuleringar är exakta och får INTE ändras utan juridisk granskning.
  */
+
+// =====================================================
+// TRE-LAGER-MODELL
+// =====================================================
+
+export const DATA_LAYERS = {
+  /** LAGER A: Källfakta - ägs INTE av systemet */
+  sourceData: {
+    id: 'source',
+    name: 'Källfakta',
+    description: 'Oförändrad data direkt från öppna källor',
+    ownership: 'Respektive datakälla',
+    disclaimer: 'Data från öppen källa, ej modifierad av systemet.',
+  },
+  
+  /** LAGER B: Aggregering - systemets beräkningsprodukt */
+  aggregation: {
+    id: 'aggregation',
+    name: 'Sammanställning',
+    description: 'Systemgenererad aggregering enligt dokumenterad metod',
+    ownership: 'Systemet',
+    disclaimer: 'Detta är en systemgenererad sammanställning baserad på öppna källor.',
+  },
+  
+  /** LAGER C: Presentation - ren visualisering */
+  presentation: {
+    id: 'presentation',
+    name: 'Visualisering',
+    description: 'Pedagogisk presentation för översikt',
+    ownership: 'Systemet',
+    disclaimer: 'Visualiseringar och sammanfattningar är avsedda för översikt.',
+  },
+} as const;
 
 // =====================================================
 // JURIDISKA DISCLAIMERS
 // =====================================================
 
 export const LEGAL_DISCLAIMERS = {
-  // Huvuddisclaimer - visas alltid på varje profil (fast text, oföränderlig)
+  // Huvuddisclaimer - visas alltid på varje profil
   main: {
     title: 'Om denna sida',
     text: `Profilerna visar offentliga uppdrag och hur relevanta indikatorer utvecklades under dessa perioder.
 Systemet tillskriver inte individer orsak, skuld eller intention.`,
   },
   
-  // Kortare version för kompakta vyer
+  // Kompakt version
   compact: 'Visar observerade utfall, inte avsikter eller orsakssamband.',
   
   // Footer-disclaimer
-  footer: `Systemet tar inte ställning till orsak. 
+  footer: `Systemet tar inte ställning till orsak.
 Det visar endast offentliga uppdrag och observerade indikatorförändringar under samma period.`,
   
   // Metoddisclaimer
@@ -34,30 +71,52 @@ och kopplar dem till nationella indikatorer. Korrelation i tid innebär inte kau
 En persons ansvar för ett område innebär inte ensamt ansvar för alla förändringar.`,
   },
   
-  // DEL XIII: Wikipedia-faktaruta
+  // DEL XIV: Aggregeringsmodell
+  aggregation: {
+    title: 'Om aggregering',
+    text: `Aggregering innebär att flera datapunkter sammanställs enligt fasta regler.
+Aggregering är inte en värdering av individer, beslut eller intentioner.`,
+  },
+  
+  // DEL XIV: Dataansvar
+  dataResponsibility: {
+    title: 'Om data',
+    text: `Systemet återger och sammanställer data från öppna källor.
+Eventuella fel i grunddata hänförs till respektive källa.`,
+  },
+  
+  // Wikipedia-faktaruta
   wikipediaAttribution: {
     title: 'Grundfakta',
     text: 'Denna information är hämtad från Wikipedia (CC BY-SA)',
     linkText: 'Visa ursprungskälla på Wikipedia',
   },
   
-  // DEL XIII: Systemanalys-sektion
+  // Systemanalys-sektion
   systemAnalysis: {
     title: 'Ansvar & observerade utfall',
     text: 'Denna del är systemgenererad analys baserad på öppna myndighetsdata.',
   },
   
-  // DEL XIII: Rättelse & transparens
+  // Rättelse & transparens
   correction: {
     title: 'Rättelse & transparens',
     text: `Om faktauppgifter är felaktiga ber vi dig först kontrollera och uppdatera Wikipedia.
 Systemet uppdateras automatiskt därefter.`,
   },
   
-  // DEL XIII: Verifieringsstatus
+  // Verifieringsstatus
   verification: {
     prefix: 'Grundfakta senast verifierad mot Wikipedia:',
     unknown: 'Ej verifierad',
+  },
+  
+  // DEL XIV: Global systemdisclaimer
+  globalSystem: {
+    title: 'Om systemet',
+    text: `Detta system samlar, strukturerar och visualiserar öppen data.
+Det producerar ingen ny fakta, fastställer inga sanningar och gör inga normativa påståenden.
+Systemet är informationsarkitektur – inte innehållsansvar.`,
   },
 } as const;
 

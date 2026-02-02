@@ -462,12 +462,150 @@ evaluation_weights       →  Viktkonfiguration för prioritering
 
 ---
 
+## Del VIII — Aggregerings- & Ansvarsmodell
+
+### Kärnprincip: "Vi visar – vi påstår inte"
+
+Systemet säger **aldrig** "hur det är".  
+Systemet säger:
+
+> "Så här ser informationen ut när dessa öppna källor sammanställs enligt denna metod."
+
+**Vad systemet GÖR:**
+- Samlar data från öppna källor
+- Strukturerar enligt transparenta regler
+- Visualiserar med neutralt språk
+- Tidslinjelägger uppdrag och indikatorer
+
+**Vad systemet INTE gör:**
+- ❌ Producerar ny fakta
+- ❌ Fastställer sanningar
+- ❌ Gör normativa påståenden
+- ❌ Tillskriver skuld eller intention
+
+> **Detta är informationsarkitektur, inte innehållsansvar.**
+
+---
+
+### Tre-lager-modellen
+
+#### LAGER A — KÄLLFAKTA (Ägs INTE av systemet)
+
+| Aspekt | Beskrivning |
+|--------|-------------|
+| **Källor** | Wikipedia, SCB, Socialstyrelsen, BRÅ, Kolada, Riksdagen |
+| **Krav** | Alltid visa källa, licens, uppdateringstid, direktlänk |
+| **Egenskaper** | Oförändrat, okommenterat, klickbart tillbaka |
+
+#### LAGER B — AGGREGERING (Systemets produkt)
+
+| Aspekt | Beskrivning |
+|--------|-------------|
+| **Operationer** | Tidslinjesynk, gruppering, nedbrytning, viktning, trendklassificering |
+| **Disclaimer** | "Detta är en systemgenererad sammanställning baserad på öppna källor." |
+| **Egenskaper** | Mekaniskt, repeterbart, dokumenterat, transparent |
+
+#### LAGER C — PRESENTATION (Ren UX)
+
+| Aspekt | Beskrivning |
+|--------|-------------|
+| **Element** | Färger, pilar, sammanfattningar, pedagogiska förenklingar |
+| **Disclaimer** | "Visualiseringar och sammanfattningar är avsedda för översikt." |
+| **Förbjudet** | Värdeord, skuld, intentioner |
+
+---
+
+### Språkstandard
+
+#### Ansvarsutlösande (FÖRBJUDET)
+
+> ❌ "Den här politikern körde värdet i botten."
+
+#### Oangripbart (KORREKT)
+
+> ✅ "Under denna period, då detta uppdrag bars, utvecklades indikatorn negativt enligt öppna data."
+
+**Egenskaper för korrekt språk:**
+- Faktabaserat
+- Tidsbundet
+- Passivt språk
+- Utan agent
+
+> **Princip: Vi pekar aldrig – tidslinjen pekar.**
+
+---
+
+### Dataansvar
+
+#### Fel formulering:
+> "Vi är inte ansvariga för datan."
+
+#### Korrekt formulering:
+> "Systemet återger och sammanställer data från öppna källor. Eventuella fel i grunddata hänförs till respektive källa."
+
+---
+
+### Metodtransparens = Frihet
+
+Ju tydligare vi är med:
+- Hur data kopplas
+- Hur trender definieras
+- Hur ansvar mappas
+- Hur osäkerhet hanteras
+
+...desto friare kan vi bygga:
+- ✅ Politikerprofiler
+- ✅ Partistatistik
+- ✅ Historiska jämförelser
+- ✅ Masterindex
+- ✅ Internationella jämförelser
+
+> **Transparens är vårt skydd.**
+
+---
+
+### Systemkrav: "Visa metod" överallt
+
+Varje sida ska ha fast länk: **"Så här är detta beräknat"**
+
+Länken leder till:
+- Exakt datakälla
+- Exakt tidsintervall
+- Exakt klassificeringsregel
+- Exakt aggregeringsmetod
+
+> **Resultat:** Vi behöver aldrig försvara siffran — vi pekar på metoden.
+
+---
+
+### Aggregering ≠ Värdering
+
+**Fast text i systemets "Om"-sektion:**
+
+> "Aggregering innebär att flera datapunkter sammanställs enligt fasta regler. Aggregering är inte en värdering av individer, beslut eller intentioner."
+
+---
+
+### Skalbarhet
+
+Samma modell fungerar för:
+- Andra länder
+- Regioner
+- Städer
+- Internationella organisationer
+
+Vi byter endast: källor, indikatorer, ansvarsmatriser.  
+**Principen är identisk.**
+
+---
+
 ## Dokumenthistorik
 
 | Version | Datum | Förändring |
 |---------|-------|------------|
 | 1.0 | 2026-02-01 | Initial formalisering |
 | 1.1 | 2026-02-01 | Rollmodell, lansering, publik vy |
+| 1.2 | 2026-02-02 | DEL VIII: Aggregerings- & ansvarsmodell |
 
 ---
 
