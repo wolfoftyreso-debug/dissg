@@ -9,13 +9,14 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, TrendingUp, Layers, Shield, Info } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Layers, Shield, Info, BarChart3 } from 'lucide-react';
 import { DOMAIN_CONFIGS, type CorrelationDomain } from '@/types/correlation';
 import { MANDATORY_DISCLAIMERS } from '@/lib/correlation/language-guard';
 import { CorrelationTimeline } from './CorrelationTimeline';
 import { CorrelationMatrix } from './CorrelationMatrix';
 import { AntiCherryPickingPanel } from './AntiCherryPickingPanel';
 import { LanguageGuardDisplay } from './LanguageGuardDisplay';
+import { StatisticalIntegrityPanel } from './StatisticalIntegrityPanel';
 
 export function CorrelationDashboard() {
   const [selectedDomains, setSelectedDomains] = useState<CorrelationDomain[]>([
@@ -87,19 +88,23 @@ export function CorrelationDashboard() {
 
       {/* Main content tabs */}
       <Tabs defaultValue="timeline" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="timeline" className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             Tidslinje
           </TabsTrigger>
-          <TabsTrigger value="matrix">Korrelationsmatris</TabsTrigger>
+          <TabsTrigger value="matrix">Matris</TabsTrigger>
+          <TabsTrigger value="integrity" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Integritet
+          </TabsTrigger>
           <TabsTrigger value="context" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
             Kontext
           </TabsTrigger>
           <TabsTrigger value="language" className="flex items-center gap-2">
             <Info className="h-4 w-4" />
-            Språkkontroll
+            Språk
           </TabsTrigger>
         </TabsList>
 
@@ -109,6 +114,10 @@ export function CorrelationDashboard() {
 
         <TabsContent value="matrix">
           <CorrelationMatrix domains={selectedDomains} />
+        </TabsContent>
+
+        <TabsContent value="integrity">
+          <StatisticalIntegrityPanel />
         </TabsContent>
 
         <TabsContent value="context">

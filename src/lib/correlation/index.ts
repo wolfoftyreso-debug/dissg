@@ -9,3 +9,4 @@ export * from './correlation-engine';
 export * from './anti-cherry-picking';
 export * from './language-guard';
 export * from './queries';
+export * from './statistical-integrity';
