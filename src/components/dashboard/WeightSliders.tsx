@@ -2,8 +2,15 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, Scale, AlertTriangle, RotateCcw, RotateCw, Save } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { 
+  Target, Scale, AlertTriangle, RotateCcw, RotateCw, Save, 
+  Loader2, Check, Trash2, Star 
+} from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useEvaluationWeights, EvaluationWeights } from '@/hooks/useEvaluationWeights';
 
 interface Weights {
   effect: number;
@@ -15,8 +22,8 @@ interface Weights {
 interface WeightSlidersProps {
   initialWeights?: Weights;
   onChange?: (weights: Weights) => void;
-  onSave?: (weights: Weights) => void;
   showFormula?: boolean;
+  enablePersistence?: boolean;
 }
 
 const DEFAULT_WEIGHTS: Weights = {
@@ -60,15 +67,35 @@ const DIMENSION_CONFIG = {
 export function WeightSliders({ 
   initialWeights = DEFAULT_WEIGHTS,
   onChange,
-  onSave,
   showFormula = true,
+  enablePersistence = true,
 }: WeightSlidersProps) {
   const [weights, setWeights] = useState<Weights>(initialWeights);
   const [isModified, setIsModified] = useState(false);
+  const [presetName, setPresetName] = useState('');
+  const [showSaveForm, setShowSaveForm] = useState(false);
 
+  const { 
+    weights: savedWeights, 
+    activeWeights,
+    isLoading, 
+    isSaving,
+    saveWeights,
+    setActiveWeight,
+    deleteWeights,
+  } = useEvaluationWeights();
+
+  // Sync with active weights from database
   useEffect(() => {
-    setWeights(initialWeights);
-  }, [initialWeights]);
+    if (activeWeights && enablePersistence) {
+      setWeights({
+        effect: Math.round(activeWeights.effect_weight * 100),
+        cost: Math.round(activeWeights.cost_weight * 100),
+        risk: Math.round(activeWeights.risk_weight * 100),
+        reversibility: Math.round(activeWeights.reversibility_weight * 100),
+      });
+    }
+  }, [activeWeights, enablePersistence]);
 
   const total = weights.effect + weights.cost + weights.risk + weights.reversibility;
 
@@ -88,12 +115,12 @@ export function WeightSliders({
       risk: Math.round(weights.risk * factor),
       reversibility: Math.round(weights.reversibility * factor),
     };
-    // Justera för avrundningsfel
     const newTotal = normalized.effect + normalized.cost + normalized.risk + normalized.reversibility;
     if (newTotal !== 100) {
       normalized.effect += (100 - newTotal);
     }
     setWeights(normalized);
+    setIsModified(true);
     onChange?.(normalized);
   };
 
@@ -103,10 +130,41 @@ export function WeightSliders({
     onChange?.(DEFAULT_WEIGHTS);
   };
 
-  const handleSave = () => {
-    onSave?.(weights);
+  const handleSaveWeights = async () => {
+    if (!presetName.trim()) return;
+    
+    await saveWeights({
+      name: presetName,
+      effect_weight: weights.effect / 100,
+      cost_weight: weights.cost / 100,
+      risk_weight: weights.risk / 100,
+      reversibility_weight: weights.reversibility / 100,
+    });
+    
+    setPresetName('');
+    setShowSaveForm(false);
     setIsModified(false);
   };
+
+  const handleLoadPreset = async (preset: EvaluationWeights) => {
+    setWeights({
+      effect: Math.round(preset.effect_weight * 100),
+      cost: Math.round(preset.cost_weight * 100),
+      risk: Math.round(preset.risk_weight * 100),
+      reversibility: Math.round(preset.reversibility_weight * 100),
+    });
+    await setActiveWeight(preset.id);
+    setIsModified(false);
+    onChange?.({
+      effect: Math.round(preset.effect_weight * 100),
+      cost: Math.round(preset.cost_weight * 100),
+      risk: Math.round(preset.risk_weight * 100),
+      reversibility: Math.round(preset.reversibility_weight * 100),
+    });
+  };
+
+  const userPresets = savedWeights.filter(w => w.user_id !== null);
+  const systemPresets = savedWeights.filter(w => w.user_id === null);
 
   return (
     <Card>
@@ -123,8 +181,12 @@ export function WeightSliders({
               <RotateCw className="w-4 h-4 mr-1" />
               Återställ
             </Button>
-            {onSave && isModified && (
-              <Button size="sm" onClick={handleSave}>
+            {enablePersistence && isModified && (
+              <Button 
+                size="sm" 
+                onClick={() => setShowSaveForm(true)}
+                disabled={total !== 100}
+              >
                 <Save className="w-4 h-4 mr-1" />
                 Spara
               </Button>
@@ -133,6 +195,74 @@ export function WeightSliders({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Saved presets */}
+        {enablePersistence && (userPresets.length > 0 || systemPresets.length > 0) && (
+          <div className="space-y-3">
+            <Label className="text-xs text-muted-foreground uppercase tracking-wide">
+              Sparade vikter
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  {systemPresets.map((preset) => (
+                    <PresetBadge
+                      key={preset.id}
+                      preset={preset}
+                      isActive={activeWeights?.id === preset.id}
+                      onLoad={handleLoadPreset}
+                      canDelete={false}
+                    />
+                  ))}
+                  {userPresets.map((preset) => (
+                    <PresetBadge
+                      key={preset.id}
+                      preset={preset}
+                      isActive={activeWeights?.id === preset.id}
+                      onLoad={handleLoadPreset}
+                      onDelete={deleteWeights}
+                      canDelete={true}
+                    />
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Save form */}
+        {showSaveForm && (
+          <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+            <Input
+              placeholder="Namn på viktkonfiguration..."
+              value={presetName}
+              onChange={(e) => setPresetName(e.target.value)}
+              className="flex-1"
+            />
+            <Button 
+              size="sm" 
+              onClick={handleSaveWeights}
+              disabled={!presetName.trim() || isSaving}
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4" />
+              )}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowSaveForm(false)}
+            >
+              Avbryt
+            </Button>
+          </div>
+        )}
+
+        {enablePersistence && <Separator />}
+
         {/* Formula display */}
         {showFormula && (
           <div className="bg-muted/50 rounded-lg p-4 font-mono text-sm">
@@ -212,6 +342,44 @@ export function WeightSliders({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function PresetBadge({ 
+  preset, 
+  isActive, 
+  onLoad, 
+  onDelete,
+  canDelete 
+}: { 
+  preset: EvaluationWeights;
+  isActive: boolean;
+  onLoad: (preset: EvaluationWeights) => void;
+  onDelete?: (id: string) => void;
+  canDelete: boolean;
+}) {
+  return (
+    <Badge 
+      variant={isActive ? "default" : "outline"}
+      className="gap-1 cursor-pointer group pr-1"
+      onClick={() => onLoad(preset)}
+    >
+      {isActive && <Star className="h-3 w-3 fill-current" />}
+      {preset.name}
+      {canDelete && onDelete && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(preset.id);
+          }}
+        >
+          <Trash2 className="h-3 w-3" />
+        </Button>
+      )}
+    </Badge>
   );
 }
 
