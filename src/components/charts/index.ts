@@ -1,6 +1,14 @@
 // Clarity Chart System
 export { ClarityChart, ClarityChartDemo } from './ClarityChart';
 
+// Animated Chart Components
+export { 
+  AnimatedChartContainer,
+  AnimatedDataPoint,
+  ChartTransitionWrapper,
+  StaggeredChartItems
+} from './AnimatedChartContainer';
+
 // Re-export visual system config
 export {
   GRAPH_RULES,
