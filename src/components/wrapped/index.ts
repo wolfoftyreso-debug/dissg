@@ -8,3 +8,6 @@ export { WrappedComparisons } from './WrappedComparisons';
 export { WrappedUnchanged } from './WrappedUnchanged';
 export { WrappedLimitations } from './WrappedLimitations';
 export { WrappedDeepDive } from './WrappedDeepDive';
+
+// WAVE 7: Public Learning Engine
+export { DailyLearningFeed, PatternLifecycleCard } from './DailyLearningFeed';
