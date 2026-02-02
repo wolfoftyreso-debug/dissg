@@ -7,7 +7,10 @@ export type AppRole =
   | 'department_lead' 
   | 'minister' 
   | 'prime_minister' 
-  | 'system_admin';
+  | 'system_admin'
+  | 'statsminister'
+  | 'departementsansvarig'
+  | 'operativ';
 
 export interface UserRole {
   role: AppRole;
@@ -45,9 +48,12 @@ export function useUserRoles() {
       const roleHierarchy: AppRole[] = [
         'public',
         'researcher', 
+        'operativ',
         'department_lead',
+        'departementsansvarig',
         'minister',
         'prime_minister',
+        'statsminister',
         'system_admin'
       ];
       
@@ -100,9 +106,12 @@ export function useHasRole(requiredRole: AppRole) {
   const roleHierarchy: AppRole[] = [
     'public',
     'researcher', 
+    'operativ',
     'department_lead',
+    'departementsansvarig',
     'minister',
     'prime_minister',
+    'statsminister',
     'system_admin'
   ];
   

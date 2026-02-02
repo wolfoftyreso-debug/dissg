@@ -4504,24 +4504,30 @@ export type Database = {
         Row: {
           assigned_at: string
           assigned_by: string | null
+          department: string | null
           id: string
           notes: string | null
+          region: string | null
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
           assigned_at?: string
           assigned_by?: string | null
+          department?: string | null
           id?: string
           notes?: string | null
+          region?: string | null
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
           assigned_at?: string
           assigned_by?: string | null
+          department?: string | null
           id?: string
           notes?: string | null
+          region?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
@@ -4592,11 +4598,16 @@ export type Database = {
     }
     Functions: {
       compute_checksum: { Args: { data: Json }; Returns: string }
+      get_gov_role: { Args: { _user_id: string }; Returns: string }
       has_any_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]
           _user_id: string
         }
+        Returns: boolean
+      }
+      has_gov_role: {
+        Args: { _role: string; _user_id: string }
         Returns: boolean
       }
       has_kpi_responsibility: {
@@ -4636,6 +4647,9 @@ export type Database = {
         | "minister"
         | "prime_minister"
         | "system_admin"
+        | "statsminister"
+        | "departementsansvarig"
+        | "operativ"
       comparability_level: "full" | "partial" | "limited" | "none"
       data_depth_level: "global_baseline" | "regional_bloc" | "national_deep"
       data_source_type: "api" | "file_feed" | "manual" | "calculated"
@@ -4830,6 +4844,9 @@ export const Constants = {
         "minister",
         "prime_minister",
         "system_admin",
+        "statsminister",
+        "departementsansvarig",
+        "operativ",
       ],
       comparability_level: ["full", "partial", "limited", "none"],
       data_depth_level: ["global_baseline", "regional_bloc", "national_deep"],
