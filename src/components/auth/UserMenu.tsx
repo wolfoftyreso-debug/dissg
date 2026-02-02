@@ -15,13 +15,16 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User, LogOut, Shield, Settings, Crown, Building2, FlaskConical, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const ROLE_ICONS = {
+const ROLE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   public: Globe,
   researcher: FlaskConical,
   department_lead: Building2,
   minister: Shield,
   prime_minister: Crown,
   system_admin: Settings,
+  statsminister: Crown,
+  departementsansvarig: Building2,
+  operativ: Shield,
 };
 
 export function UserMenu() {

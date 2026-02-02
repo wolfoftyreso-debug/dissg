@@ -186,6 +186,87 @@ export const ROLE_VIEW_CONFIGS: Record<AppRole, RoleViewConfig> = {
     defaultTimeframe: 'week',
     priorityThreshold: 0,
   },
+
+  // Swedish government roles
+  statsminister: {
+    role: 'statsminister',
+    displayName: 'Statsminister',
+    description: 'Högsta regeringsnivå med fullständig systemöversikt',
+    dashboardTitle: 'Statsministerns Lägesbild',
+    focusAreas: ['Systemrisk', 'Kritiska indikatorer', 'Strategiska beslut', 'Tvärsektoriell analys'],
+    allowedNavItems: ['overview', 'indicators', 'responsibility', 'analysis', 'decisions', 'admin'],
+    kpiFilters: {
+      showAll: true,
+    },
+    features: {
+      canPrioritizeActions: true,
+      canViewAllKPIs: true,
+      canViewDepartmentKPIs: true,
+      canViewAgencyKPIs: true,
+      canEditWeights: true,
+      canAddActions: true,
+      canApproveActions: true,
+      canViewSensitiveData: true,
+      canExportData: true,
+      canManageUsers: true,
+    },
+    defaultTimeframe: 'quarter',
+    priorityThreshold: 60,
+  },
+
+  departementsansvarig: {
+    role: 'departementsansvarig',
+    displayName: 'Departementsansvarig',
+    description: 'Departementsövergripande ansvar med fokus på sektorspecifika KPI:er',
+    dashboardTitle: 'Departementsöversikt',
+    focusAreas: ['Departementets KPI:er', 'Prioriterade åtgärder', 'Tvärsektoriella beroenden'],
+    allowedNavItems: ['overview', 'indicators', 'responsibility', 'analysis', 'decisions'],
+    kpiFilters: {
+      showAll: false,
+      categories: [],
+    },
+    features: {
+      canPrioritizeActions: true,
+      canViewAllKPIs: true,
+      canViewDepartmentKPIs: true,
+      canViewAgencyKPIs: true,
+      canEditWeights: true,
+      canAddActions: true,
+      canApproveActions: true,
+      canViewSensitiveData: true,
+      canExportData: true,
+      canManageUsers: false,
+    },
+    defaultTimeframe: 'quarter',
+    priorityThreshold: 50,
+  },
+
+  operativ: {
+    role: 'operativ',
+    displayName: 'Operativ nivå',
+    description: 'Regional och kommunal operativ nivå med fokus på genomförande',
+    dashboardTitle: 'Operativ Översikt',
+    focusAreas: ['Regionala KPI:er', 'Operativa åtgärder', 'Lokal anpassning'],
+    allowedNavItems: ['overview', 'indicators', 'responsibility', 'analysis'],
+    kpiFilters: {
+      showAll: false,
+      responsibilityAreas: [],
+    },
+    features: {
+      canPrioritizeActions: true,
+      canViewAllKPIs: false,
+      canViewDepartmentKPIs: true,
+      canViewAgencyKPIs: true,
+      canEditWeights: false,
+      canAddActions: true,
+      canApproveActions: false,
+      canViewSensitiveData: true,
+      canExportData: true,
+      canManageUsers: false,
+    },
+    defaultTimeframe: 'month',
+    priorityThreshold: 40,
+  },
 };
 
 // Department to category mappings

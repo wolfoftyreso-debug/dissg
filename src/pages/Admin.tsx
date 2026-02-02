@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRoles, useHasRole } from '@/hooks/useUserRole';
+import { useIsStatsminister } from '@/hooks/useGovRole';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,11 +11,14 @@ import { APIKeyManager } from '@/components/admin/APIKeyManager';
 import { ManualDataEntry } from '@/components/admin/ManualDataEntry';
 import { DataSourceManager } from '@/components/admin/DataSourceManager';
 import { IngestPipelineMonitor } from '@/components/admin/IngestPipelineMonitor';
+import { RoleManager } from '@/components/admin/RoleManager';
 
 const Admin = () => {
   const navigate = useNavigate();
   const { data: roleData, isLoading: rolesLoading } = useUserRoles();
   const isAdmin = useHasRole('system_admin');
+  const isStatsminister = useIsStatsminister();
+  const canAccess = isAdmin || isStatsminister;
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -68,7 +72,7 @@ const Admin = () => {
   }
 
   // Not admin
-  if (!isAdmin) {
+  if (!canAccess) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-md w-full">
@@ -126,8 +130,12 @@ const Admin = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
-        <Tabs defaultValue="api-keys" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
+        <Tabs defaultValue="roles" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5 max-w-3xl">
+            <TabsTrigger value="roles" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Roller
+            </TabsTrigger>
             <TabsTrigger value="api-keys" className="flex items-center gap-2">
               <Key className="h-4 w-4" />
               API-nycklar
@@ -145,6 +153,10 @@ const Admin = () => {
               Global Ingest
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="roles">
+            <RoleManager />
+          </TabsContent>
 
           <TabsContent value="api-keys">
             <APIKeyManager />

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { AppRole } from '@/hooks/useUserRole';
 import { getRoleConfig, ROLE_VIEW_CONFIGS } from '@/config/roleViewConfig';
 import {
@@ -19,6 +18,9 @@ const ROLE_ICONS: Record<AppRole, React.ReactNode> = {
   minister: <Shield className="h-4 w-4" />,
   prime_minister: <Crown className="h-4 w-4" />,
   system_admin: <Users className="h-4 w-4" />,
+  statsminister: <Crown className="h-4 w-4" />,
+  departementsansvarig: <Building2 className="h-4 w-4" />,
+  operativ: <Shield className="h-4 w-4" />,
 };
 
 interface RoleSwitcherProps {

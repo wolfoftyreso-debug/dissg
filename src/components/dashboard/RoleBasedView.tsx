@@ -10,6 +10,9 @@ const ROLE_ICONS: Record<AppRole, React.ReactNode> = {
   minister: <Shield className="h-4 w-4" />,
   prime_minister: <Crown className="h-4 w-4" />,
   system_admin: <Users className="h-4 w-4" />,
+  statsminister: <Crown className="h-4 w-4" />,
+  departementsansvarig: <Building2 className="h-4 w-4" />,
+  operativ: <Shield className="h-4 w-4" />,
 };
 
 const ROLE_COLORS: Record<AppRole, string> = {
@@ -19,6 +22,9 @@ const ROLE_COLORS: Record<AppRole, string> = {
   minister: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
   prime_minister: 'bg-primary/10 text-primary',
   system_admin: 'bg-destructive/10 text-destructive',
+  statsminister: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  departementsansvarig: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+  operativ: 'bg-green-500/10 text-green-600 dark:text-green-400',
 };
 
 interface RoleBadgeProps {
@@ -111,9 +117,12 @@ interface RoleRequiredProps {
 const ROLE_HIERARCHY: AppRole[] = [
   'public',
   'researcher',
+  'operativ',
   'department_lead',
+  'departementsansvarig',
   'minister',
   'prime_minister',
+  'statsminister',
   'system_admin',
 ];
 
