@@ -11,7 +11,8 @@ import {
   ZoomIn,
   ZoomOut,
   ChevronDown,
-  Info
+  Info,
+  GitCompare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -29,6 +30,8 @@ import {
 } from 'recharts';
 import { format, subMonths, subYears, parseISO } from 'date-fns';
 import { sv } from 'date-fns/locale';
+import { KPICompareSelector } from './KPICompareSelector';
+import { KPICompareChart } from './KPICompareChart';
 
 interface HistoryPanelProps {
   kpi: KPI;
@@ -127,6 +130,8 @@ function CustomTooltip({ active, payload, label }: any) {
 export function HistoryPanel({ kpi }: HistoryPanelProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>('2y');
   const [showDetails, setShowDetails] = useState(false);
+  const [showCompareSelector, setShowCompareSelector] = useState(false);
+  const [compareKPI, setCompareKPI] = useState<KPI | null>(null);
   
   const months = TIME_RANGES.find(r => r.value === timeRange)?.months || 24;
   
@@ -199,6 +204,11 @@ export function HistoryPanel({ kpi }: HistoryPanelProps) {
   
   const isUsingMockData = !dbData || dbData.length === 0;
   
+  const handleSelectCompareKPI = (selectedKPI: KPI) => {
+    setCompareKPI(selectedKPI);
+    setShowCompareSelector(false);
+  };
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -207,6 +217,20 @@ export function HistoryPanel({ kpi }: HistoryPanelProps) {
           Historik
         </h3>
         <div className="flex items-center gap-2">
+          {/* Compare button */}
+          <button
+            onClick={() => setShowCompareSelector(!showCompareSelector)}
+            className={cn(
+              "flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium rounded transition-colors border",
+              showCompareSelector || compareKPI
+                ? "bg-primary text-primary-foreground border-primary"
+                : "text-muted-foreground hover:text-foreground border-border bg-muted/50 hover:bg-muted"
+            )}
+          >
+            <GitCompare className="h-3 w-3" />
+            {compareKPI ? 'Byt KPI' : 'Jämför'}
+          </button>
+          
           {/* Time range selector */}
           <div className="flex rounded-md border border-border bg-muted/50 p-0.5">
             {TIME_RANGES.map((range) => (
@@ -226,6 +250,25 @@ export function HistoryPanel({ kpi }: HistoryPanelProps) {
           </div>
         </div>
       </div>
+      
+      {/* Compare KPI selector */}
+      {showCompareSelector && (
+        <KPICompareSelector
+          currentKPI={kpi}
+          onSelect={handleSelectCompareKPI}
+          onCancel={() => setShowCompareSelector(false)}
+        />
+      )}
+      
+      {/* Compare chart */}
+      {compareKPI && !showCompareSelector && (
+        <KPICompareChart
+          kpi1={kpi}
+          kpi2={compareKPI}
+          months={months}
+          onRemoveCompare={() => setCompareKPI(null)}
+        />
+      )}
       
       {/* Mock data warning */}
       {isUsingMockData && (
