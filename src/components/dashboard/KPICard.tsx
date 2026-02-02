@@ -2,8 +2,10 @@ import { KPI } from '@/types/kpi';
 import { StatusBadge } from './StatusBadge';
 import { TrendIndicator } from './TrendIndicator';
 import { Sparkline } from './Sparkline';
+import { ConfidenceBar } from './ConfidenceBar';
 import { cn } from '@/lib/utils';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, ShieldCheck, ShieldAlert, Shield } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface KPICardProps {
   kpi: KPI;
@@ -34,10 +36,43 @@ function generateSparklineData(value: number, trend: string, percent: number): n
   return data;
 }
 
+// Get confidence level label and styling
+function getConfidenceLevel(confidence: number): { 
+  label: string; 
+  description: string;
+  Icon: typeof ShieldCheck;
+  className: string;
+} {
+  if (confidence >= 90) {
+    return {
+      label: 'Hög',
+      description: 'Verifierad data från officiella källor med full täckning',
+      Icon: ShieldCheck,
+      className: 'text-status-positive'
+    };
+  }
+  if (confidence >= 70) {
+    return {
+      label: 'Medel',
+      description: 'Data från pålitliga källor, viss osäkerhet kan förekomma',
+      Icon: Shield,
+      className: 'text-status-warning'
+    };
+  }
+  return {
+    label: 'Låg',
+    description: 'Preliminär eller ofullständig data, tolka med försiktighet',
+    Icon: ShieldAlert,
+    className: 'text-status-critical'
+  };
+}
+
 export function KPICard({ kpi, onClick }: KPICardProps) {
   const sparklineData = generateSparklineData(kpi.value, kpi.trend, kpi.trendPercent);
   const isCritical = kpi.status === 'critical';
   const hasActiveWarning = isCritical && kpi.redFlags.length > 0;
+  const confidenceLevel = getConfidenceLevel(kpi.confidence);
+  const ConfidenceIcon = confidenceLevel.Icon;
 
   return (
     <button
@@ -78,14 +113,41 @@ export function KPICard({ kpi, onClick }: KPICardProps) {
         />
       </div>
 
-      {/* Bottom: Trend + Warning */}
+      {/* Bottom: Trend + Confidence + Warning */}
       <div className="flex items-center justify-between border-t border-border pt-2">
-        <TrendIndicator
-          direction={kpi.trend}
-          percent={kpi.trendPercent}
-          inverted={kpi.inverted}
-          compact
-        />
+        <div className="flex items-center gap-3">
+          <TrendIndicator
+            direction={kpi.trend}
+            percent={kpi.trendPercent}
+            inverted={kpi.inverted}
+            compact
+          />
+          
+          {/* Confidence indicator */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5 cursor-help">
+                <ConfidenceIcon className={cn('h-3.5 w-3.5', confidenceLevel.className)} />
+                <span className={cn('text-[10px] font-medium', confidenceLevel.className)}>
+                  {kpi.confidence}%
+                </span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs">
+              <div className="space-y-1">
+                <div className="font-semibold flex items-center gap-1.5">
+                  <ConfidenceIcon className={cn('h-3.5 w-3.5', confidenceLevel.className)} />
+                  Datakvalitet: {confidenceLevel.label}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {confidenceLevel.description}
+                </p>
+                <ConfidenceBar value={kpi.confidence} className="mt-2" />
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+        
         {hasActiveWarning && (
           <div className="flex items-center gap-1 text-status-critical">
             <AlertTriangle className="h-3 w-3" />

@@ -4,14 +4,44 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { 
-  TrendingUp, TrendingDown, Minus, Info, Database, 
-  CheckCircle, AlertTriangle, ExternalLink 
-} from 'lucide-react';
+import { ConfidenceBar } from '@/components/dashboard/ConfidenceBar';
+import { Database, CheckCircle, AlertTriangle, ShieldCheck, Shield, ShieldAlert } from 'lucide-react';
 import { useEuKpiDefinitions } from '@/hooks/useEuData';
 import { euKpiCategories, getEuComparabilityLevel, euComparabilityRules, type NutsLevel } from '@/config/euConfig';
+import { cn } from '@/lib/utils';
+
+// Get confidence level styling based on comparability score (0-1)
+function getConfidenceConfig(score: number): {
+  label: string;
+  Icon: typeof ShieldCheck;
+  className: string;
+  bgClassName: string;
+} {
+  const percentage = score * 100;
+  if (percentage >= 90) {
+    return {
+      label: 'Hög',
+      Icon: ShieldCheck,
+      className: 'text-status-positive',
+      bgClassName: 'bg-status-positive/10'
+    };
+  }
+  if (percentage >= 70) {
+    return {
+      label: 'Medel',
+      Icon: Shield,
+      className: 'text-status-warning',
+      bgClassName: 'bg-status-warning/10'
+    };
+  }
+  return {
+    label: 'Låg',
+    Icon: ShieldAlert,
+    className: 'text-status-critical',
+    bgClassName: 'bg-status-critical/10'
+  };
+}
 
 interface EuKpiOverviewProps {
   nutsLevel: NutsLevel;
@@ -19,7 +49,7 @@ interface EuKpiOverviewProps {
   category?: string;
 }
 
-export function EuKpiOverview({ nutsLevel, countryCode, category }: EuKpiOverviewProps) {
+export function EuKpiOverview({ nutsLevel, countryCode: _countryCode, category }: EuKpiOverviewProps) {
   const { data: kpiDefs, isLoading } = useEuKpiDefinitions(category);
 
   // Group by category
@@ -44,7 +74,7 @@ export function EuKpiOverview({ nutsLevel, countryCode, category }: EuKpiOvervie
   return (
     <div className="space-y-6">
       {/* Summary */}
-      <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20">
+      <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -54,7 +84,7 @@ export function EuKpiOverview({ nutsLevel, countryCode, category }: EuKpiOvervie
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Badge className="bg-green-500/20 text-green-500">
+              <Badge className="bg-status-positive/20 text-status-positive">
                 <CheckCircle className="h-3 w-3 mr-1" />
                 Harmoniserad data
               </Badge>
@@ -123,6 +153,8 @@ interface KpiCardProps {
 function KpiCard({ kpi, nutsLevel }: KpiCardProps) {
   const comparabilityLevel = getEuComparabilityLevel(kpi.comparability_score);
   const comparabilityConfig = euComparabilityRules[comparabilityLevel];
+  const confidenceConfig = getConfidenceConfig(kpi.comparability_score);
+  const ConfidenceIcon = confidenceConfig.Icon;
   
   const isAvailableAtLevel = nutsLevel >= kpi.min_nuts_level && nutsLevel <= kpi.max_nuts_level;
 
@@ -180,31 +212,40 @@ function KpiCard({ kpi, nutsLevel }: KpiCardProps) {
           </TooltipContent>
         </Tooltip>
 
-        {/* Comparability */}
+        {/* Comparability / Data Quality */}
         <Tooltip>
           <TooltipTrigger>
             <div className="text-center">
-              <div className="text-xs text-muted-foreground">Jämförbarhet</div>
-              <Badge className={comparabilityConfig.color.replace('text-', 'bg-').replace('-500', '-500/20')}>
+              <div className="text-xs text-muted-foreground">Datakvalitet</div>
+              <div className={cn(
+                'flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium mt-0.5',
+                confidenceConfig.bgClassName,
+                confidenceConfig.className
+              )}>
+                <ConfidenceIcon className="h-3 w-3" />
                 {Math.round(kpi.comparability_score * 100)}%
-              </Badge>
+              </div>
             </div>
           </TooltipTrigger>
-          <TooltipContent>
-            <div className="space-y-1">
-              <div className="font-semibold">{comparabilityConfig.label}</div>
-              <div className="text-xs">{comparabilityConfig.description}</div>
+          <TooltipContent className="max-w-xs">
+            <div className="space-y-2">
+              <div className="font-semibold flex items-center gap-1.5">
+                <ConfidenceIcon className={cn('h-4 w-4', confidenceConfig.className)} />
+                {comparabilityConfig.label}
+              </div>
+              <p className="text-xs text-muted-foreground">{comparabilityConfig.description}</p>
+              <ConfidenceBar value={Math.round(kpi.comparability_score * 100)} className="mt-2" />
             </div>
           </TooltipContent>
         </Tooltip>
 
         {/* Status */}
         {isAvailableAtLevel ? (
-          <CheckCircle className="h-5 w-5 text-green-500" />
+          <CheckCircle className="h-5 w-5 text-status-positive" />
         ) : (
           <Tooltip>
             <TooltipTrigger>
-              <AlertTriangle className="h-5 w-5 text-yellow-500" />
+              <AlertTriangle className="h-5 w-5 text-status-warning" />
             </TooltipTrigger>
             <TooltipContent>
               Ej tillgänglig på NUTS {nutsLevel}
