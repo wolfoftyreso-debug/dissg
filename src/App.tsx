@@ -50,6 +50,8 @@ import IndexEngineDemo from "./pages/IndexEngineDemo";
 import CorrelationDemo from "./pages/CorrelationDemo";
 import SmokeTestPage from "./pages/SmokeTest";
 import TrustLogPage from "./pages/TrustLogPage";
+import BigQuestionsPage from "./pages/BigQuestionsPage";
+import BigQuestionDetailPage from "./pages/BigQuestionDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -103,7 +105,8 @@ const App = () => (
               <Route path="/correlation" element={<CorrelationDemo />} />
               <Route path="/smoke-test" element={<SmokeTestPage />} />
               <Route path="/trust-log" element={<TrustLogPage />} />
-              
+              <Route path="/big-questions" element={<BigQuestionsPage />} />
+              <Route path="/big-questions/:code" element={<BigQuestionDetailPage />} />
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={
                 <ProtectedRoute>

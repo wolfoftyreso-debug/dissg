@@ -704,6 +704,219 @@ export type Database = {
           },
         ]
       }
+      big_question_history: {
+        Row: {
+          change_reason: string | null
+          country_code: string | null
+          id: string
+          importance_score: number
+          period: string
+          question_id: string
+          rank_position: number
+          recorded_at: string
+        }
+        Insert: {
+          change_reason?: string | null
+          country_code?: string | null
+          id?: string
+          importance_score: number
+          period: string
+          question_id: string
+          rank_position: number
+          recorded_at?: string
+        }
+        Update: {
+          change_reason?: string | null
+          country_code?: string | null
+          id?: string
+          importance_score?: number
+          period?: string
+          question_id?: string
+          rank_position?: number
+          recorded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "big_question_history_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "big_question_history_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "big_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      big_question_rankings: {
+        Row: {
+          calculated_at: string
+          country_code: string | null
+          cross_domain_impact: number
+          data_uncertainty: number
+          id: string
+          importance_score: number | null
+          period_end: string
+          period_start: string
+          population_affected: number
+          question_id: string
+          rank_change: number | null
+          rank_position: number | null
+          region_code: string | null
+          trend_acceleration: number
+        }
+        Insert: {
+          calculated_at?: string
+          country_code?: string | null
+          cross_domain_impact?: number
+          data_uncertainty?: number
+          id?: string
+          importance_score?: number | null
+          period_end: string
+          period_start: string
+          population_affected?: number
+          question_id: string
+          rank_change?: number | null
+          rank_position?: number | null
+          region_code?: string | null
+          trend_acceleration?: number
+        }
+        Update: {
+          calculated_at?: string
+          country_code?: string | null
+          cross_domain_impact?: number
+          data_uncertainty?: number
+          id?: string
+          importance_score?: number | null
+          period_end?: string
+          period_start?: string
+          population_affected?: number
+          question_id?: string
+          rank_change?: number | null
+          rank_position?: number | null
+          region_code?: string | null
+          trend_acceleration?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "big_question_rankings_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "big_question_rankings_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "big_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      big_question_summaries: {
+        Row: {
+          country_code: string | null
+          generated_at: string
+          id: string
+          language_code: string
+          question_id: string
+          summary_text: string
+          underlying_indicators: Json | null
+          valid_until: string | null
+          why_ranked_high: string | null
+        }
+        Insert: {
+          country_code?: string | null
+          generated_at?: string
+          id?: string
+          language_code?: string
+          question_id: string
+          summary_text: string
+          underlying_indicators?: Json | null
+          valid_until?: string | null
+          why_ranked_high?: string | null
+        }
+        Update: {
+          country_code?: string | null
+          generated_at?: string
+          id?: string
+          language_code?: string
+          question_id?: string
+          summary_text?: string
+          underlying_indicators?: Json | null
+          valid_until?: string | null
+          why_ranked_high?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "big_question_summaries_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "big_question_summaries_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "big_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      big_questions: {
+        Row: {
+          category: Database["public"]["Enums"]["question_category"]
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          primary_kpi_codes: string[]
+          question_text: string
+          question_text_local: Json | null
+          secondary_kpi_codes: string[] | null
+          short_description: string
+          updated_at: string
+          what_this_does_not_show: string[]
+          what_this_shows: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["question_category"]
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          primary_kpi_codes?: string[]
+          question_text: string
+          question_text_local?: Json | null
+          secondary_kpi_codes?: string[] | null
+          short_description: string
+          updated_at?: string
+          what_this_does_not_show?: string[]
+          what_this_shows: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["question_category"]
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          primary_kpi_codes?: string[]
+          question_text?: string
+          question_text_local?: Json | null
+          secondary_kpi_codes?: string[] | null
+          short_description?: string
+          updated_at?: string
+          what_this_does_not_show?: string[]
+          what_this_shows?: string
+        }
+        Relationships: []
+      }
       calculated_indicators: {
         Row: {
           created_at: string
@@ -7275,6 +7488,10 @@ export type Database = {
           unchanged_kpis: number
         }[]
       }
+      calculate_question_importance: {
+        Args: { p_country_code?: string; p_question_id: string }
+        Returns: number
+      }
       compute_checksum: { Args: { data: Json }; Returns: string }
       create_trust_log_entry: {
         Args: {
@@ -7370,6 +7587,13 @@ export type Database = {
         | "lag_signal"
         | "anomaly"
       priority_level: "critical" | "high" | "medium" | "low" | "monitor"
+      question_category:
+        | "demography_work"
+        | "economic_capacity"
+        | "health_longevity"
+        | "energy_resources"
+        | "food_supply"
+        | "institutional_resilience"
       responsibility_area:
         | "halsa"
         | "arbete"
@@ -7584,6 +7808,14 @@ export const Constants = {
         "anomaly",
       ],
       priority_level: ["critical", "high", "medium", "low", "monitor"],
+      question_category: [
+        "demography_work",
+        "economic_capacity",
+        "health_longevity",
+        "energy_resources",
+        "food_supply",
+        "institutional_resilience",
+      ],
       responsibility_area: [
         "halsa",
         "arbete",
