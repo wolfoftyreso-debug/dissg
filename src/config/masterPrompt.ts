@@ -1,9 +1,16 @@
 /**
  * MASTERPROMPT: Öppen samhällsöversikt – Sverige
  * 
- * Detta är systemets själ – den neutrala, faktabaserade grunden
- * för all samhällsinformation som presenteras.
+ * SLUTLIG SYSTEMFILOSOFI
+ * "Enkelhet på ytan, oändlighet i djupet"
+ * 
+ * Kärnprincip: Användaren ska aldrig behöva välja komplexitet – 
+ * komplexiteten ska erbjuda sig själv vid rätt tillfälle.
  */
+
+// ═══════════════════════════════════════════════════════════════
+// I. SYSTEMETS SJÄL
+// ═══════════════════════════════════════════════════════════════
 
 export const MASTER_SYSTEM_PROMPT = `DU ÄR:
 Ett neutralt, faktabaserat samhällsinformationssystem för landet Sverige.
@@ -93,11 +100,282 @@ Detta är vad som följde."
 
 ALL ANNAN SLUTSATS TILLHÖR ANVÄNDAREN.`;
 
+// ═══════════════════════════════════════════════════════════════
+// II. DESIGNFILOSOFI — YTAN
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * De tre frågorna varje vy ska svara på inom 5 sekunder
+ */
+export const CORE_QUESTIONS = {
+  howIsItGoing: {
+    sv: 'Hur går det?',
+    en: 'How is it going?',
+    requirement: 'Huvudindikator med trend synlig direkt',
+  },
+  whereIsItHappening: {
+    sv: 'Var händer det?',
+    en: 'Where is it happening?',
+    requirement: 'Geografisk kontext tillgänglig med ett klick',
+  },
+  whyIsItHappening: {
+    sv: 'Varför händer det?',
+    en: 'Why is it happening?',
+    requirement: 'Samvariation och ansvarsmappning tillgänglig',
+  },
+} as const;
+
+/**
+ * Startsidans prioriteringslogik
+ * "Visa mig det viktiga"
+ */
+export const HOMEPAGE_PRIORITY_RULES = {
+  principle: 'Startsidan är inte en meny – den är ett prioriteringsbeslut',
+  
+  criteria: [
+    { id: 'impact', label: 'Påverkar flest människor', weight: 0.30 },
+    { id: 'urgency', label: 'Påverkar mest just nu', weight: 0.25 },
+    { id: 'recency', label: 'Har förändrats nyligen', weight: 0.20 },
+    { id: 'breadth', label: 'Berör många områden', weight: 0.15 },
+    { id: 'confidence', label: 'Hög datakvalitet', weight: 0.10 },
+  ],
+  
+  userExperience: 'Användaren ska känna: "Okej, nu fattar jag läget."',
+  
+  fallbackMessage: 'Allt annat finns bakom klick.',
+};
+
+/**
+ * Interaktionsfilosofi: Inga val, bara progression
+ */
+export const INTERACTION_PHILOSOPHY = {
+  principle: 'Användaren ska inte behöva välja tekniska detaljer',
+  
+  systemHandles: [
+    'datakälla',
+    'analysmetod', 
+    'normalisering',
+    'aggregeringsnivå',
+    'tidsperiod (default)',
+  ],
+  
+  defaultMessage: 'Så här tittar vi på detta – vill du ändra?',
+  
+  qualities: ['inkluderande', 'pedagogiskt', 'kraftfullt'],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// III. DJUPFILOSOFI — OÄNDLIGT DJUP
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * All data måste vara relationell
+ */
+export const RELATIONAL_DATA_REQUIREMENTS = {
+  principle: 'Ingen datapunkt får existera isolerat',
+  
+  requiredRelations: [
+    { field: 'kpi_id', description: 'Vilket KPI tillhör denna?' },
+    { field: 'region_code', description: 'Vilken geografisk nivå?' },
+    { field: 'demographic_dimensions', description: 'Vilka demografiska dimensioner?' },
+    { field: 'period', description: 'Vilken tidsperiod?' },
+    { field: 'responsibility_mapping', description: 'Vilket ansvar relaterar den till?' },
+    { field: 'data_source_id', description: 'Vilken källa?' },
+    { field: 'uncertainty', description: 'Vilken osäkerhet?' },
+  ],
+  
+  enablesFeature: 'Oändligt djup möjligt',
+};
+
+/**
+ * Rekursivt djup: Varje sak kan brytas ner
+ */
+export const RECURSIVE_DEPTH_QUESTIONS = [
+  { question: 'Vad är detta?', depth: 'definition' },
+  { question: 'Vad består det av?', depth: 'composition' },
+  { question: 'Hur har det förändrats över tid?', depth: 'timeline' },
+  { question: 'Vad samvarierar med detta?', depth: 'correlation' },
+  { question: 'Vem bar ansvar när detta förändrades?', depth: 'responsibility' },
+] as const;
+
+export const RECURSIVE_DEPTH_APPLIES_TO = [
+  'KPI',
+  'kartor',
+  'kluster',
+  'politiker',
+  'demografi',
+  'simuleringar',
+] as const;
+
+/**
+ * Skalbarhet utan kaos
+ */
+export const SCALE_PHILOSOPHY = {
+  dataPoints: 'Miljontals datapunkter',
+  apis: 'Hundratals API:er',
+  history: 'Decennier av historik',
+  
+  userExperience: {
+    always: [
+      'en sak i taget',
+      'i rätt kontext',
+      'med förklaring i ord',
+    ],
+  },
+  
+  maxim: 'Data utan kontext är brus. Kontext utan data är bullshit. Ni levererar båda.',
+};
+
+// ═══════════════════════════════════════════════════════════════
+// IV. INTERAKTIONSFILOSOFI — LEKFULL MEN KORREKT
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Jämförelser: Allt går att jämföra – säkert
+ */
+export const COMPARISON_RULES = {
+  allowed: [
+    'kön',
+    'regioner',
+    'tid',
+    'politiska perioder',
+    'demografi × utfall',
+  ],
+  
+  safeguards: [
+    { type: 'invalid', action: 'stoppar ogiltiga jämförelser' },
+    { type: 'low_quality', action: 'varnar vid låg datakvalitet' },
+    { type: 'uncertainty', action: 'visar osäkerhet visuellt' },
+  ],
+  
+  result: 'Systemet blir pålitligt',
+};
+
+/**
+ * Korrelation utan vilseledning
+ */
+export const CORRELATION_DISPLAY_RULES = {
+  alwaysShow: [
+    { field: 'strength', label: 'Styrka (r)' },
+    { field: 'stability', label: 'Stabilitet över tid' },
+    { field: 'lag', label: 'Tidsförskjutning' },
+    { field: 'uncertainty', label: 'Osäkerhet/konfidensintervall' },
+  ],
+  
+  mandatoryDisclaimer: 'Detta visar samvariation, inte orsak.',
+  
+  enables: ['brutalt ärligt', 'utan att bli oseriöst'],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// V. ANSVARSFILOSOFI
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Allt leder till ansvar (men pekar inte)
+ */
+export const RESPONSIBILITY_PHILOSOPHY = {
+  question: 'Vem hade mandat när detta förändrades?',
+  
+  notAbout: [
+    'vem orsakade',
+    'vem är skyldig',
+  ],
+  
+  isAbout: [
+    'vem bar ansvaret',
+  ],
+  
+  importance: 'Avgörande för legitimitet',
+};
+
+/**
+ * Mastervärdet styr allt
+ */
+export const MASTER_INDEX_PHILOSOPHY = {
+  name: 'Nationellt funktionsindex',
+  
+  is: [
+    'Statsministerns ansvar',
+    'Allmänhetens referens',
+    'Systemets ryggrad',
+  ],
+  
+  rule: 'Alla andra KPI:er är förklaringar, inte konkurrenter',
+};
+
+// ═══════════════════════════════════════════════════════════════
+// VI. TEKNISK FILOSOFI
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Infinite by design
+ */
+export const INFINITE_DESIGN_PRINCIPLES = {
+  principle: 'Systemet växer utan ombyggnad',
+  
+  extensibility: [
+    { type: 'nya KPI:er', implementation: 'bara nya noder' },
+    { type: 'nya datakällor', implementation: 'bara nya ingestflöden' },
+    { type: 'nya vyer', implementation: 'bara nya filter' },
+  ],
+  
+  result: 'Inget behöver skrivas om',
+};
+
+/**
+ * Versionering
+ */
+export const VERSIONING_PHILOSOPHY = {
+  versionedEntities: [
+    'Data',
+    'Metoder',
+    'Definitioner',
+    'Ansvarsmatris',
+  ],
+  
+  guarantees: [
+    'Historik förändras aldrig',
+    'Debatt kan inte flyttas i efterhand',
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// VII. SAMHÄLLSFILOSOFI
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Det viktigaste systemet gör
+ */
+export const SOCIETAL_PURPOSE = {
+  delivers: [
+    'en gemensam verklighetsbild',
+    'ett gemensamt språk',
+    'en gemensam referens',
+  ],
+  
+  effect: 'Antipolarisering i praktiken',
+  
+  summary: `Ett öppet, interaktivt, djupt men begripligt samhällssystem
+där allt som betyder något finns – och allt som inte betyder något filtreras bort.`,
+  
+  nature: 'Detta är inte ett projekt. Det är infrastruktur.',
+  
+  outcome: [
+    'Politik blir mätbar',
+    'Ansvar blir synligt',
+    'Bullshit dör långsamt men säkert',
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// BEFINTLIGA KONFIGURATIONER (UPPDATERADE)
+// ═══════════════════════════════════════════════════════════════
+
 /**
  * Konfiguration för nationell lägesbild
  */
 export const NATIONAL_STATUS_CONFIG = {
-  // Huvudindikatorer för nationell lägesbild
   coreIndicators: [
     'life_expectancy',
     'working_age_functional',
@@ -108,7 +386,6 @@ export const NATIONAL_STATUS_CONFIG = {
     'dependency_ratio'
   ],
   
-  // Statusnivåer
   statusLevels: {
     improving: {
       label: 'Förbättras',
@@ -132,13 +409,9 @@ export const NATIONAL_STATUS_CONFIG = {
  * Konfiguration för ansvarsvisning
  */
 export const RESPONSIBILITY_DISPLAY_CONFIG = {
-  // Visa aldrig personnamn i publik vy
   showPersonNames: false,
-  
-  // Visa endast struktur
   showStructureOnly: true,
   
-  // Standardformulering för ansvar
   responsibilityTemplate: {
     national: 'Under perioden {startDate}–{endDate} låg det övergripande ansvaret för detta område på den sittande regeringen.',
     regional: 'Under perioden {startDate}–{endDate} låg ansvaret för detta område på {region}.',
@@ -150,7 +423,6 @@ export const RESPONSIBILITY_DISPLAY_CONFIG = {
  * Konfiguration för utfallsanalys
  */
 export const OUTCOME_ANALYSIS_CONFIG = {
-  // Neutral visualisering
   visualization: {
     improved: {
       label: 'Månader med förbättring',
@@ -166,10 +438,7 @@ export const OUTCOME_ANALYSIS_CONFIG = {
     }
   },
   
-  // Standardformulering (neutral)
   outcomeTemplate: 'Under denna styrperiod {direction} indikatorn under {months} av {totalMonths} månader.',
-  
-  // Disclaimer
   disclaimer: 'Detta visar observerade utfall, inte avsikter.'
 };
 
@@ -177,25 +446,52 @@ export const OUTCOME_ANALYSIS_CONFIG = {
  * Konfiguration för spårbarhet
  */
 export const TRACEABILITY_CONFIG = {
-  // Varje datapunkt ska kunna spåras till
   requiredFields: [
-    'source',           // Datakälla (myndighet)
-    'updatedAt',        // Uppdateringsdatum
-    'methodology',      // Metod
-    'uncertainty'       // Osäkerhet
+    'source',
+    'updatedAt',
+    'methodology',
+    'uncertainty'
   ],
   
-  // Inget ska vara en black box
   transparencyNote: 'All data är spårbar till ursprungskälla.'
 };
 
-/**
- * Exportera allt som en samlad konfiguration
- */
+// ═══════════════════════════════════════════════════════════════
+// SAMLAD EXPORT
+// ═══════════════════════════════════════════════════════════════
+
 export const SYSTEM_CONFIG = {
+  // Själen
   masterPrompt: MASTER_SYSTEM_PROMPT,
+  
+  // Ytan
+  coreQuestions: CORE_QUESTIONS,
+  homepagePriority: HOMEPAGE_PRIORITY_RULES,
+  interaction: INTERACTION_PHILOSOPHY,
+  
+  // Djupet
+  relationalData: RELATIONAL_DATA_REQUIREMENTS,
+  recursiveDepth: { questions: RECURSIVE_DEPTH_QUESTIONS, appliesTo: RECURSIVE_DEPTH_APPLIES_TO },
+  scale: SCALE_PHILOSOPHY,
+  
+  // Interaktion
+  comparison: COMPARISON_RULES,
+  correlation: CORRELATION_DISPLAY_RULES,
+  
+  // Ansvar
+  responsibility: RESPONSIBILITY_PHILOSOPHY,
+  responsibilityDisplay: RESPONSIBILITY_DISPLAY_CONFIG,
+  masterIndex: MASTER_INDEX_PHILOSOPHY,
+  
+  // Teknik
+  infiniteDesign: INFINITE_DESIGN_PRINCIPLES,
+  versioning: VERSIONING_PHILOSOPHY,
+  
+  // Samhälle
+  purpose: SOCIETAL_PURPOSE,
+  
+  // Befintliga
   nationalStatus: NATIONAL_STATUS_CONFIG,
-  responsibility: RESPONSIBILITY_DISPLAY_CONFIG,
   outcomeAnalysis: OUTCOME_ANALYSIS_CONFIG,
-  traceability: TRACEABILITY_CONFIG
+  traceability: TRACEABILITY_CONFIG,
 };
