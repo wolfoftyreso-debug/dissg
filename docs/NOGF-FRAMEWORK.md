@@ -599,6 +599,151 @@ Vi byter endast: källor, indikatorer, ansvarsmatriser.
 
 ---
 
+## Del IX — Oändligt Djup, Rätt Gjort
+
+### Djupprincipen
+
+> **Ingen vy får avslöja en individ – men varje vy ska kunna förklaras ner till datapunkt.**
+
+**Tillåtet:**
+- ✅ Aggregering
+- ✅ K-anonymitet
+- ✅ Minsta cellstorlek
+- ✅ Statistiskt brus
+
+**Förbjudet:**
+- ❌ Personnamn
+- ❌ Person-ID
+- ❌ Små grupper som kan bakåtrekonstrueras
+- ❌ Individidentifiering
+
+> **Motto: Full analyskraft, inte övervakning.**
+
+---
+
+### Navigationshierarkin (6 nivåer)
+
+| Nivå | Namn | Fråga | Min. observationer |
+|------|------|-------|-------------------|
+| 0 | Nationell översikt | Hur mår landet? | 100 000 |
+| 1 | Regional vy | Var i landet ser vi detta? | 10 000 |
+| 2 | Kommun / stad | Vilka städer sticker ut? | 1 000 |
+| 3 | Områdeskluster | Vilka mönster ser vi? | 100 |
+| 4 | Datapunkter | Vad visar rådata? | 50 |
+| 5 | Metodologi | Hur mättes detta? | 0 |
+
+**Nivå 3-exempel:**
+> "Områden med hög andel långtidssjukskrivna + låg sysselsättning + hög vårdkonsumtion."
+
+> **Regel: Datapunkt ≠ individ.**
+
+---
+
+### Geografisk kartvy
+
+**Funktioner:**
+- Zoom (nation → kvarter, med spärr)
+- Heatmaps, choropleth, kluster
+- Tidsreglage (år, kvartal, månad)
+- KPI-väljare
+- Jämför-läge (före/efter beslut)
+
+**Klusteranalys:**
+- DBSCAN
+- K-means
+
+---
+
+### Simulering
+
+**Tydligt märkt disclaimer:**
+> "Simulering – detta ändrar inte verklig data"
+
+**Användaren kan:**
+- Justera en indikator (max ±20%)
+- Se hur masterindex reagerar
+- Se vilka områden som påverkas mest
+- Se historiska känsligheter
+
+**Exempel:**
+> "Om arbetsförmågan ökar med 1 procentenhet i dessa regioner, hur påverkas helheten?"
+
+> **Detta är utbildande, avslöjande och helt ofarligt juridiskt.**
+
+---
+
+### Orsakskedjor ("Varför-vyer")
+
+Varje KPI ska ha knappen: **"Visa orsakskedja"**
+
+**Visar:**
+- Vilka andra KPI:er som samvarierar
+- Tidsförskjutning (månader)
+- Styrka (korrelationskoefficient)
+- Stabilitet (över tid)
+
+**Visualiserat som:**
+- Flödesdiagram (inte nättrassel)
+- Alltid klickbart
+
+**Disclaimer:**
+> "Samvariation i tid innebär inte kausalitet."
+
+---
+
+### Typfall / Personas (Anonyma)
+
+Systemet ska ha:
+- Syntetiska "exempelpersoner"
+- Typfall baserade på statistik
+- Personas för pedagogik
+
+**Exempel:**
+> "En typisk person i detta kluster är 45–55 år, långtidssjukskriven, med återkommande vårdkontakt."
+
+**Disclaimer:**
+> "Typfall baseras på statistiska mönster och representerar inga verkliga individer."
+
+---
+
+### Integritetsskydd (Privacy by Design)
+
+| Skydd | Värde |
+|-------|-------|
+| K-anonymitet | Min 5 individer/grupp |
+| Minsta cellstorlek | 10 observationer |
+| Statistiskt brus | 2% vid djup zoom |
+| Automatisk blockering | Under tröskel |
+
+**Meddelanden:**
+- Spärrad: "Datat är för tunt för att visas på denna nivå."
+- Varning: "Begränsat underlag – tolka med försiktighet."
+- Brus: "Statistiskt brus har tillämpats för integritetsskydd."
+
+---
+
+### Rekursiv designprincip
+
+> **Varje graf → kan brytas ner → till data → till källa → till metod**
+
+Det finns aldrig ett slut. Det finns bara:
+- Fler filter
+- Fler jämförelser
+- Fler perspektiv
+
+---
+
+### Systemdefinition
+
+> **Ett rekursivt, pedagogiskt, geografiskt och ansvarskopplat analysuniversum – där verkligheten går att förstå i valfri upplösning utan att någon offras.**
+
+**Principer:**
+1. Oändligt analytiskt djup – aldrig identifierande djup
+2. Du går ner till datapunkt, inte person
+3. Upplyst transparens, inte kontroll
+
+---
+
 ## Dokumenthistorik
 
 | Version | Datum | Förändring |
@@ -606,6 +751,7 @@ Vi byter endast: källor, indikatorer, ansvarsmatriser.
 | 1.0 | 2026-02-01 | Initial formalisering |
 | 1.1 | 2026-02-01 | Rollmodell, lansering, publik vy |
 | 1.2 | 2026-02-02 | DEL VIII: Aggregerings- & ansvarsmodell |
+| 1.3 | 2026-02-02 | DEL IX: Oändligt djup, integritetsskydd |
 
 ---
 
