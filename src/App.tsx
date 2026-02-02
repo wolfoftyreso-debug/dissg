@@ -24,6 +24,7 @@ import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
+import ConceptDemo from "./pages/ConceptDemo";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
               <Route path="/eu" element={<EuDashboardPage />} />
               <Route path="/om" element={<AboutSystem />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/demo" element={<ConceptDemo />} />
               
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={
