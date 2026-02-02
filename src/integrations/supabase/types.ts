@@ -1059,6 +1059,125 @@ export type Database = {
         }
         Relationships: []
       }
+      decision_milestones: {
+        Row: {
+          completed_date: string | null
+          created_at: string | null
+          decision_id: string
+          description: string | null
+          id: string
+          responsible_entity: string | null
+          status: string
+          target_date: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          completed_date?: string | null
+          created_at?: string | null
+          decision_id: string
+          description?: string | null
+          id?: string
+          responsible_entity?: string | null
+          status?: string
+          target_date: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          completed_date?: string | null
+          created_at?: string | null
+          decision_id?: string
+          description?: string | null
+          id?: string
+          responsible_entity?: string | null
+          status?: string
+          target_date?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decision_milestones_decision_id_fkey"
+            columns: ["decision_id"]
+            isOneToOne: false
+            referencedRelation: "policy_decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      decision_outcomes: {
+        Row: {
+          attribution_score: number | null
+          baseline_date: string | null
+          baseline_value: number | null
+          change_absolute: number | null
+          change_percent: number | null
+          confidence_level: number | null
+          created_at: string | null
+          current_value: number
+          decision_id: string
+          id: string
+          kpi_id: string
+          measurement_date: string
+          notes: string | null
+          target_achieved: boolean | null
+          target_value: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          attribution_score?: number | null
+          baseline_date?: string | null
+          baseline_value?: number | null
+          change_absolute?: number | null
+          change_percent?: number | null
+          confidence_level?: number | null
+          created_at?: string | null
+          current_value: number
+          decision_id: string
+          id?: string
+          kpi_id: string
+          measurement_date: string
+          notes?: string | null
+          target_achieved?: boolean | null
+          target_value?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          attribution_score?: number | null
+          baseline_date?: string | null
+          baseline_value?: number | null
+          change_absolute?: number | null
+          change_percent?: number | null
+          confidence_level?: number | null
+          created_at?: string | null
+          current_value?: number
+          decision_id?: string
+          id?: string
+          kpi_id?: string
+          measurement_date?: string
+          notes?: string | null
+          target_achieved?: boolean | null
+          target_value?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decision_outcomes_decision_id_fkey"
+            columns: ["decision_id"]
+            isOneToOne: false
+            referencedRelation: "policy_decisions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "decision_outcomes_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       decision_timeline: {
         Row: {
           action_id: string | null
@@ -3909,39 +4028,60 @@ export type Database = {
       }
       policy_decisions: {
         Row: {
+          budget_sek: number | null
+          category: string | null
           created_at: string
           decision_date: string
           description: string | null
           effectiveness_score: number | null
+          evaluation_date: string | null
           expected_effect: string | null
           id: string
+          implementation_end: string | null
+          implementation_start: string | null
           measured_effect: string | null
+          responsible_department: string | null
+          responsible_minister: string | null
           status: string
           target_kpis: string[]
           title: string
           updated_at: string
         }
         Insert: {
+          budget_sek?: number | null
+          category?: string | null
           created_at?: string
           decision_date: string
           description?: string | null
           effectiveness_score?: number | null
+          evaluation_date?: string | null
           expected_effect?: string | null
           id?: string
+          implementation_end?: string | null
+          implementation_start?: string | null
           measured_effect?: string | null
+          responsible_department?: string | null
+          responsible_minister?: string | null
           status?: string
           target_kpis?: string[]
           title: string
           updated_at?: string
         }
         Update: {
+          budget_sek?: number | null
+          category?: string | null
           created_at?: string
           decision_date?: string
           description?: string | null
           effectiveness_score?: number | null
+          evaluation_date?: string | null
           expected_effect?: string | null
           id?: string
+          implementation_end?: string | null
+          implementation_start?: string | null
           measured_effect?: string | null
+          responsible_department?: string | null
+          responsible_minister?: string | null
           status?: string
           target_kpis?: string[]
           title?: string
@@ -4597,6 +4737,17 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_decision_effectiveness: {
+        Args: { p_decision_id: string }
+        Returns: {
+          avg_change_percent: number
+          declined_kpis: number
+          improved_kpis: number
+          overall_score: number
+          total_kpis: number
+          unchanged_kpis: number
+        }[]
+      }
       compute_checksum: { Args: { data: Json }; Returns: string }
       get_gov_role: { Args: { _user_id: string }; Returns: string }
       has_any_role: {
