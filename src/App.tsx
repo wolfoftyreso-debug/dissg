@@ -49,6 +49,7 @@ import GlobalRealityDemo from "./pages/GlobalRealityDemo";
 import IndexEngineDemo from "./pages/IndexEngineDemo";
 import CorrelationDemo from "./pages/CorrelationDemo";
 import SmokeTestPage from "./pages/SmokeTest";
+import TrustLogPage from "./pages/TrustLogPage";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +102,7 @@ const App = () => (
               <Route path="/indices" element={<IndexEngineDemo />} />
               <Route path="/correlation" element={<CorrelationDemo />} />
               <Route path="/smoke-test" element={<SmokeTestPage />} />
+              <Route path="/trust-log" element={<TrustLogPage />} />
               
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={
