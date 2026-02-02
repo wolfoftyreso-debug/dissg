@@ -8,7 +8,6 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
-  ReferenceArea,
   Brush,
   Area,
   ComposedChart,
@@ -19,55 +18,19 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Calendar, 
   TrendingUp, 
   AlertTriangle,
+  Database,
+  RefreshCw,
 } from 'lucide-react';
 import { format, parseISO, subMonths } from 'date-fns';
 import { sv } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { HISTORICAL_EVENTS, type HistoricalEvent } from '@/data/historicalEvents';
-
-// Generate historical mock data for a KPI
-function generateHistoricalData(
-  kpiId: string, 
-  baseValue: number, 
-  months: number,
-  volatility: number = 0.05
-): Array<{ date: string; value: number; projected?: boolean }> {
-  const data: Array<{ date: string; value: number; projected?: boolean }> = [];
-  const now = new Date();
-  
-  // Generate data for past months
-  for (let i = months; i >= 0; i--) {
-    const date = subMonths(now, i);
-    const trend = (months - i) / months * 0.1; // Slight upward trend
-    const noise = (Math.random() - 0.5) * volatility * baseValue;
-    const seasonality = Math.sin((date.getMonth() / 12) * Math.PI * 2) * baseValue * 0.03;
-    
-    data.push({
-      date: format(date, 'yyyy-MM-dd'),
-      value: Math.round((baseValue * (1 + trend) + noise + seasonality) * 100) / 100,
-    });
-  }
-  
-  // Add 6 months of projection
-  for (let i = 1; i <= 6; i++) {
-    const date = subMonths(now, -i);
-    const lastValue = data[data.length - 1].value;
-    const trend = i * 0.01;
-    const noise = (Math.random() - 0.5) * volatility * baseValue * 0.5;
-    
-    data.push({
-      date: format(date, 'yyyy-MM-dd'),
-      value: Math.round((lastValue * (1 + trend) + noise) * 100) / 100,
-      projected: true,
-    });
-  }
-  
-  return data;
-}
+import { useHistoricalKPIData } from '@/hooks/useHistoricalKPIData';
 
 // Custom tooltip
 function CustomTooltip({ active, payload, label }: any) {
@@ -75,6 +38,8 @@ function CustomTooltip({ active, payload, label }: any) {
   
   const date = parseISO(label);
   const isProjected = payload[0]?.payload?.projected;
+  const confidence = payload[0]?.payload?.confidence;
+  const status = payload[0]?.payload?.status;
   
   return (
     <div className="bg-popover border rounded-lg shadow-lg p-3 text-sm">
@@ -101,6 +66,11 @@ function CustomTooltip({ active, payload, label }: any) {
           </div>
         ))}
       </div>
+      {confidence && (
+        <div className="mt-2 pt-2 border-t text-xs text-muted-foreground">
+          Konfidens: {confidence}% | Status: {status}
+        </div>
+      )}
     </div>
   );
 }
@@ -108,18 +78,14 @@ function CustomTooltip({ active, payload, label }: any) {
 interface HistoricalTimelineChartProps {
   kpiId?: string;
   kpiName?: string;
-  baseValue?: number;
   showEvents?: boolean;
-  showProjection?: boolean;
   height?: number;
 }
 
 export function HistoricalTimelineChart({
-  kpiId = 'default',
+  kpiId,
   kpiName = 'Indikator',
-  baseValue = 100,
   showEvents = true,
-  showProjection = true,
   height = 400,
 }: HistoricalTimelineChartProps) {
   const [timeRange, setTimeRange] = useState<'1y' | '3y' | '5y' | '10y'>('5y');
@@ -128,11 +94,16 @@ export function HistoricalTimelineChart({
   const [showTrendline, setShowTrendline] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<HistoricalEvent | null>(null);
   
+  // Fetch real data from database
+  const { data: historicalData, isLoading, refetch } = useHistoricalKPIData(kpiId, timeRange);
+  
   const monthsMap = { '1y': 12, '3y': 36, '5y': 60, '10y': 120 };
   
+  // Use real data or show empty state
   const data = useMemo(() => {
-    return generateHistoricalData(kpiId, baseValue, monthsMap[timeRange]);
-  }, [kpiId, baseValue, timeRange]);
+    if (!historicalData?.data?.length) return [];
+    return historicalData.data;
+  }, [historicalData]);
   
   // Calculate confidence band (±5%)
   const dataWithBands = useMemo(() => {
@@ -140,22 +111,12 @@ export function HistoricalTimelineChart({
       ...d,
       upper: d.value * 1.05,
       lower: d.value * 0.95,
-      trendline: d.value, // Simplified trendline
+      trendline: d.value,
     }));
   }, [data]);
   
-  // Calculate statistics
-  const stats = useMemo(() => {
-    const values = data.filter(d => !d.projected).map(d => d.value);
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const avg = values.reduce((a, b) => a + b, 0) / values.length;
-    const first = values[0];
-    const last = values[values.length - 1];
-    const change = ((last - first) / first) * 100;
-    
-    return { min, max, avg, first, last, change };
-  }, [data]);
+  // Use stats from hook or calculate fallback
+  const stats = historicalData?.stats || { min: 0, max: 0, avg: 0, first: 0, last: 0, change: 0 };
   
   // Filter relevant historical events
   const relevantEvents = useMemo(() => {
@@ -168,12 +129,70 @@ export function HistoricalTimelineChart({
   }, [showEvents, timeRange]);
   
   const formatXAxis = (dateStr: string) => {
-    const date = parseISO(dateStr);
-    return format(date, timeRange === '1y' ? 'MMM' : 'MMM yy', { locale: sv });
+    try {
+      const date = parseISO(dateStr);
+      return format(date, timeRange === '1y' ? 'MMM' : 'MMM yy', { locale: sv });
+    } catch {
+      return dateStr;
+    }
   };
   
-  const projectionStartIndex = data.findIndex(d => d.projected);
-  const projectionStartDate = projectionStartIndex >= 0 ? data[projectionStartIndex].date : null;
+  const displayName = historicalData?.kpiName || kpiName;
+  const displayUnit = historicalData?.unit || 'värde';
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            Historisk Tidslinje: {kpiName}
+          </CardTitle>
+          <CardDescription>Laddar data...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[400px] w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // Empty state
+  if (!data.length) {
+    return (
+      <Card>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Historisk Tidslinje: {displayName}
+              </CardTitle>
+              <CardDescription>Ingen historisk data tillgänglig</CardDescription>
+            </div>
+            <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as typeof timeRange)}>
+              <TabsList className="h-8">
+                <TabsTrigger value="1y" className="text-xs">1 år</TabsTrigger>
+                <TabsTrigger value="3y" className="text-xs">3 år</TabsTrigger>
+                <TabsTrigger value="5y" className="text-xs">5 år</TabsTrigger>
+                <TabsTrigger value="10y" className="text-xs">10 år</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+            <div className="text-center">
+              <Database className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p className="mb-2">Ingen tidsseriedata hittades för denna KPI</p>
+              <p className="text-sm">Välj en annan tidsperiod eller KPI</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -182,10 +201,14 @@ export function HistoricalTimelineChart({
           <div>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
-              Historisk Tidslinje: {kpiName}
+              Historisk Tidslinje: {displayName}
             </CardTitle>
-            <CardDescription>
-              Interaktiv visualisering med {monthsMap[timeRange]} månaders data
+            <CardDescription className="flex items-center gap-2">
+              <Database className="h-3 w-3" />
+              {data.length} datapunkter från databasen ({displayUnit})
+              <button onClick={() => refetch()} className="ml-2 hover:text-primary">
+                <RefreshCw className="h-3 w-3" />
+              </button>
             </CardDescription>
           </div>
           
@@ -317,17 +340,6 @@ export function HistoricalTimelineChart({
               />
             )}
             
-            {/* Projection area highlight */}
-            {showProjection && projectionStartDate && (
-              <ReferenceArea
-                x1={projectionStartDate}
-                x2={data[data.length - 1].date}
-                fill="hsl(var(--muted))"
-                fillOpacity={0.3}
-                label={{ value: 'Prognos', position: 'insideTopRight', fontSize: 10 }}
-              />
-            )}
-            
             {/* Event markers as reference lines */}
             {relevantEvents.map(event => (
               <ReferenceLine
@@ -355,7 +367,7 @@ export function HistoricalTimelineChart({
                 strokeWidth={2}
                 dot={false}
                 activeDot={{ r: 6, fill: 'hsl(var(--primary))' }}
-                name={kpiName}
+                name={displayName}
               />
             ) : (
               <Area
@@ -365,7 +377,7 @@ export function HistoricalTimelineChart({
                 strokeWidth={2}
                 fill="hsl(var(--primary))"
                 fillOpacity={0.2}
-                name={kpiName}
+                name={displayName}
               />
             )}
             

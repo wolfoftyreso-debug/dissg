@@ -16,18 +16,22 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Layers, 
   TrendingUp, 
   Calendar,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Database,
+  RefreshCw,
 } from 'lucide-react';
-import { format, parseISO, subMonths } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { sv } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-import { KPI, CATEGORIES } from '@/types/kpi';
+import { CATEGORIES } from '@/types/kpi';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useAvailableKPIs, useMultipleKPIHistoricalData } from '@/hooks/useHistoricalKPIData';
 
 // Color palette for multiple lines
 const CHART_COLORS = [
@@ -43,39 +47,16 @@ const CHART_COLORS = [
   '#00C49F',
 ];
 
-// Generate normalized historical data
-function generateNormalizedData(
-  kpis: KPI[], 
-  months: number
-): Array<{ date: string; [key: string]: number | string }> {
-  const data: Array<{ date: string; [key: string]: number | string }> = [];
-  const now = new Date();
-  
-  for (let i = months; i >= 0; i--) {
-    const date = subMonths(now, i);
-    const point: { date: string; [key: string]: number | string } = {
-      date: format(date, 'yyyy-MM-dd'),
-    };
-    
-    kpis.forEach(kpi => {
-      // Normalize to 0-100 scale
-      const trend = (months - i) / months * 0.1;
-      const noise = (Math.random() - 0.5) * 0.05;
-      const baseNormalized = 50 + (kpi.value / 100) * 30; // Simplified normalization
-      point[kpi.id] = Math.round((baseNormalized * (1 + trend + noise)) * 10) / 10;
-    });
-    
-    data.push(point);
-  }
-  
-  return data;
-}
-
 // Custom tooltip for multi-KPI
 function MultiTooltip({ active, payload, label, kpiMap }: any) {
   if (!active || !payload || !payload.length) return null;
   
-  const date = parseISO(label);
+  let date: Date;
+  try {
+    date = parseISO(label);
+  } catch {
+    return null;
+  }
   
   return (
     <div className="bg-popover border rounded-lg shadow-lg p-3 text-sm max-w-xs">
@@ -85,7 +66,7 @@ function MultiTooltip({ active, payload, label, kpiMap }: any) {
       </div>
       <div className="space-y-1.5">
         {payload.map((entry: any, index: number) => {
-          const kpi = kpiMap[entry.dataKey];
+          const kpi = kpiMap?.[entry.dataKey];
           return (
             <div key={index} className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
@@ -98,7 +79,7 @@ function MultiTooltip({ active, payload, label, kpiMap }: any) {
                 </span>
               </div>
               <span className="font-mono font-medium shrink-0">
-                {entry.value.toFixed(1)}
+                {typeof entry.value === 'number' ? entry.value.toLocaleString('sv-SE', { maximumFractionDigits: 2 }) : '-'}
               </span>
             </div>
           );
@@ -109,45 +90,43 @@ function MultiTooltip({ active, payload, label, kpiMap }: any) {
 }
 
 interface MultiKPITimelineChartProps {
-  kpis: KPI[];
   defaultSelected?: string[];
   height?: number;
 }
 
 export function MultiKPITimelineChart({
-  kpis,
   defaultSelected = [],
   height = 450,
 }: MultiKPITimelineChartProps) {
   const [timeRange, setTimeRange] = useState<'1y' | '3y' | '5y'>('3y');
   const [selectedKPIs, setSelectedKPIs] = useState<Set<string>>(
-    new Set(defaultSelected.length > 0 ? defaultSelected : kpis.slice(0, 3).map(k => k.id))
+    new Set(defaultSelected)
   );
   const [showSelector, setShowSelector] = useState(false);
   
-  const monthsMap = { '1y': 12, '3y': 36, '5y': 60 };
+  // Fetch available KPIs from database
+  const { data: availableKPIs, isLoading: loadingKPIs } = useAvailableKPIs();
   
-  const activeKPIs = useMemo(() => {
-    return kpis.filter(kpi => selectedKPIs.has(kpi.id));
-  }, [kpis, selectedKPIs]);
+  // Initialize with first 3 KPIs if no default selection
+  const activeKPIIds = useMemo(() => {
+    if (selectedKPIs.size > 0) return Array.from(selectedKPIs);
+    if (availableKPIs?.length) {
+      const initial = availableKPIs.slice(0, 3).map(k => k.id);
+      return initial;
+    }
+    return [];
+  }, [selectedKPIs, availableKPIs]);
   
-  const data = useMemo(() => {
-    return generateNormalizedData(activeKPIs, monthsMap[timeRange]);
-  }, [activeKPIs, timeRange]);
-  
-  const kpiMap = useMemo(() => {
-    return kpis.reduce((acc, kpi) => {
-      acc[kpi.id] = kpi;
-      return acc;
-    }, {} as Record<string, KPI>);
-  }, [kpis]);
+  // Fetch historical data for selected KPIs
+  const { data: historicalData, isLoading: loadingData, refetch } = useMultipleKPIHistoricalData(activeKPIIds, timeRange);
   
   const kpisByCategory = useMemo(() => {
+    if (!availableKPIs) return [];
     return CATEGORIES.map(cat => ({
       category: cat,
-      kpis: kpis.filter(k => k.category === cat.id),
+      kpis: availableKPIs.filter(k => k.category === cat.id),
     })).filter(g => g.kpis.length > 0);
-  }, [kpis]);
+  }, [availableKPIs]);
   
   const toggleKPI = (kpiId: string) => {
     setSelectedKPIs(prev => {
@@ -162,9 +141,35 @@ export function MultiKPITimelineChart({
   };
   
   const formatXAxis = (dateStr: string) => {
-    const date = parseISO(dateStr);
-    return format(date, 'MMM yy', { locale: sv });
+    try {
+      const date = parseISO(dateStr);
+      return format(date, 'MMM yy', { locale: sv });
+    } catch {
+      return dateStr;
+    }
   };
+  
+  const chartData = historicalData?.chartData || [];
+  const kpiMap = historicalData?.kpiMap || {};
+  const activeKPIs = availableKPIs?.filter(k => activeKPIIds.includes(k.id)) || [];
+
+  // Loading state
+  if (loadingKPIs) {
+    return (
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2">
+            <Layers className="h-5 w-5 text-primary" />
+            Jämför Indikatorer över Tid
+          </CardTitle>
+          <CardDescription>Laddar KPI-definitioner...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[450px] w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -175,8 +180,12 @@ export function MultiKPITimelineChart({
               <Layers className="h-5 w-5 text-primary" />
               Jämför Indikatorer över Tid
             </CardTitle>
-            <CardDescription>
-              Välj upp till 10 KPI:er för jämförelse (normaliserad skala 0-100)
+            <CardDescription className="flex items-center gap-2">
+              <Database className="h-3 w-3" />
+              Riktig data från databasen • Välj upp till 10 KPI:er
+              <button onClick={() => refetch()} className="ml-2 hover:text-primary">
+                <RefreshCw className="h-3 w-3" />
+              </button>
             </CardDescription>
           </div>
           
@@ -216,6 +225,9 @@ export function MultiKPITimelineChart({
                   <span className="text-muted-foreground">×</span>
                 </Badge>
               ))}
+              {activeKPIs.length === 0 && (
+                <span className="text-muted-foreground text-sm">Ingen KPI vald</span>
+              )}
             </div>
             
             <CollapsibleTrigger asChild>
@@ -241,19 +253,19 @@ export function MultiKPITimelineChart({
                             key={kpi.id}
                             className={cn(
                               "flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors",
-                              selectedKPIs.has(kpi.id) 
+                              selectedKPIs.has(kpi.id) || activeKPIIds.includes(kpi.id)
                                 ? "bg-primary/10 border border-primary/30" 
                                 : "bg-background hover:bg-muted"
                             )}
                             onClick={() => toggleKPI(kpi.id)}
                           >
                             <Checkbox 
-                              checked={selectedKPIs.has(kpi.id)}
+                              checked={selectedKPIs.has(kpi.id) || activeKPIIds.includes(kpi.id)}
                               className="pointer-events-none"
                             />
                             <div className="min-w-0">
                               <div className="text-sm font-medium truncate">{kpi.name}</div>
-                              <div className="text-xs text-muted-foreground">{kpi.value} {kpi.unit}</div>
+                              <div className="text-xs text-muted-foreground">{kpi.code}</div>
                             </div>
                           </div>
                         ))}
@@ -267,16 +279,19 @@ export function MultiKPITimelineChart({
         </Collapsible>
         
         {/* Chart */}
-        {activeKPIs.length === 0 ? (
+        {loadingData ? (
+          <Skeleton className="h-[400px] w-full" />
+        ) : chartData.length === 0 ? (
           <div className="h-[300px] flex items-center justify-center text-muted-foreground">
             <div className="text-center">
-              <Layers className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Välj minst en indikator för att visa grafen</p>
+              <Database className="h-12 w-12 mx-auto mb-2 opacity-50" />
+              <p className="mb-2">Ingen historisk data hittades</p>
+              <p className="text-sm">Välj KPI:er som har lagrat tidsseriedata</p>
             </div>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={height}>
-            <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+            <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" opacity={0.3} />
               
               <XAxis 
@@ -290,13 +305,8 @@ export function MultiKPITimelineChart({
               <YAxis 
                 tick={{ fontSize: 11 }}
                 className="fill-muted-foreground"
-                domain={[0, 100]}
-                label={{ 
-                  value: 'Normaliserat (0-100)', 
-                  angle: -90, 
-                  position: 'insideLeft',
-                  style: { fontSize: 11, fill: 'hsl(var(--muted-foreground))' }
-                }}
+                domain={['auto', 'auto']}
+                tickFormatter={(v) => v.toLocaleString('sv-SE')}
               />
               
               <Tooltip content={<MultiTooltip kpiMap={kpiMap} />} />
@@ -320,22 +330,25 @@ export function MultiKPITimelineChart({
                   dot={false}
                   activeDot={{ r: 5 }}
                   name={kpi.id}
+                  connectNulls
                 />
               ))}
               
-              <Brush
-                dataKey="date"
-                height={30}
-                stroke="hsl(var(--primary))"
-                tickFormatter={formatXAxis}
-                startIndex={Math.max(0, data.length - 18)}
-              />
+              {chartData.length > 18 && (
+                <Brush
+                  dataKey="date"
+                  height={30}
+                  stroke="hsl(var(--primary))"
+                  tickFormatter={formatXAxis}
+                  startIndex={Math.max(0, chartData.length - 18)}
+                />
+              )}
             </LineChart>
           </ResponsiveContainer>
         )}
         
-        {/* Correlation hint */}
-        {activeKPIs.length >= 2 && (
+        {/* Info hint */}
+        {activeKPIs.length >= 2 && chartData.length > 0 && (
           <div className="mt-4 p-3 bg-muted/50 rounded-lg text-sm flex items-start gap-2">
             <TrendingUp className="h-4 w-4 text-primary mt-0.5 shrink-0" />
             <div>
