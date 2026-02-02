@@ -18,3 +18,6 @@ export { GMIWeightEditor } from './GMIWeightEditor';
 export { PlanetaryDashboard } from './PlanetaryDashboard';
 export { GlobalBenchmarkView } from './GlobalBenchmarkView';
 export { NeutralSummaryGenerator, NeutralSummaryText } from './NeutralSummaryGenerator';
+
+// WAVE 11: Global Reality Index
+export { GlobalRealityIndex } from './GlobalRealityIndex';
