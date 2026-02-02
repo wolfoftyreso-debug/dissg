@@ -35,3 +35,15 @@ verify_jwt = false
 
 [functions.calculate-relevance]
 verify_jwt = false
+
+[functions.generate-feed-events]
+verify_jwt = false
+
+[functions.feed-webhook-delivery]
+verify_jwt = false
+
+[functions.feed-sse]
+verify_jwt = false
+
+[functions.feed-api]
+verify_jwt = false

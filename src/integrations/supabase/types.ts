@@ -440,6 +440,57 @@ export type Database = {
           },
         ]
       }
+      critical_signal_overrides: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          kpi_id: string | null
+          observation_id: string | null
+          override_type: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          kpi_id?: string | null
+          observation_id?: string | null
+          override_type?: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          kpi_id?: string | null
+          observation_id?: string | null
+          override_type?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "critical_signal_overrides_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "critical_signal_overrides_observation_id_fkey"
+            columns: ["observation_id"]
+            isOneToOne: false
+            referencedRelation: "observations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_priority_snapshots: {
         Row: {
           calculation_duration_ms: number | null
@@ -817,6 +868,363 @@ export type Database = {
             columns: ["factor_kpi_id"]
             isOneToOne: false
             referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_definitions: {
+        Row: {
+          category: string
+          code: string
+          created_at: string
+          default_frequency: string
+          description: string
+          id: string
+          include_links: boolean
+          include_metrics: boolean
+          include_why_now: boolean
+          is_active: boolean
+          max_events_per_day: number
+          min_confidence: number
+          min_duration_periods: number
+          min_effect_threshold: number
+          name: string
+          tier: Database["public"]["Enums"]["feed_tier"]
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string
+          default_frequency?: string
+          description: string
+          id?: string
+          include_links?: boolean
+          include_metrics?: boolean
+          include_why_now?: boolean
+          is_active?: boolean
+          max_events_per_day?: number
+          min_confidence?: number
+          min_duration_periods?: number
+          min_effect_threshold?: number
+          name: string
+          tier?: Database["public"]["Enums"]["feed_tier"]
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string
+          default_frequency?: string
+          description?: string
+          id?: string
+          include_links?: boolean
+          include_metrics?: boolean
+          include_why_now?: boolean
+          is_active?: boolean
+          max_events_per_day?: number
+          min_confidence?: number
+          min_duration_periods?: number
+          min_effect_threshold?: number
+          name?: string
+          tier?: Database["public"]["Enums"]["feed_tier"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      feed_delivery_log: {
+        Row: {
+          delivered_at: string
+          delivery_method: Database["public"]["Enums"]["delivery_method"]
+          error_message: string | null
+          event_id: string
+          id: string
+          response_code: number | null
+          response_time_ms: number | null
+          retry_count: number
+          status: string
+          subscription_id: string
+        }
+        Insert: {
+          delivered_at?: string
+          delivery_method: Database["public"]["Enums"]["delivery_method"]
+          error_message?: string | null
+          event_id: string
+          id?: string
+          response_code?: number | null
+          response_time_ms?: number | null
+          retry_count?: number
+          status?: string
+          subscription_id: string
+        }
+        Update: {
+          delivered_at?: string
+          delivery_method?: Database["public"]["Enums"]["delivery_method"]
+          error_message?: string | null
+          event_id?: string
+          id?: string
+          response_code?: number | null
+          response_time_ms?: number | null
+          retry_count?: number
+          status?: string
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_delivery_log_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "feed_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_delivery_log_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "feed_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_event_interactions: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          interaction_context: Json | null
+          interaction_type: string
+          subscription_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          interaction_context?: Json | null
+          interaction_type: string
+          subscription_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          interaction_context?: Json | null
+          interaction_type?: string
+          subscription_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_event_interactions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "feed_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feed_event_interactions_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "feed_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_events: {
+        Row: {
+          checksum: string
+          confidence: string
+          data_sources: string[]
+          decision_ids: string[] | null
+          explore_url: string | null
+          feed_id: string
+          generated_at: string
+          generation_context: Json | null
+          id: string
+          kpi_ids: string[]
+          methodology_url: string | null
+          metrics: Json
+          observation_ids: string[] | null
+          scope_code: string | null
+          scope_type: string
+          severity: Database["public"]["Enums"]["feed_severity"]
+          source_urls: Json | null
+          summary: string
+          valid_from: string
+          valid_until: string | null
+          why_now: Json
+        }
+        Insert: {
+          checksum: string
+          confidence?: string
+          data_sources?: string[]
+          decision_ids?: string[] | null
+          explore_url?: string | null
+          feed_id: string
+          generated_at?: string
+          generation_context?: Json | null
+          id?: string
+          kpi_ids?: string[]
+          methodology_url?: string | null
+          metrics?: Json
+          observation_ids?: string[] | null
+          scope_code?: string | null
+          scope_type?: string
+          severity?: Database["public"]["Enums"]["feed_severity"]
+          source_urls?: Json | null
+          summary: string
+          valid_from?: string
+          valid_until?: string | null
+          why_now?: Json
+        }
+        Update: {
+          checksum?: string
+          confidence?: string
+          data_sources?: string[]
+          decision_ids?: string[] | null
+          explore_url?: string | null
+          feed_id?: string
+          generated_at?: string
+          generation_context?: Json | null
+          id?: string
+          kpi_ids?: string[]
+          methodology_url?: string | null
+          metrics?: Json
+          observation_ids?: string[] | null
+          scope_code?: string | null
+          scope_type?: string
+          severity?: Database["public"]["Enums"]["feed_severity"]
+          source_urls?: Json | null
+          summary?: string
+          valid_from?: string
+          valid_until?: string | null
+          why_now?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_events_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "feed_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_subscriptions: {
+        Row: {
+          api_key_id: string | null
+          created_at: string
+          custom_frequency: string | null
+          custom_max_events_per_day: number | null
+          delivery_method: Database["public"]["Enums"]["delivery_method"]
+          demographic_filter: Json | null
+          feed_id: string
+          id: string
+          is_active: boolean
+          is_paused: boolean
+          kpi_category_filter: string[] | null
+          min_severity: Database["public"]["Enums"]["feed_severity"]
+          pause_until: string | null
+          region_filter: string[] | null
+          responsibility_level_filter: string[] | null
+          updated_at: string
+          user_id: string | null
+          webhook_secret: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          api_key_id?: string | null
+          created_at?: string
+          custom_frequency?: string | null
+          custom_max_events_per_day?: number | null
+          delivery_method?: Database["public"]["Enums"]["delivery_method"]
+          demographic_filter?: Json | null
+          feed_id: string
+          id?: string
+          is_active?: boolean
+          is_paused?: boolean
+          kpi_category_filter?: string[] | null
+          min_severity?: Database["public"]["Enums"]["feed_severity"]
+          pause_until?: string | null
+          region_filter?: string[] | null
+          responsibility_level_filter?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+          webhook_secret?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          api_key_id?: string | null
+          created_at?: string
+          custom_frequency?: string | null
+          custom_max_events_per_day?: number | null
+          delivery_method?: Database["public"]["Enums"]["delivery_method"]
+          demographic_filter?: Json | null
+          feed_id?: string
+          id?: string
+          is_active?: boolean
+          is_paused?: boolean
+          kpi_category_filter?: string[] | null
+          min_severity?: Database["public"]["Enums"]["feed_severity"]
+          pause_until?: string | null
+          region_filter?: string[] | null
+          responsibility_level_filter?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+          webhook_secret?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_subscriptions_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "feed_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feed_threshold_adjustments: {
+        Row: {
+          adjusted_by: string
+          adjustment_type: string
+          created_at: string
+          evidence: Json | null
+          feed_id: string
+          id: string
+          new_value: number
+          old_value: number
+          reason: string
+        }
+        Insert: {
+          adjusted_by?: string
+          adjustment_type: string
+          created_at?: string
+          evidence?: Json | null
+          feed_id: string
+          id?: string
+          new_value: number
+          old_value: number
+          reason: string
+        }
+        Update: {
+          adjusted_by?: string
+          adjustment_type?: string
+          created_at?: string
+          evidence?: Json | null
+          feed_id?: string
+          id?: string
+          new_value?: number
+          old_value?: number
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feed_threshold_adjustments_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "feed_definitions"
             referencedColumns: ["id"]
           },
         ]
@@ -2343,6 +2751,9 @@ export type Database = {
         | "prime_minister"
         | "system_admin"
       data_source_type: "api" | "file_feed" | "manual" | "calculated"
+      delivery_method: "api" | "webhook" | "sse" | "kafka"
+      feed_severity: "low" | "medium" | "high" | "critical"
+      feed_tier: "open" | "plus" | "pro"
       kpi_category:
         | "demografi_halsa"
         | "arbete_produktivitet"
@@ -2533,6 +2944,9 @@ export const Constants = {
         "system_admin",
       ],
       data_source_type: ["api", "file_feed", "manual", "calculated"],
+      delivery_method: ["api", "webhook", "sse", "kafka"],
+      feed_severity: ["low", "medium", "high", "critical"],
+      feed_tier: ["open", "plus", "pro"],
       kpi_category: [
         "demografi_halsa",
         "arbete_produktivitet",
