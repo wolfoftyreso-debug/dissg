@@ -15,6 +15,7 @@ import ProfileDemo from "./pages/ProfileDemo";
 import DepthDemo from "./pages/DepthDemo";
 import EuDashboardPage from "./pages/EuDashboard";
 import WrappedDemo from "./pages/WrappedDemo";
+import ApiLicensingPage from "./pages/ApiLicensing";
 import AboutSystem from "./pages/AboutSystem";
 import RegionalView from "./pages/RegionalView";
 import DecisionTimeline from "./pages/DecisionTimeline";
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/regional" element={<RegionalView />} />
             <Route path="/decisions" element={<DecisionTimeline />} />
             <Route path="/compact" element={<GlobalCompact />} />
+            <Route path="/api-policy" element={<ApiLicensingPage />} />
             <Route path="/gmi" element={<GlobalMasterIndex />} />
             <Route path="/profiles" element={<PublicProfiles />} />
             <Route path="/profile-demo" element={<ProfileDemo />} />

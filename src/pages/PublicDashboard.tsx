@@ -625,6 +625,11 @@ export default function PublicDashboard() {
                   🇪🇺 EU Dashboard
                 </Link>
               </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/api-policy" className="gap-2">
+                  📜 API & Licenser
+                </Link>
+              </Button>
             </div>
 
             {/* Area Grid */}
