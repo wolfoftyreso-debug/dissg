@@ -34,3 +34,6 @@ export {
   DemographicDataGuard,
   ForbiddenCrossingWarning 
 } from './DemographicDataGuard';
+
+// WAVE 9 - Global Reality Graph
+export { GlobalRealityGraph } from './GlobalRealityGraph';

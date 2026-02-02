@@ -290,3 +290,86 @@ export function validateEdge(
   }
   return { valid: true };
 }
+
+// ============================================================
+// WAVE 9: BT3 — TIDSAXEL I GRAFEN
+// ============================================================
+
+export interface GraphSnapshot {
+  id: string;
+  timestamp: string;
+  nodeCount: number;
+  edgeCount: number;
+  metadata: {
+    coverage: string[];
+    generatedAt: string;
+  };
+}
+
+export interface TimelineConfig {
+  startYear: number;
+  endYear: number;
+  granularity: 'year' | 'quarter' | 'month';
+  animationSpeed: 'slow' | 'normal' | 'fast';
+}
+
+// Extended edge types for Wave 9
+export const EXTENDED_EDGE_TYPES = [
+  'amplifies',       // Förstärker effekt
+  'dampens',         // Dämpar effekt
+  'coincides_with',  // Sammanfaller tidsmässigt
+  'conditioned_by',  // Villkoras av
+  'contradicts'      // Motsäger mönster
+] as const;
+
+// Edge analysis methods
+export type EdgeAnalysisMethod = 
+  | 'statistical_correlation'
+  | 'time_series_analysis'
+  | 'granger_causality'
+  | 'difference_in_differences'
+  | 'regression_analysis'
+  | 'temporal_coincidence'
+  | 'expert_assessment'
+  | 'literature_review'
+  | 'machine_learning'
+  | 'observational';
+
+// Extended edge with Wave 9 requirements
+export interface ExtendedEdge {
+  id: string;
+  sourceId: string;
+  targetId: string;
+  type: string;
+  
+  // OBLIGATORISKT: Ingen kant utan metod
+  strength: number;
+  lag?: number;
+  confidence: number;
+  method: EdgeAnalysisMethod;
+  
+  // Temporal validity
+  validFrom?: string;
+  validTo?: string;
+  
+  // Evidence
+  sampleSize?: number;
+  pValue?: number;
+  sources: string[];
+  limitations?: string[];
+}
+
+// Neutral phrases for edge types
+export const EDGE_NEUTRAL_PHRASES: Record<string, { sv: string; en: string }> = {
+  correlates_with: { sv: 'korrelerar med', en: 'correlates with' },
+  affects: { sv: 'påverkar', en: 'affects' },
+  preceded_by: { sv: 'föregicks av', en: 'preceded by' },
+  caused_by: { sv: 'samvarierar med', en: 'co-varies with' }, // Försiktigare
+  contains: { sv: 'innehåller', en: 'contains' },
+  measures: { sv: 'mäter', en: 'measures' },
+  amplifies: { sv: 'förstärker', en: 'amplifies' },
+  dampens: { sv: 'dämpar', en: 'dampens' },
+  coincides_with: { sv: 'sammanfaller med', en: 'coincides with' },
+  conditioned_by: { sv: 'villkoras av', en: 'conditioned by' },
+  contradicts: { sv: 'motsäger', en: 'contradicts' }
+};
