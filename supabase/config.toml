@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.kolada-ingest]
 verify_jwt = false
+
+[functions.svk-ingest]
+verify_jwt = false
