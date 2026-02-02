@@ -31,3 +31,4 @@ export { SemanticTextBlock, SemanticWarning, DataTierBadge, PatternBlock, Histor
 
 // WAVE 12: Global Power, Conflict & Risk Layer (Non-Operative)
 export { ConflictRiskLayer } from './ConflictRiskLayer';
+export { RiskIndicatorPanel } from './RiskIndicatorPanel';
