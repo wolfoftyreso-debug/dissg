@@ -610,3 +610,183 @@ export const BIG_QUESTIONS_LAYER_COMPLETE = {
   missions: MISSIONS_CONFIG,
   definitionOfDone: BQL_DEFINITION_OF_DONE,
 } as const;
+
+// ============================================================
+// BLOCK 56: AUTO-RANKED QUESTION CATEGORIES
+// ============================================================
+
+export const QUESTION_CATEGORIES = {
+  demography_work: {
+    code: 'DEM',
+    label: 'Demografi & Arbete',
+    labelEn: 'Demography & Work',
+    icon: 'Users',
+    color: 'text-blue-600',
+  },
+  economic_capacity: {
+    code: 'ECO',
+    label: 'Ekonomisk kapacitet',
+    labelEn: 'Economic Capacity',
+    icon: 'TrendingUp',
+    color: 'text-green-600',
+  },
+  health_longevity: {
+    code: 'HEA',
+    label: 'Hälsa & Livslängd',
+    labelEn: 'Health & Longevity',
+    icon: 'Heart',
+    color: 'text-red-600',
+  },
+  energy_resources: {
+    code: 'ENE',
+    label: 'Energi & Resurser',
+    labelEn: 'Energy & Resources',
+    icon: 'Zap',
+    color: 'text-yellow-600',
+  },
+  food_supply: {
+    code: 'FOO',
+    label: 'Mat & Försörjning',
+    labelEn: 'Food & Supply',
+    icon: 'Wheat',
+    color: 'text-orange-600',
+  },
+  institutional_resilience: {
+    code: 'INS',
+    label: 'Institutionell resiliens',
+    labelEn: 'Institutional Resilience',
+    icon: 'Building',
+    color: 'text-purple-600',
+  },
+} as const;
+
+export type QuestionCategory = keyof typeof QUESTION_CATEGORIES;
+
+// ============================================================
+// BLOCK 56: RANKING FORMULA
+// ============================================================
+
+export const RANKING_WEIGHTS = {
+  trend_acceleration: 1.0,
+  cross_domain_impact: 1.0,
+  population_affected: 1.0,
+  data_uncertainty: -1.0,
+} as const;
+
+export interface RankingMetrics {
+  trend_acceleration: number;
+  cross_domain_impact: number;
+  population_affected: number;
+  data_uncertainty: number;
+}
+
+export function calculateImportanceScore(metrics: RankingMetrics): number {
+  return (
+    metrics.trend_acceleration * RANKING_WEIGHTS.trend_acceleration +
+    metrics.cross_domain_impact * RANKING_WEIGHTS.cross_domain_impact +
+    metrics.population_affected * RANKING_WEIGHTS.population_affected +
+    metrics.data_uncertainty * RANKING_WEIGHTS.data_uncertainty
+  );
+}
+
+// ============================================================
+// BLOCK 56: ANTI-MISUSE RULES
+// ============================================================
+
+export const ANTI_MISUSE_RULES = {
+  forbiddenPatterns: [
+    /crisis/i, /catastrophe/i, /disaster/i, /emergency/i,
+    /must act/i, /should do/i, /recommend/i, /predict/i,
+    /will happen/i, /forecast/i,
+  ],
+  requiredElements: [
+    'what_this_shows', 'what_this_does_not_show',
+    'source_links', 'uncertainty_disclosure',
+  ],
+  textRequirements: {
+    descriptive: true,
+    bounded: true,
+    linked: true,
+    noNormative: true,
+  },
+};
+
+// ============================================================
+// BLOCK 56: VIEW CONFIG
+// ============================================================
+
+export const VIEW_CONFIG = {
+  global: { maxQuestions: 5, summaryMaxWords: 25, showRankChange: true },
+  national: { maxQuestions: 5, summaryMaxWords: 30, showRankChange: true, showGlobalComparison: true },
+  detail: { showFullDescription: true, showIndicatorLinks: true, showHistory: true, showWhatNotShown: true },
+};
+
+// ============================================================
+// BLOCK 56: DATABASE INTERFACES
+// ============================================================
+
+export interface BigQuestionDB {
+  id: string;
+  code: string;
+  category: QuestionCategory;
+  question_text: string;
+  question_text_local?: Record<string, string>;
+  short_description: string;
+  what_this_shows: string;
+  what_this_does_not_show: string[];
+  primary_kpi_codes: string[];
+  secondary_kpi_codes?: string[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BigQuestionRanking {
+  id: string;
+  question_id: string;
+  country_code: string | null;
+  region_code: string | null;
+  trend_acceleration: number;
+  cross_domain_impact: number;
+  population_affected: number;
+  data_uncertainty: number;
+  importance_score: number;
+  rank_position: number | null;
+  rank_change: number;
+  period_start: string;
+  period_end: string;
+  calculated_at: string;
+}
+
+export interface BigQuestionWithRanking extends BigQuestionDB {
+  ranking?: BigQuestionRanking;
+}
+
+// ============================================================
+// BLOCK 56: DISPLAY HELPERS
+// ============================================================
+
+export function getRankChangeIndicator(change: number): {
+  icon: string;
+  color: string;
+  label: string;
+} {
+  if (change > 0) return { icon: 'ArrowUp', color: 'text-status-critical', label: `+${change} ranking` };
+  if (change < 0) return { icon: 'ArrowDown', color: 'text-status-positive', label: `${change} ranking` };
+  return { icon: 'Minus', color: 'text-muted-foreground', label: 'Unchanged' };
+}
+
+export function formatImportanceScore(score: number): string {
+  return score.toFixed(1);
+}
+
+// ============================================================
+// BLOCK 56: DEFINITION OF DONE
+// ============================================================
+
+export const BIG_QUESTIONS_DONE_CRITERIA = {
+  everyCountryHasView: true,
+  rankingChangesOverTime: true,
+  usersStopAskingWhatsImportant: true,
+  aiAgentsCiteCorrectly: true,
+};
