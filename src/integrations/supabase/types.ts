@@ -1930,6 +1930,96 @@ export type Database = {
           },
         ]
       }
+      disease_burden: {
+        Row: {
+          age_group: string | null
+          cause_code: string
+          cause_level: number | null
+          cause_name: string
+          confidence_lower: number | null
+          confidence_upper: number | null
+          country_code: string
+          created_at: string
+          dalys: number | null
+          dalys_per_100k: number | null
+          data_source_code: string
+          deaths: number | null
+          deaths_per_100k: number | null
+          gbd_study_year: number | null
+          id: string
+          incidence: number | null
+          incidence_per_100k: number | null
+          parent_cause_code: string | null
+          period_year: number
+          prevalence: number | null
+          prevalence_per_100k: number | null
+          region_code: string | null
+          sex: string | null
+          yld: number | null
+          yld_per_100k: number | null
+          yll: number | null
+          yll_per_100k: number | null
+        }
+        Insert: {
+          age_group?: string | null
+          cause_code: string
+          cause_level?: number | null
+          cause_name: string
+          confidence_lower?: number | null
+          confidence_upper?: number | null
+          country_code: string
+          created_at?: string
+          dalys?: number | null
+          dalys_per_100k?: number | null
+          data_source_code?: string
+          deaths?: number | null
+          deaths_per_100k?: number | null
+          gbd_study_year?: number | null
+          id?: string
+          incidence?: number | null
+          incidence_per_100k?: number | null
+          parent_cause_code?: string | null
+          period_year: number
+          prevalence?: number | null
+          prevalence_per_100k?: number | null
+          region_code?: string | null
+          sex?: string | null
+          yld?: number | null
+          yld_per_100k?: number | null
+          yll?: number | null
+          yll_per_100k?: number | null
+        }
+        Update: {
+          age_group?: string | null
+          cause_code?: string
+          cause_level?: number | null
+          cause_name?: string
+          confidence_lower?: number | null
+          confidence_upper?: number | null
+          country_code?: string
+          created_at?: string
+          dalys?: number | null
+          dalys_per_100k?: number | null
+          data_source_code?: string
+          deaths?: number | null
+          deaths_per_100k?: number | null
+          gbd_study_year?: number | null
+          id?: string
+          incidence?: number | null
+          incidence_per_100k?: number | null
+          parent_cause_code?: string | null
+          period_year?: number
+          prevalence?: number | null
+          prevalence_per_100k?: number | null
+          region_code?: string | null
+          sex?: string | null
+          yld?: number | null
+          yld_per_100k?: number | null
+          yll?: number | null
+          yll_per_100k?: number | null
+        }
+        Relationships: []
+      }
       eu_cluster_members: {
         Row: {
           cluster_id: string
@@ -4028,6 +4118,314 @@ export type Database = {
         }
         Relationships: []
       }
+      health_indicators: {
+        Row: {
+          aggregation_method: string | null
+          atc_codes: string[] | null
+          category: string
+          code: string
+          created_at: string
+          data_quality_notes: string | null
+          definition_source: string | null
+          description: string | null
+          icd_codes: string[] | null
+          id: string
+          is_active: boolean | null
+          is_inverted: boolean | null
+          name: string
+          name_local: Json | null
+          normalization_method: string | null
+          subcategory: string | null
+          typical_lag_months: number | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          aggregation_method?: string | null
+          atc_codes?: string[] | null
+          category: string
+          code: string
+          created_at?: string
+          data_quality_notes?: string | null
+          definition_source?: string | null
+          description?: string | null
+          icd_codes?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          is_inverted?: boolean | null
+          name: string
+          name_local?: Json | null
+          normalization_method?: string | null
+          subcategory?: string | null
+          typical_lag_months?: number | null
+          unit: string
+          updated_at?: string
+        }
+        Update: {
+          aggregation_method?: string | null
+          atc_codes?: string[] | null
+          category?: string
+          code?: string
+          created_at?: string
+          data_quality_notes?: string | null
+          definition_source?: string | null
+          description?: string | null
+          icd_codes?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          is_inverted?: boolean | null
+          name?: string
+          name_local?: Json | null
+          normalization_method?: string | null
+          subcategory?: string | null
+          typical_lag_months?: number | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      health_policy_periods: {
+        Row: {
+          affected_indicators: string[] | null
+          affected_substances: string[] | null
+          category: string
+          code: string
+          country_code: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          key_changes: string[] | null
+          name: string
+          name_local: Json | null
+          region_code: string | null
+          source_documents: string[] | null
+          source_urls: string[] | null
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          affected_indicators?: string[] | null
+          affected_substances?: string[] | null
+          category: string
+          code: string
+          country_code: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          key_changes?: string[] | null
+          name: string
+          name_local?: Json | null
+          region_code?: string | null
+          source_documents?: string[] | null
+          source_urls?: string[] | null
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          affected_indicators?: string[] | null
+          affected_substances?: string[] | null
+          category?: string
+          code?: string
+          country_code?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          key_changes?: string[] | null
+          name?: string
+          name_local?: Json | null
+          region_code?: string | null
+          source_documents?: string[] | null
+          source_urls?: string[] | null
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      health_scenario_analogues: {
+        Row: {
+          base_country_code: string
+          base_period_end: string
+          base_period_start: string
+          category: string
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          key_characteristics: Json | null
+          name: string
+          observed_outcomes: Json | null
+          relevant_indicators: string[] | null
+          relevant_substances: string[] | null
+          uncertainty_factors: string[] | null
+        }
+        Insert: {
+          base_country_code: string
+          base_period_end: string
+          base_period_start: string
+          category: string
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          key_characteristics?: Json | null
+          name: string
+          observed_outcomes?: Json | null
+          relevant_indicators?: string[] | null
+          relevant_substances?: string[] | null
+          uncertainty_factors?: string[] | null
+        }
+        Update: {
+          base_country_code?: string
+          base_period_end?: string
+          base_period_start?: string
+          category?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          key_characteristics?: Json | null
+          name?: string
+          observed_outcomes?: Json | null
+          relevant_indicators?: string[] | null
+          relevant_substances?: string[] | null
+          uncertainty_factors?: string[] | null
+        }
+        Relationships: []
+      }
+      health_values: {
+        Row: {
+          age_group: string | null
+          confidence: number | null
+          country_code: string
+          created_at: string
+          data_source_code: string
+          estimation_method: string | null
+          flags: string[] | null
+          id: string
+          indicator_id: string
+          is_estimated: boolean | null
+          period_end: string
+          period_start: string
+          region_code: string | null
+          source_indicator_code: string | null
+          source_url: string | null
+          updated_at: string
+          value: number
+          value_female: number | null
+          value_male: number | null
+        }
+        Insert: {
+          age_group?: string | null
+          confidence?: number | null
+          country_code: string
+          created_at?: string
+          data_source_code: string
+          estimation_method?: string | null
+          flags?: string[] | null
+          id?: string
+          indicator_id: string
+          is_estimated?: boolean | null
+          period_end: string
+          period_start: string
+          region_code?: string | null
+          source_indicator_code?: string | null
+          source_url?: string | null
+          updated_at?: string
+          value: number
+          value_female?: number | null
+          value_male?: number | null
+        }
+        Update: {
+          age_group?: string | null
+          confidence?: number | null
+          country_code?: string
+          created_at?: string
+          data_source_code?: string
+          estimation_method?: string | null
+          flags?: string[] | null
+          id?: string
+          indicator_id?: string
+          is_estimated?: boolean | null
+          period_end?: string
+          period_start?: string
+          region_code?: string | null
+          source_indicator_code?: string | null
+          source_url?: string | null
+          updated_at?: string
+          value?: number
+          value_female?: number | null
+          value_male?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_values_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "health_indicators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      healthcare_capacity: {
+        Row: {
+          country_code: string
+          created_at: string
+          data_source_code: string
+          health_expenditure_pct_gdp: number | null
+          health_expenditure_per_capita_usd: number | null
+          hospital_beds_per_10k: number | null
+          id: string
+          nurses_per_10k: number | null
+          out_of_pocket_pct: number | null
+          period_year: number
+          physicians_per_10k: number | null
+          psychiatric_beds_per_10k: number | null
+          region_code: string | null
+          source_url: string | null
+          universal_coverage_index: number | null
+        }
+        Insert: {
+          country_code: string
+          created_at?: string
+          data_source_code: string
+          health_expenditure_pct_gdp?: number | null
+          health_expenditure_per_capita_usd?: number | null
+          hospital_beds_per_10k?: number | null
+          id?: string
+          nurses_per_10k?: number | null
+          out_of_pocket_pct?: number | null
+          period_year: number
+          physicians_per_10k?: number | null
+          psychiatric_beds_per_10k?: number | null
+          region_code?: string | null
+          source_url?: string | null
+          universal_coverage_index?: number | null
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          data_source_code?: string
+          health_expenditure_pct_gdp?: number | null
+          health_expenditure_per_capita_usd?: number | null
+          hospital_beds_per_10k?: number | null
+          id?: string
+          nurses_per_10k?: number | null
+          out_of_pocket_pct?: number | null
+          period_year?: number
+          physicians_per_10k?: number | null
+          psychiatric_beds_per_10k?: number | null
+          region_code?: string | null
+          source_url?: string | null
+          universal_coverage_index?: number | null
+        }
+        Relationships: []
+      }
       indicator_detection_log: {
         Row: {
           confidence_score: number
@@ -5277,6 +5675,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      life_expectancy: {
+        Row: {
+          country_code: string
+          created_at: string
+          data_source_code: string
+          healthy_life_expectancy_female: number | null
+          healthy_life_expectancy_male: number | null
+          healthy_life_expectancy_total: number | null
+          id: string
+          infant_mortality_per_1k: number | null
+          life_expectancy_female: number | null
+          life_expectancy_male: number | null
+          life_expectancy_total: number
+          maternal_mortality_per_100k: number | null
+          period_year: number
+          region_code: string | null
+          source_url: string | null
+          under5_mortality_per_1k: number | null
+        }
+        Insert: {
+          country_code: string
+          created_at?: string
+          data_source_code: string
+          healthy_life_expectancy_female?: number | null
+          healthy_life_expectancy_male?: number | null
+          healthy_life_expectancy_total?: number | null
+          id?: string
+          infant_mortality_per_1k?: number | null
+          life_expectancy_female?: number | null
+          life_expectancy_male?: number | null
+          life_expectancy_total: number
+          maternal_mortality_per_100k?: number | null
+          period_year: number
+          region_code?: string | null
+          source_url?: string | null
+          under5_mortality_per_1k?: number | null
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          data_source_code?: string
+          healthy_life_expectancy_female?: number | null
+          healthy_life_expectancy_male?: number | null
+          healthy_life_expectancy_total?: number | null
+          id?: string
+          infant_mortality_per_1k?: number | null
+          life_expectancy_female?: number | null
+          life_expectancy_male?: number | null
+          life_expectancy_total?: number
+          maternal_mortality_per_100k?: number | null
+          period_year?: number
+          region_code?: string | null
+          source_url?: string | null
+          under5_mortality_per_1k?: number | null
+        }
+        Relationships: []
       }
       lineage_chain_links: {
         Row: {
@@ -7480,6 +7935,169 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      substance_data: {
+        Row: {
+          age_group: string | null
+          confidence: number | null
+          country_code: string
+          created_at: string
+          data_source_code: string
+          id: string
+          is_estimated: boolean | null
+          measure_type: string
+          methodology_notes: string | null
+          period_end: string
+          period_start: string
+          region_code: string | null
+          source_url: string | null
+          substance_id: string
+          unit: string
+          value: number
+          value_female: number | null
+          value_male: number | null
+        }
+        Insert: {
+          age_group?: string | null
+          confidence?: number | null
+          country_code: string
+          created_at?: string
+          data_source_code: string
+          id?: string
+          is_estimated?: boolean | null
+          measure_type: string
+          methodology_notes?: string | null
+          period_end: string
+          period_start: string
+          region_code?: string | null
+          source_url?: string | null
+          substance_id: string
+          unit: string
+          value: number
+          value_female?: number | null
+          value_male?: number | null
+        }
+        Update: {
+          age_group?: string | null
+          confidence?: number | null
+          country_code?: string
+          created_at?: string
+          data_source_code?: string
+          id?: string
+          is_estimated?: boolean | null
+          measure_type?: string
+          methodology_notes?: string | null
+          period_end?: string
+          period_start?: string
+          region_code?: string | null
+          source_url?: string | null
+          substance_id?: string
+          unit?: string
+          value?: number
+          value_female?: number | null
+          value_male?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "substance_data_substance_id_fkey"
+            columns: ["substance_id"]
+            isOneToOne: false
+            referencedRelation: "substance_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      substance_legal_status: {
+        Row: {
+          country_code: string
+          created_at: string
+          effective_from: string
+          effective_to: string | null
+          id: string
+          notes: string | null
+          schedule: string | null
+          source_document: string | null
+          source_url: string | null
+          status: string
+          substance_id: string
+        }
+        Insert: {
+          country_code: string
+          created_at?: string
+          effective_from: string
+          effective_to?: string | null
+          id?: string
+          notes?: string | null
+          schedule?: string | null
+          source_document?: string | null
+          source_url?: string | null
+          status: string
+          substance_id: string
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          notes?: string | null
+          schedule?: string | null
+          source_document?: string | null
+          source_url?: string | null
+          status?: string
+          substance_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "substance_legal_status_substance_id_fkey"
+            columns: ["substance_id"]
+            isOneToOne: false
+            referencedRelation: "substance_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      substance_profiles: {
+        Row: {
+          chemical_class: string | null
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_local: Json | null
+          pharmacological_category: string | null
+          updated_at: string
+          who_classification: string | null
+        }
+        Insert: {
+          chemical_class?: string | null
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_local?: Json | null
+          pharmacological_category?: string | null
+          updated_at?: string
+          who_classification?: string | null
+        }
+        Update: {
+          chemical_class?: string | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_local?: Json | null
+          pharmacological_category?: string | null
+          updated_at?: string
+          who_classification?: string | null
+        }
+        Relationships: []
       }
       surfaced_insights: {
         Row: {
