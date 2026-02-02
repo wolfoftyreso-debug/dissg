@@ -16,6 +16,8 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Link } from 'react-router-dom';
 import { PublicOnboarding } from '@/components/onboarding';
 import { calculateKPIStatus } from '@/config/kpiThresholds';
+import { HowWeKnowSection, generateHowWeKnowData } from '@/components/transparency/HowWeKnowSection';
+
 
 // Category groupings with human-readable names and descriptions
 const AREA_GROUPS = [
@@ -456,6 +458,14 @@ function KPIDetailView({
             </Card>
           </CollapsibleContent>
         </Collapsible>
+
+        {/* Hur vet vi det? - New dedicated section */}
+        <div className="mt-4">
+          <HowWeKnowSection 
+            data={generateHowWeKnowData(kpi.id, kpi.name)}
+            variant="card"
+          />
+        </div>
       </div>
 
       {/* Responsibility */}
