@@ -6,7 +6,6 @@
 
 import { ObservationCard } from './ObservationCard';
 import type { ObservationCard as ObservationCardType, ObservationType } from '@/types/ai-observation';
-import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 
 interface ObservationCardListProps {
@@ -45,7 +44,7 @@ export function ObservationCardList({ observations, onViewRawData }: Observation
   
   return (
     <div className="space-y-4">
-      {/* Filter tabs */}
+      {/* Filter tabs - text only */}
       <div className="flex flex-wrap gap-2">
         {(['all', 'deviation', 'comovement', 'stability', 'alternative'] as const).map((type) => {
           const count = type === 'all' ? observations.length : (typeCounts[type] || 0);
@@ -61,12 +60,7 @@ export function ObservationCardList({ observations, onViewRawData }: Observation
                   : 'bg-background border-border hover:border-foreground/20'
               }`}
             >
-              {typeLabels[type]}
-              {count > 0 && (
-                <Badge variant="secondary" className="ml-1.5 h-4 px-1 text-[10px]">
-                  {count}
-                </Badge>
-              )}
+              {typeLabels[type]} ({count})
             </button>
           );
         })}
