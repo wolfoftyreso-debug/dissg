@@ -28,3 +28,6 @@ export { BigQuestionsLayerV2 } from './BigQuestionsLayerV2';
 export { BigQuestionsLanding } from './BigQuestionsLanding';
 export { UserMissions } from './UserMissions';
 export { SemanticTextBlock, SemanticWarning, DataTierBadge, PatternBlock, HistoricalContextBlock } from './SemanticText';
+
+// WAVE 12: Global Power, Conflict & Risk Layer (Non-Operative)
+export { ConflictRiskLayer } from './ConflictRiskLayer';
