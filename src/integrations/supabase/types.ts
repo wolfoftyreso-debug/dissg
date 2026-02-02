@@ -1413,6 +1413,321 @@ export type Database = {
           },
         ]
       }
+      covid_comparison_validity: {
+        Row: {
+          assessed_at: string
+          country_a: string
+          country_b: string
+          data_type: string
+          definition_match: boolean | null
+          id: string
+          invalidity_reasons: string[] | null
+          is_valid: boolean
+          methodology_match: boolean | null
+          period_end: string
+          period_start: string
+          reporting_match: boolean | null
+          validity_score: number | null
+        }
+        Insert: {
+          assessed_at?: string
+          country_a: string
+          country_b: string
+          data_type: string
+          definition_match?: boolean | null
+          id?: string
+          invalidity_reasons?: string[] | null
+          is_valid: boolean
+          methodology_match?: boolean | null
+          period_end: string
+          period_start: string
+          reporting_match?: boolean | null
+          validity_score?: number | null
+        }
+        Update: {
+          assessed_at?: string
+          country_a?: string
+          country_b?: string
+          data_type?: string
+          definition_match?: boolean | null
+          id?: string
+          invalidity_reasons?: string[] | null
+          is_valid?: boolean
+          methodology_match?: boolean | null
+          period_end?: string
+          period_start?: string
+          reporting_match?: boolean | null
+          validity_score?: number | null
+        }
+        Relationships: []
+      }
+      covid_conclusion_types: {
+        Row: {
+          conclusion_type: string
+          created_at: string
+          forbidden_phrases: string[] | null
+          id: string
+          is_allowed: boolean
+          requires_conditions: string[] | null
+          template_text: string
+        }
+        Insert: {
+          conclusion_type: string
+          created_at?: string
+          forbidden_phrases?: string[] | null
+          id?: string
+          is_allowed?: boolean
+          requires_conditions?: string[] | null
+          template_text: string
+        }
+        Update: {
+          conclusion_type?: string
+          created_at?: string
+          forbidden_phrases?: string[] | null
+          id?: string
+          is_allowed?: boolean
+          requires_conditions?: string[] | null
+          template_text?: string
+        }
+        Relationships: []
+      }
+      covid_excess_mortality: {
+        Row: {
+          age_standardized: boolean | null
+          baseline_period: string | null
+          country_code: string
+          created_at: string
+          data_source_code: string
+          excess_deaths: number | null
+          excess_percent: number | null
+          expected_deaths: number
+          expected_deaths_lower: number | null
+          expected_deaths_upper: number | null
+          id: string
+          methodology: string
+          observed_deaths: number
+          period_end: string
+          period_start: string
+          season_adjusted: boolean | null
+        }
+        Insert: {
+          age_standardized?: boolean | null
+          baseline_period?: string | null
+          country_code: string
+          created_at?: string
+          data_source_code: string
+          excess_deaths?: number | null
+          excess_percent?: number | null
+          expected_deaths: number
+          expected_deaths_lower?: number | null
+          expected_deaths_upper?: number | null
+          id?: string
+          methodology: string
+          observed_deaths: number
+          period_end: string
+          period_start: string
+          season_adjusted?: boolean | null
+        }
+        Update: {
+          age_standardized?: boolean | null
+          baseline_period?: string | null
+          country_code?: string
+          created_at?: string
+          data_source_code?: string
+          excess_deaths?: number | null
+          excess_percent?: number | null
+          expected_deaths?: number
+          expected_deaths_lower?: number | null
+          expected_deaths_upper?: number | null
+          id?: string
+          methodology?: string
+          observed_deaths?: number
+          period_end?: string
+          period_start?: string
+          season_adjusted?: boolean | null
+        }
+        Relationships: []
+      }
+      covid_method_changes: {
+        Row: {
+          change_date: string
+          change_type: string
+          comparability_note: string
+          country_code: string
+          created_at: string
+          data_type: string
+          id: string
+          impact_severity: string
+          new_definition: string
+          previous_definition: string
+          source_url: string | null
+        }
+        Insert: {
+          change_date: string
+          change_type: string
+          comparability_note: string
+          country_code: string
+          created_at?: string
+          data_type: string
+          id?: string
+          impact_severity: string
+          new_definition: string
+          previous_definition: string
+          source_url?: string | null
+        }
+        Update: {
+          change_date?: string
+          change_type?: string
+          comparability_note?: string
+          country_code?: string
+          created_at?: string
+          data_type?: string
+          id?: string
+          impact_severity?: string
+          new_definition?: string
+          previous_definition?: string
+          source_url?: string | null
+        }
+        Relationships: []
+      }
+      covid_policy_periods: {
+        Row: {
+          country_code: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_verified: boolean | null
+          policy_type: string
+          region_code: string | null
+          source_url: string | null
+          start_date: string
+          stringency_level: number | null
+        }
+        Insert: {
+          country_code: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_verified?: boolean | null
+          policy_type: string
+          region_code?: string | null
+          source_url?: string | null
+          start_date: string
+          stringency_level?: number | null
+        }
+        Update: {
+          country_code?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_verified?: boolean | null
+          policy_type?: string
+          region_code?: string | null
+          source_url?: string | null
+          start_date?: string
+          stringency_level?: number | null
+        }
+        Relationships: []
+      }
+      covid_raw_data: {
+        Row: {
+          age_group: string | null
+          confidence_interval_lower: number | null
+          confidence_interval_upper: number | null
+          country_code: string
+          created_at: string
+          data_source_code: string
+          data_type: string
+          definition_version: string
+          id: string
+          is_preliminary: boolean | null
+          period_date: string
+          region_code: string | null
+          reporter: string
+          reporting_lag_days: number | null
+          revision_number: number | null
+          value: number
+          value_per_100k: number | null
+        }
+        Insert: {
+          age_group?: string | null
+          confidence_interval_lower?: number | null
+          confidence_interval_upper?: number | null
+          country_code: string
+          created_at?: string
+          data_source_code: string
+          data_type: string
+          definition_version: string
+          id?: string
+          is_preliminary?: boolean | null
+          period_date: string
+          region_code?: string | null
+          reporter: string
+          reporting_lag_days?: number | null
+          revision_number?: number | null
+          value: number
+          value_per_100k?: number | null
+        }
+        Update: {
+          age_group?: string | null
+          confidence_interval_lower?: number | null
+          confidence_interval_upper?: number | null
+          country_code?: string
+          created_at?: string
+          data_source_code?: string
+          data_type?: string
+          definition_version?: string
+          id?: string
+          is_preliminary?: boolean | null
+          period_date?: string
+          region_code?: string | null
+          reporter?: string
+          reporting_lag_days?: number | null
+          revision_number?: number | null
+          value?: number
+          value_per_100k?: number | null
+        }
+        Relationships: []
+      }
+      covid_sensitivity_results: {
+        Row: {
+          analysis_code: string
+          base_query_params: Json
+          created_at: string
+          id: string
+          key_sensitivities: string[] | null
+          results: Json
+          stability_classification: string
+          stability_score: number
+          variations_tested: Json
+        }
+        Insert: {
+          analysis_code: string
+          base_query_params: Json
+          created_at?: string
+          id?: string
+          key_sensitivities?: string[] | null
+          results: Json
+          stability_classification: string
+          stability_score: number
+          variations_tested: Json
+        }
+        Update: {
+          analysis_code?: string
+          base_query_params?: Json
+          created_at?: string
+          id?: string
+          key_sensitivities?: string[] | null
+          results?: Json
+          stability_classification?: string
+          stability_score?: number
+          variations_tested?: Json
+        }
+        Relationships: []
+      }
       critical_signal_overrides: {
         Row: {
           created_at: string
