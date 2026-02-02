@@ -42,6 +42,7 @@ import SwedenDashboard from "./pages/SwedenDashboard";
 import ScenarioDemo from "./pages/ScenarioDemo";
 import CapacityDemo from "./pages/CapacityDemo";
 import FairnessDemo from "./pages/FairnessDemo";
+import CivilizationDemo from "./pages/CivilizationDemo";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ const App = () => (
               <Route path="/scenario" element={<ScenarioDemo />} />
               <Route path="/capacity" element={<CapacityDemo />} />
               <Route path="/fairness" element={<FairnessDemo />} />
+              <Route path="/civilization" element={<CivilizationDemo />} />
               
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={
