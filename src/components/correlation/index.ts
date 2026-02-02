@@ -8,3 +8,4 @@ export { CorrelationTimeline } from './CorrelationTimeline';
 export { CorrelationMatrix } from './CorrelationMatrix';
 export { AntiCherryPickingPanel } from './AntiCherryPickingPanel';
 export { LanguageGuardDisplay } from './LanguageGuardDisplay';
+export { StatisticalIntegrityPanel } from './StatisticalIntegrityPanel';
