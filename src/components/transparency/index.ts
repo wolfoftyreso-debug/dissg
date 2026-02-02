@@ -1,20 +1,16 @@
 /**
  * DEL XIV — AGGREGERINGS- & ANSVARSMODELL
+ * DEL XXIV — KÄNSLIGA VYER & SPRÅKREGLER
  * 
  * Transparenskomponenter för "Vi visar – vi påstår inte"
- * 
- * Exporterar:
- * - MethodologyDisclosure: "Så här är detta beräknat" dialog
- * - DataLayerIndicator: Visar datalager (A/B/C)
- * - SourceAttribution: Källattribution med licens och datum
- * - GlobalDisclaimer: Systemdisclaimer i olika varianter
- * - NeutralLanguageFormatter: Neutrala textformuleringar
  */
 
 export { MethodologyDisclosure } from './MethodologyDisclosure';
 export { DataLayerIndicator } from './DataLayerIndicator';
 export { SourceAttribution } from './SourceAttribution';
 export { GlobalDisclaimer } from './GlobalDisclaimer';
+
+// DEL XIV: Neutral Language
 export {
   NeutralTrendText,
   NeutralTimeText,
@@ -23,3 +19,6 @@ export {
   NeutralCorrelationStatement,
   containsForbiddenTerms,
 } from './NeutralLanguageFormatter';
+
+// DEL XXIV: Sensitive View Components
+export { SensitiveViewDisclaimer, ShowHowWeKnow, MandatoryDisclaimers } from './SensitiveViewComponents';
