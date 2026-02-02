@@ -1,13 +1,14 @@
-import { Bell, User } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { KPI } from '@/types/kpi';
 import { cn } from '@/lib/utils';
+import { UserMenu } from '@/components/auth/UserMenu';
 
 interface AppHeaderProps {
   kpis: KPI[];
   role?: string;
 }
 
-export function AppHeader({ kpis, role = 'Statsminister' }: AppHeaderProps) {
+export function AppHeader({ kpis }: AppHeaderProps) {
   const criticalCount = kpis.filter(k => k.status === 'critical').length;
   const hasAlerts = criticalCount > 0;
 
@@ -57,10 +58,9 @@ export function AppHeader({ kpis, role = 'Statsminister' }: AppHeaderProps) {
             )}
           </button>
 
-          {/* Profile / behörighet */}
-          <div className="flex items-center gap-1.5 border-l border-border pl-4">
-            <User className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium text-foreground">{role}</span>
+          {/* Profile / Användarmeny */}
+          <div className="border-l border-border pl-4">
+            <UserMenu />
           </div>
         </div>
       </div>
