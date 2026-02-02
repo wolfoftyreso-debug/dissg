@@ -1,5 +1,5 @@
 /**
- * DEL XV-XIX — OÄNDLIGT DJUP, RÄTT GJORT
+ * DEL XV-XIX, XXIV — OÄNDLIGT DJUP, RÄTT GJORT
  * 
  * Komponenter för rekursiv analys med integritetsskydd:
  * - DEL XV: Grundläggande djupanalys
@@ -7,6 +7,7 @@
  * - DEL XVII: Simulering & "Lek med talen"
  * - DEL XVIII: Privacy-by-Design spärrar
  * - DEL XIX: Oändligt djup (rekursiv utforskning)
+ * - DEL XXIV: Djupdata (kön, migration, ursprung)
  */
 
 // DEL XV - Grundläggande
@@ -27,3 +28,9 @@ export { PrivacySpärrar, DatapointDisclaimer } from './PrivacySpärrar';
 
 // DEL XIX - Oändligt djup (rekursiv utforskning)
 export { InfiniteDepthEngine } from './InfiniteDepthEngine';
+
+// DEL XXIV - Djupdata med N-spärrar
+export { 
+  DemographicDataGuard,
+  ForbiddenCrossingWarning 
+} from './DemographicDataGuard';
