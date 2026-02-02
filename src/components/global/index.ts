@@ -24,4 +24,6 @@ export { GlobalRealityIndex } from './GlobalRealityIndex';
 
 // WAVE 12: Big Questions Layer & Missions
 export { BigQuestionsLayer } from './BigQuestionsLayer';
+export { BigQuestionsLayerV2 } from './BigQuestionsLayerV2';
 export { UserMissions } from './UserMissions';
+export { SemanticTextBlock, SemanticWarning, DataTierBadge, PatternBlock, HistoricalContextBlock } from './SemanticText';
