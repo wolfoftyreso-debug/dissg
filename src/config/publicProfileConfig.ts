@@ -45,78 +45,97 @@ export const DATA_LAYERS = {
 } as const;
 
 // =====================================================
-// JURIDISKA DISCLAIMERS
+// JURIDISKA DISCLAIMERS (EXAKTA FORMULERINGAR)
+// ⚠️ Dessa texter är oföränderliga och utgör juridiskt skydd
 // =====================================================
 
 export const LEGAL_DISCLAIMERS = {
-  // Huvuddisclaimer - visas alltid på varje profil
-  main: {
-    title: 'Om denna sida',
-    text: `Profilerna visar offentliga uppdrag och hur relevanta indikatorer utvecklades under dessa perioder.
-Systemet tillskriver inte individer orsak, skuld eller intention.`,
+  // A. Global disclaimer (sidfot, alla sidor)
+  global: {
+    title: 'Om informationen',
+    text: `Denna plattform sammanställer och visualiserar information från öppna källor (t.ex. myndighetsstatistik och Wikipedia). Plattformen producerar ingen ny fakta och tar inte ställning i politiska frågor. Visualiseringar och sammanställningar är systemgenererade enligt öppet redovisad metodik.`,
   },
   
-  // Kompakt version
+  // B. Datakälla & ansvar (på alla KPI- och analyssidor)
+  dataSource: {
+    title: 'Datakällor och ansvar',
+    text: `All grunddata härrör från öppna källor. Eventuella fel eller brister i grunddata hänförs till respektive källa. Plattformen ansvarar för aggregering, tidslinjeläggning och presentation enligt publicerad metod.`,
+  },
+  
+  // C. Analysens natur (på alla analysvyer)
+  analysis: {
+    title: 'Om analysen',
+    text: `Analysen visar observerade samband i tid mellan ansvar, beslut och indikatorutveckling. Analysen fastställer inte kausalitet, intention eller skuld.`,
+  },
+  
+  // D. Ansvar & roller (på roll- och ansvarsvyer)
+  responsibility: {
+    title: 'Ansvar och mandat',
+    text: `Ansvar visas som formella uppdrag och mandatperioder. Plattformen tillskriver inte individer personlig orsak till utfall.`,
+  },
+  
+  // E. Politikerprofiler (överst på varje profilsida)
+  profile: {
+    title: 'Viktig information',
+    text: `Denna profilsida visar offentliga uppdrag (källa: Wikipedia) och hur relevanta indikatorer utvecklades under dessa perioder. Utfallet är en sammanställning av öppna data och innebär ingen värdering av personen.`,
+  },
+  
+  // F. Rättelse & uppdatering (på profilsidor)
+  correction: {
+    title: 'Rättelser',
+    text: `Biografiska fakta hämtas från Wikipedia (CC BY-SA). För rättelser av grundfakta hänvisas till Wikipedia. Plattformen synkroniserar uppdateringar regelbundet.`,
+  },
+  
+  // G. Metodlänk (fast länk överallt)
+  methodLink: {
+    title: 'Så här är detta beräknat',
+    text: `Läs om datakällor, tidsfönster, trendklassificering, osäkerhet och aggregeringsregler.`,
+  },
+  
+  // Legacy-stöd för befintliga komponenter
+  main: {
+    title: 'Viktig information',
+    text: `Denna profilsida visar offentliga uppdrag (källa: Wikipedia) och hur relevanta indikatorer utvecklades under dessa perioder. Utfallet är en sammanställning av öppna data och innebär ingen värdering av personen.`,
+  },
+  
   compact: 'Visar observerade utfall, inte avsikter eller orsakssamband.',
   
-  // Footer-disclaimer
-  footer: `Systemet tar inte ställning till orsak.
-Det visar endast offentliga uppdrag och observerade indikatorförändringar under samma period.`,
+  footer: `Denna plattform sammanställer och visualiserar information från öppna källor. Plattformen producerar ingen ny fakta och tar inte ställning i politiska frågor.`,
   
-  // Metoddisclaimer
   methodology: {
     title: 'Metod och begränsningar',
-    text: `Dessa sidor sammanställer offentligt tillgänglig information om uppdrag 
-och kopplar dem till nationella indikatorer. Korrelation i tid innebär inte kausalitet.
-En persons ansvar för ett område innebär inte ensamt ansvar för alla förändringar.`,
+    text: `Analysen visar observerade samband i tid mellan ansvar, beslut och indikatorutveckling. Analysen fastställer inte kausalitet, intention eller skuld.`,
   },
   
-  // DEL XIV: Aggregeringsmodell
   aggregation: {
     title: 'Om aggregering',
-    text: `Aggregering innebär att flera datapunkter sammanställs enligt fasta regler.
-Aggregering är inte en värdering av individer, beslut eller intentioner.`,
+    text: `Aggregering innebär att flera datapunkter sammanställs enligt fasta regler. Aggregering är inte en värdering av individer, beslut eller intentioner.`,
   },
   
-  // DEL XIV: Dataansvar
   dataResponsibility: {
-    title: 'Om data',
-    text: `Systemet återger och sammanställer data från öppna källor.
-Eventuella fel i grunddata hänförs till respektive källa.`,
+    title: 'Datakällor och ansvar',
+    text: `All grunddata härrör från öppna källor. Eventuella fel eller brister i grunddata hänförs till respektive källa. Plattformen ansvarar för aggregering, tidslinjeläggning och presentation enligt publicerad metod.`,
   },
   
-  // Wikipedia-faktaruta
   wikipediaAttribution: {
     title: 'Grundfakta',
     text: 'Denna information är hämtad från Wikipedia (CC BY-SA)',
     linkText: 'Visa ursprungskälla på Wikipedia',
   },
   
-  // Systemanalys-sektion
   systemAnalysis: {
     title: 'Ansvar & observerade utfall',
     text: 'Denna del är systemgenererad analys baserad på öppna myndighetsdata.',
   },
   
-  // Rättelse & transparens
-  correction: {
-    title: 'Rättelse & transparens',
-    text: `Om faktauppgifter är felaktiga ber vi dig först kontrollera och uppdatera Wikipedia.
-Systemet uppdateras automatiskt därefter.`,
-  },
-  
-  // Verifieringsstatus
   verification: {
     prefix: 'Grundfakta senast verifierad mot Wikipedia:',
     unknown: 'Ej verifierad',
   },
   
-  // DEL XIV: Global systemdisclaimer
   globalSystem: {
-    title: 'Om systemet',
-    text: `Detta system samlar, strukturerar och visualiserar öppen data.
-Det producerar ingen ny fakta, fastställer inga sanningar och gör inga normativa påståenden.
-Systemet är informationsarkitektur – inte innehållsansvar.`,
+    title: 'Om informationen',
+    text: `Denna plattform sammanställer och visualiserar information från öppna källor (t.ex. myndighetsstatistik och Wikipedia). Plattformen producerar ingen ny fakta och tar inte ställning i politiska frågor. Visualiseringar och sammanställningar är systemgenererade enligt öppet redovisad metodik.`,
   },
 } as const;
 

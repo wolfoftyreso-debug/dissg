@@ -8,6 +8,7 @@ import PublicDashboard from "./pages/PublicDashboard";
 import GlobalCompact from "./pages/GlobalCompact";
 import Admin from "./pages/Admin";
 import PublicProfiles from "./pages/PublicProfiles";
+import ProfileDemo from "./pages/ProfileDemo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/compact" element={<GlobalCompact />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/profiles" element={<PublicProfiles />} />
+          <Route path="/profile-demo" element={<ProfileDemo />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
