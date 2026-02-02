@@ -1,6 +1,32 @@
-# 📘 MASTER README — SYSTEMKONTRAKT
+# 🔴 SYSTEM CONTRACT — HÅRD PRINCIPLÅSNING
 
-## Öppet samhällssystem för lägesbild, ansvar och utfall
+**Status: LÅST**  
+**Version: 1.0.0**  
+**Datum: 2026-02-02**
+
+---
+
+## ⚡ DESSA REGLER FÅR ALDRIG BRYTAS
+
+| # | Regel | Enforced |
+|---|-------|----------|
+| 1 | **API-first.** UI är en klient. | ✅ |
+| 2 | **Inget hårdkodat.** Allt deklarativt. | ✅ |
+| 3 | **All data append-only + versionerad.** | ✅ |
+| 4 | **Djup är oändligt. Enkelhet är default.** | ✅ |
+| 5 | **Osäkerhet visas hellre än att döljas.** | ✅ |
+| 6 | **Relevans styr alltid startsidan.** | ✅ |
+| 7 | **Allt ska kunna jämföras — om det är statistiskt rimligt.** | ✅ |
+
+---
+
+## 🔥 SYSTEMETS KÄRNLÖFTE
+
+> **"Detta system ska göra det omöjligt att prata skit om verkligheten — utan att förstå den."**
+
+---
+
+## 📘 ÖPPET SAMHÄLLSSYSTEM
 
 **Version**: v1.0 — levande dokument (versionerat)
 
@@ -9,7 +35,7 @@
 ## 1. Syfte (varför systemet finns)
 
 Systemets syfte är att:
-- ge en gemensam, verifierbar lägesbild av landet
+- ge en gemensam, verifierbar lägesbild av världen
 - visa hur mätbara utfall utvecklas över tid
 - koppla utfall till formella ansvar och mandat
 - göra detta begripligt för alla, från allmänhet till högsta ledning
