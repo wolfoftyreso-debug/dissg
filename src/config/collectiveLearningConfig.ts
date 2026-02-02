@@ -1,9 +1,9 @@
 /**
  * MODULE — COLLECTIVE LEARNING TRACKER (CLT)
- * "Vad världen faktiskt lär sig (eller inte) över tid"
+ * "Vad har världen lärt sig – och vad upprepar den?"
  * 
- * Spårar globalt lärande, upprepade misstag och 
- * kunskapsackumulering.
+ * Systemets långminne. Inte moral. Inte skuld.
+ * Observerad förändring i beteende, fokus och resultat över tid.
  */
 
 // ═══════════════════════════════════════════════════════════════
@@ -11,180 +11,575 @@
 // ═══════════════════════════════════════════════════════════════
 
 export const CLT_CORE_PRINCIPLE = {
-  statement: 'Mänskligheten lär sig – men långsamt, ojämnt och med frekventa återfall.',
-  statementEn: 'Humanity learns – but slowly, unevenly, and with frequent relapses.',
+  statement: 'Lärande mäts i förändrat beteende och utfall – inte i ambitioner.',
+  statementEn: 'Learning is measured in changed behavior and outcomes – not in ambitions.',
+  systemQuestion: 'När liknande situationer uppstår över tid, förändras beteenden, beslut och utfall – eller upprepas samma mönster?',
+  systemQuestionEn: 'When similar situations arise over time, do behaviors, decisions and outcomes change – or are the same patterns repeated?',
   enforced: true,
 } as const;
 
 // ═══════════════════════════════════════════════════════════════
-// LEARNING CATEGORIES
+// BLOCK UA — PATTERN MEMORY ENGINE
 // ═══════════════════════════════════════════════════════════════
 
-export type LearningDomain = 
-  | 'economic_policy'
-  | 'public_health'
-  | 'environmental'
-  | 'governance'
-  | 'technology'
-  | 'social_policy';
+export type PatternCategory = 
+  | 'crisis_response'
+  | 'reform_cycle'
+  | 'policy_wave'
+  | 'attention_wave'
+  | 'warning_to_action';
 
-export interface LearningPattern {
+export interface HistoricalPattern {
   id: string;
-  domain: LearningDomain;
+  code: string;
+  category: PatternCategory;
   title: string;
   titleSv: string;
   description: string;
   descriptionSv: string;
   firstObserved: string;
-  timesRepeated: number;
-  timesLearned: number;
-  currentStatus: 'learned' | 'learning' | 'forgotten' | 'repeating';
-  confidenceLevel: number;
-  geographicSpread: 'global' | 'regional' | 'local';
-  examples: LearningExample[];
+  occurrences: PatternOccurrence[];
+  situationType: string;
+  situationTypeSv: string;
 }
 
-export interface LearningExample {
-  country: string;
-  year: string;
-  outcome: 'success' | 'failure' | 'mixed';
-  description: string;
-  descriptionSv: string;
+export interface PatternOccurrence {
+  id: string;
+  location: string;
+  period: string;
+  triggerEvent: string;
+  triggerEventSv: string;
+  responseType: string;
+  responseTypeSv: string;
+  outcome: string;
+  outcomeSv: string;
+  recognitionSpeedDays: number;
+  learningClassification: LearningClassification;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MISTAKE PATTERNS
+// BLOCK UB — LEARNING SIGNALS
 // ═══════════════════════════════════════════════════════════════
 
-export interface RepeatedMistake {
+export interface LearningSignals {
+  patternId: string;
+  recognitionSpeed: SignalMeasurement;
+  responseChange: SignalMeasurement;
+  outcomeShift: SignalMeasurement;
+  narrativeEvolution: SignalMeasurement;
+}
+
+export interface SignalMeasurement {
+  currentValue: number;
+  historicalAverage: number;
+  trend: 'improving' | 'stable' | 'declining';
+  comparisonText: string;
+  comparisonTextSv: string;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK UC — LEARNING CLASSIFICATION
+// ═══════════════════════════════════════════════════════════════
+
+export type LearningClassification = 
+  | 'adaptive'
+  | 'partial'
+  | 'stagnation'
+  | 'regression';
+
+export const LEARNING_CLASSIFICATION_LABELS: Record<LearningClassification, { en: string; sv: string; description: string; descriptionSv: string }> = {
+  adaptive: {
+    en: 'Adaptive Learning',
+    sv: 'Adaptiv inlärning',
+    description: 'Behavior changes, outcome improves',
+    descriptionSv: 'Beteende ändras, utfall förbättras',
+  },
+  partial: {
+    en: 'Partial Learning',
+    sv: 'Partiell inlärning',
+    description: 'Problem recognized but not solved',
+    descriptionSv: 'Problemet känns igen men löses inte',
+  },
+  stagnation: {
+    en: 'Stagnation',
+    sv: 'Stagnation',
+    description: 'Same response, same outcome',
+    descriptionSv: 'Samma respons, samma utfall',
+  },
+  regression: {
+    en: 'Regression',
+    sv: 'Regression',
+    description: 'Worse response over time',
+    descriptionSv: 'Sämre respons över tid',
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK UD — GLOBAL LEARNING DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+
+export type LearningDomain = 
+  | 'energy'
+  | 'health'
+  | 'economy'
+  | 'environment'
+  | 'governance'
+  | 'technology'
+  | 'social';
+
+export interface DomainLearningStatus {
+  domain: LearningDomain;
+  domainName: string;
+  domainNameSv: string;
+  learningScore: number;
+  trend: 'improving' | 'stable' | 'declining';
+  timespan: string;
+  keyPatterns: string[];
+  regionalVariation: RegionalVariation[];
+}
+
+export interface RegionalVariation {
+  region: string;
+  regionSv: string;
+  deviation: number;
+  note: string;
+  noteSv: string;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK UE — "WHAT WE KEEP REPEATING"
+// ═══════════════════════════════════════════════════════════════
+
+export interface RepeatedPattern {
   id: string;
   pattern: string;
   patternSv: string;
-  occurrences: MistakeOccurrence[];
-  avgTimeBetween: string;
-  lastOccurred: string;
-  predictedRisk: 'low' | 'medium' | 'high';
-  warningSignals: string[];
-  warningSignalsSv: string[];
+  occurrenceCount: number;
+  domains: LearningDomain[];
+  examples: RepeatedExample[];
+  rootCauses: string[];
+  rootCausesSv: string[];
+  noImprovementObserved: boolean;
 }
 
-export interface MistakeOccurrence {
-  id: string;
+export interface RepeatedExample {
+  period: string;
   location: string;
-  date: string;
-  severity: number;
-  outcome: string;
-  outcomeSv: string;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// REPLICATION TRACKING
-// ═══════════════════════════════════════════════════════════════
-
-export interface PolicyReplication {
-  originalPolicy: string;
-  originalCountry: string;
-  originalYear: string;
-  replications: ReplicationAttempt[];
-  successRate: number;
-  avgAdaptation: 'full_copy' | 'modified' | 'heavily_adapted';
-  keyLessons: string[];
-  keyLessonsSv: string[];
-}
-
-export interface ReplicationAttempt {
-  country: string;
-  year: string;
-  adaptationType: 'full_copy' | 'modified' | 'heavily_adapted';
-  outcome: 'success' | 'partial' | 'failure';
-  contextDifferences: string[];
-}
-
-// ═══════════════════════════════════════════════════════════════
-// KNOWLEDGE ACCUMULATION
-// ═══════════════════════════════════════════════════════════════
-
-export interface KnowledgeScore {
-  domain: LearningDomain;
-  globalScore: number; // 0-100
-  trend: 'accumulating' | 'stable' | 'eroding';
-  strengthAreas: string[];
-  weakAreas: string[];
-  recentChanges: KnowledgeChange[];
-}
-
-export interface KnowledgeChange {
-  date: string;
-  type: 'confirmed' | 'falsified' | 'refined' | 'forgotten';
   description: string;
   descriptionSv: string;
-  impactScore: number;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK UF — SCIENCE vs ACTION GAP
+// ═══════════════════════════════════════════════════════════════
+
+export interface ScienceActionGap {
+  id: string;
+  topic: string;
+  topicSv: string;
+  scientificConsensusYear: string;
+  consensusDescription: string;
+  consensusDescriptionSv: string;
+  firstMajorActionYear: string | null;
+  actionDescription: string | null;
+  actionDescriptionSv: string | null;
+  gapYears: number | null;
+  status: 'acted' | 'partial_action' | 'no_action';
+  ongoingGap: boolean;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK UG — POSITIVE DEVIATION
+// ═══════════════════════════════════════════════════════════════
+
+export interface PositiveDeviation {
+  id: string;
+  title: string;
+  titleSv: string;
+  description: string;
+  descriptionSv: string;
+  domain: LearningDomain;
+  historicalAverageLag: number;
+  actualLag: number;
+  improvementFactor: number;
+  enablingFactors: string[];
+  enablingFactorsSv: string[];
+  structuralConditions: string[];
+  structuralConditionsSv: string[];
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK UH — LEARNING vs ATTENTION
+// ═══════════════════════════════════════════════════════════════
+
+export type AttentionLearningQuadrant = 
+  | 'high_attention_high_learning'
+  | 'high_attention_low_learning'
+  | 'low_attention_high_learning'
+  | 'low_attention_low_learning';
+
+export interface AttentionLearningItem {
+  id: string;
+  topic: string;
+  topicSv: string;
+  attentionScore: number;
+  learningScore: number;
+  quadrant: AttentionLearningQuadrant;
+  interpretation: string;
+  interpretationSv: string;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK UI — COLLECTIVE MEMORY WIDGET
+// ═══════════════════════════════════════════════════════════════
+
+export interface CollectiveMemoryStatus {
+  overallTrend: 'improving' | 'stable' | 'declining';
+  patternAwareness: number;
+  lastUpdated: string;
+  keyInsight: string;
+  keyInsightSv: string;
 }
 
 // ═══════════════════════════════════════════════════════════════
 // MOCK DATA
 // ═══════════════════════════════════════════════════════════════
 
-export const MOCK_LEARNING_PATTERNS: LearningPattern[] = [
+export const MOCK_PATTERNS: HistoricalPattern[] = [
   {
-    id: 'clp-1',
-    domain: 'economic_policy',
-    title: 'Austerity During Recession',
-    titleSv: 'Åtstramning under lågkonjunktur',
-    description: 'Reducing government spending during economic downturns tends to deepen recessions.',
-    descriptionSv: 'Att minska offentliga utgifter under ekonomiska nedgångar tenderar att fördjupa lågkonjunkturer.',
-    firstObserved: '1930',
-    timesRepeated: 12,
-    timesLearned: 4,
-    currentStatus: 'repeating',
-    confidenceLevel: 0.85,
-    geographicSpread: 'global',
-    examples: [
-      { country: 'Greece', year: '2010-2015', outcome: 'failure', description: 'Severe austerity led to 25% GDP decline', descriptionSv: 'Kraftig åtstramning ledde till 25% BNP-nedgång' },
-      { country: 'USA', year: '2009', outcome: 'success', description: 'Stimulus prevented deeper recession', descriptionSv: 'Stimulans förhindrade djupare lågkonjunktur' },
+    id: 'hp-1',
+    code: 'CRISIS-DELAY',
+    category: 'crisis_response',
+    title: 'Delayed Crisis Response',
+    titleSv: 'Försenad krisrespons',
+    description: 'Pattern of delayed response to slow-building crises',
+    descriptionSv: 'Mönster av försenad respons på långsamt byggande kriser',
+    firstObserved: '1930s',
+    situationType: 'Slow-onset systemic risk',
+    situationTypeSv: 'Långsam systemisk risk',
+    occurrences: [
+      {
+        id: 'o1',
+        location: 'Global',
+        period: '2007-2008',
+        triggerEvent: 'Financial system instability',
+        triggerEventSv: 'Finansiell systeminstabilitet',
+        responseType: 'Reactive bailouts',
+        responseTypeSv: 'Reaktiva räddningspaket',
+        outcome: 'Crisis contained but repeated pattern',
+        outcomeSv: 'Krisen begränsades men mönstret upprepades',
+        recognitionSpeedDays: 540,
+        learningClassification: 'partial',
+      },
+      {
+        id: 'o2',
+        location: 'Europe',
+        period: '2010-2012',
+        triggerEvent: 'Sovereign debt accumulation',
+        triggerEventSv: 'Statsskuldsackumulering',
+        responseType: 'Delayed coordinated response',
+        responseTypeSv: 'Försenad koordinerad respons',
+        outcome: 'Prolonged crisis, political instability',
+        outcomeSv: 'Utdragen kris, politisk instabilitet',
+        recognitionSpeedDays: 720,
+        learningClassification: 'stagnation',
+      },
     ],
   },
   {
-    id: 'clp-2',
-    domain: 'public_health',
-    title: 'Early Pandemic Response',
-    titleSv: 'Tidig pandemiberedskap',
-    description: 'Early, aggressive containment measures reduce total harm from pandemics.',
-    descriptionSv: 'Tidiga, aggressiva begränsningsåtgärder minskar total skada från pandemier.',
+    id: 'hp-2',
+    code: 'PANDEMIC-PREP',
+    category: 'warning_to_action',
+    title: 'Pandemic Preparedness Gap',
+    titleSv: 'Pandemiberedskapsgap',
+    description: 'Gap between warning and actual preparation',
+    descriptionSv: 'Gap mellan varning och faktisk förberedelse',
     firstObserved: '1918',
-    timesRepeated: 5,
-    timesLearned: 3,
-    currentStatus: 'learning',
-    confidenceLevel: 0.78,
-    geographicSpread: 'global',
-    examples: [
-      { country: 'South Korea', year: '2020', outcome: 'success', description: 'Rapid testing and tracing controlled spread', descriptionSv: 'Snabb testning och spårning kontrollerade spridningen' },
+    situationType: 'Known but underestimated risk',
+    situationTypeSv: 'Känd men underskattad risk',
+    occurrences: [
+      {
+        id: 'o3',
+        location: 'Global',
+        period: '2002-2003',
+        triggerEvent: 'SARS outbreak',
+        triggerEventSv: 'SARS-utbrott',
+        responseType: 'Rapid containment, some preparation',
+        responseTypeSv: 'Snabb begränsning, viss förberedelse',
+        outcome: 'Contained, but preparation faded',
+        outcomeSv: 'Begränsad, men förberedelse avtog',
+        recognitionSpeedDays: 90,
+        learningClassification: 'partial',
+      },
+      {
+        id: 'o4',
+        location: 'Global',
+        period: '2020',
+        triggerEvent: 'COVID-19 pandemic',
+        triggerEventSv: 'COVID-19-pandemi',
+        responseType: 'Variable, often delayed',
+        responseTypeSv: 'Varierande, ofta försenad',
+        outcome: 'Major global impact despite warnings',
+        outcomeSv: 'Stor global påverkan trots varningar',
+        recognitionSpeedDays: 60,
+        learningClassification: 'partial',
+      },
     ],
   },
 ];
 
-export const MOCK_REPEATED_MISTAKES: RepeatedMistake[] = [
+export const MOCK_DOMAIN_STATUS: DomainLearningStatus[] = [
   {
-    id: 'rm-1',
-    pattern: 'Housing bubble denial',
-    patternSv: 'Förnekande av bostadsbubbla',
-    occurrences: [
-      { id: 'o1', location: 'Japan', date: '1991', severity: 9, outcome: 'Lost decade', outcomeSv: 'Förlorat decennium' },
-      { id: 'o2', location: 'USA', date: '2008', severity: 10, outcome: 'Global financial crisis', outcomeSv: 'Global finanskris' },
-      { id: 'o3', location: 'Spain', date: '2008', severity: 8, outcome: 'Banking collapse', outcomeSv: 'Bankkollaps' },
+    domain: 'health',
+    domainName: 'Public Health',
+    domainNameSv: 'Folkhälsa',
+    learningScore: 62,
+    trend: 'improving',
+    timespan: '1950-2024',
+    keyPatterns: ['Vaccination adoption', 'Pandemic response'],
+    regionalVariation: [
+      { region: 'Northern Europe', regionSv: 'Nordeuropa', deviation: 12, note: 'Strong public health systems', noteSv: 'Starka folkhälsosystem' },
+      { region: 'Sub-Saharan Africa', regionSv: 'Afrika söder om Sahara', deviation: -18, note: 'Resource constraints', noteSv: 'Resursbegränsningar' },
     ],
-    avgTimeBetween: '8-15 years',
-    lastOccurred: '2008',
-    predictedRisk: 'medium',
-    warningSignals: ['Rapid price increase', 'Debt-to-income ratios', 'Speculation metrics'],
-    warningSignalsSv: ['Snabb prisökning', 'Skuld-till-inkomst-kvoter', 'Spekulationsmått'],
+  },
+  {
+    domain: 'economy',
+    domainName: 'Economic Policy',
+    domainNameSv: 'Ekonomisk politik',
+    learningScore: 45,
+    trend: 'stable',
+    timespan: '1970-2024',
+    keyPatterns: ['Crisis response cycles', 'Debt management'],
+    regionalVariation: [
+      { region: 'East Asia', regionSv: 'Östasien', deviation: 8, note: 'Post-1997 reforms', noteSv: 'Reformer efter 1997' },
+    ],
+  },
+  {
+    domain: 'environment',
+    domainName: 'Environmental',
+    domainNameSv: 'Miljö',
+    learningScore: 38,
+    trend: 'stable',
+    timespan: '1970-2024',
+    keyPatterns: ['Ozone response', 'Climate action gap'],
+    regionalVariation: [],
+  },
+  {
+    domain: 'governance',
+    domainName: 'Governance',
+    domainNameSv: 'Styrning',
+    learningScore: 51,
+    trend: 'declining',
+    timespan: '1990-2024',
+    keyPatterns: ['Democratic backsliding', 'Institutional erosion'],
+    regionalVariation: [],
+  },
+  {
+    domain: 'technology',
+    domainName: 'Technology',
+    domainNameSv: 'Teknologi',
+    learningScore: 71,
+    trend: 'improving',
+    timespan: '1980-2024',
+    keyPatterns: ['Rapid adoption', 'Unintended consequences'],
+    regionalVariation: [],
   },
 ];
+
+export const MOCK_REPEATED_PATTERNS: RepeatedPattern[] = [
+  {
+    id: 'rp-1',
+    pattern: 'Late reaction to slow-building risks',
+    patternSv: 'Sen reaktion på långsamt växande risker',
+    occurrenceCount: 8,
+    domains: ['economy', 'environment', 'health'],
+    examples: [
+      { period: '2008', location: 'Global', description: 'Financial crisis signals ignored', descriptionSv: 'Finanskrisens signaler ignorerades' },
+      { period: '2020', location: 'Global', description: 'Pandemic warnings underacted', descriptionSv: 'Pandemivarningar underagerades' },
+    ],
+    rootCauses: ['Short-term incentives', 'Optimism bias', 'Diffuse responsibility'],
+    rootCausesSv: ['Kortsiktiga incitament', 'Optimism-bias', 'Diffust ansvar'],
+    noImprovementObserved: true,
+  },
+  {
+    id: 'rp-2',
+    pattern: 'Underestimation of exponential growth',
+    patternSv: 'Underskattning av exponentiell tillväxt',
+    occurrenceCount: 6,
+    domains: ['health', 'technology', 'environment'],
+    examples: [
+      { period: 'Early 2020', location: 'Europe/US', description: 'COVID-19 spread underestimated', descriptionSv: 'COVID-19-spridning underskattades' },
+    ],
+    rootCauses: ['Linear mental models', 'Lack of systems thinking'],
+    rootCausesSv: ['Linjära mentala modeller', 'Brist på systemtänkande'],
+    noImprovementObserved: true,
+  },
+  {
+    id: 'rp-3',
+    pattern: 'Overfocus on short-term relief',
+    patternSv: 'Överfokus på kortsiktig lindring',
+    occurrenceCount: 12,
+    domains: ['economy', 'social', 'governance'],
+    examples: [
+      { period: '2010-2015', location: 'Eurozone', description: 'Austerity prioritized over structural reform', descriptionSv: 'Åtstramning prioriterades över strukturell reform' },
+    ],
+    rootCauses: ['Electoral cycles', 'Visible vs invisible outcomes'],
+    rootCausesSv: ['Valcykler', 'Synliga vs osynliga utfall'],
+    noImprovementObserved: false,
+  },
+];
+
+export const MOCK_SCIENCE_GAPS: ScienceActionGap[] = [
+  {
+    id: 'sg-1',
+    topic: 'Tobacco and Cancer',
+    topicSv: 'Tobak och cancer',
+    scientificConsensusYear: '1964',
+    consensusDescription: 'US Surgeon General report confirmed link',
+    consensusDescriptionSv: 'US Surgeon General-rapport bekräftade samband',
+    firstMajorActionYear: '1998',
+    actionDescription: 'Master Settlement Agreement in US',
+    actionDescriptionSv: 'Master Settlement Agreement i USA',
+    gapYears: 34,
+    status: 'acted',
+    ongoingGap: false,
+  },
+  {
+    id: 'sg-2',
+    topic: 'Ozone Depletion',
+    topicSv: 'Ozonnedbrytning',
+    scientificConsensusYear: '1976',
+    consensusDescription: 'CFCs identified as cause',
+    consensusDescriptionSv: 'CFC identifierades som orsak',
+    firstMajorActionYear: '1987',
+    actionDescription: 'Montreal Protocol signed',
+    actionDescriptionSv: 'Montrealprotokollet undertecknades',
+    gapYears: 11,
+    status: 'acted',
+    ongoingGap: false,
+  },
+  {
+    id: 'sg-3',
+    topic: 'Climate Change',
+    topicSv: 'Klimatförändring',
+    scientificConsensusYear: '1990',
+    consensusDescription: 'IPCC First Assessment Report',
+    consensusDescriptionSv: 'IPCC:s första utvärderingsrapport',
+    firstMajorActionYear: '2015',
+    actionDescription: 'Paris Agreement',
+    actionDescriptionSv: 'Parisavtalet',
+    gapYears: 25,
+    status: 'partial_action',
+    ongoingGap: true,
+  },
+  {
+    id: 'sg-4',
+    topic: 'Antibiotic Resistance',
+    topicSv: 'Antibiotikaresistens',
+    scientificConsensusYear: '1990s',
+    consensusDescription: 'Growing resistance patterns documented',
+    consensusDescriptionSv: 'Växande resistensmönster dokumenterade',
+    firstMajorActionYear: null,
+    actionDescription: null,
+    actionDescriptionSv: null,
+    gapYears: null,
+    status: 'no_action',
+    ongoingGap: true,
+  },
+];
+
+export const MOCK_POSITIVE_DEVIATIONS: PositiveDeviation[] = [
+  {
+    id: 'pd-1',
+    title: 'Ozone Layer Recovery',
+    titleSv: 'Ozonlagrets återhämtning',
+    description: 'Faster-than-average response to scientific warning',
+    descriptionSv: 'Snabbare än genomsnittlig respons på vetenskaplig varning',
+    domain: 'environment',
+    historicalAverageLag: 25,
+    actualLag: 11,
+    improvementFactor: 2.3,
+    enablingFactors: ['Clear causation', 'Available alternatives', 'Industry cooperation'],
+    enablingFactorsSv: ['Tydligt orsakssamband', 'Tillgängliga alternativ', 'Branschsamarbete'],
+    structuralConditions: ['Limited number of producers', 'Non-essential consumer product', 'Global coordination mechanism'],
+    structuralConditionsSv: ['Begränsat antal producenter', 'Icke-essentiell konsumentprodukt', 'Global koordineringsmekanism'],
+  },
+  {
+    id: 'pd-2',
+    title: 'COVID-19 Vaccine Development',
+    titleSv: 'COVID-19-vaccinutveckling',
+    description: 'Record-breaking vaccine development timeline',
+    descriptionSv: 'Rekordslagen vaccinutvecklingstidslinje',
+    domain: 'health',
+    historicalAverageLag: 120,
+    actualLag: 11,
+    improvementFactor: 11,
+    enablingFactors: ['Prior mRNA research', 'Global urgency', 'Unprecedented funding'],
+    enablingFactorsSv: ['Tidigare mRNA-forskning', 'Global brådska', 'Oöverträffad finansiering'],
+    structuralConditions: ['Pre-existing platform technology', 'Regulatory flexibility', 'Global manufacturing capacity'],
+    structuralConditionsSv: ['Befintlig plattformsteknologi', 'Regulatorisk flexibilitet', 'Global tillverkningskapacitet'],
+  },
+];
+
+export const MOCK_ATTENTION_LEARNING: AttentionLearningItem[] = [
+  {
+    id: 'al-1',
+    topic: 'Climate Policy',
+    topicSv: 'Klimatpolitik',
+    attentionScore: 85,
+    learningScore: 32,
+    quadrant: 'high_attention_low_learning',
+    interpretation: 'High public discourse, limited behavioral change',
+    interpretationSv: 'Hög offentlig diskurs, begränsad beteendeförändring',
+  },
+  {
+    id: 'al-2',
+    topic: 'Childhood Vaccination',
+    topicSv: 'Barnvaccination',
+    attentionScore: 35,
+    learningScore: 78,
+    quadrant: 'low_attention_high_learning',
+    interpretation: 'Quiet progress through institutional learning',
+    interpretationSv: 'Tyst framsteg genom institutionellt lärande',
+  },
+  {
+    id: 'al-3',
+    topic: 'Antibiotic Stewardship',
+    topicSv: 'Antibiotikaförvaltning',
+    attentionScore: 22,
+    learningScore: 28,
+    quadrant: 'low_attention_low_learning',
+    interpretation: 'Neglected issue with limited action',
+    interpretationSv: 'Försummat problem med begränsad åtgärd',
+  },
+  {
+    id: 'al-4',
+    topic: 'Traffic Safety',
+    topicSv: 'Trafiksäkerhet',
+    attentionScore: 55,
+    learningScore: 72,
+    quadrant: 'high_attention_high_learning',
+    interpretation: 'Sustained attention with measurable improvements',
+    interpretationSv: 'Ihållande uppmärksamhet med mätbara förbättringar',
+  },
+];
+
+export const MOCK_COLLECTIVE_MEMORY: CollectiveMemoryStatus = {
+  overallTrend: 'stable',
+  patternAwareness: 54,
+  lastUpdated: '2024-11-28',
+  keyInsight: 'Recognition of problems has improved, but response speed remains unchanged.',
+  keyInsightSv: 'Igenkänning av problem har förbättrats, men responshastighet förblir oförändrad.',
+};
+
+// ═══════════════════════════════════════════════════════════════
+// SYSTEM STATUS
+// ═══════════════════════════════════════════════════════════════
 
 export const COLLECTIVE_LEARNING_SYSTEM = {
   name: 'Collective Learning Tracker',
   acronym: 'CLT',
-  version: '1.0',
+  version: '2.0',
   core_principle: CLT_CORE_PRINCIPLE,
-  result: 'Synliggör mänsklighetens lärande – och var vi upprepar samma misstag.',
+  result: 'Civilisationens minne, byggt på data – inte åsikt.',
 } as const;
