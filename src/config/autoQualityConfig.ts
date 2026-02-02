@@ -399,3 +399,412 @@ export const AUTO_QUALITY_STATUS = {
   ],
   slowOverFast: true,
 } as const;
+
+// ═══════════════════════════════════════════════════════════════
+// WAVE 21 — SELF-AUDITING & SELF-IMPROVING REALITY ENGINE
+// ═══════════════════════════════════════════════════════════════
+// "AI granskar AI. Systemet granskar sig självt."
+// 
+// Ingen kod, ingen analys, ingen visualisering får nå produktion
+// utan att ha passerat minst 3 oberoende AI-granskare.
+// 
+// Detta är kvalitet genom friktion.
+// ═══════════════════════════════════════════════════════════════
+
+export const WAVE21_CORE_PRINCIPLE = {
+  statement: 'Ingen människa ska behöva vara smart för att förstå världen. Systemet ska göra det jobbet.',
+  enforced: true,
+  display: 'engraved',
+} as const;
+
+export type AIReviewerType =
+  | 'CODE_INTEGRITY_REVIEWER'
+  | 'DATA_TRUTH_AUDITOR'
+  | 'COGNITIVE_LOAD_REVIEWER'
+  | 'RELEVANCE_GUARD'
+  | 'ACCOUNTABILITY_SAFETY_REVIEWER'
+  | 'META_QUALITY_CONTROLLER'
+  | 'SYSTEM_EVOLUTION_AGENT';
+
+export type ReviewStatus = 'pending' | 'passed' | 'failed' | 'needs_reaudit';
+
+export interface AIReviewResult {
+  reviewer: AIReviewerType;
+  status: ReviewStatus;
+  issues: Array<{
+    severity: 'critical' | 'warning' | 'info';
+    description: string;
+    location?: string;
+    suggested_fix: string;
+  }>;
+  suggestions: string[];
+  timestamp: string;
+  output_file: string;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK JA — CODE INTEGRITY REVIEWER
+// ═══════════════════════════════════════════════════════════════
+
+export const CODE_INTEGRITY_REVIEWER = {
+  id: 'CODE_INTEGRITY_REVIEWER' as AIReviewerType,
+  block: 'JA',
+  name: 'Code Integrity Reviewer',
+  purpose: 'Stoppa teknisk skuld innan den föds',
+  trigger: 'every_pr',
+  blocking: true,
+
+  prompt: `Du är Code Integrity Reviewer för Global Reality OS.
+
+Granska koden med fokus på:
+• otydlig logik
+• implicit antagande
+• hårdkodad tolkning
+• magiska värden
+• risk för feltolkning i dataflöde
+
+För varje problem:
+• beskriv risken
+• föreslå exakt förbättring
+
+Om koden är korrekt: säg "No integrity issues detected".`,
+
+  focus_areas: [
+    'unclear_logic',
+    'implicit_assumptions',
+    'hardcoded_interpretations',
+    'magic_values',
+    'data_flow_misinterpretation_risk',
+  ],
+
+  output: { file: 'code_integrity_report.json', format: 'json', required_for_merge: true },
+} as const;
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK JB — DATA TRUTH AUDITOR
+// ═══════════════════════════════════════════════════════════════
+
+export const DATA_TRUTH_AUDITOR = {
+  id: 'DATA_TRUTH_AUDITOR' as AIReviewerType,
+  block: 'JB',
+  name: 'Data Truth Auditor',
+  purpose: 'Stoppa falsk precision och smygande kausalitet',
+  trigger: 'data_or_aggregation_change',
+  blocking: true,
+
+  prompt: `Du är Data Truth Auditor.
+
+Granska all ny eller ändrad aggregation:
+• Vad summeras?
+• Vad normaliseras?
+• Finns risk att användare tolkar detta som orsak?
+• Är osäkerhet tydligt visad?
+
+Flagga:
+• falsk exakthet
+• otydliga procentsatser
+• vilseledande pilar eller färger
+
+Föreslå exakt hur presentationen ska bli tydligare.`,
+
+  flags: [
+    { code: 'FALSE_PRECISION', description: 'Falsk exakthet (t.ex. 73.2847%)' },
+    { code: 'UNCLEAR_PERCENTAGE', description: 'Otydlig procentsats utan bas' },
+    { code: 'MISLEADING_VISUAL', description: 'Vilseledande pil eller färg' },
+    { code: 'IMPLIED_CAUSATION', description: 'Implicit kausalitet utan bevis' },
+    { code: 'HIDDEN_UNCERTAINTY', description: 'Osäkerhet ej tydligt visad' },
+  ],
+
+  output: { file: 'aggregation_audit.md', format: 'markdown', required_for_merge: true },
+} as const;
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK JC — COGNITIVE LOAD REVIEWER
+// ═══════════════════════════════════════════════════════════════
+
+export const COGNITIVE_LOAD_REVIEWER = {
+  id: 'COGNITIVE_LOAD_REVIEWER' as AIReviewerType,
+  block: 'JC',
+  name: 'Cognitive Load Reviewer',
+  purpose: 'Eliminera feltolkning innan användare ens ser den',
+  trigger: 'ui_or_text_change',
+  blocking: true,
+
+  prompt: `Du är Cognitive Load Reviewer.
+
+Titta på UI / text / visualisering och simulera:
+1. Stressad journalist
+2. Oinsatt medborgare
+3. Beslutsfattare
+
+För varje:
+• Vad tror de siffran betyder?
+• Var kan de misstolka riktning, storlek eller betydelse?
+
+Föreslå:
+• textändringar
+• borttag av symboler
+• explicita förklaringar
+
+Målet: ingen ska kunna tolka detta fel på 5 sek.`,
+
+  simulated_users: [
+    { persona: 'stressed_journalist', name: 'Stressad journalist', time_budget_seconds: 5 },
+    { persona: 'uninformed_citizen', name: 'Oinsatt medborgare', time_budget_seconds: 10 },
+    { persona: 'decision_maker', name: 'Beslutsfattare', time_budget_seconds: 5 },
+  ],
+
+  success_criteria: { max_misinterpretation_time_seconds: 5, required_clarity_score: 0.95 },
+
+  output: { file: 'misinterpretation_risks.md', format: 'markdown', required_for_merge: true },
+} as const;
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK JD — RELEVANCE GUARD
+// ═══════════════════════════════════════════════════════════════
+
+export const RELEVANCE_GUARD = {
+  id: 'RELEVANCE_GUARD' as AIReviewerType,
+  block: 'JD',
+  name: 'Relevance Guard',
+  purpose: 'Stoppa att brus hamnar överst',
+  trigger: 'display_order_change',
+  blocking: true,
+
+  prompt: `Du är Relevance Guard.
+
+Granska vad som visas högst upp i systemet.
+
+Kontrollera:
+• Är detta rätt L-nivå (L0–L4)?
+• Har något låg-impact fått för hög synlighet?
+• Saknas något hög-impact?
+
+Föreslå ny ordning strikt baserat på påverkan.`,
+
+  level_definitions: {
+    L0: 'Noise - ingen mätbar påverkan',
+    L1: 'Micro - påverkar få, kortvarigt',
+    L2: 'Local - påverkar lokalsamhälle',
+    L3: 'National - påverkar nation',
+    L4: 'Civilizational - påverkar mänskligheten',
+  },
+
+  output: { file: 'priority_corrections.json', format: 'json', required_for_merge: true },
+} as const;
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK JE — ACCOUNTABILITY SAFETY REVIEWER
+// ═══════════════════════════════════════════════════════════════
+
+export const ACCOUNTABILITY_SAFETY_REVIEWER = {
+  id: 'ACCOUNTABILITY_SAFETY_REVIEWER' as AIReviewerType,
+  block: 'JE',
+  name: 'Accountability Safety Reviewer',
+  purpose: 'Rättssäkerhet. Ingen fingerpekning.',
+  trigger: 'accountability_or_responsibility_change',
+  blocking: true,
+
+  prompt: `Du är Accountability Safety Reviewer.
+
+Granska ansvarskopplingar:
+• Är ansvar kopplat till roll, inte person?
+• Är tidsperiod tydlig?
+• Finns risk att detta uppfattas som skuld eller dom?
+
+Föreslå omformuleringar där språket kan bli strikt deskriptivt.`,
+
+  forbidden_patterns: ['misslyckades', 'skuld', 'ansvarig för felet', 'borde ha', 'försummade'],
+
+  output: { file: 'legal_safety_notes.md', format: 'markdown', required_for_merge: true },
+} as const;
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK JF — META QUALITY CONTROLLER
+// ═══════════════════════════════════════════════════════════════
+
+export const META_QUALITY_CONTROLLER = {
+  id: 'META_QUALITY_CONTROLLER' as AIReviewerType,
+  block: 'JF',
+  name: 'Meta Quality Controller',
+  purpose: 'Förhindra att granskarna själva blir slappa',
+  trigger: 'after_all_reviewers',
+  blocking: true,
+  can_force_reaudit: true,
+
+  prompt: `Du är Meta Quality Controller.
+
+Granska output från:
+• Code Integrity Reviewer
+• Data Truth Auditor
+• Cognitive Load Reviewer
+• Relevance Guard
+• Accountability Reviewer
+
+Identifiera:
+• missade risker
+• för snälla bedömningar
+• motsägelser
+
+Kräver omgranskning där kvaliteten är otillräcklig.`,
+
+  reviews: ['CODE_INTEGRITY_REVIEWER', 'DATA_TRUTH_AUDITOR', 'COGNITIVE_LOAD_REVIEWER', 'RELEVANCE_GUARD', 'ACCOUNTABILITY_SAFETY_REVIEWER'] as AIReviewerType[],
+
+  quality_checks: [
+    { check: 'missed_risks', action: 'flag_and_reaudit' },
+    { check: 'too_lenient', action: 'flag_and_reaudit' },
+    { check: 'contradictions', action: 'resolve_and_document' },
+    { check: 'incomplete_review', action: 'reject' },
+  ],
+
+  output: { file: 'meta_review_verdict.md', format: 'markdown', required_for_merge: true },
+} as const;
+
+// ═══════════════════════════════════════════════════════════════
+// BLOCK JG — SYSTEM EVOLUTION AGENT
+// ═══════════════════════════════════════════════════════════════
+
+export const SYSTEM_EVOLUTION_AGENT = {
+  id: 'SYSTEM_EVOLUTION_AGENT' as AIReviewerType,
+  block: 'JG',
+  name: 'System Evolution Agent',
+  purpose: 'Systemet ska självt föreslå nästa förbättring',
+  trigger: 'daily',
+  autonomous: true,
+
+  prompt: `Du är System Evolution Agent.
+
+Utifrån:
+• senaste ändringar
+• senaste användarbeteende
+• senaste missförstånd
+
+Föreslå:
+• vilka delar som är för komplexa
+• vilka vyer som kan förenklas
+• vilken data som saknas för helhetsförståelse
+
+Rangordna förbättringar efter samhällelig nytta.`,
+
+  input_sources: ['recent_changes', 'user_behavior_analytics', 'misunderstanding_logs', 'review_history', 'feedback_signals'],
+
+  output: { file: 'evolution_backlog.yaml', format: 'yaml', feeds_into: 'sprint_backlog' },
+} as const;
+
+// ═══════════════════════════════════════════════════════════════
+// ALL REVIEWERS REGISTRY
+// ═══════════════════════════════════════════════════════════════
+
+export const ALL_AI_REVIEWERS = {
+  CODE_INTEGRITY_REVIEWER,
+  DATA_TRUTH_AUDITOR,
+  COGNITIVE_LOAD_REVIEWER,
+  RELEVANCE_GUARD,
+  ACCOUNTABILITY_SAFETY_REVIEWER,
+  META_QUALITY_CONTROLLER,
+  SYSTEM_EVOLUTION_AGENT,
+} as const;
+
+// ═══════════════════════════════════════════════════════════════
+// AUTOMATIC REVIEW PIPELINE
+// ═══════════════════════════════════════════════════════════════
+
+export const SELF_AUDIT_PIPELINE = {
+  name: 'Self-Auditing Pipeline',
+  version: '1.0',
+  description: 'Maskinell kvalitetsgranskning utan mänsklig flaskhals',
+
+  stages: [
+    { stage: 1, name: 'Change Detection', automatic: true },
+    { 
+      stage: 2, 
+      name: 'Parallel Review', 
+      reviewers: ['CODE_INTEGRITY_REVIEWER', 'DATA_TRUTH_AUDITOR', 'COGNITIVE_LOAD_REVIEWER', 'RELEVANCE_GUARD', 'ACCOUNTABILITY_SAFETY_REVIEWER'] as AIReviewerType[],
+      parallel: true,
+      automatic: true,
+    },
+    { stage: 3, name: 'Meta Review', reviewers: ['META_QUALITY_CONTROLLER'] as AIReviewerType[], automatic: true },
+    { stage: 4, name: 'Gate Decision', rules: { any_failed: 'block', all_passed: 'proceed_to_staging', needs_reaudit: 'return_to_stage_2' }, automatic: true },
+    { stage: 5, name: 'Staging Simulation', simulations: ['synthetic_user_tests', 'misinterpretation_scenarios', 'edge_case_validation'], automatic: true },
+    { stage: 6, name: 'Production Deploy', requires: { all_reviews_passed: true, meta_review_passed: true, staging_tests_passed: true }, automatic: true },
+  ],
+
+  blocking_rules: { any_critical_issue: true, meta_review_failed: true, min_reviewers_passed: 3 },
+  continuous: true,
+} as const;
+
+// ═══════════════════════════════════════════════════════════════
+// PIPELINE HELPERS
+// ═══════════════════════════════════════════════════════════════
+
+export interface PipelineState {
+  change_id: string;
+  current_stage: number;
+  reviews: Partial<Record<AIReviewerType, AIReviewResult>>;
+  meta_review: AIReviewResult | null;
+  staging_passed: boolean;
+  final_status: 'pending' | 'passed' | 'blocked' | 'deployed';
+  started_at: string;
+  completed_at: string | null;
+}
+
+export function createPipelineState(changeId: string): PipelineState {
+  return {
+    change_id: changeId,
+    current_stage: 1,
+    reviews: {},
+    meta_review: null,
+    staging_passed: false,
+    final_status: 'pending',
+    started_at: new Date().toISOString(),
+    completed_at: null,
+  };
+}
+
+export function evaluatePipelineGate(state: PipelineState): 'proceed' | 'block' | 'reaudit' {
+  const results = Object.values(state.reviews);
+  
+  if (results.some(r => r.status === 'failed')) return 'block';
+  if (state.meta_review?.status === 'needs_reaudit') return 'reaudit';
+  
+  const passedCount = results.filter(r => r.status === 'passed').length;
+  if (passedCount < SELF_AUDIT_PIPELINE.blocking_rules.min_reviewers_passed) return 'block';
+  
+  return 'proceed';
+}
+
+export function getReviewerPrompt(id: AIReviewerType): string {
+  return ALL_AI_REVIEWERS[id].prompt;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WAVE 21 SYSTEM STATUS
+// ═══════════════════════════════════════════════════════════════
+
+export const WAVE21_SELF_AUDIT_SYSTEM = {
+  name: 'Wave 21 — Self-Auditing & Self-Improving Engine',
+  version: '21.0',
+  
+  core_principle: WAVE21_CORE_PRINCIPLE,
+  reviewers: Object.keys(ALL_AI_REVIEWERS) as AIReviewerType[],
+  pipeline: SELF_AUDIT_PIPELINE,
+  
+  achievements: {
+    replaced_manual_qa: true,
+    replaced_gut_feeling: true,
+    replaced_fix_later: true,
+    machine_truth_testing: true,
+    self_improving_system: true,
+  },
+  
+  comparison: {
+    vs_palantir: 'De analyserar data. Vi industrialiserar förståelse.',
+    vs_bloomberg: 'De aggregerar. Vi säkerställer sanning.',
+  },
+  
+  next_waves: [
+    { wave: 22, name: 'Full CI/CD Integration' },
+    { wave: 23, name: 'Synthetic Reality Tests' },
+    { wave: 24, name: 'Global Blind-Spot Detection' },
+  ],
+} as const;
