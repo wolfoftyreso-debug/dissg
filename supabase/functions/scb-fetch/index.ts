@@ -11,9 +11,43 @@ const corsHeaders = {
 // Dokumentation: https://www.scb.se/en/services/open-data-api/api-for-the-statistical-database/
 // ═══════════════════════════════════════════════════════════════
 
-// API 2.0 endpoints
-const SCB_API_V2_BASE = "https://api.scb.se/OV0104/v2beta/doris/sv/ssd";
-const SCB_API_V1_BASE = "https://api.scb.se/OV0104/v1/doris/sv/ssd"; // Fallback
+// ═══════════════════════════════════════════════════════════════
+// PxWeb API - Officiella endpoints
+// Dokumentation: https://www.scb.se/en/services/open-data-api/pxwebapi/pxapi-2.0/
+// ═══════════════════════════════════════════════════════════════
+
+// API 2.0 produktions-URL (lanserad oktober 2025)
+const SCB_API_V2_BASE = "https://statistikdatabasen.scb.se/api/v2/sv/ssd";
+// Fallback beta-URL
+const SCB_API_V2_BETA = "https://api.scb.se/OV0104/v2beta/api/v2/sv/ssd";
+// Legacy API 1.0 (stöder fortfarande POST med json)
+const SCB_API_V1_BASE = "https://api.scb.se/OV0104/v1/doris/sv/ssd";
+
+// Länskoder för regional breakdown
+const REGION_CODES: Record<string, string> = {
+  "00": "Sverige",
+  "01": "Stockholms län",
+  "03": "Uppsala län",
+  "04": "Södermanlands län",
+  "05": "Östergötlands län",
+  "06": "Jönköpings län",
+  "07": "Kronobergs län",
+  "08": "Kalmar län",
+  "09": "Gotlands län",
+  "10": "Blekinge län",
+  "12": "Skåne län",
+  "13": "Hallands län",
+  "14": "Västra Götalands län",
+  "17": "Värmlands län",
+  "18": "Örebro län",
+  "19": "Västmanlands län",
+  "20": "Dalarnas län",
+  "21": "Gävleborgs län",
+  "22": "Västernorrlands län",
+  "23": "Jämtlands län",
+  "24": "Västerbottens län",
+  "25": "Norrbottens län",
+};
 
 interface TableConfig {
   path: string;
@@ -21,6 +55,7 @@ interface TableConfig {
   kpiCode: string;
   dataSourceCode: string;
   apiVersion: '1.0' | '2.0';
+  responseFormat?: 'json' | 'json-stat2';  // Default: 'json' för 1.0, 'json-stat2' för 2.0
   query: {
     query: Array<{ code: string; selection: { filter: string; values: string[] } }>;
     response: { format: string };
@@ -30,6 +65,7 @@ interface TableConfig {
   granularity?: string;
   aggregation?: 'sum' | 'average' | 'latest';
   isInverted?: boolean;
+  includeRegions?: boolean;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -353,14 +389,14 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
   total_population: {
     path: "BE/BE0101/BE0101A/BefolkningNy",
     description: "Sveriges totala befolkning",
-    kpiCode: "working_age_functional", // Används för normalisering
+    kpiCode: "total_population",
     dataSourceCode: "scb_px",
     apiVersion: '1.0',
     query: {
       query: [
         { code: "Region", selection: { filter: "item", values: ["00"] } },
         { code: "Alder", selection: { filter: "item", values: ["tot"] } },
-        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1", "2"] } },
         { code: "ContentsCode", selection: { filter: "item", values: ["BE0101N1"] } },
         { code: "Tid", selection: { filter: "top", values: ["10"] } },
       ],
@@ -371,10 +407,108 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     granularity: "yearly",
     aggregation: 'sum',
   },
+
+  // ─────────────────────────────────────────────────────────────
+  // BEFOLKNINGSSTATISTIK - Per region
+  // ─────────────────────────────────────────────────────────────
+  population_by_region: {
+    path: "BE/BE0101/BE0101A/BefolkningNy",
+    description: "Befolkning per län",
+    kpiCode: "population_regional",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Region", selection: { filter: "all", values: ["*"] } },
+        { code: "Alder", selection: { filter: "item", values: ["tot"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1", "2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["BE0101N1"] } },
+        { code: "Tid", selection: { filter: "top", values: ["1"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal",
+    granularity: "yearly",
+    aggregation: 'sum',
+    includeRegions: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // BEFOLKNINGSSTATISTIK - Åldersfördelning (5-årsklasser)
+  // ─────────────────────────────────────────────────────────────
+  population_by_age: {
+    path: "BE/BE0101/BE0101A/BefolkningNy",
+    description: "Befolkning per åldersgrupp",
+    kpiCode: "population_age_structure",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Region", selection: { filter: "item", values: ["00"] } },
+        { code: "Alder", selection: { filter: "agg:Ålder5år", values: [
+          "0-4", "5-9", "10-14", "15-19", "20-24", "25-29", "30-34", 
+          "35-39", "40-44", "45-49", "50-54", "55-59", "60-64",
+          "65-69", "70-74", "75-79", "80-84", "85-89", "90+"
+        ] } },
+        { code: "Kon", selection: { filter: "item", values: ["1", "2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["BE0101N1"] } },
+        { code: "Tid", selection: { filter: "top", values: ["5"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal",
+    granularity: "yearly",
+    aggregation: 'sum',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // BEFOLKNINGSSTATISTIK - Födda och döda
+  // ─────────────────────────────────────────────────────────────
+  births_deaths: {
+    path: "BE/BE0101/BE0101H/FoijddDodMij",
+    description: "Födda och döda per månad",
+    kpiCode: "natural_population_change",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Region", selection: { filter: "item", values: ["00"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["BE0101E1", "BE0101E2"] } },
+        { code: "Tid", selection: { filter: "top", values: ["24"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal",
+    granularity: "monthly",
+    aggregation: 'sum',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // BEFOLKNINGSSTATISTIK - In- och utvandring
+  // ─────────────────────────────────────────────────────────────
+  migration: {
+    path: "BE/BE0101/BE0101J/InijUt",
+    description: "In- och utvandring per år",
+    kpiCode: "net_migration",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Region", selection: { filter: "item", values: ["00"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["BE0101AE", "BE0101AF"] } },
+        { code: "Tid", selection: { filter: "top", values: ["10"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal",
+    granularity: "yearly",
+    aggregation: 'sum',
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════
-// SCB API HELPERS
+// SCB API HELPERS - Stöd för både 1.0 (json) och 2.0 (json-stat2)
 // ═══════════════════════════════════════════════════════════════
 
 interface SCBDataItem {
@@ -383,8 +517,104 @@ interface SCBDataItem {
 }
 
 interface SCBResponse {
+  // V1 format (json)
   columns?: { code: string; text: string; type: string }[];
   data?: SCBDataItem[];
+  // V2 format (json-stat2)
+  id?: string[];
+  size?: number[];
+  dimension?: Record<string, {
+    label: string;
+    category: {
+      index: Record<string, number>;
+      label: Record<string, string>;
+    };
+  }>;
+  value?: number[];
+  status?: Record<string, string>;
+}
+
+// JSON-stat2 parser för PxWeb 2.0
+interface ParsedJsonStat {
+  values: Array<{ 
+    period: string; 
+    value: number; 
+    region?: string;
+    dimensions: Record<string, string>;
+  }>;
+}
+
+function parseJsonStat2(data: SCBResponse): ParsedJsonStat | null {
+  if (!data.value || !data.dimension || !data.size || !data.id) {
+    console.warn("[SCB] Missing json-stat2 structure");
+    return null;
+  }
+
+  const dimensions = data.id;
+  const sizes = data.size;
+  const values = data.value;
+  
+  // Build dimension labels lookup
+  const dimLabels: Record<string, Record<string, string>> = {};
+  for (const dimId of dimensions) {
+    if (data.dimension[dimId]?.category?.label) {
+      dimLabels[dimId] = data.dimension[dimId].category.label;
+    }
+  }
+
+  // Calculate strides for multi-dimensional indexing
+  const strides: number[] = [];
+  let stride = 1;
+  for (let i = sizes.length - 1; i >= 0; i--) {
+    strides.unshift(stride);
+    stride *= sizes[i];
+  }
+
+  const results: ParsedJsonStat['values'] = [];
+
+  // Iterate through all value positions
+  for (let flatIndex = 0; flatIndex < values.length; flatIndex++) {
+    const value = values[flatIndex];
+    
+    // Skip missing values
+    if (value === null || isNaN(value)) continue;
+    
+    // Decode multi-dimensional position
+    const dimValues: Record<string, string> = {};
+    let remaining = flatIndex;
+    
+    for (let d = 0; d < dimensions.length; d++) {
+      const dimId = dimensions[d];
+      const dimIndex = Math.floor(remaining / strides[d]);
+      remaining = remaining % strides[d];
+      
+      // Get the key at this index
+      const dimInfo = data.dimension[dimId];
+      if (dimInfo?.category?.index) {
+        const keys = Object.entries(dimInfo.category.index)
+          .sort((a, b) => a[1] - b[1])
+          .map(([key]) => key);
+        
+        if (keys[dimIndex]) {
+          const key = keys[dimIndex];
+          dimValues[dimId] = dimLabels[dimId]?.[key] || key;
+        }
+      }
+    }
+
+    // Extract period (usually "Tid" dimension)
+    const period = dimValues["Tid"] || dimValues["tid"] || Object.values(dimValues).find(v => /^\d{4}/.test(v)) || "";
+    const region = dimValues["Region"] || dimValues["region"];
+
+    results.push({
+      period,
+      value,
+      region,
+      dimensions: dimValues,
+    });
+  }
+
+  return { values: results };
 }
 
 async function fetchFromSCB(config: TableConfig): Promise<SCBResponse> {
@@ -392,7 +622,14 @@ async function fetchFromSCB(config: TableConfig): Promise<SCBResponse> {
   const baseUrl = config.apiVersion === '2.0' ? SCB_API_V2_BASE : SCB_API_V1_BASE;
   const url = `${baseUrl}/${config.path}`;
   
-  console.log(`[SCB] Fetching from: ${url} (API ${config.apiVersion})`);
+  // Determine response format
+  const responseFormat = config.responseFormat || (config.apiVersion === '2.0' ? 'json-stat2' : 'json');
+  const queryWithFormat = {
+    ...config.query,
+    response: { format: responseFormat }
+  };
+  
+  console.log(`[SCB] Fetching from: ${url} (API ${config.apiVersion}, format: ${responseFormat})`);
   
   try {
     const response = await fetch(url, {
@@ -401,13 +638,13 @@ async function fetchFromSCB(config: TableConfig): Promise<SCBResponse> {
         "Content-Type": "application/json",
         "Accept": "application/json",
       },
-      body: JSON.stringify(config.query),
+      body: JSON.stringify(queryWithFormat),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[SCB] API error ${response.status}: ${errorText.substring(0, 300)}`);
-      throw new Error(`SCB API error: ${response.status}`);
+      console.error(`[SCB] API error ${response.status}: ${errorText.substring(0, 500)}`);
+      throw new Error(`SCB API error: ${response.status} - ${errorText.substring(0, 100)}`);
     }
 
     return await response.json();
@@ -421,8 +658,86 @@ function parseScbResponse(data: SCBResponse, config: TableConfig): {
   value: number; 
   previousValue?: number; 
   period: string;
-  rawValues: Array<{ period: string; value: number }>;
+  rawValues: Array<{ period: string; value: number; region?: string }>;
+  regionalData?: Array<{ region: string; value: number; period: string }>;
 } | null {
+  const responseFormat = config.responseFormat || (config.apiVersion === '2.0' ? 'json-stat2' : 'json');
+  
+  // ─────────────────────────────────────────────────────────────
+  // JSON-stat2 format (PxWeb 2.0)
+  // ─────────────────────────────────────────────────────────────
+  if (responseFormat === 'json-stat2' || data.value) {
+    const parsed = parseJsonStat2(data);
+    if (!parsed || parsed.values.length === 0) {
+      console.warn(`[SCB] No data in json-stat2 response for ${config.kpiCode}`);
+      return null;
+    }
+
+    // Group by period (and optionally region)
+    const periodValues: Record<string, number[]> = {};
+    const regionalData: Array<{ region: string; value: number; period: string }> = [];
+    
+    for (const item of parsed.values) {
+      const period = item.period;
+      if (!periodValues[period]) {
+        periodValues[period] = [];
+      }
+      periodValues[period].push(item.value);
+      
+      if (config.includeRegions && item.region) {
+        regionalData.push({
+          region: item.region,
+          value: item.value,
+          period,
+        });
+      }
+    }
+
+    // Aggregate
+    const aggregatedPeriods: Record<string, number> = {};
+    for (const [period, values] of Object.entries(periodValues)) {
+      switch (config.aggregation) {
+        case 'sum':
+          aggregatedPeriods[period] = values.reduce((a, b) => a + b, 0);
+          break;
+        case 'average':
+          aggregatedPeriods[period] = values.reduce((a, b) => a + b, 0) / values.length;
+          break;
+        case 'latest':
+        default:
+          aggregatedPeriods[period] = values[values.length - 1];
+      }
+    }
+
+    const sortedPeriods = Object.keys(aggregatedPeriods).sort();
+    if (sortedPeriods.length === 0) return null;
+
+    const latestPeriod = sortedPeriods[sortedPeriods.length - 1];
+    const previousPeriod = sortedPeriods.length > 1 ? sortedPeriods[sortedPeriods.length - 2] : null;
+    
+    let latestValue = aggregatedPeriods[latestPeriod];
+    let previousValue = previousPeriod ? aggregatedPeriods[previousPeriod] : undefined;
+
+    if (config.valueMultiplier) {
+      latestValue *= config.valueMultiplier;
+      if (previousValue !== undefined) previousValue *= config.valueMultiplier;
+    }
+
+    return {
+      value: latestValue,
+      previousValue,
+      period: latestPeriod,
+      rawValues: sortedPeriods.map(p => ({
+        period: p,
+        value: aggregatedPeriods[p] * (config.valueMultiplier || 1),
+      })),
+      regionalData: config.includeRegions ? regionalData : undefined,
+    };
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Legacy JSON format (PxWeb 1.0)
+  // ─────────────────────────────────────────────────────────────
   if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
     console.warn(`[SCB] No data in response for ${config.kpiCode}`);
     return null;
