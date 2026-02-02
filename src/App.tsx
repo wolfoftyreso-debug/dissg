@@ -26,6 +26,7 @@ import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import ConceptDemo from "./pages/ConceptDemo";
 import CanvasDemo from "./pages/CanvasDemo";
+import LearningPaths from "./pages/LearningPaths";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="/settings" element={<Settings />} />
               <Route path="/demo" element={<ConceptDemo />} />
               <Route path="/canvas" element={<CanvasDemo />} />
+              <Route path="/learn" element={<LearningPaths />} />
               
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={
