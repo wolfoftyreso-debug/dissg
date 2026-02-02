@@ -61,6 +61,7 @@ import AIGroundingPage from "./pages/AIGroundingPage";
 import RealityCheckDemo from "./pages/RealityCheckDemo";
 import OnboardingPage from "./pages/OnboardingPage";
 import SpotlessPage from "./pages/SpotlessPage";
+import PrioritizedPage from "./pages/PrioritizedPage";
 
 const queryClient = new QueryClient();
 
@@ -125,6 +126,7 @@ const App = () => (
               <Route path="/reality-check" element={<RealityCheckDemo />} />
               <Route path="/onboarding" element={<OnboardingPage />} />
               <Route path="/spotless" element={<SpotlessPage />} />
+              <Route path="/prioritized" element={<PrioritizedPage />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
