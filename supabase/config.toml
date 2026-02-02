@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.analyze-kpi]
 verify_jwt = false
+
+[functions.kolada-ingest]
+verify_jwt = false
