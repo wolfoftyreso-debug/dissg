@@ -15,6 +15,7 @@ import DepthDemo from "./pages/DepthDemo";
 import WrappedDemo from "./pages/WrappedDemo";
 import AboutSystem from "./pages/AboutSystem";
 import RegionalView from "./pages/RegionalView";
+import DecisionTimeline from "./pages/DecisionTimeline";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/public" element={<PublicDashboard />} />
             <Route path="/regional" element={<RegionalView />} />
+            <Route path="/decisions" element={<DecisionTimeline />} />
             <Route path="/compact" element={<GlobalCompact />} />
             <Route path="/profiles" element={<PublicProfiles />} />
             <Route path="/profile-demo" element={<ProfileDemo />} />
