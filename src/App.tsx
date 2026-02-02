@@ -29,6 +29,7 @@ import CanvasDemo from "./pages/CanvasDemo";
 import LearningPaths from "./pages/LearningPaths";
 import StoriesDemo from "./pages/StoriesDemo";
 import ResilienceDemo from "./pages/ResilienceDemo";
+import InsightBuilderDemo from "./pages/InsightBuilderDemo";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
               <Route path="/learn" element={<LearningPaths />} />
               <Route path="/stories" element={<StoriesDemo />} />
               <Route path="/resilience" element={<ResilienceDemo />} />
+              <Route path="/insights" element={<InsightBuilderDemo />} />
               
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={
