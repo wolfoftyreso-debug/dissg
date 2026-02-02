@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Layers, MapPin, Sparkles, Shield, Scale } from 'lucide-react';
+import { ArrowLeft, Layers, MapPin, Sparkles, Shield, Scale, Repeat } from 'lucide-react';
 import { 
   DepthNavigator, 
   CausalChainViewer, 
@@ -10,6 +10,8 @@ import {
   AdvancedSimulation,
   PrivacySpärrar,
   DatapointDisclaimer,
+  ClusterExplainerDetailed,
+  InfiniteDepthEngine,
 } from '@/components/depth';
 import type { DepthLevel } from '@/config/depthModelConfig';
 
@@ -18,15 +20,17 @@ import type { DepthLevel } from '@/config/depthModelConfig';
  * 
  * Visar hela djupmodellen:
  * - Kart-UX med 4 zoom-nivåer (DEL XVI)
+ * - Klusterlogik med datapunkter (DEL XVI)
  * - Simulering & sandbox (DEL XVII)
  * - Privacy-by-design spärrar (DEL XVIII)
- * - Rekursiv design (DEL XIX)
+ * - Rekursiv design med oändliga "varför" (DEL XIX)
  */
 const DepthDemo = () => {
   const [currentLevel, setCurrentLevel] = useState<DepthLevel>(0);
   const [zoomLevel, setZoomLevel] = useState(0);
   const [observationCount, setObservationCount] = useState(1000000);
   const [activeTab, setActiveTab] = useState('map');
+  const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
 
   // Simulera minskat underlag vid djupare nivåer
   const handleLevelChange = (level: DepthLevel) => {
@@ -73,10 +77,14 @@ const DepthDemo = () => {
 
       <main className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="map" className="gap-1.5">
               <MapPin className="h-4 w-4" />
               Karta (XVI)
+            </TabsTrigger>
+            <TabsTrigger value="clusters" className="gap-1.5">
+              <Layers className="h-4 w-4" />
+              Kluster (XVI)
             </TabsTrigger>
             <TabsTrigger value="simulation" className="gap-1.5">
               <Sparkles className="h-4 w-4" />
@@ -86,9 +94,9 @@ const DepthDemo = () => {
               <Shield className="h-4 w-4" />
               Privacy (XVIII)
             </TabsTrigger>
-            <TabsTrigger value="depth" className="gap-1.5">
-              <Layers className="h-4 w-4" />
-              Djup (XV)
+            <TabsTrigger value="infinite" className="gap-1.5">
+              <Repeat className="h-4 w-4" />
+              Oändligt (XIX)
             </TabsTrigger>
           </TabsList>
 
@@ -102,6 +110,29 @@ const DepthDemo = () => {
                 />
               </div>
               <div className="space-y-6">
+                <PrivacySpärrar 
+                  currentObservations={observationCount}
+                  currentZoomLevel={zoomLevel}
+                />
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* DEL XVI - Klusterlogik */}
+          <TabsContent value="clusters" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ClusterExplainerDetailed 
+                selectedClusterId={selectedCluster ?? undefined}
+                onClusterSelect={setSelectedCluster}
+              />
+              <div className="space-y-6">
+                <DepthNavigator
+                  currentLevel={currentLevel}
+                  onLevelChange={handleLevelChange}
+                  observationCount={observationCount}
+                  selectedRegion="Kluster"
+                  selectedKpi="Sysselsättning"
+                />
                 <PrivacySpärrar 
                   currentObservations={observationCount}
                   currentZoomLevel={zoomLevel}
@@ -140,21 +171,17 @@ const DepthDemo = () => {
             </div>
           </TabsContent>
 
-          {/* DEL XV - Djupnavigering */}
-          <TabsContent value="depth" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <DepthNavigator
-                currentLevel={currentLevel}
-                onLevelChange={handleLevelChange}
-                observationCount={observationCount}
-                selectedRegion="Stockholm"
-                selectedKpi="Sysselsättning"
-              />
-              <CausalChainViewer kpiName="Sysselsättningsgrad" />
-              <PrivacySpärrar 
-                currentObservations={observationCount}
-                currentZoomLevel={currentLevel}
-              />
+          {/* DEL XIX - Oändligt djup */}
+          <TabsContent value="infinite" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <InfiniteDepthEngine />
+              <div className="space-y-6">
+                <CausalChainViewer kpiName="Sysselsättningsgrad" />
+                <PrivacySpärrar 
+                  currentObservations={observationCount}
+                  currentZoomLevel={currentLevel}
+                />
+              </div>
             </div>
           </TabsContent>
         </Tabs>
