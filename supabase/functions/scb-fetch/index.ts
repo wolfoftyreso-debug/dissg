@@ -964,6 +964,326 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     includeRegions: true,
     isInverted: true,
   },
+
+  // ═══════════════════════════════════════════════════════════════
+  // UTÖKADE SYSSELSÄTTNINGSTABELLER (AM0401)
+  // ═══════════════════════════════════════════════════════════════
+
+  // ─────────────────────────────────────────────────────────────
+  // SYSSELSÄTTNING - Per sektor (offentlig/privat)
+  // ─────────────────────────────────────────────────────────────
+  employment_by_sector: {
+    path: "AM/AM0401/AM0401G/NAKUSysselSektor",
+    description: "Sysselsatta efter sektor (offentlig/privat)",
+    kpiCode: "employment_by_sector",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["15-74"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "Sektor", selection: { filter: "item", values: ["priv", "stat", "komm", "landi"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CJ"] } },
+        { code: "Tid", selection: { filter: "top", values: ["24"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "tusental",
+    granularity: "monthly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // SYSSELSÄTTNING - Per bransch (SNI2007)
+  // ─────────────────────────────────────────────────────────────
+  employment_by_industry: {
+    path: "AM/AM0401/AM0401D/NAKUSysselNar",
+    description: "Sysselsatta efter näringsgren (SNI2007)",
+    kpiCode: "employment_by_industry",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["15-74"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "SNI2007", selection: { filter: "item", values: [
+          "A", "B-E", "F", "G-I", "J", "K", "L", "M-N", "O-Q", "R-U"
+        ] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CJ"] } },
+        { code: "Tid", selection: { filter: "top", values: ["12"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "tusental",
+    granularity: "monthly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // SYSSELSÄTTNING - Per utbildningsnivå
+  // ─────────────────────────────────────────────────────────────
+  employment_by_education: {
+    path: "AM/AM0401/AM0401K/NAKUBefAkeUtb",
+    description: "Sysselsättningsgrad efter utbildningsnivå",
+    kpiCode: "employment_by_education",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["25-64"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "Utbildning", selection: { filter: "item", values: ["1", "2", "3", "4"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CK"] } },
+        { code: "Tid", selection: { filter: "top", values: ["12"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "%",
+    granularity: "monthly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // SYSSELSÄTTNING - Heltid/deltid
+  // ─────────────────────────────────────────────────────────────
+  employment_fulltime_parttime: {
+    path: "AM/AM0401/AM0401E/NAKUSysselArstid",
+    description: "Sysselsatta heltid/deltid",
+    kpiCode: "employment_work_time",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["15-74"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1", "2"] } },
+        { code: "Arbetstid", selection: { filter: "item", values: ["1-34", "35+"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CJ"] } },
+        { code: "Tid", selection: { filter: "top", values: ["24"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "tusental",
+    granularity: "monthly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // ARBETSKRAFTSDELTAGANDE
+  // ─────────────────────────────────────────────────────────────
+  labor_force_participation: {
+    path: "AM/AM0401/AM0401A/NAKUBefAkeLArb",
+    description: "Arbetskraftsdeltagande 15-74 år",
+    kpiCode: "labor_force_participation",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["15-74"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CI"] } },
+        { code: "Tid", selection: { filter: "top", values: ["24"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "%",
+    granularity: "monthly",
+    aggregation: 'latest',
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // UTÖKADE BNP-TABELLER (NR0103)
+  // ═══════════════════════════════════════════════════════════════
+
+  // ─────────────────────────────────────────────────────────────
+  // BNP - Årlig totalproduktion
+  // ─────────────────────────────────────────────────────────────
+  gdp_annual: {
+    path: "NR/NR0103/NR0103A/NR0103ENS2010T01A",
+    description: "BNP årsdata, löpande priser",
+    kpiCode: "gdp_annual",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["BNP"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000001W"] } },
+        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+      ],
+      response: { format: "json" }
+    },
+    valueMultiplier: 0.001,
+    unit: "miljarder SEK",
+    granularity: "yearly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // BNP - Per bransch (förädlingsvärde)
+  // ─────────────────────────────────────────────────────────────
+  gdp_by_industry: {
+    path: "NR/NR0103/NR0103A/NR0103ENS2010T01A",
+    description: "Förädlingsvärde per bransch",
+    kpiCode: "gdp_by_industry",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: [
+          "A", "B-E", "F", "G-I", "J", "K", "L", "M-N", "O-Q", "R-U"
+        ] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000001W"] } },
+        { code: "Tid", selection: { filter: "top", values: ["10"] } },
+      ],
+      response: { format: "json" }
+    },
+    valueMultiplier: 0.001,
+    unit: "miljarder SEK",
+    granularity: "yearly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // BNP - Användningssidan (konsumtion, investeringar, export)
+  // ─────────────────────────────────────────────────────────────
+  gdp_expenditure: {
+    path: "NR/NR0103/NR0103B/NR0103ENS2010T01Kv",
+    description: "BNP från användningssidan (C+I+G+X-M)",
+    kpiCode: "gdp_expenditure",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: [
+          "HkKons",  // Hushållskonsumtion
+          "HiOKons", // Icke-vinstdrivande org.
+          "OOffKons", // Offentlig konsumtion
+          "FBrInvest", // Fasta bruttoinvesteringar
+          "Export", // Export
+          "Import"  // Import
+        ] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000001W"] } },
+        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+      ],
+      response: { format: "json" }
+    },
+    valueMultiplier: 0.001,
+    unit: "miljarder SEK",
+    granularity: "quarterly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // BNP - Volymindex (fasta priser)
+  // ─────────────────────────────────────────────────────────────
+  gdp_volume_index: {
+    path: "NR/NR0103/NR0103B/NR0103ENS2010T01Kv",
+    description: "BNP volymindex, säsongsrensat",
+    kpiCode: "gdp_volume_index",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["BNP"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000002N"] } }, // Volymindex
+        { code: "Tid", selection: { filter: "top", values: ["40"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "index (2021=100)",
+    granularity: "quarterly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // ARBETSKOSTNAD PER TIMME - Nationalräkenskaper
+  // ─────────────────────────────────────────────────────────────
+  labor_cost_per_hour: {
+    path: "NR/NR0103/NR0103B/NR0103ENS2010T04Kv",
+    description: "Arbetskostnad per arbetad timme",
+    kpiCode: "labor_cost_hourly",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["TOT"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000003Y"] } },
+        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "SEK/timme",
+    granularity: "quarterly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // INVESTERINGAR - Fasta bruttoinvesteringar
+  // ─────────────────────────────────────────────────────────────
+  gross_fixed_investments: {
+    path: "NR/NR0103/NR0103B/NR0103ENS2010T01Kv",
+    description: "Fasta bruttoinvesteringar",
+    kpiCode: "gross_investments",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["FBrInvest"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000001W"] } },
+        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+      ],
+      response: { format: "json" }
+    },
+    valueMultiplier: 0.001,
+    unit: "miljarder SEK",
+    granularity: "quarterly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // EXPORT OCH IMPORT
+  // ─────────────────────────────────────────────────────────────
+  trade_balance: {
+    path: "NR/NR0103/NR0103B/NR0103ENS2010T01Kv",
+    description: "Export och import av varor och tjänster",
+    kpiCode: "trade_balance",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["Export", "Import"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000001W"] } },
+        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+      ],
+      response: { format: "json" }
+    },
+    valueMultiplier: 0.001,
+    unit: "miljarder SEK",
+    granularity: "quarterly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // DISPONIBEL INKOMST - Hushållssektorn
+  // ─────────────────────────────────────────────────────────────
+  household_disposable_income: {
+    path: "NR/NR0103/NR0103C/NR0103ENS2010T08Kv",
+    description: "Hushållens disponibla inkomst",
+    kpiCode: "household_income",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Sektor", selection: { filter: "item", values: ["S14+S15"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000B1"] } },
+        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+      ],
+      response: { format: "json" }
+    },
+    valueMultiplier: 0.001,
+    unit: "miljarder SEK",
+    granularity: "quarterly",
+    aggregation: 'latest',
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════
