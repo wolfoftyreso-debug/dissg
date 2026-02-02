@@ -38,3 +38,7 @@ export { HistoricalDepthTimeline } from './HistoricalDepthTimeline';
 
 // WAVE 12: Global Historical Sources & Ingestion
 export { SourceTransparencyPanel } from './SourceTransparencyPanel';
+
+// WAVE 12: All Data In – Simple Out (Block 41)
+export { SimpleOverviewCard, SimpleOverviewGrid } from './SimpleOverviewCard';
+export { LayeredViewContainer } from './LayeredViewContainer';
