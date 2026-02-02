@@ -45,3 +45,6 @@ export { LayeredViewContainer } from './LayeredViewContainer';
 
 // WAVE 12: Master Prompt & Core Indicators (Block 42)
 export { CoreIndicatorGrid } from './CoreIndicatorGrid';
+
+// WAVE 12: Truth Oracle Doctrine
+export * from '../doctrine';
