@@ -184,6 +184,68 @@ export type Database = {
         }
         Relationships: []
       }
+      action_outcome_links: {
+        Row: {
+          action_id: string | null
+          attribution_confidence: number | null
+          baseline_period: string | null
+          baseline_value: number | null
+          change_percent: number | null
+          confounding_factors: string[] | null
+          id: string
+          linked_at: string | null
+          methodology_note: string | null
+          observation_summary: string
+          observed_period: string | null
+          observed_value: number | null
+          outcome_reference_id: string
+          outcome_type: string
+          pattern_type: string | null
+        }
+        Insert: {
+          action_id?: string | null
+          attribution_confidence?: number | null
+          baseline_period?: string | null
+          baseline_value?: number | null
+          change_percent?: number | null
+          confounding_factors?: string[] | null
+          id?: string
+          linked_at?: string | null
+          methodology_note?: string | null
+          observation_summary: string
+          observed_period?: string | null
+          observed_value?: number | null
+          outcome_reference_id: string
+          outcome_type: string
+          pattern_type?: string | null
+        }
+        Update: {
+          action_id?: string | null
+          attribution_confidence?: number | null
+          baseline_period?: string | null
+          baseline_value?: number | null
+          change_percent?: number | null
+          confounding_factors?: string[] | null
+          id?: string
+          linked_at?: string | null
+          methodology_note?: string | null
+          observation_summary?: string
+          observed_period?: string | null
+          observed_value?: number | null
+          outcome_reference_id?: string
+          outcome_type?: string
+          pattern_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "action_outcome_links_action_id_fkey"
+            columns: ["action_id"]
+            isOneToOne: false
+            referencedRelation: "policy_actions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analysis_audit_log: {
         Row: {
           action: string
@@ -652,6 +714,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      causal_chains: {
+        Row: {
+          alternative_explanations: Json | null
+          chain_code: string
+          chain_confidence: number | null
+          chain_steps: Json
+          created_at: string | null
+          first_movement_date: string | null
+          id: string
+          outcome_description: string
+          outcome_observed_date: string | null
+          related_action_ids: string[] | null
+          related_kpi_ids: string[] | null
+          total_chain_duration_months: number | null
+          uncertainty_factors: string[] | null
+        }
+        Insert: {
+          alternative_explanations?: Json | null
+          chain_code: string
+          chain_confidence?: number | null
+          chain_steps: Json
+          created_at?: string | null
+          first_movement_date?: string | null
+          id?: string
+          outcome_description: string
+          outcome_observed_date?: string | null
+          related_action_ids?: string[] | null
+          related_kpi_ids?: string[] | null
+          total_chain_duration_months?: number | null
+          uncertainty_factors?: string[] | null
+        }
+        Update: {
+          alternative_explanations?: Json | null
+          chain_code?: string
+          chain_confidence?: number | null
+          chain_steps?: Json
+          created_at?: string | null
+          first_movement_date?: string | null
+          id?: string
+          outcome_description?: string
+          outcome_observed_date?: string | null
+          related_action_ids?: string[] | null
+          related_kpi_ids?: string[] | null
+          total_chain_duration_months?: number | null
+          uncertainty_factors?: string[] | null
+        }
+        Relationships: []
       }
       countries: {
         Row: {
@@ -1276,6 +1386,95 @@ export type Database = {
             columns: ["decision_id"]
             isOneToOne: false
             referencedRelation: "policy_decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discovered_effects: {
+        Row: {
+          analysis_method: string
+          assumptions: Json
+          confidence_score: number
+          counterexamples: number | null
+          discovered_at: string | null
+          duration_months: number | null
+          effect_direction: string | null
+          effect_magnitude: number | null
+          effect_type: string
+          geo_scope: string | null
+          id: string
+          is_verified: boolean | null
+          limitations: string[] | null
+          p_value: number | null
+          replications: number | null
+          sample_size: number | null
+          source_action_id: string | null
+          standard_error: number | null
+          target_index_code: string | null
+          target_kpi_id: string | null
+          time_lag_months: number | null
+          time_period_end: string | null
+          time_period_start: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          analysis_method: string
+          assumptions?: Json
+          confidence_score: number
+          counterexamples?: number | null
+          discovered_at?: string | null
+          duration_months?: number | null
+          effect_direction?: string | null
+          effect_magnitude?: number | null
+          effect_type: string
+          geo_scope?: string | null
+          id?: string
+          is_verified?: boolean | null
+          limitations?: string[] | null
+          p_value?: number | null
+          replications?: number | null
+          sample_size?: number | null
+          source_action_id?: string | null
+          standard_error?: number | null
+          target_index_code?: string | null
+          target_kpi_id?: string | null
+          time_lag_months?: number | null
+          time_period_end?: string | null
+          time_period_start?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          analysis_method?: string
+          assumptions?: Json
+          confidence_score?: number
+          counterexamples?: number | null
+          discovered_at?: string | null
+          duration_months?: number | null
+          effect_direction?: string | null
+          effect_magnitude?: number | null
+          effect_type?: string
+          geo_scope?: string | null
+          id?: string
+          is_verified?: boolean | null
+          limitations?: string[] | null
+          p_value?: number | null
+          replications?: number | null
+          sample_size?: number | null
+          source_action_id?: string | null
+          standard_error?: number | null
+          target_index_code?: string | null
+          target_kpi_id?: string | null
+          time_lag_months?: number | null
+          time_period_end?: string | null
+          time_period_start?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discovered_effects_target_kpi_id_fkey"
+            columns: ["target_kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
             referencedColumns: ["id"]
           },
         ]
@@ -3501,6 +3700,63 @@ export type Database = {
           },
         ]
       }
+      knowledge_boundaries: {
+        Row: {
+          assessed_at: string | null
+          assessor: string | null
+          caveats: string[] | null
+          data_gaps: string[] | null
+          entity_id: string
+          entity_type: string
+          explicit_assumptions: string[] | null
+          id: string
+          implicit_assumptions: string[] | null
+          known_confidence: number | null
+          known_facts: Json
+          methodological_limits: string[] | null
+          missing_data_types: string[] | null
+          missing_geographies: string[] | null
+          missing_time_periods: string[] | null
+          unknown_aspects: string[] | null
+        }
+        Insert: {
+          assessed_at?: string | null
+          assessor?: string | null
+          caveats?: string[] | null
+          data_gaps?: string[] | null
+          entity_id: string
+          entity_type: string
+          explicit_assumptions?: string[] | null
+          id?: string
+          implicit_assumptions?: string[] | null
+          known_confidence?: number | null
+          known_facts?: Json
+          methodological_limits?: string[] | null
+          missing_data_types?: string[] | null
+          missing_geographies?: string[] | null
+          missing_time_periods?: string[] | null
+          unknown_aspects?: string[] | null
+        }
+        Update: {
+          assessed_at?: string | null
+          assessor?: string | null
+          caveats?: string[] | null
+          data_gaps?: string[] | null
+          entity_id?: string
+          entity_type?: string
+          explicit_assumptions?: string[] | null
+          id?: string
+          implicit_assumptions?: string[] | null
+          known_confidence?: number | null
+          known_facts?: Json
+          methodological_limits?: string[] | null
+          missing_data_types?: string[] | null
+          missing_geographies?: string[] | null
+          missing_time_periods?: string[] | null
+          unknown_aspects?: string[] | null
+        }
+        Relationships: []
+      }
       knowledge_graph_edges: {
         Row: {
           confidence: number | null
@@ -3951,6 +4207,144 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      learning_replications: {
+        Row: {
+          conditions: Json | null
+          deviation_explanation: string | null
+          deviation_from_original: number | null
+          effect_observed: string | null
+          geo_context: string
+          id: string
+          learning_id: string | null
+          recorded_at: string | null
+          replicated: boolean
+          source_effect_id: string | null
+          time_context: string
+        }
+        Insert: {
+          conditions?: Json | null
+          deviation_explanation?: string | null
+          deviation_from_original?: number | null
+          effect_observed?: string | null
+          geo_context: string
+          id?: string
+          learning_id?: string | null
+          recorded_at?: string | null
+          replicated: boolean
+          source_effect_id?: string | null
+          time_context: string
+        }
+        Update: {
+          conditions?: Json | null
+          deviation_explanation?: string | null
+          deviation_from_original?: number | null
+          effect_observed?: string | null
+          geo_context?: string
+          id?: string
+          learning_id?: string | null
+          recorded_at?: string | null
+          replicated?: boolean
+          source_effect_id?: string | null
+          time_context?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_replications_learning_id_fkey"
+            columns: ["learning_id"]
+            isOneToOne: false
+            referencedRelation: "learnings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_replications_source_effect_id_fkey"
+            columns: ["source_effect_id"]
+            isOneToOne: false
+            referencedRelation: "discovered_effects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learnings: {
+        Row: {
+          blocking_factors: string[] | null
+          context_conditions: Json
+          context_geo: string[]
+          context_time_end: string | null
+          context_time_start: string
+          counterexample_contexts: Json | null
+          counterexamples: number | null
+          created_at: string | null
+          detailed_description: string | null
+          effect_confidence: number
+          effect_magnitude: string | null
+          enabling_factors: string[] | null
+          evidence_grade: string | null
+          id: string
+          last_validated_at: string | null
+          learning_code: string
+          observed_effect: string
+          replication_contexts: Json | null
+          replications: number | null
+          required_conditions: string[] | null
+          source_action_ids: string[] | null
+          source_effect_ids: string[] | null
+          summary: string
+          updated_at: string | null
+        }
+        Insert: {
+          blocking_factors?: string[] | null
+          context_conditions?: Json
+          context_geo: string[]
+          context_time_end?: string | null
+          context_time_start: string
+          counterexample_contexts?: Json | null
+          counterexamples?: number | null
+          created_at?: string | null
+          detailed_description?: string | null
+          effect_confidence: number
+          effect_magnitude?: string | null
+          enabling_factors?: string[] | null
+          evidence_grade?: string | null
+          id?: string
+          last_validated_at?: string | null
+          learning_code: string
+          observed_effect: string
+          replication_contexts?: Json | null
+          replications?: number | null
+          required_conditions?: string[] | null
+          source_action_ids?: string[] | null
+          source_effect_ids?: string[] | null
+          summary: string
+          updated_at?: string | null
+        }
+        Update: {
+          blocking_factors?: string[] | null
+          context_conditions?: Json
+          context_geo?: string[]
+          context_time_end?: string | null
+          context_time_start?: string
+          counterexample_contexts?: Json | null
+          counterexamples?: number | null
+          created_at?: string | null
+          detailed_description?: string | null
+          effect_confidence?: number
+          effect_magnitude?: string | null
+          enabling_factors?: string[] | null
+          evidence_grade?: string | null
+          id?: string
+          last_validated_at?: string | null
+          learning_code?: string
+          observed_effect?: string
+          replication_contexts?: Json | null
+          replications?: number | null
+          required_conditions?: string[] | null
+          source_action_ids?: string[] | null
+          source_effect_ids?: string[] | null
+          summary?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       license_agreements: {
         Row: {
@@ -4751,6 +5145,72 @@ export type Database = {
         }
         Relationships: []
       }
+      policy_actions: {
+        Row: {
+          action_type: string
+          announced_date: string | null
+          budget_amount_sek: number | null
+          budget_type: string | null
+          created_at: string | null
+          decision_reference: string | null
+          description: string | null
+          effective_date: string
+          end_date: string | null
+          expected_effects: Json | null
+          geo_scope: string
+          id: string
+          related_kpi_ids: string[] | null
+          responsible_body: string
+          sector: string | null
+          source_url: string | null
+          target_population: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          action_type: string
+          announced_date?: string | null
+          budget_amount_sek?: number | null
+          budget_type?: string | null
+          created_at?: string | null
+          decision_reference?: string | null
+          description?: string | null
+          effective_date: string
+          end_date?: string | null
+          expected_effects?: Json | null
+          geo_scope: string
+          id?: string
+          related_kpi_ids?: string[] | null
+          responsible_body: string
+          sector?: string | null
+          source_url?: string | null
+          target_population?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          action_type?: string
+          announced_date?: string | null
+          budget_amount_sek?: number | null
+          budget_type?: string | null
+          created_at?: string | null
+          decision_reference?: string | null
+          description?: string | null
+          effective_date?: string
+          end_date?: string | null
+          expected_effects?: Json | null
+          geo_scope?: string
+          id?: string
+          related_kpi_ids?: string[] | null
+          responsible_body?: string
+          sector?: string | null
+          source_url?: string | null
+          target_population?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       policy_decisions: {
         Row: {
           budget_sek: number | null
@@ -5019,6 +5479,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      public_data_sources: {
+        Row: {
+          api_endpoint: string | null
+          base_url: string | null
+          category: string
+          code: string
+          country_code: string | null
+          created_at: string | null
+          extraction_mode: string
+          extraction_status: string | null
+          id: string
+          is_active: boolean | null
+          last_extracted_at: string | null
+          metadata: Json | null
+          name: string
+          quality_score: number | null
+          record_count: number | null
+          update_frequency: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          api_endpoint?: string | null
+          base_url?: string | null
+          category: string
+          code: string
+          country_code?: string | null
+          created_at?: string | null
+          extraction_mode: string
+          extraction_status?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_extracted_at?: string | null
+          metadata?: Json | null
+          name: string
+          quality_score?: number | null
+          record_count?: number | null
+          update_frequency?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          api_endpoint?: string | null
+          base_url?: string | null
+          category?: string
+          code?: string
+          country_code?: string | null
+          created_at?: string | null
+          extraction_mode?: string
+          extraction_status?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_extracted_at?: string | null
+          metadata?: Json | null
+          name?: string
+          quality_score?: number | null
+          record_count?: number | null
+          update_frequency?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       public_officials: {
         Row: {
@@ -5618,6 +6138,86 @@ export type Database = {
             columns: ["simulation_id"]
             isOneToOne: false
             referencedRelation: "simulation_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      surfaced_insights: {
+        Row: {
+          created_at: string | null
+          data_quality_score: number | null
+          display_tier: number | null
+          expires_at: string | null
+          id: string
+          insight_code: string
+          is_active: boolean | null
+          is_new: boolean | null
+          is_replicated: boolean | null
+          is_stable: boolean | null
+          method_description: string | null
+          population_affected: number | null
+          priority_score: number | null
+          similar_case_ids: string[] | null
+          source_id: string | null
+          source_type: string | null
+          summary_line: string
+          surfaced_at: string | null
+          visualization_config: Json | null
+          visualization_type: string | null
+          why_explanation_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data_quality_score?: number | null
+          display_tier?: number | null
+          expires_at?: string | null
+          id?: string
+          insight_code: string
+          is_active?: boolean | null
+          is_new?: boolean | null
+          is_replicated?: boolean | null
+          is_stable?: boolean | null
+          method_description?: string | null
+          population_affected?: number | null
+          priority_score?: number | null
+          similar_case_ids?: string[] | null
+          source_id?: string | null
+          source_type?: string | null
+          summary_line: string
+          surfaced_at?: string | null
+          visualization_config?: Json | null
+          visualization_type?: string | null
+          why_explanation_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data_quality_score?: number | null
+          display_tier?: number | null
+          expires_at?: string | null
+          id?: string
+          insight_code?: string
+          is_active?: boolean | null
+          is_new?: boolean | null
+          is_replicated?: boolean | null
+          is_stable?: boolean | null
+          method_description?: string | null
+          population_affected?: number | null
+          priority_score?: number | null
+          similar_case_ids?: string[] | null
+          source_id?: string | null
+          source_type?: string | null
+          summary_line?: string
+          surfaced_at?: string | null
+          visualization_config?: Json | null
+          visualization_type?: string | null
+          why_explanation_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "surfaced_insights_why_explanation_id_fkey"
+            columns: ["why_explanation_id"]
+            isOneToOne: false
+            referencedRelation: "causal_chains"
             referencedColumns: ["id"]
           },
         ]
