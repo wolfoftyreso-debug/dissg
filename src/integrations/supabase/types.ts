@@ -607,6 +607,7 @@ export type Database = {
           reversibility_weight: number
           risk_weight: number
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           cost_weight?: number
@@ -619,6 +620,7 @@ export type Database = {
           reversibility_weight?: number
           risk_weight?: number
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           cost_weight?: number
@@ -631,6 +633,7 @@ export type Database = {
           reversibility_weight?: number
           risk_weight?: number
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
