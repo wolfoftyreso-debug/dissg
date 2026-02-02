@@ -1,8 +1,8 @@
-import { Bell } from 'lucide-react';
+import { Bell, ExternalLink } from 'lucide-react';
 import { KPI } from '@/types/kpi';
 import { cn } from '@/lib/utils';
 import { UserMenu } from '@/components/auth/UserMenu';
-
+import { Link } from 'react-router-dom';
 interface AppHeaderProps {
   kpis: KPI[];
   role?: string;
@@ -30,8 +30,17 @@ export function AppHeader({ kpis }: AppHeaderProps) {
           </h1>
         </div>
 
-        {/* Right: Date, notifications, profile */}
+        {/* Right: Public link, Date, notifications, profile */}
         <div className="flex items-center gap-4">
+          {/* Link to public view */}
+          <Link 
+            to="/public" 
+            className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            Publik vy
+          </Link>
+
           {/* Date and timezone - diskret */}
           <div className="hidden sm:block text-right">
             <p className="text-xs text-muted-foreground">
