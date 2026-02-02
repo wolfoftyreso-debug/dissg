@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { SpotlessProvider } from "@/context/SpotlessContext";
 import Index from "./pages/Index";
 import PublicDashboard from "./pages/PublicDashboard";
 import GlobalCompact from "./pages/GlobalCompact";
@@ -59,6 +60,7 @@ import BigQuestionDetailPage from "./pages/BigQuestionDetailPage";
 import AIGroundingPage from "./pages/AIGroundingPage";
 import RealityCheckDemo from "./pages/RealityCheckDemo";
 import OnboardingPage from "./pages/OnboardingPage";
+import SpotlessPage from "./pages/SpotlessPage";
 
 const queryClient = new QueryClient();
 
@@ -66,7 +68,8 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AuthProvider>
-        <TooltipProvider>
+        <SpotlessProvider>
+          <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -121,6 +124,7 @@ const App = () => (
               <Route path="/ai/grounding" element={<AIGroundingPage />} />
               <Route path="/reality-check" element={<RealityCheckDemo />} />
               <Route path="/onboarding" element={<OnboardingPage />} />
+              <Route path="/spotless" element={<SpotlessPage />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
@@ -144,7 +148,8 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
-        </TooltipProvider>
+          </TooltipProvider>
+        </SpotlessProvider>
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
