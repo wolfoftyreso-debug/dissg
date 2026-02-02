@@ -72,6 +72,27 @@
     --trend-down: 0 75% 48%;
     --trend-stable: 210 10% 55%;
 
+    /* DEL XXI: Semantiska trendfärger */
+    --trend-positive: 145 55% 38%;
+    --trend-warning: 40 95% 48%;
+    --trend-negative: 0 75% 48%;
+    --trend-neutral: 210 10% 55%;
+
+    /* Konfidensnivåer */
+    --confidence-high: 145 55% 38%;
+    --confidence-medium: 40 95% 48%;
+    --confidence-low: 0 75% 48%;
+
+    /* Datalager A/B/C */
+    --layer-a: 210 65% 45%;
+    --layer-b: 40 95% 48%;
+    --layer-c: 0 75% 48%;
+
+    /* Simuleringsläge (tydligt avgränsat) */
+    --simulation-bg: 280 60% 97%;
+    --simulation-border: 280 60% 70%;
+    --simulation-text: 280 60% 30%;
+
     /* Typography - System font stack för snabbhet */
     --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 

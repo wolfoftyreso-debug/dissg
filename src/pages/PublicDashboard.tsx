@@ -4,14 +4,17 @@ import { mockKPIs } from '@/data/mockKPIs';
 import { cn } from '@/lib/utils';
 import { 
   TrendingUp, TrendingDown, Minus, ChevronRight, Info, Shield, 
-  ChevronDown, ExternalLink, ArrowLeft, BarChart3, Eye, Database
+  ChevronDown, ExternalLink, ArrowLeft, BarChart3, Eye, Database,
+  HelpCircle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Link } from 'react-router-dom';
+import { PublicOnboarding } from '@/components/onboarding';
 
 // Category groupings with human-readable names and descriptions
 const AREA_GROUPS = [
@@ -471,6 +474,7 @@ export default function PublicDashboard() {
   const [view, setView] = useState<ViewState>('overview');
   const [selectedArea, setSelectedArea] = useState<SelectedArea | null>(null);
   const [selectedKPI, setSelectedKPI] = useState<SelectedKPI | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   
   const kpis = useMemo(() => {
     if (dbKPIs && dbKPIs.length > 0) {
@@ -547,12 +551,28 @@ export default function PublicDashboard() {
             <Shield className="h-5 w-5 text-primary" />
             <span className="font-semibold text-sm">Nationellt Läge</span>
           </div>
-          <Link 
-            to="/"
-            className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-          >
-            Intern vy <ExternalLink className="h-3 w-3" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
+                  <HelpCircle className="h-3.5 w-3.5" />
+                  Hur fungerar det?
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="p-0 border-0 bg-transparent shadow-none max-w-md">
+                <PublicOnboarding 
+                  onComplete={() => setShowOnboarding(false)} 
+                  onSkip={() => setShowOnboarding(false)} 
+                />
+              </DialogContent>
+            </Dialog>
+            <Link 
+              to="/"
+              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+            >
+              Intern vy <ExternalLink className="h-3 w-3" />
+            </Link>
+          </div>
         </div>
       </header>
 
