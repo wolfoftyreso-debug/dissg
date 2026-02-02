@@ -4,9 +4,9 @@ import { ClearTrendIndicator } from './ClearTrendIndicator';
 import { SimpleExplanationButton } from './SimpleExplanationButton';
 import { Sparkline } from './Sparkline';
 import { cn } from '@/lib/utils';
-import { AlertTriangle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { AlertTriangle, TrendingUp, TrendingDown, Minus, HelpCircle } from 'lucide-react';
 import { getSimpleExplanation } from '@/config/simpleExplanations';
-
+import { HowWeKnowLink } from '@/components/transparency/HowWeKnowSection';
 interface ClearKPICardProps {
   kpi: KPI;
   onClick?: () => void;
@@ -202,7 +202,7 @@ export function ClearKPICard({ kpi, onClick }: ClearKPICardProps) {
         </div>
       </div>
 
-      {/* Warning & Explain Simply */}
+      {/* Warning & Actions */}
       <div className="flex items-center justify-between pt-2 border-t border-border">
         {hasActiveWarning ? (
           <div className="flex items-center gap-1.5 text-status-critical bg-status-critical/10 px-2 py-1 rounded">
@@ -212,7 +212,7 @@ export function ClearKPICard({ kpi, onClick }: ClearKPICardProps) {
             </span>
           </div>
         ) : (
-          <div />
+          <HowWeKnowLink kpiId={kpi.id} kpiName={kpi.name} />
         )}
         <SimpleExplanationButton
           kpiId={kpi.id}

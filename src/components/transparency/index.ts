@@ -33,3 +33,6 @@ export { ReproduceButton, ReproduceLink } from './ReproduceButton';
 
 // WAVE 7: Data Constitution
 export { ConstitutionArticleCard, ViolationAlert, ConstitutionRef } from './ConstitutionArticle';
+
+// Public transparency
+export { HowWeKnowSection, HowWeKnowLink, generateHowWeKnowData } from './HowWeKnowSection';
