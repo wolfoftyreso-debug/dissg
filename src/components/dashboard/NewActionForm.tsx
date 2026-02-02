@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,8 +21,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Plus, Loader2 } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Plus, Loader2, Lock, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
+import { Link } from 'react-router-dom';
 
 interface NewActionFormProps {
   kpiIds?: string[];
@@ -51,6 +54,7 @@ const DEPARTMENTS = [
 ];
 
 export function NewActionForm({ kpiIds = [], onSuccess }: NewActionFormProps) {
+  const { user, loading: authLoading } = useAuth();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -60,13 +64,16 @@ export function NewActionForm({ kpiIds = [], onSuccess }: NewActionFormProps) {
     estimated_cost_sek: '',
     estimated_timeframe_months: '',
     source_document: '',
-    proposed_by: '',
   });
 
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
     mutationFn: async () => {
+      if (!user) {
+        throw new Error('Du måste vara inloggad för att skapa åtgärdsförslag');
+      }
+
       const { data, error } = await supabase
         .from('action_options')
         .insert({
@@ -82,7 +89,7 @@ export function NewActionForm({ kpiIds = [], onSuccess }: NewActionFormProps) {
             ? parseInt(formData.estimated_timeframe_months) 
             : null,
           source_document: formData.source_document || null,
-          proposed_by: formData.proposed_by || null,
+          proposed_by: user.id,
           status: 'proposed',
         })
         .select()
@@ -100,7 +107,11 @@ export function NewActionForm({ kpiIds = [], onSuccess }: NewActionFormProps) {
     },
     onError: (error) => {
       console.error('Create action error:', error);
-      toast.error('Kunde inte skapa åtgärdsförslag');
+      if (error.message.includes('row-level security')) {
+        toast.error('Autentisering krävs – logga in för att skapa förslag');
+      } else {
+        toast.error('Kunde inte skapa åtgärdsförslag');
+      }
     },
   });
 
@@ -113,13 +124,17 @@ export function NewActionForm({ kpiIds = [], onSuccess }: NewActionFormProps) {
       estimated_cost_sek: '',
       estimated_timeframe_months: '',
       source_document: '',
-      proposed_by: '',
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      toast.error('Du måste vara inloggad för att skapa åtgärdsförslag');
+      return;
+    }
+
     if (!formData.title || !formData.description || !formData.category || !formData.responsible_department) {
       toast.error('Fyll i alla obligatoriska fält');
       return;
@@ -127,6 +142,51 @@ export function NewActionForm({ kpiIds = [], onSuccess }: NewActionFormProps) {
 
     createMutation.mutate();
   };
+
+  // Visa låst knapp om ej inloggad
+  if (!authLoading && !user) {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className="opacity-70">
+            <Lock className="w-4 h-4 mr-2" />
+            Nytt åtgärdsförslag
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="w-5 h-5" />
+              Inloggning krävs
+            </DialogTitle>
+            <DialogDescription>
+              För att skapa åtgärdsförslag måste du vara inloggad som behörig användare.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Alert>
+            <AlertDescription className="space-y-3">
+              <p>
+                Endast behöriga användare kan skapa och utvärdera åtgärdsförslag. 
+                Detta säkerställer spårbarhet och kvalitet i beslutsstödet.
+              </p>
+              <div className="flex gap-2">
+                <Button asChild size="sm">
+                  <Link to="/login">
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Logga in
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/register">Registrera</Link>
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -250,19 +310,13 @@ export function NewActionForm({ kpiIds = [], onSuccess }: NewActionFormProps) {
             />
           </div>
 
-          {/* Förslagsställare */}
-          <div className="space-y-2">
-            <Label htmlFor="proposedBy">Förslagsställare</Label>
-            <Input
-              id="proposedBy"
-              placeholder="Namn eller roll"
-              value={formData.proposed_by}
-              onChange={(e) => setFormData(prev => ({ ...prev, proposed_by: e.target.value }))}
-            />
+          {/* Inloggad som */}
+          <div className="text-xs text-muted-foreground border-t pt-3">
+            Inloggad som: {user?.email}
           </div>
 
           {/* Submit */}
-          <div className="flex justify-end gap-2 pt-4">
+          <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Avbryt
             </Button>
