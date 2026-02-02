@@ -53,6 +53,7 @@ import TrustLogPage from "./pages/TrustLogPage";
 import CharterPage from "./pages/CharterPage";
 import GovernancePage from "./pages/GovernancePage";
 import EvidenceRequirementPage from "./pages/EvidenceRequirementPage";
+import EvidenceMechanismPage from "./pages/EvidenceMechanismPage";
 import BigQuestionsPage from "./pages/BigQuestionsPage";
 import BigQuestionDetailPage from "./pages/BigQuestionDetailPage";
 import AIGroundingPage from "./pages/AIGroundingPage";
@@ -113,6 +114,7 @@ const App = () => (
               <Route path="/charter" element={<CharterPage />} />
               <Route path="/governance" element={<GovernancePage />} />
               <Route path="/evidence" element={<EvidenceRequirementPage />} />
+              <Route path="/mechanism" element={<EvidenceMechanismPage />} />
               <Route path="/big-questions" element={<BigQuestionsPage />} />
               <Route path="/big-questions/:code" element={<BigQuestionDetailPage />} />
               <Route path="/ai/grounding" element={<AIGroundingPage />} />
