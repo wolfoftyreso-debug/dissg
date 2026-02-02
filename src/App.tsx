@@ -13,6 +13,7 @@ import PublicProfiles from "./pages/PublicProfiles";
 import ProfileDemo from "./pages/ProfileDemo";
 import DepthDemo from "./pages/DepthDemo";
 import WrappedDemo from "./pages/WrappedDemo";
+import AboutSystem from "./pages/AboutSystem";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/profiles" element={<PublicProfiles />} />
             <Route path="/profile-demo" element={<ProfileDemo />} />
             <Route path="/wrapped" element={<WrappedDemo />} />
+            <Route path="/om" element={<AboutSystem />} />
             
             {/* Skyddade routes - kräver inloggning */}
             <Route path="/" element={
