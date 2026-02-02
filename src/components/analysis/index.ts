@@ -3,3 +3,7 @@
  */
 
 export { CorrelationSandbox } from './CorrelationSandbox';
+export { CorrelationMatrix } from './CorrelationMatrix';
+export { CorrelationScatterPlot } from './CorrelationScatterPlot';
+export { CorrelationAnalysisView } from './CorrelationAnalysisView';
+export type { KPITimeSeriesData } from './CorrelationAnalysisView';
