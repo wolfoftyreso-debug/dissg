@@ -18,24 +18,24 @@ import { toast } from 'sonner';
 
 interface SCBFetchResult {
   success: boolean;
-  source: string;
-  table: string;
-  kpi_code: string;
-  kpi_name?: string;
-  value: number;
-  previous_value?: number;
+  value?: number;
+  period?: string;
+  trend?: 'up' | 'down' | 'stable';
+  trend_percent?: number;
   unit?: string;
-  trend: 'up' | 'down' | 'stable';
-  trend_percent: number;
-  period: string;
-  inserted: boolean;
-  historical_values?: Array<{ period: string; value: number }>;
   error?: string;
 }
 
 const AVAILABLE_TABLES = [
-  { key: 'population', label: 'Befolkning', description: 'Folkmängd per månad', kpi: 'A1' },
-  { key: 'population_yearly', label: 'Befolkning (år)', description: 'Folkmängd per år', kpi: 'A1' },
+  { key: 'life_expectancy', label: 'Förväntad livslängd', description: 'Återstående medellivslängd vid födelsen', kpi: 'A1', code: 'life_expectancy' },
+  { key: 'excess_mortality_monthly', label: 'Döda/månad', description: 'Antal döda per månad för överdödlighetsberäkning', kpi: 'A2', code: 'excess_mortality' },
+  { key: 'working_age_population', label: 'Arbetsför befolkning', description: 'Befolkning 18-64 år', kpi: 'B1', code: 'working_age_functional' },
+  { key: 'employment_rate', label: 'Sysselsättningsgrad', description: 'Sysselsättningsgrad 20-64 år', kpi: 'B2', code: 'employment_rate_net' },
+  { key: 'productivity', label: 'Produktivitet', description: 'BNP per arbetad timme', kpi: 'B3', code: 'productivity_per_hour' },
+  { key: 'unemployment', label: 'Arbetslöshet', description: 'Arbetslöshet 15-74 år', kpi: 'D1', code: 'long_term_exclusion' },
+  { key: 'tax_base', label: 'Skattebasen', description: 'Beskattningsbar förvärvsinkomst per invånare', kpi: 'C1', code: 'tax_base_growth' },
+  { key: 'housing', label: 'Bostadsbyggande', description: 'Färdigställda bostäder per år', kpi: 'F1', code: 'housing_turnover' },
+  { key: 'total_population', label: 'Total befolkning', description: 'Sveriges totala befolkning', kpi: 'A', code: 'total_population' },
 ];
 
 export function SCBDataFetcher() {
@@ -68,15 +68,27 @@ export function SCBDataFetcher() {
 
   const fetchAllMutation = useMutation({
     mutationFn: async () => {
-      const promises = AVAILABLE_TABLES.map(table =>
-        supabase.functions.invoke('scb-fetch', {
-          body: { table_key: table.key },
-        }).then(response => ({
-          tableKey: table.key,
-          result: response.data as SCBFetchResult,
-        }))
-      );
-      return Promise.all(promises);
+      // Use the batch API with kpi_codes for efficiency
+      const kpiCodes = AVAILABLE_TABLES.map(t => t.code);
+      const response = await supabase.functions.invoke('scb-fetch', {
+        body: { kpi_codes: kpiCodes },
+      });
+      
+      if (response.error) throw response.error;
+      
+      // Transform the response to match expected format
+      const results = response.data.results || {};
+      return AVAILABLE_TABLES.map(table => ({
+        tableKey: table.key,
+        result: results[table.key] ? {
+          success: results[table.key].success as boolean,
+          value: results[table.key].value as number | undefined,
+          period: results[table.key].period as string | undefined,
+          error: results[table.key].error as string | undefined,
+          trend: 'stable' as const,
+          trend_percent: 0,
+        } : { success: false, error: 'No data' } as SCBFetchResult
+      }));
     },
     onSuccess: (allResults) => {
       const newResults: Record<string, SCBFetchResult> = {};
@@ -148,24 +160,26 @@ export function SCBDataFetcher() {
                   </div>
                   <p className="text-xs text-muted-foreground">{table.description}</p>
                   
-                  {result?.success && (
+                  {result?.success && result.value !== undefined && (
                     <div className="flex items-center gap-3 mt-2">
                       <span className="text-lg font-bold">
-                        {result.value.toFixed(2)} {result.unit}
+                        {result.value.toFixed(2)} {result.unit || ''}
                       </span>
                       <div className="flex items-center gap-1">
-                        <TrendIcon trend={result.trend} />
+                        <TrendIcon trend={result.trend || 'stable'} />
                         <span className={`text-xs ${
                           result.trend === 'up' ? 'text-green-600' : 
                           result.trend === 'down' ? 'text-red-600' : 
                           'text-muted-foreground'
                         }`}>
-                          {result.trend_percent > 0 ? '+' : ''}{result.trend_percent.toFixed(2)}%
+                          {(result.trend_percent || 0) > 0 ? '+' : ''}{(result.trend_percent || 0).toFixed(2)}%
                         </span>
                       </div>
-                      <Badge variant="secondary" className="text-[10px]">
-                        {result.period}
-                      </Badge>
+                      {result.period && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          {result.period}
+                        </Badge>
+                      )}
                     </div>
                   )}
                 </div>
@@ -195,8 +209,9 @@ export function SCBDataFetcher() {
           })}
         </div>
 
-        <div className="text-xs text-muted-foreground pt-2 border-t">
-          <span className="font-medium">Källa:</span> api.scb.se • PxWebApi v1 • Öppen data
+        <div className="text-xs text-muted-foreground pt-2 border-t space-y-1">
+          <div><span className="font-medium">Källa:</span> api.scb.se • PxWebApi 2.0 • Öppen data</div>
+          <div><span className="font-medium">Rate limit:</span> 30 req/min • 10 000 req/dag</div>
         </div>
       </CardContent>
     </Card>
