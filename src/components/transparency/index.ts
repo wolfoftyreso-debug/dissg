@@ -36,3 +36,31 @@ export { ConstitutionArticleCard, ViolationAlert, ConstitutionRef } from './Cons
 
 // Public transparency
 export { HowWeKnowSection, HowWeKnowLink, generateHowWeKnowData } from './HowWeKnowSection';
+
+// WAVE 7: Data Positioning (BC)
+export { DataPositionBadge, getDataPositionMeta } from './DataPositionBadge';
+
+// WAVE 7: Raw Data Guarantee (BD)
+export { RawDataViewer, RawDataLink, RawDataIcon } from './RawDataViewer';
+
+// WAVE 7: Zero-Interpretation Mode (BF) & Comparison Guards (BG, BK)
+export {
+  ZeroInterpretTrend,
+  ZeroInterpretComparison,
+  ValueWordGuard,
+  DefinitionDiffDisplay,
+  MisinterpretationWarning,
+  ComparisonStrengthBadge,
+  ComparisonGuard,
+} from './ZeroInterpretationMode';
+
+// WAVE 7: Method Visibility Engine (BH)
+export {
+  MethodVisibilityDisplay,
+  FormulaTooltip,
+  validateMethodVisibility,
+  type MethodDetails,
+} from './MethodVisibilityEngine';
+
+// WAVE 7: System Footer (BC/BI)
+export { SystemFooter } from './SystemFooter';

@@ -3,7 +3,7 @@ import { useKPIOverview } from '@/hooks/useKPIData';
 import { mockKPIs } from '@/data/mockKPIs';
 import { cn } from '@/lib/utils';
 import { 
-  TrendingUp, TrendingDown, Minus, ChevronRight, Info, Shield, 
+  TrendingUp, TrendingDown, Minus, ChevronRight, Shield, 
   ChevronDown, ExternalLink, ArrowLeft, BarChart3, Eye, Database,
   HelpCircle, Calendar
 } from 'lucide-react';
@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom';
 import { PublicOnboarding } from '@/components/onboarding';
 import { calculateKPIStatus } from '@/config/kpiThresholds';
 import { HowWeKnowSection, generateHowWeKnowData } from '@/components/transparency/HowWeKnowSection';
+import { SystemFooter } from '@/components/transparency/SystemFooter';
 
 
 // Category groupings with human-readable names and descriptions
@@ -686,33 +687,8 @@ export default function PublicDashboard() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t bg-card mt-8">
-        <div className="max-w-2xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
-            <div>
-              <h4 className="font-medium mb-1">Om detta system</h4>
-              <p className="text-muted-foreground text-xs">
-                Samma data som används för beslutsfattande på nationell nivå.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-medium mb-1">Spårbarhet</h4>
-              <p className="text-muted-foreground text-xs">
-                Varje siffra kan spåras till källan.
-              </p>
-            </div>
-          </div>
-          
-          <div className="mt-6 pt-4 border-t flex items-center justify-between text-xs text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Info className="h-3 w-3" />
-              <span>Demo med simulerad data</span>
-            </div>
-            <span>NOGF v1.0</span>
-          </div>
-        </div>
-      </footer>
+      {/* Footer with official data positioning */}
+      <SystemFooter variant="full" lang="sv" className="bg-card" />
     </div>
   );
 }
