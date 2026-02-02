@@ -34,6 +34,7 @@ import CollectiveLearningDemo from "./pages/CollectiveLearningDemo";
 import MisuseDetectionDemo from "./pages/MisuseDetectionDemo";
 import SystemMemoryDemo from "./pages/SystemMemoryDemo";
 import CognitiveBiasDemo from "./pages/CognitiveBiasDemo";
+import HumanViabilityDemo from "./pages/HumanViabilityDemo";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,7 @@ const App = () => (
               <Route path="/misuse-detection" element={<MisuseDetectionDemo />} />
               <Route path="/system-memory" element={<SystemMemoryDemo />} />
               <Route path="/cognitive-bias" element={<CognitiveBiasDemo />} />
+              <Route path="/viability" element={<HumanViabilityDemo />} />
               
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={
