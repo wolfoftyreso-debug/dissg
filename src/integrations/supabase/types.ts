@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_tiers: {
+        Row: {
+          code: string
+          created_at: string | null
+          features: Json
+          id: string
+          is_active: boolean | null
+          limits: Json | null
+          name: string
+          price_monthly: number | null
+          tier_type: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          features: Json
+          id?: string
+          is_active?: boolean | null
+          limits?: Json | null
+          name: string
+          price_monthly?: number | null
+          tier_type: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean | null
+          limits?: Json | null
+          name?: string
+          price_monthly?: number | null
+          tier_type?: string
+        }
+        Relationships: []
+      }
       action_evaluations: {
         Row: {
           action_id: string
@@ -1701,6 +1737,71 @@ export type Database = {
           },
         ]
       }
+      event_taxonomy: {
+        Row: {
+          category: string
+          code: string
+          created_at: string | null
+          definition: string
+          detection_keywords: Json | null
+          expected_data_links: Json | null
+          expected_kpi_impacts: Json | null
+          geographic_scope: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_local: Json | null
+          parent_event_id: string | null
+          severity_scale: Json | null
+          typical_duration: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string | null
+          definition: string
+          detection_keywords?: Json | null
+          expected_data_links?: Json | null
+          expected_kpi_impacts?: Json | null
+          geographic_scope?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_local?: Json | null
+          parent_event_id?: string | null
+          severity_scale?: Json | null
+          typical_duration?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string | null
+          definition?: string
+          detection_keywords?: Json | null
+          expected_data_links?: Json | null
+          expected_kpi_impacts?: Json | null
+          geographic_scope?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_local?: Json | null
+          parent_event_id?: string | null
+          severity_scale?: Json | null
+          typical_duration?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_taxonomy_parent_event_id_fkey"
+            columns: ["parent_event_id"]
+            isOneToOne: false
+            referencedRelation: "event_taxonomy"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       factor_contributions: {
         Row: {
           analysis_chain_id: string
@@ -1760,6 +1861,95 @@ export type Database = {
             columns: ["factor_kpi_id"]
             isOneToOne: false
             referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fast_data_sources: {
+        Row: {
+          api_endpoint: string | null
+          code: string
+          created_at: string | null
+          data_type: string
+          fallback_value: Json | null
+          id: string
+          is_active: boolean | null
+          is_realtime: boolean | null
+          last_updated_at: string | null
+          last_value: Json | null
+          latency_ms: number | null
+          name: string
+          update_frequency_seconds: number | null
+        }
+        Insert: {
+          api_endpoint?: string | null
+          code: string
+          created_at?: string | null
+          data_type: string
+          fallback_value?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_realtime?: boolean | null
+          last_updated_at?: string | null
+          last_value?: Json | null
+          latency_ms?: number | null
+          name: string
+          update_frequency_seconds?: number | null
+        }
+        Update: {
+          api_endpoint?: string | null
+          code?: string
+          created_at?: string | null
+          data_type?: string
+          fallback_value?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_realtime?: boolean | null
+          last_updated_at?: string | null
+          last_value?: Json | null
+          latency_ms?: number | null
+          name?: string
+          update_frequency_seconds?: number | null
+        }
+        Relationships: []
+      }
+      fast_data_values: {
+        Row: {
+          id: string
+          is_live: boolean | null
+          latency_ms: number | null
+          metadata: Json | null
+          recorded_at: string | null
+          source_id: string | null
+          unit: string | null
+          value: number
+        }
+        Insert: {
+          id?: string
+          is_live?: boolean | null
+          latency_ms?: number | null
+          metadata?: Json | null
+          recorded_at?: string | null
+          source_id?: string | null
+          unit?: string | null
+          value: number
+        }
+        Update: {
+          id?: string
+          is_live?: boolean | null
+          latency_ms?: number | null
+          metadata?: Json | null
+          recorded_at?: string | null
+          source_id?: string | null
+          unit?: string | null
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fast_data_values_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "fast_data_sources"
             referencedColumns: ["id"]
           },
         ]
@@ -2186,6 +2376,89 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      global_events: {
+        Row: {
+          affected_population: number | null
+          confidence_score: number | null
+          created_at: string | null
+          description: string | null
+          event_time: string
+          event_type_id: string | null
+          geo_city: string | null
+          geo_coordinates: Json | null
+          geo_country: string | null
+          geo_precision: string | null
+          geo_region: string | null
+          id: string
+          impact_radius_km: number | null
+          intensity: number | null
+          is_verified: boolean | null
+          related_countries: string[] | null
+          related_kpis: string[] | null
+          source_events: Json | null
+          time_precision: string | null
+          title: string
+          updated_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          affected_population?: number | null
+          confidence_score?: number | null
+          created_at?: string | null
+          description?: string | null
+          event_time: string
+          event_type_id?: string | null
+          geo_city?: string | null
+          geo_coordinates?: Json | null
+          geo_country?: string | null
+          geo_precision?: string | null
+          geo_region?: string | null
+          id?: string
+          impact_radius_km?: number | null
+          intensity?: number | null
+          is_verified?: boolean | null
+          related_countries?: string[] | null
+          related_kpis?: string[] | null
+          source_events?: Json | null
+          time_precision?: string | null
+          title: string
+          updated_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          affected_population?: number | null
+          confidence_score?: number | null
+          created_at?: string | null
+          description?: string | null
+          event_time?: string
+          event_type_id?: string | null
+          geo_city?: string | null
+          geo_coordinates?: Json | null
+          geo_country?: string | null
+          geo_precision?: string | null
+          geo_region?: string | null
+          id?: string
+          impact_radius_km?: number | null
+          intensity?: number | null
+          is_verified?: boolean | null
+          related_countries?: string[] | null
+          related_kpis?: string[] | null
+          source_events?: Json | null
+          time_precision?: string | null
+          title?: string
+          updated_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "global_events_event_type_id_fkey"
+            columns: ["event_type_id"]
+            isOneToOne: false
+            referencedRelation: "event_taxonomy"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       global_feed_definitions: {
         Row: {
@@ -3168,6 +3441,96 @@ export type Database = {
           },
         ]
       }
+      knowledge_graph_edges: {
+        Row: {
+          confidence: number | null
+          created_at: string | null
+          edge_type: string
+          id: string
+          properties: Json | null
+          source_node_id: string | null
+          target_node_id: string | null
+          valid_from: string | null
+          valid_until: string | null
+          weight: number | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string | null
+          edge_type: string
+          id?: string
+          properties?: Json | null
+          source_node_id?: string | null
+          target_node_id?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+          weight?: number | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string | null
+          edge_type?: string
+          id?: string
+          properties?: Json | null
+          source_node_id?: string | null
+          target_node_id?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_graph_edges_source_node_id_fkey"
+            columns: ["source_node_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_graph_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_graph_edges_target_node_id_fkey"
+            columns: ["target_node_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_graph_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_graph_nodes: {
+        Row: {
+          created_at: string | null
+          embedding_text: string | null
+          entity_id: string | null
+          entity_table: string | null
+          id: string
+          label: string
+          node_type: string
+          properties: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          embedding_text?: string | null
+          entity_id?: string | null
+          entity_table?: string | null
+          id?: string
+          label: string
+          node_type: string
+          properties?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          embedding_text?: string | null
+          entity_id?: string | null
+          entity_table?: string | null
+          id?: string
+          label?: string
+          node_type?: string
+          properties?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       kpi_alerts: {
         Row: {
           acknowledged_at: string | null
@@ -3824,6 +4187,254 @@ export type Database = {
           },
         ]
       }
+      media_events: {
+        Row: {
+          clean_text: string | null
+          confidence_score: number | null
+          created_at: string | null
+          deduplication_hash: string | null
+          detected_language: string | null
+          duplicate_of: string | null
+          entities_extracted: Json | null
+          event_types_detected: Json | null
+          external_id: string | null
+          fetched_at: string | null
+          geo_resolution: Json | null
+          id: string
+          is_duplicate: boolean | null
+          original_language: string | null
+          processed_at: string | null
+          published_at: string | null
+          sentiment_intensity: number | null
+          source_id: string | null
+          source_url: string | null
+          summary: string | null
+          time_resolution: Json | null
+          title: string
+          topic_classification: Json | null
+          volume_indicator: number | null
+        }
+        Insert: {
+          clean_text?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          deduplication_hash?: string | null
+          detected_language?: string | null
+          duplicate_of?: string | null
+          entities_extracted?: Json | null
+          event_types_detected?: Json | null
+          external_id?: string | null
+          fetched_at?: string | null
+          geo_resolution?: Json | null
+          id?: string
+          is_duplicate?: boolean | null
+          original_language?: string | null
+          processed_at?: string | null
+          published_at?: string | null
+          sentiment_intensity?: number | null
+          source_id?: string | null
+          source_url?: string | null
+          summary?: string | null
+          time_resolution?: Json | null
+          title: string
+          topic_classification?: Json | null
+          volume_indicator?: number | null
+        }
+        Update: {
+          clean_text?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          deduplication_hash?: string | null
+          detected_language?: string | null
+          duplicate_of?: string | null
+          entities_extracted?: Json | null
+          event_types_detected?: Json | null
+          external_id?: string | null
+          fetched_at?: string | null
+          geo_resolution?: Json | null
+          id?: string
+          is_duplicate?: boolean | null
+          original_language?: string | null
+          processed_at?: string | null
+          published_at?: string | null
+          sentiment_intensity?: number | null
+          source_id?: string | null
+          source_url?: string | null
+          summary?: string | null
+          time_resolution?: Json | null
+          title?: string
+          topic_classification?: Json | null
+          volume_indicator?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_events_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "media_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_events_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "media_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_kpi_correlations: {
+        Row: {
+          calculated_at: string | null
+          correlation_coefficient: number | null
+          id: string
+          is_significant: boolean | null
+          kpi_id: string | null
+          lag_days: number | null
+          period_end: string | null
+          period_start: string | null
+          sample_size: number | null
+          topic: string
+        }
+        Insert: {
+          calculated_at?: string | null
+          correlation_coefficient?: number | null
+          id?: string
+          is_significant?: boolean | null
+          kpi_id?: string | null
+          lag_days?: number | null
+          period_end?: string | null
+          period_start?: string | null
+          sample_size?: number | null
+          topic: string
+        }
+        Update: {
+          calculated_at?: string | null
+          correlation_coefficient?: number | null
+          id?: string
+          is_significant?: boolean | null
+          kpi_id?: string | null
+          lag_days?: number | null
+          period_end?: string | null
+          period_start?: string | null
+          sample_size?: number | null
+          topic?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_kpi_correlations_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_sources: {
+        Row: {
+          api_endpoint: string | null
+          base_url: string | null
+          bias_assessment: string | null
+          code: string
+          country_code: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          language: string | null
+          last_fetch_at: string | null
+          last_fetch_error: string | null
+          metadata: Json | null
+          name: string
+          reliability_score: number | null
+          rss_feed_url: string | null
+          source_type: string
+          update_frequency: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          api_endpoint?: string | null
+          base_url?: string | null
+          bias_assessment?: string | null
+          code: string
+          country_code?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          language?: string | null
+          last_fetch_at?: string | null
+          last_fetch_error?: string | null
+          metadata?: Json | null
+          name: string
+          reliability_score?: number | null
+          rss_feed_url?: string | null
+          source_type: string
+          update_frequency?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          api_endpoint?: string | null
+          base_url?: string | null
+          bias_assessment?: string | null
+          code?: string
+          country_code?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          language?: string | null
+          last_fetch_at?: string | null
+          last_fetch_error?: string | null
+          metadata?: Json | null
+          name?: string
+          reliability_score?: number | null
+          rss_feed_url?: string | null
+          source_type?: string
+          update_frequency?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      media_volume_aggregates: {
+        Row: {
+          article_count: number | null
+          avg_sentiment: number | null
+          country_code: string | null
+          created_at: string | null
+          date: string
+          event_type: string | null
+          id: string
+          intensity_score: number | null
+          region_code: string | null
+          topic: string | null
+          unique_sources: number | null
+        }
+        Insert: {
+          article_count?: number | null
+          avg_sentiment?: number | null
+          country_code?: string | null
+          created_at?: string | null
+          date: string
+          event_type?: string | null
+          id?: string
+          intensity_score?: number | null
+          region_code?: string | null
+          topic?: string | null
+          unique_sources?: number | null
+        }
+        Update: {
+          article_count?: number | null
+          avg_sentiment?: number | null
+          country_code?: string | null
+          created_at?: string | null
+          date?: string
+          event_type?: string | null
+          id?: string
+          intensity_score?: number | null
+          region_code?: string | null
+          topic?: string | null
+          unique_sources?: number | null
+        }
+        Relationships: []
+      }
       nuts_regions: {
         Row: {
           area_km2: number | null
@@ -4286,6 +4897,110 @@ export type Database = {
         }
         Relationships: []
       }
+      quality_flags: {
+        Row: {
+          action_taken: string | null
+          adjusted_confidence: number | null
+          created_at: string | null
+          details: Json | null
+          entity_id: string
+          entity_type: string
+          flag_type: string
+          id: string
+          is_resolved: boolean | null
+          message: string | null
+          original_confidence: number | null
+          resolved_at: string | null
+          resolved_by: string | null
+          rule_id: string | null
+          severity: string
+        }
+        Insert: {
+          action_taken?: string | null
+          adjusted_confidence?: number | null
+          created_at?: string | null
+          details?: Json | null
+          entity_id: string
+          entity_type: string
+          flag_type: string
+          id?: string
+          is_resolved?: boolean | null
+          message?: string | null
+          original_confidence?: number | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          rule_id?: string | null
+          severity: string
+        }
+        Update: {
+          action_taken?: string | null
+          adjusted_confidence?: number | null
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string
+          entity_type?: string
+          flag_type?: string
+          id?: string
+          is_resolved?: boolean | null
+          message?: string | null
+          original_confidence?: number | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          rule_id?: string | null
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quality_flags_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "quality_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quality_rules: {
+        Row: {
+          applies_to: string
+          auto_action: string | null
+          code: string
+          condition_config: Json | null
+          condition_sql: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          rule_type: string
+          severity: string | null
+        }
+        Insert: {
+          applies_to: string
+          auto_action?: string | null
+          code: string
+          condition_config?: Json | null
+          condition_sql?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          rule_type: string
+          severity?: string | null
+        }
+        Update: {
+          applies_to?: string
+          auto_action?: string | null
+          code?: string
+          condition_config?: Json | null
+          condition_sql?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          rule_type?: string
+          severity?: string | null
+        }
+        Relationships: []
+      }
       regional_subdivisions: {
         Row: {
           area_km2: number | null
@@ -4596,6 +5311,154 @@ export type Database = {
         }
         Relationships: []
       }
+      simulation_definitions: {
+        Row: {
+          code: string
+          created_at: string | null
+          default_assumptions: Json | null
+          description: string | null
+          id: string
+          input_schema: Json
+          is_active: boolean | null
+          model_version: string | null
+          name: string
+          output_schema: Json
+          simulation_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          default_assumptions?: Json | null
+          description?: string | null
+          id?: string
+          input_schema: Json
+          is_active?: boolean | null
+          model_version?: string | null
+          name: string
+          output_schema: Json
+          simulation_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          default_assumptions?: Json | null
+          description?: string | null
+          id?: string
+          input_schema?: Json
+          is_active?: boolean | null
+          model_version?: string | null
+          name?: string
+          output_schema?: Json
+          simulation_type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      simulation_runs: {
+        Row: {
+          affected_kpis: Json | null
+          assumptions: Json | null
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          execution_time_ms: number | null
+          historical_sensitivity: Json | null
+          id: string
+          input_parameters: Json
+          name: string | null
+          results: Json | null
+          simulation_id: string | null
+          status: string | null
+          uncertainty_bounds: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          affected_kpis?: Json | null
+          assumptions?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          historical_sensitivity?: Json | null
+          id?: string
+          input_parameters: Json
+          name?: string | null
+          results?: Json | null
+          simulation_id?: string | null
+          status?: string | null
+          uncertainty_bounds?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          affected_kpis?: Json | null
+          assumptions?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          historical_sensitivity?: Json | null
+          id?: string
+          input_parameters?: Json
+          name?: string | null
+          results?: Json | null
+          simulation_id?: string | null
+          status?: string | null
+          uncertainty_bounds?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "simulation_runs_simulation_id_fkey"
+            columns: ["simulation_id"]
+            isOneToOne: false
+            referencedRelation: "simulation_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_access: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          organization_id: string | null
+          tier_id: string | null
+          user_id: string | null
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          organization_id?: string | null
+          tier_id?: string | null
+          user_id?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          organization_id?: string | null
+          tier_id?: string | null
+          user_id?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_access_tier_id_fkey"
+            columns: ["tier_id"]
+            isOneToOne: false
+            referencedRelation: "access_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_relevance_preferences: {
         Row: {
           boost_factor: number
@@ -4687,6 +5550,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_ui_preferences: {
+        Row: {
+          created_at: string | null
+          current_layer: string | null
+          custom_dashboards: Json | null
+          default_country: string | null
+          default_region: string | null
+          id: string
+          notification_settings: Json | null
+          pinned_countries: string[] | null
+          pinned_kpis: string[] | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_layer?: string | null
+          custom_dashboards?: Json | null
+          default_country?: string | null
+          default_region?: string | null
+          id?: string
+          notification_settings?: Json | null
+          pinned_countries?: string[] | null
+          pinned_kpis?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_layer?: string | null
+          custom_dashboards?: Json | null
+          default_country?: string | null
+          default_region?: string | null
+          id?: string
+          notification_settings?: Json | null
+          pinned_countries?: string[] | null
+          pinned_kpis?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
