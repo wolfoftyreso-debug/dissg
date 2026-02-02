@@ -23,3 +23,6 @@ export { MisinterpretationGuard, MisinterpretationBadge } from './Misinterpretat
 export { QualityScore } from './QualityScore';
 export { UserNotes } from './UserNotes';
 export { InsightLibraryView } from './InsightLibrary';
+
+// COGNITIVE BIAS EXPOSURE LAYER (CBEL)
+export { CognitiveBiasPanel } from './CognitiveBiasPanel';
