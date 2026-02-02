@@ -26,3 +26,7 @@ export { InsightLibraryView } from './InsightLibrary';
 
 // COGNITIVE BIAS EXPOSURE LAYER (CBEL)
 export { CognitiveBiasPanel } from './CognitiveBiasPanel';
+
+// BLOCK D: INSIGHT FLAGS (Mobile-First Global Depth Plan)
+export { InsightFlagCard, InsightFlagList, PeerGroupDisplay } from './InsightFlags';
+export * from '@/lib/insights/insightFlags';
