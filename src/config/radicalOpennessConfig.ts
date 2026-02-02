@@ -193,3 +193,95 @@ export function validateDisclosures(
   const missing = REQUIRED_DISCLOSURES.filter(key => !disclosures[key]);
   return { valid: missing.length === 0, missing };
 }
+
+// ============================================================
+// WAVE 11: BLOCK CJ — PLANETARY LAUNCH MODE
+// BLOCK CO — GLOBAL COMMUNICATION (ANTI-HYPE)
+// BLOCK CP — LONG-TERM IMMUNITY MODE
+// ============================================================
+
+export interface LaunchPolicy {
+  rule: string;
+  enforcement: 'mandatory' | 'default' | 'recommended';
+  rationale: string;
+  violation_response: string;
+}
+
+export const LAUNCH_POLICIES: LaunchPolicy[] = [
+  {
+    rule: 'Ingen gated beta',
+    enforcement: 'mandatory',
+    rationale: 'Öppenhet från start bygger förtroende och tillåter granskning',
+    violation_response: 'Alla stängda betaprogram avslutas vid lansering'
+  },
+  {
+    rule: 'Ingen inbjudningslista',
+    enforcement: 'mandatory',
+    rationale: 'Exklusivitet undergräver demokratisk tillgång',
+    violation_response: 'Alla användare får tillgång samtidigt'
+  },
+  {
+    rule: 'Offentlig URL utan registrering för läsning',
+    enforcement: 'mandatory',
+    rationale: 'Data är offentlig — läsning kräver aldrig konto',
+    violation_response: 'Alla läs-endpoints öppna'
+  }
+];
+
+export interface LandingSection {
+  order: number;
+  id: string;
+  title: string;
+  component: string;
+  priority: 'critical' | 'high' | 'standard';
+  load_strategy: 'immediate' | 'lazy';
+  max_load_time_ms: number;
+}
+
+export const LANDING_SECTIONS: LandingSection[] = [
+  { order: 1, id: 'planetary_dashboard', title: 'Global status just nu', component: 'PlanetaryDashboard', priority: 'critical', load_strategy: 'immediate', max_load_time_ms: 500 },
+  { order: 2, id: 'changes_24h', title: 'Vad ändrades senaste 24h', component: 'DailyChangeFeed', priority: 'critical', load_strategy: 'immediate', max_load_time_ms: 800 },
+  { order: 3, id: 'stress_points', title: 'Pågående stresspunkter', component: 'GlobalStressPoints', priority: 'high', load_strategy: 'immediate', max_load_time_ms: 1000 },
+  { order: 4, id: 'verify_yourself', title: 'Så verifierar du datan själv', component: 'ReproducibilityGuide', priority: 'high', load_strategy: 'lazy', max_load_time_ms: 1500 }
+];
+
+export interface ReleaseCheckItem {
+  id: string;
+  category: 'data' | 'api' | 'ui' | 'security';
+  requirement: string;
+  blocking: boolean;
+}
+
+export const RELEASE_CHECKLIST: ReleaseCheckItem[] = [
+  { id: 'rc_01', category: 'data', requirement: 'Alla grafer visar källa + metod', blocking: true },
+  { id: 'rc_02', category: 'api', requirement: 'Alla endpoints har explain=true support', blocking: true },
+  { id: 'rc_03', category: 'ui', requirement: 'Reproduce-knapp på alla insikter', blocking: true },
+  { id: 'rc_04', category: 'security', requirement: 'Kill-switches testade', blocking: true }
+];
+
+// CO1: Language rules — anti-hype
+export const FORBIDDEN_MARKETING_WORDS = [
+  'revolutionerande', 'banbrytande', 'unik', 'bäst', 'världsledande',
+  'game-changer', 'disruptiv', 'fantastisk', 'otrolig', 'perfekt'
+] as const;
+
+export const ALLOWED_MESSAGING_CATEGORIES = {
+  how_it_works: ['Så samlar systemet data', 'Så beräknas index'],
+  how_to_verify: ['Så återställer du en beräkning', 'Så granskar du en källa'],
+  how_to_challenge: ['Så rapporterar du fel', 'Så föreslår du alternativ metod']
+} as const;
+
+// CP1: Immunity rules — systemet överlever er
+export interface ImmunityRule {
+  id: string;
+  principle: string;
+  mechanism: string;
+  failure_mode: string;
+}
+
+export const IMMUNITY_RULES: ImmunityRule[] = [
+  { id: 'im_01', principle: 'Öppna standarder', mechanism: 'G-DSP protocol fritt licensierat', failure_mode: 'Protokollet kan inte ägas exklusivt' },
+  { id: 'im_02', principle: 'Öppen metod', mechanism: 'Alla beräkningsmetoder i Method Registry', failure_mode: 'Vem som helst kan implementera' },
+  { id: 'im_03', principle: 'Federerad drift', mechanism: 'Multipla noder kör samma protokoll', failure_mode: 'Ingen enskild nod kan stänga systemet' },
+  { id: 'im_04', principle: 'Ingen central ägare av sanning', mechanism: 'Data aggregeras, inte auktoriseras', failure_mode: 'Ingen kan deklarera officiell tolkning' }
+];
