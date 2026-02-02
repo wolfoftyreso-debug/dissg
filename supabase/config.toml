@@ -59,3 +59,9 @@ verify_jwt = false
 
 [functions.wrapped-api]
 verify_jwt = false
+
+[functions.observation-summary]
+verify_jwt = false
+
+[functions.ai-observation]
+verify_jwt = false
