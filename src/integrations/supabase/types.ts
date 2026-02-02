@@ -593,6 +593,99 @@ export type Database = {
           },
         ]
       }
+      governance_outcomes: {
+        Row: {
+          actions_with_effect: number | null
+          actions_without_effect: number | null
+          calculated_at: string | null
+          governance_period_id: string
+          id: string
+          kpi_id: string
+          months_declined: number | null
+          months_improved: number | null
+          months_stagnant: number | null
+          snapshot_date: string
+        }
+        Insert: {
+          actions_with_effect?: number | null
+          actions_without_effect?: number | null
+          calculated_at?: string | null
+          governance_period_id: string
+          id?: string
+          kpi_id: string
+          months_declined?: number | null
+          months_improved?: number | null
+          months_stagnant?: number | null
+          snapshot_date: string
+        }
+        Update: {
+          actions_with_effect?: number | null
+          actions_without_effect?: number | null
+          calculated_at?: string | null
+          governance_period_id?: string
+          id?: string
+          kpi_id?: string
+          months_declined?: number | null
+          months_improved?: number | null
+          months_stagnant?: number | null
+          snapshot_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_outcomes_governance_period_id_fkey"
+            columns: ["governance_period_id"]
+            isOneToOne: false
+            referencedRelation: "governance_periods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "governance_outcomes_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      governance_periods: {
+        Row: {
+          areas: Database["public"]["Enums"]["responsibility_area"][]
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          level: Database["public"]["Enums"]["responsibility_level"]
+          party_constellation: string[] | null
+          period_name: string
+          region_code: string | null
+          start_date: string
+        }
+        Insert: {
+          areas: Database["public"]["Enums"]["responsibility_area"][]
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          level: Database["public"]["Enums"]["responsibility_level"]
+          party_constellation?: string[] | null
+          period_name: string
+          region_code?: string | null
+          start_date: string
+        }
+        Update: {
+          areas?: Database["public"]["Enums"]["responsibility_area"][]
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          level?: Database["public"]["Enums"]["responsibility_level"]
+          party_constellation?: string[] | null
+          period_name?: string
+          region_code?: string | null
+          start_date?: string
+        }
+        Relationships: []
+      }
       ingest_log: {
         Row: {
           completed_at: string | null
@@ -860,6 +953,59 @@ export type Database = {
         }
         Relationships: []
       }
+      kpi_responsibility_matrix: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          kpi_id: string
+          primary_area: Database["public"]["Enums"]["responsibility_area"]
+          primary_level: Database["public"]["Enums"]["responsibility_level"]
+          secondary_areas:
+            | Database["public"]["Enums"]["responsibility_area"][]
+            | null
+          secondary_levels:
+            | Database["public"]["Enums"]["responsibility_level"][]
+            | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          kpi_id: string
+          primary_area: Database["public"]["Enums"]["responsibility_area"]
+          primary_level?: Database["public"]["Enums"]["responsibility_level"]
+          secondary_areas?:
+            | Database["public"]["Enums"]["responsibility_area"][]
+            | null
+          secondary_levels?:
+            | Database["public"]["Enums"]["responsibility_level"][]
+            | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          kpi_id?: string
+          primary_area?: Database["public"]["Enums"]["responsibility_area"]
+          primary_level?: Database["public"]["Enums"]["responsibility_level"]
+          secondary_areas?:
+            | Database["public"]["Enums"]["responsibility_area"][]
+            | null
+          secondary_levels?:
+            | Database["public"]["Enums"]["responsibility_level"][]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kpi_responsibility_matrix_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: true
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kpi_values: {
         Row: {
           confidence: number
@@ -931,6 +1077,128 @@ export type Database = {
             columns: ["kpi_id"]
             isOneToOne: false
             referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_index_components: {
+        Row: {
+          created_at: string | null
+          id: string
+          kpi_id: string
+          master_index_id: string
+          normalization_method: string | null
+          weight: number
+          weight_rationale: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          kpi_id: string
+          master_index_id: string
+          normalization_method?: string | null
+          weight: number
+          weight_rationale?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          kpi_id?: string
+          master_index_id?: string
+          normalization_method?: string | null
+          weight?: number
+          weight_rationale?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_index_components_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "master_index_components_master_index_id_fkey"
+            columns: ["master_index_id"]
+            isOneToOne: false
+            referencedRelation: "master_index_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      master_index_config: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      master_index_values: {
+        Row: {
+          calculated_at: string | null
+          component_values: Json
+          confidence: number | null
+          id: string
+          master_index_id: string
+          period_end: string
+          period_start: string
+          previous_value: number | null
+          trend: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent: number | null
+          value: number
+        }
+        Insert: {
+          calculated_at?: string | null
+          component_values?: Json
+          confidence?: number | null
+          id?: string
+          master_index_id: string
+          period_end: string
+          period_start: string
+          previous_value?: number | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent?: number | null
+          value: number
+        }
+        Update: {
+          calculated_at?: string | null
+          component_values?: Json
+          confidence?: number | null
+          id?: string
+          master_index_id?: string
+          period_end?: string
+          period_start?: string
+          previous_value?: number | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent?: number | null
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_index_values_master_index_id_fkey"
+            columns: ["master_index_id"]
+            isOneToOne: false
+            referencedRelation: "master_index_config"
             referencedColumns: ["id"]
           },
         ]
@@ -1049,6 +1317,60 @@ export type Database = {
           target_kpis?: string[]
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          display_name: string | null
+          id: string
+          is_public_profile: boolean | null
+          organization: string | null
+          party_affiliation: string | null
+          position_title: string | null
+          region_code: string | null
+          responsibility_areas:
+            | Database["public"]["Enums"]["responsibility_area"][]
+            | null
+          responsibility_level:
+            | Database["public"]["Enums"]["responsibility_level"]
+            | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_name?: string | null
+          id: string
+          is_public_profile?: boolean | null
+          organization?: string | null
+          party_affiliation?: string | null
+          position_title?: string | null
+          region_code?: string | null
+          responsibility_areas?:
+            | Database["public"]["Enums"]["responsibility_area"][]
+            | null
+          responsibility_level?:
+            | Database["public"]["Enums"]["responsibility_level"]
+            | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          is_public_profile?: boolean | null
+          organization?: string | null
+          party_affiliation?: string | null
+          position_title?: string | null
+          region_code?: string | null
+          responsibility_areas?:
+            | Database["public"]["Enums"]["responsibility_area"][]
+            | null
+          responsibility_level?:
+            | Database["public"]["Enums"]["responsibility_level"]
+            | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1208,6 +1530,16 @@ export type Database = {
         | "lag_signal"
         | "anomaly"
       priority_level: "critical" | "high" | "medium" | "low" | "monitor"
+      responsibility_area:
+        | "halsa"
+        | "arbete"
+        | "utbildning"
+        | "trygghet"
+        | "ekonomi"
+        | "infrastruktur"
+        | "integration"
+        | "miljo"
+      responsibility_level: "nationell" | "regional" | "kommunal"
       trend_direction: "up" | "down" | "stable"
       update_frequency:
         | "realtime"
@@ -1390,6 +1722,17 @@ export const Constants = {
         "anomaly",
       ],
       priority_level: ["critical", "high", "medium", "low", "monitor"],
+      responsibility_area: [
+        "halsa",
+        "arbete",
+        "utbildning",
+        "trygghet",
+        "ekonomi",
+        "infrastruktur",
+        "integration",
+        "miljo",
+      ],
+      responsibility_level: ["nationell", "regional", "kommunal"],
       trend_direction: ["up", "down", "stable"],
       update_frequency: [
         "realtime",
