@@ -4,6 +4,7 @@
  * Block 45: Canonical Fact Page — AI + Google Dominance
  * Block 48: Auto Internal Link Engine
  * Block 49: Indicator Page — Definition, method, usage
+ * Block 50: Debate Page — Neutral, data-first contested topics
  * 
  * Components optimized for search engines and AI agents.
  * 
@@ -14,6 +15,7 @@
 
 export { FactPageTemplate, type FactPageData } from './FactPageTemplate';
 export { IndicatorPageTemplate, type IndicatorPageData } from './IndicatorPageTemplate';
+export { DebatePageTemplate, type DebatePageData } from './DebatePageTemplate';
 export { SemanticLinkSection, InlineSemanticLinks } from './SemanticLinkSection';
 
 // Re-export config utilities
