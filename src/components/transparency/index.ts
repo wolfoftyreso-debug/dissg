@@ -22,3 +22,7 @@ export {
 
 // DEL XXIV: Sensitive View Components
 export { SensitiveViewDisclaimer, ShowHowWeKnow, MandatoryDisclaimers } from './SensitiveViewComponents';
+
+// DEL XXVIII: Version & Revision Model
+export { RevisionHistory } from './RevisionHistory';
+export { LineageViewer } from './LineageViewer';
