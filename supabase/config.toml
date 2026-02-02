@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.canonical-api]
 verify_jwt = false
+
+[functions.wrapped-api]
+verify_jwt = false
