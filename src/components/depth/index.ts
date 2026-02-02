@@ -37,3 +37,6 @@ export {
 
 // WAVE 9 - Global Reality Graph
 export { GlobalRealityGraph } from './GlobalRealityGraph';
+
+// System Memory Archive (SMA)
+export { SystemMemoryArchive } from './SystemMemoryArchive';
