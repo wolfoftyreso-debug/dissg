@@ -2311,6 +2311,66 @@ export type Database = {
           },
         ]
       }
+      global_changelog: {
+        Row: {
+          affected_downstream: string[] | null
+          change_magnitude: number | null
+          change_reason: string | null
+          change_type: string
+          changed_at: string
+          changed_by: string | null
+          entity_code: string | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+          is_breaking_change: boolean | null
+          metadata: Json | null
+          new_value: Json | null
+          old_value: Json | null
+          recalculation_completed: boolean | null
+          requires_recalculation: boolean | null
+          source_reference: string | null
+        }
+        Insert: {
+          affected_downstream?: string[] | null
+          change_magnitude?: number | null
+          change_reason?: string | null
+          change_type: string
+          changed_at?: string
+          changed_by?: string | null
+          entity_code?: string | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          is_breaking_change?: boolean | null
+          metadata?: Json | null
+          new_value?: Json | null
+          old_value?: Json | null
+          recalculation_completed?: boolean | null
+          requires_recalculation?: boolean | null
+          source_reference?: string | null
+        }
+        Update: {
+          affected_downstream?: string[] | null
+          change_magnitude?: number | null
+          change_reason?: string | null
+          change_type?: string
+          changed_at?: string
+          changed_by?: string | null
+          entity_code?: string | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          is_breaking_change?: boolean | null
+          metadata?: Json | null
+          new_value?: Json | null
+          old_value?: Json | null
+          recalculation_completed?: boolean | null
+          requires_recalculation?: boolean | null
+          source_reference?: string | null
+        }
+        Relationships: []
+      }
       global_data_sources: {
         Row: {
           api_base_url: string | null
@@ -4637,6 +4697,60 @@ export type Database = {
           },
         ]
       }
+      pipeline_status: {
+        Row: {
+          avg_duration_ms: number | null
+          config: Json | null
+          consecutive_failures: number | null
+          id: string
+          items_failed: number | null
+          items_processed: number | null
+          last_error: string | null
+          last_error_at: string | null
+          last_run_at: string | null
+          last_success_at: string | null
+          next_scheduled_at: string | null
+          pipeline_name: string
+          pipeline_type: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          avg_duration_ms?: number | null
+          config?: Json | null
+          consecutive_failures?: number | null
+          id?: string
+          items_failed?: number | null
+          items_processed?: number | null
+          last_error?: string | null
+          last_error_at?: string | null
+          last_run_at?: string | null
+          last_success_at?: string | null
+          next_scheduled_at?: string | null
+          pipeline_name: string
+          pipeline_type: string
+          status: string
+          updated_at?: string | null
+        }
+        Update: {
+          avg_duration_ms?: number | null
+          config?: Json | null
+          consecutive_failures?: number | null
+          id?: string
+          items_failed?: number | null
+          items_processed?: number | null
+          last_error?: string | null
+          last_error_at?: string | null
+          last_run_at?: string | null
+          last_success_at?: string | null
+          next_scheduled_at?: string | null
+          pipeline_name?: string
+          pipeline_type?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       policy_decisions: {
         Row: {
           budget_sek: number | null
@@ -4743,6 +4857,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      precomputed_aggregations: {
+        Row: {
+          aggregation_key: string
+          aggregation_type: string
+          computation_version: string | null
+          computed_at: string
+          confidence: number | null
+          coverage: number | null
+          granularity: string
+          id: string
+          period_end: string
+          period_start: string
+          result_data: Json
+          source_count: number | null
+          valid_until: string | null
+        }
+        Insert: {
+          aggregation_key: string
+          aggregation_type: string
+          computation_version?: string | null
+          computed_at?: string
+          confidence?: number | null
+          coverage?: number | null
+          granularity: string
+          id?: string
+          period_end: string
+          period_start: string
+          result_data: Json
+          source_count?: number | null
+          valid_until?: string | null
+        }
+        Update: {
+          aggregation_key?: string
+          aggregation_type?: string
+          computation_version?: string | null
+          computed_at?: string
+          confidence?: number | null
+          coverage?: number | null
+          granularity?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          result_data?: Json
+          source_count?: number | null
+          valid_until?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -4998,6 +5160,48 @@ export type Database = {
           name?: string
           rule_type?: string
           severity?: string | null
+        }
+        Relationships: []
+      }
+      query_cache: {
+        Row: {
+          cache_tier: string | null
+          computation_time_ms: number | null
+          created_at: string
+          expires_at: string
+          hit_count: number | null
+          id: string
+          last_accessed_at: string | null
+          query_fingerprint: string
+          query_params: Json
+          result_data: Json
+          result_size_bytes: number | null
+        }
+        Insert: {
+          cache_tier?: string | null
+          computation_time_ms?: number | null
+          created_at?: string
+          expires_at: string
+          hit_count?: number | null
+          id?: string
+          last_accessed_at?: string | null
+          query_fingerprint: string
+          query_params: Json
+          result_data: Json
+          result_size_bytes?: number | null
+        }
+        Update: {
+          cache_tier?: string | null
+          computation_time_ms?: number | null
+          created_at?: string
+          expires_at?: string
+          hit_count?: number | null
+          id?: string
+          last_accessed_at?: string | null
+          query_fingerprint?: string
+          query_params?: Json
+          result_data?: Json
+          result_size_bytes?: number | null
         }
         Relationships: []
       }
@@ -5417,6 +5621,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_metrics: {
+        Row: {
+          id: string
+          metric_name: string
+          metric_unit: string | null
+          metric_value: number
+          recorded_at: string
+          tags: Json | null
+        }
+        Insert: {
+          id?: string
+          metric_name: string
+          metric_unit?: string | null
+          metric_value: number
+          recorded_at?: string
+          tags?: Json | null
+        }
+        Update: {
+          id?: string
+          metric_name?: string
+          metric_unit?: string | null
+          metric_value?: number
+          recorded_at?: string
+          tags?: Json | null
+        }
+        Relationships: []
       }
       user_access: {
         Row: {
