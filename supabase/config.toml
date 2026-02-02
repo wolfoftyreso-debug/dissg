@@ -47,3 +47,12 @@ verify_jwt = false
 
 [functions.feed-api]
 verify_jwt = false
+
+[functions.auto-discovery]
+verify_jwt = false
+
+[functions.generate-facts]
+verify_jwt = false
+
+[functions.canonical-api]
+verify_jwt = false

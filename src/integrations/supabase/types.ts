@@ -955,6 +955,80 @@ export type Database = {
           },
         ]
       }
+      canonical_facts: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          fact_code: string
+          generated_at: string
+          geo_code: string
+          geo_level: string
+          id: string
+          indicator_id: string
+          is_active: boolean
+          method: string
+          statement: string
+          statement_template: string
+          time_range_end: string
+          time_range_start: string
+          trend_direction: string | null
+          trend_magnitude: number | null
+          uncertainty: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          fact_code: string
+          generated_at?: string
+          geo_code: string
+          geo_level: string
+          id?: string
+          indicator_id: string
+          is_active?: boolean
+          method: string
+          statement: string
+          statement_template: string
+          time_range_end: string
+          time_range_start: string
+          trend_direction?: string | null
+          trend_magnitude?: number | null
+          uncertainty: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          fact_code?: string
+          generated_at?: string
+          geo_code?: string
+          geo_level?: string
+          id?: string
+          indicator_id?: string
+          is_active?: boolean
+          method?: string
+          statement?: string
+          statement_template?: string
+          time_range_end?: string
+          time_range_start?: string
+          trend_direction?: string | null
+          trend_magnitude?: number | null
+          uncertainty?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "canonical_facts_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       causal_chains: {
         Row: {
           alternative_explanations: Json | null
@@ -2378,6 +2452,78 @@ export type Database = {
           },
         ]
       }
+      fact_sources: {
+        Row: {
+          contribution_weight: number | null
+          created_at: string
+          fact_id: string
+          id: string
+          source_id: string
+        }
+        Insert: {
+          contribution_weight?: number | null
+          created_at?: string
+          fact_id: string
+          id?: string
+          source_id: string
+        }
+        Update: {
+          contribution_weight?: number | null
+          created_at?: string
+          fact_id?: string
+          id?: string
+          source_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fact_sources_fact_id_fkey"
+            columns: ["fact_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_facts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fact_sources_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fact_templates: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          language_code: string
+          template_code: string
+          template_text: string
+          trend_type: string
+          variables_required: string[]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          language_code?: string
+          template_code: string
+          template_text: string
+          trend_type: string
+          variables_required: string[]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          language_code?: string
+          template_code?: string
+          template_text?: string
+          trend_type?: string
+          variables_required?: string[]
+        }
+        Relationships: []
+      }
       factor_contributions: {
         Row: {
           analysis_chain_id: string
@@ -3763,6 +3909,50 @@ export type Database = {
           start_date?: string
         }
         Relationships: []
+      }
+      indicator_detection_log: {
+        Row: {
+          confidence_score: number
+          detected_at: string
+          detected_indicators: Json
+          detection_method: string
+          id: string
+          matched_kpi_ids: string[] | null
+          new_indicators_suggested: Json | null
+          processed: boolean
+          source_id: string
+        }
+        Insert: {
+          confidence_score: number
+          detected_at?: string
+          detected_indicators: Json
+          detection_method: string
+          id?: string
+          matched_kpi_ids?: string[] | null
+          new_indicators_suggested?: Json | null
+          processed?: boolean
+          source_id: string
+        }
+        Update: {
+          confidence_score?: number
+          detected_at?: string
+          detected_indicators?: Json
+          detection_method?: string
+          id?: string
+          matched_kpi_ids?: string[] | null
+          new_indicators_suggested?: Json | null
+          processed?: boolean
+          source_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicator_detection_log_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ingest_log: {
         Row: {
@@ -6555,6 +6745,47 @@ export type Database = {
         }
         Relationships: []
       }
+      raw_data_ingest: {
+        Row: {
+          checksum: string
+          id: string
+          ingested_at: string
+          payload_json: Json
+          processed_at: string | null
+          processing_error: string | null
+          processing_status: string
+          source_id: string
+        }
+        Insert: {
+          checksum: string
+          id?: string
+          ingested_at?: string
+          payload_json: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          processing_status?: string
+          source_id: string
+        }
+        Update: {
+          checksum?: string
+          id?: string
+          ingested_at?: string
+          payload_json?: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          processing_status?: string
+          source_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_data_ingest_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       regional_subdivisions: {
         Row: {
           area_km2: number | null
@@ -7035,6 +7266,59 @@ export type Database = {
           },
         ]
       }
+      source_discovery_queue: {
+        Row: {
+          created_source_id: string | null
+          discovered_at: string
+          geographic_scope_detected: string[] | null
+          id: string
+          license_detected: string | null
+          processed_at: string | null
+          schema_detected: Json | null
+          source_type: string
+          source_url: string
+          temporal_scope_detected: Json | null
+          validation_errors: Json | null
+          validation_status: string
+        }
+        Insert: {
+          created_source_id?: string | null
+          discovered_at?: string
+          geographic_scope_detected?: string[] | null
+          id?: string
+          license_detected?: string | null
+          processed_at?: string | null
+          schema_detected?: Json | null
+          source_type: string
+          source_url: string
+          temporal_scope_detected?: Json | null
+          validation_errors?: Json | null
+          validation_status?: string
+        }
+        Update: {
+          created_source_id?: string | null
+          discovered_at?: string
+          geographic_scope_detected?: string[] | null
+          id?: string
+          license_detected?: string | null
+          processed_at?: string | null
+          schema_detected?: Json | null
+          source_type?: string
+          source_url?: string
+          temporal_scope_detected?: Json | null
+          validation_errors?: Json | null
+          validation_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "source_discovery_queue_created_source_id_fkey"
+            columns: ["created_source_id"]
+            isOneToOne: false
+            referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       surfaced_insights: {
         Row: {
           created_at: string | null
@@ -7506,6 +7790,15 @@ export type Database = {
         }
         Returns: string
       }
+      generate_fact_code: {
+        Args: {
+          p_geo_code: string
+          p_indicator_code: string
+          p_time_end: string
+          p_time_start: string
+        }
+        Returns: string
+      }
       generate_trust_log_id: { Args: never; Returns: string }
       get_gov_role: { Args: { _user_id: string }; Returns: string }
       has_any_role: {
@@ -7530,6 +7823,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      validate_data_contract: { Args: { p_data: Json }; Returns: Json }
     }
     Enums: {
       action_status:
