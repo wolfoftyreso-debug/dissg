@@ -265,8 +265,8 @@ export const CorrelationSandbox: React.FC = () => {
       <SystemBreadcrumbs
         items={[
           { label: 'World', labelSv: 'Världen', level: 'world', href: '/' },
-          { label: 'Analysis', labelSv: 'Analys', level: 'system' },
-          { label: 'Correlation Sandbox', labelSv: 'Korrelationssandbox', level: 'indicator' }
+          { label: 'Analysis', labelSv: 'Analys', level: 'indicator' },
+          { label: 'Correlation Sandbox', labelSv: 'Korrelationssandbox', level: 'method' }
         ]}
       />
 

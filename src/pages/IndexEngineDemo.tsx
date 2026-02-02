@@ -84,15 +84,15 @@ const IndexEngineDemo: React.FC = () => {
       <SystemBreadcrumbs
         items={[
           { label: 'World', labelSv: 'Världen', level: 'world', href: '/' },
-          { label: 'Indices', labelSv: 'Index', level: 'system', href: '/indices' },
-          { label: currentIndex.code, labelSv: currentIndex.code, level: 'indicator' }
+          { label: 'Indices', labelSv: 'Index', level: 'indicator', href: '/indices' },
+          { label: currentIndex.code, labelSv: currentIndex.code, level: 'method' }
         ]}
       />
 
       <SystemHierarchyPath
         world="Global"
-        system="Index Engine"
-        indicator={currentIndex.nameSv}
+        indicator="Index Engine"
+        method={currentIndex.nameSv}
       />
 
       {/* Index selector */}
