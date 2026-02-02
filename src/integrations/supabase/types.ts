@@ -2691,6 +2691,306 @@ export type Database = {
           },
         ]
       }
+      ingest_mappings: {
+        Row: {
+          created_at: string | null
+          geo_code_format: string | null
+          geo_field_path: string | null
+          geo_level: string | null
+          id: string
+          is_active: boolean | null
+          mapping_confidence: number | null
+          scale_factor: number | null
+          schema_version: number
+          source_code: string
+          source_field_name: string | null
+          source_field_path: string
+          source_unit: string | null
+          target_kpi_code: string
+          target_unit: string | null
+          time_field_path: string | null
+          time_format: string | null
+          transformation_formula: string | null
+          transformation_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          geo_code_format?: string | null
+          geo_field_path?: string | null
+          geo_level?: string | null
+          id?: string
+          is_active?: boolean | null
+          mapping_confidence?: number | null
+          scale_factor?: number | null
+          schema_version: number
+          source_code: string
+          source_field_name?: string | null
+          source_field_path: string
+          source_unit?: string | null
+          target_kpi_code: string
+          target_unit?: string | null
+          time_field_path?: string | null
+          time_format?: string | null
+          transformation_formula?: string | null
+          transformation_type?: string
+        }
+        Update: {
+          created_at?: string | null
+          geo_code_format?: string | null
+          geo_field_path?: string | null
+          geo_level?: string | null
+          id?: string
+          is_active?: boolean | null
+          mapping_confidence?: number | null
+          scale_factor?: number | null
+          schema_version?: number
+          source_code?: string
+          source_field_name?: string | null
+          source_field_path?: string
+          source_unit?: string | null
+          target_kpi_code?: string
+          target_unit?: string | null
+          time_field_path?: string | null
+          time_format?: string | null
+          transformation_formula?: string | null
+          transformation_type?: string
+        }
+        Relationships: []
+      }
+      ingest_pipeline_runs: {
+        Row: {
+          completed_at: string | null
+          duration_ms: number | null
+          error_details: Json | null
+          error_message: string | null
+          fetch_id: string
+          id: string
+          layer_1_completed_at: string | null
+          layer_1_status: string | null
+          layer_2_completed_at: string | null
+          layer_2_status: string | null
+          layer_3_completed_at: string | null
+          layer_3_status: string | null
+          layer_4_completed_at: string | null
+          layer_4_status: string | null
+          mapping_errors: number | null
+          records_aggregated: number | null
+          records_fetched: number | null
+          records_mapped: number | null
+          records_validated: number | null
+          retry_count: number | null
+          source_code: string
+          started_at: string | null
+          status: string
+          validation_errors: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          duration_ms?: number | null
+          error_details?: Json | null
+          error_message?: string | null
+          fetch_id: string
+          id?: string
+          layer_1_completed_at?: string | null
+          layer_1_status?: string | null
+          layer_2_completed_at?: string | null
+          layer_2_status?: string | null
+          layer_3_completed_at?: string | null
+          layer_3_status?: string | null
+          layer_4_completed_at?: string | null
+          layer_4_status?: string | null
+          mapping_errors?: number | null
+          records_aggregated?: number | null
+          records_fetched?: number | null
+          records_mapped?: number | null
+          records_validated?: number | null
+          retry_count?: number | null
+          source_code: string
+          started_at?: string | null
+          status?: string
+          validation_errors?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          duration_ms?: number | null
+          error_details?: Json | null
+          error_message?: string | null
+          fetch_id?: string
+          id?: string
+          layer_1_completed_at?: string | null
+          layer_1_status?: string | null
+          layer_2_completed_at?: string | null
+          layer_2_status?: string | null
+          layer_3_completed_at?: string | null
+          layer_3_status?: string | null
+          layer_4_completed_at?: string | null
+          layer_4_status?: string | null
+          mapping_errors?: number | null
+          records_aggregated?: number | null
+          records_fetched?: number | null
+          records_mapped?: number | null
+          records_validated?: number | null
+          retry_count?: number | null
+          source_code?: string
+          started_at?: string | null
+          status?: string
+          validation_errors?: number | null
+        }
+        Relationships: []
+      }
+      ingest_schemas: {
+        Row: {
+          breaking_changes: Json | null
+          change_type: string | null
+          detected_at: string | null
+          detected_fields: string[] | null
+          field_types: Json | null
+          id: string
+          is_current: boolean | null
+          schema_definition: Json
+          source_code: string
+          superseded_at: string | null
+          version: number
+        }
+        Insert: {
+          breaking_changes?: Json | null
+          change_type?: string | null
+          detected_at?: string | null
+          detected_fields?: string[] | null
+          field_types?: Json | null
+          id?: string
+          is_current?: boolean | null
+          schema_definition: Json
+          source_code: string
+          superseded_at?: string | null
+          version?: number
+        }
+        Update: {
+          breaking_changes?: Json | null
+          change_type?: string | null
+          detected_at?: string | null
+          detected_fields?: string[] | null
+          field_types?: Json | null
+          id?: string
+          is_current?: boolean | null
+          schema_definition?: Json
+          source_code?: string
+          superseded_at?: string | null
+          version?: number
+        }
+        Relationships: []
+      }
+      ingest_sources: {
+        Row: {
+          auth_config: Json | null
+          auth_type: string | null
+          base_url: string | null
+          code: string
+          consecutive_failures: number | null
+          countries_covered: string[] | null
+          created_at: string | null
+          documentation_url: string | null
+          geographic_coverage: string
+          id: string
+          is_active: boolean | null
+          last_error: string | null
+          last_fetch_at: string | null
+          last_success_at: string | null
+          license_type: string | null
+          license_url: string | null
+          name: string
+          schedule_cron: string | null
+          schedule_type: string
+          source_type: string
+          timezone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          auth_config?: Json | null
+          auth_type?: string | null
+          base_url?: string | null
+          code: string
+          consecutive_failures?: number | null
+          countries_covered?: string[] | null
+          created_at?: string | null
+          documentation_url?: string | null
+          geographic_coverage?: string
+          id?: string
+          is_active?: boolean | null
+          last_error?: string | null
+          last_fetch_at?: string | null
+          last_success_at?: string | null
+          license_type?: string | null
+          license_url?: string | null
+          name: string
+          schedule_cron?: string | null
+          schedule_type?: string
+          source_type: string
+          timezone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          auth_config?: Json | null
+          auth_type?: string | null
+          base_url?: string | null
+          code?: string
+          consecutive_failures?: number | null
+          countries_covered?: string[] | null
+          created_at?: string | null
+          documentation_url?: string | null
+          geographic_coverage?: string
+          id?: string
+          is_active?: boolean | null
+          last_error?: string | null
+          last_fetch_at?: string | null
+          last_success_at?: string | null
+          license_type?: string | null
+          license_url?: string | null
+          name?: string
+          schedule_cron?: string | null
+          schedule_type?: string
+          source_type?: string
+          timezone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ingest_validation_rules: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          kpi_code: string | null
+          rule_config: Json
+          rule_name: string
+          rule_type: string
+          severity: string
+          source_code: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          kpi_code?: string | null
+          rule_config: Json
+          rule_name: string
+          rule_type: string
+          severity?: string
+          source_code?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          kpi_code?: string | null
+          rule_config?: Json
+          rule_name?: string
+          rule_type?: string
+          severity?: string
+          source_code?: string | null
+        }
+        Relationships: []
+      }
       internal_notes: {
         Row: {
           action_id: string | null
@@ -4107,6 +4407,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      semantic_concepts: {
+        Row: {
+          calculation_method: string | null
+          category: string
+          code: string
+          created_at: string | null
+          definition: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          parent_code: string | null
+          related_codes: string[] | null
+          source_standards: string[] | null
+          standard_precision: number | null
+          standard_unit: string | null
+        }
+        Insert: {
+          calculation_method?: string | null
+          category: string
+          code: string
+          created_at?: string | null
+          definition?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          parent_code?: string | null
+          related_codes?: string[] | null
+          source_standards?: string[] | null
+          standard_precision?: number | null
+          standard_unit?: string | null
+        }
+        Update: {
+          calculation_method?: string | null
+          category?: string
+          code?: string
+          created_at?: string | null
+          definition?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          parent_code?: string | null
+          related_codes?: string[] | null
+          source_standards?: string[] | null
+          standard_precision?: number | null
+          standard_unit?: string | null
+        }
+        Relationships: []
       }
       user_relevance_preferences: {
         Row: {
