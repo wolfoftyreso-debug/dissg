@@ -2,20 +2,27 @@
  * BLOCK 7: GLOBAL NAVIGATION SYSTEM
  * 
  * Breadcrumbs + "You are here" indicator
- * Struktur: World → Region → Country → System → Indicator
+ * Extended structure: World → Region → Country → Indicator → Method → Data
+ * 
+ * User always knows:
+ * - Where they are
+ * - Why this is shown
+ * - How to go deeper
+ * - How to go back
  */
 
 import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { ChevronRight, Globe, Map, Building2, BarChart3, Activity, Home } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ChevronRight, Globe, Map, Building2, BarChart3, Home, FileText, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { type BreadcrumbLevel } from '@/config/extremeClaritySystem';
 
 export interface BreadcrumbItem {
   label: string;
   labelSv: string;
   href?: string;
   icon?: React.ReactNode;
-  level: 'world' | 'region' | 'country' | 'system' | 'indicator';
+  level: BreadcrumbLevel;
 }
 
 interface SystemBreadcrumbsProps {
@@ -23,20 +30,22 @@ interface SystemBreadcrumbsProps {
   className?: string;
 }
 
-const LEVEL_ICONS = {
+const LEVEL_ICONS: Record<BreadcrumbLevel, React.ReactNode> = {
   world: <Globe className="h-3 w-3" />,
   region: <Map className="h-3 w-3" />,
   country: <Building2 className="h-3 w-3" />,
-  system: <BarChart3 className="h-3 w-3" />,
-  indicator: <Activity className="h-3 w-3" />,
+  indicator: <BarChart3 className="h-3 w-3" />,
+  method: <FileText className="h-3 w-3" />,
+  data: <Database className="h-3 w-3" />,
 };
 
-const LEVEL_LABELS = {
+const LEVEL_LABELS: Record<BreadcrumbLevel, string> = {
   world: 'Världen',
   region: 'Region',
   country: 'Land',
-  system: 'System',
   indicator: 'Indikator',
+  method: 'Metod',
+  data: 'Data',
 };
 
 export const SystemBreadcrumbs: React.FC<SystemBreadcrumbsProps> = ({ 
@@ -96,7 +105,7 @@ export const SystemBreadcrumbs: React.FC<SystemBreadcrumbsProps> = ({
  * Shows where user is in the system hierarchy
  */
 export const SystemLocationIndicator: React.FC<{
-  level: BreadcrumbItem['level'];
+  level: BreadcrumbLevel;
   current: string;
   className?: string;
 }> = ({ level, current, className }) => {
@@ -115,21 +124,24 @@ export const SystemLocationIndicator: React.FC<{
 
 /**
  * Full hierarchy indicator showing complete path
+ * Extended with Method and Data levels
  */
 export const SystemHierarchyPath: React.FC<{
   world?: string;
   region?: string;
   country?: string;
-  system?: string;
   indicator?: string;
+  method?: string;
+  data?: string;
   className?: string;
-}> = ({ world = 'Global', region, country, system, indicator, className }) => {
+}> = ({ world = 'Global', region, country, indicator, method, data, className }) => {
   const parts = [
-    { key: 'world', value: world, icon: LEVEL_ICONS.world },
-    { key: 'region', value: region, icon: LEVEL_ICONS.region },
-    { key: 'country', value: country, icon: LEVEL_ICONS.country },
-    { key: 'system', value: system, icon: LEVEL_ICONS.system },
-    { key: 'indicator', value: indicator, icon: LEVEL_ICONS.indicator },
+    { key: 'world' as BreadcrumbLevel, value: world, icon: LEVEL_ICONS.world },
+    { key: 'region' as BreadcrumbLevel, value: region, icon: LEVEL_ICONS.region },
+    { key: 'country' as BreadcrumbLevel, value: country, icon: LEVEL_ICONS.country },
+    { key: 'indicator' as BreadcrumbLevel, value: indicator, icon: LEVEL_ICONS.indicator },
+    { key: 'method' as BreadcrumbLevel, value: method, icon: LEVEL_ICONS.method },
+    { key: 'data' as BreadcrumbLevel, value: data, icon: LEVEL_ICONS.data },
   ].filter(p => p.value);
 
   return (
@@ -147,6 +159,43 @@ export const SystemHierarchyPath: React.FC<{
             <span>{part.value}</span>
           </span>
         </React.Fragment>
+      ))}
+    </div>
+  );
+};
+
+/**
+ * Depth indicator showing current level in the 5-level pyramid
+ */
+export const DepthIndicator: React.FC<{
+  currentLevel: 1 | 2 | 3 | 4 | 5;
+  className?: string;
+}> = ({ currentLevel, className }) => {
+  const levels = [
+    { level: 1, label: 'Observation' },
+    { level: 2, label: 'Definition' },
+    { level: 3, label: 'Metod' },
+    { level: 4, label: 'Begränsning' },
+    { level: 5, label: 'Data' },
+  ];
+  
+  return (
+    <div className={cn("flex items-center gap-1", className)}>
+      {levels.map(({ level, label }) => (
+        <div
+          key={level}
+          className={cn(
+            "flex items-center gap-1 px-2 py-0.5 text-xs rounded",
+            level === currentLevel
+              ? "bg-primary text-primary-foreground font-medium"
+              : level < currentLevel
+                ? "bg-primary/20 text-primary"
+                : "bg-muted text-muted-foreground"
+          )}
+        >
+          <span>{level}</span>
+          {level === currentLevel && <span className="hidden sm:inline">· {label}</span>}
+        </div>
       ))}
     </div>
   );

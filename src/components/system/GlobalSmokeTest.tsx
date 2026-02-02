@@ -281,7 +281,7 @@ export const GlobalSmokeTest: React.FC = () => {
       <SystemBreadcrumbs
         items={[
           { label: 'System', labelSv: 'System', level: 'world', href: '/' },
-          { label: 'Smoke Test', labelSv: 'Smoke Test', level: 'system' }
+          { label: 'Smoke Test', labelSv: 'Smoke Test', level: 'indicator' }
         ]}
       />
 

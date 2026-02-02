@@ -260,7 +260,7 @@ export default function MisuseDetectionDemo() {
         <SystemBreadcrumbs
           items={[
             { label: 'System', labelSv: 'System', level: 'world', href: '/' },
-            { label: 'Governance', labelSv: 'Governance', level: 'system' },
+            { label: 'Governance', labelSv: 'Governance', level: 'indicator' },
           ]}
         />
 
