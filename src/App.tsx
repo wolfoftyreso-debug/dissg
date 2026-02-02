@@ -62,14 +62,14 @@ const App = () => (
               } />
               
               <Route path="/depth-demo" element={
-                <ProtectedRoute requiredRole="researcher">
+                <ProtectedRoute requiredRole="operativ">
                   <DepthDemo />
                 </ProtectedRoute>
               } />
               
-              {/* Admin - kräver departementschef eller högre */}
+              {/* Admin - kräver Statsminister */}
               <Route path="/admin" element={
-                <ProtectedRoute requiredRole="department_lead">
+                <ProtectedRoute requiredRole="statsminister">
                   <Admin />
                 </ProtectedRoute>
               } />

@@ -11,9 +11,10 @@ import { DecisionsTimelinePanel } from '@/components/dashboard/DecisionsTimeline
 import { ResponsibilityPanel } from '@/components/dashboard/ResponsibilityPanel';
 import { AnalysisPanel } from '@/components/dashboard/AnalysisPanel';
 import { RoleBasedDashboard } from '@/components/dashboard/RoleBasedDashboard';
+import { GovRoleDashboard } from '@/components/dashboard/GovRoleDashboard';
 import { AlertNotificationPanel } from '@/components/dashboard/AlertNotificationPanel';
 import { useKPIOverview } from '@/hooks/useKPIData';
-import { useUserRoles } from '@/hooks/useUserRole';
+import { useGovRole } from '@/hooks/useGovRole';
 import { getRoleConfig } from '@/config/roleViewConfig';
 import { Loader2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -24,8 +25,8 @@ const Index = () => {
   const [comparisonPeriod, setComparisonPeriod] = useState<'week' | 'month3' | 'month12'>('week');
   const [viewMode, setViewMode] = useState<'standard' | 'role'>('role');
   
-  const { data: roleData } = useUserRoles();
-  const currentRole = roleData?.highestRole || 'public';
+  const { data: govRole } = useGovRole();
+  const currentRole = govRole?.role || 'public';
   const roleConfig = getRoleConfig(currentRole);
   
   // Try to fetch from database first
@@ -86,7 +87,10 @@ const Index = () => {
         <AlertNotificationPanel />
 
         {viewMode === 'role' ? (
-          <RoleBasedDashboard kpis={kpis} onKPIClick={setSelectedKPI} />
+          <>
+            <GovRoleDashboard />
+            <RoleBasedDashboard kpis={kpis} onKPIClick={setSelectedKPI} />
+          </>
         ) : (
           <>
             {activeNav === 'overview' && kpisByCategory.map(({ category, kpis }, index) => (

@@ -1,6 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserRoles } from '@/hooks/useUserRole';
-import { getRoleConfig } from '@/config/roleViewConfig';
+import { useGovRole, GovRole, GOV_ROLE_LABELS } from '@/hooks/useGovRole';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -12,24 +11,24 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User, LogOut, Shield, Settings, Crown, Building2, FlaskConical, Globe } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { LogOut, Settings, Crown, Building2, Briefcase, Shield } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 
-const ROLE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  public: Globe,
-  researcher: FlaskConical,
-  department_lead: Building2,
-  minister: Shield,
-  prime_minister: Crown,
-  system_admin: Settings,
+const ROLE_ICONS: Record<GovRole, React.ComponentType<{ className?: string }>> = {
   statsminister: Crown,
   departementsansvarig: Building2,
-  operativ: Shield,
+  operativ: Briefcase,
+};
+
+const ROLE_COLORS: Record<GovRole, string> = {
+  statsminister: 'bg-amber-500/20 text-amber-600 border-amber-500/30',
+  departementsansvarig: 'bg-blue-500/20 text-blue-600 border-blue-500/30',
+  operativ: 'bg-green-500/20 text-green-600 border-green-500/30',
 };
 
 export function UserMenu() {
   const { user, signOut } = useAuth();
-  const { data: roleData } = useUserRoles();
+  const { data: govRole, isLoading } = useGovRole();
   const navigate = useNavigate();
 
   if (!user) {
@@ -45,18 +44,24 @@ export function UserMenu() {
     );
   }
 
-  const roleConfig = roleData ? getRoleConfig(roleData.highestRole) : null;
-  const RoleIcon = roleData ? ROLE_ICONS[roleData.highestRole] : User;
+  const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'Användare';
   
-  // Skapa initialer från email
-  const initials = user.email
-    ? user.email.split('@')[0].slice(0, 2).toUpperCase()
-    : 'AN';
+  // Skapa initialer
+  const initials = displayName
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   const handleSignOut = async () => {
     await signOut();
     navigate('/login');
   };
+
+  const role = govRole?.role as GovRole | undefined;
+  const RoleIcon = role ? ROLE_ICONS[role] : Shield;
+  const roleColor = role ? ROLE_COLORS[role] : '';
 
   return (
     <DropdownMenu>
@@ -68,12 +73,12 @@ export function UserMenu() {
             </AvatarFallback>
           </Avatar>
           <span className="hidden sm:inline text-xs font-medium truncate max-w-[120px]">
-            {user.user_metadata?.display_name || user.email?.split('@')[0]}
+            {displayName}
           </span>
-          {roleConfig && (
-            <Badge variant="outline" className="hidden md:flex text-xs gap-1">
+          {role && !isLoading && (
+            <Badge variant="outline" className={`hidden md:flex text-xs gap-1 ${roleColor}`}>
               <RoleIcon className="h-3 w-3" />
-              <span className="hidden lg:inline">{roleConfig.displayName}</span>
+              <span className="hidden lg:inline">{GOV_ROLE_LABELS[role]}</span>
             </Badge>
           )}
         </Button>
@@ -81,26 +86,27 @@ export function UserMenu() {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {user.user_metadata?.display_name || 'Användare'}
-            </p>
+            <p className="text-sm font-medium leading-none">{displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
           </div>
         </DropdownMenuLabel>
         
-        {roleConfig && (
+        {govRole && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="font-normal">
               <div className="flex items-center gap-2">
                 <RoleIcon className="h-4 w-4 text-muted-foreground" />
                 <div>
-                  <p className="text-xs font-medium">{roleConfig.displayName}</p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {roleConfig.description}
-                  </p>
+                  <p className="text-xs font-medium">{GOV_ROLE_LABELS[role!]}</p>
+                  {govRole.department && (
+                    <p className="text-xs text-muted-foreground">{govRole.department}</p>
+                  )}
+                  {govRole.region && (
+                    <p className="text-xs text-muted-foreground">{govRole.region}</p>
+                  )}
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -109,10 +115,21 @@ export function UserMenu() {
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={() => navigate('/admin')}>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Inställningar</span>
+        <DropdownMenuItem asChild>
+          <Link to="/settings">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Inställningar</span>
+          </Link>
         </DropdownMenuItem>
+        
+        {role === 'statsminister' && (
+          <DropdownMenuItem asChild>
+            <Link to="/admin">
+              <Shield className="mr-2 h-4 w-4" />
+              <span>Administration</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         
         <DropdownMenuSeparator />
         
