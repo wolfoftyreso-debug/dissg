@@ -3,6 +3,7 @@
  * 
  * Displays when a query is blocked or needs warning.
  * Technical barrier against medical advice.
+ * Integrates with AI & Compliance Guardrails system.
  */
 
 import React from 'react';
@@ -10,19 +11,25 @@ import { ShieldAlert, AlertCircle, Stethoscope } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import type { GuardrailResponse } from '@/lib/health/guardrails';
+import { getLegalDisclaimers } from '@/lib/compliance';
 
 interface HealthGuardrailBlockProps {
   response: GuardrailResponse;
   onDismiss?: () => void;
   className?: string;
+  jurisdiction?: string;
 }
 
 export function HealthGuardrailBlock({
   response,
   onDismiss,
-  className = ''
+  className = '',
+  jurisdiction = 'GLOBAL'
 }: HealthGuardrailBlockProps) {
-  if (response.warningLevel === 'none' || response.allowed === true && !response.reason) {
+  // Get legal disclaimers for jurisdiction
+  const legalDisclaimers = getLegalDisclaimers(jurisdiction);
+  
+  if (response.warningLevel === 'none' || (response.allowed === true && !response.reason)) {
     return null;
   }
 
@@ -60,6 +67,13 @@ export function HealthGuardrailBlock({
                 <li>• Substance use prevalence data</li>
               </ul>
             </div>
+            {legalDisclaimers.length > 0 && (
+              <div className="pt-2 border-t border-red-200 dark:border-red-800 mt-3">
+                <p className="text-xs text-red-600 dark:text-red-400 italic">
+                  {legalDisclaimers[0]}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
