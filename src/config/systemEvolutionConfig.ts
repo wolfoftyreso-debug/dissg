@@ -625,3 +625,248 @@ export function getPromptForRole(role: EngineRole, stepIndex: number): string {
   }
   return '';
 }
+
+// ============================================================
+// MASTER EXECUTION BLOCK 22
+// FEATURE FREEZE, LAUNCH DISCIPLINE & SYSTEM IMMUNITY
+// 
+// Syfte: Stoppa systemet från att bli sämre när det blir större.
+// Detta handlar om självkontroll, tempo och ryggrad.
+// ============================================================
+
+// 1. FEATURE FREEZE DEFINITION
+export interface FeatureFreezeRules {
+  readonly forbidden: readonly string[];
+  readonly allowed: readonly string[];
+  readonly effectiveDate: string;
+  readonly version: string;
+}
+
+export const FEATURE_FREEZE_RULES: FeatureFreezeRules = {
+  version: '1.0.0',
+  effectiveDate: '2026-02-02',
+  
+  forbidden: [
+    'Nya funktioner',
+    'Nya vytyper',
+    'Nya index',
+    'Nya API-endpoints',
+    'Nya datakällor utan metodgenomgång',
+    'Nya visualiseringstyper',
+    'Nya användarroller',
+    'Nya integrations-kopplingar',
+  ],
+  
+  allowed: [
+    'Bugfixar',
+    'Prestandaförbättringar',
+    'Tydligare språk',
+    'Förenklingar',
+    'Borttagning av överflöd',
+    'Säkerhetsuppdateringar',
+    'Tillgänglighetsförbättringar',
+    'Dokumentationsuppdateringar',
+  ],
+} as const;
+
+// 2. CANONICAL "WHAT WE SHIP" LIST
+export type ModuleStatus = 'core_locked' | 'optional_default_off' | 'excluded' | 'deprecated';
+
+export interface SystemModule {
+  readonly code: string;
+  readonly name: string;
+  readonly status: ModuleStatus;
+  readonly description: string;
+  readonly lockedAt?: string;
+  readonly reason?: string;
+}
+
+export const CANONICAL_SYSTEM_MODULES: readonly SystemModule[] = [
+  // A. CORE SYSTEM (LOCKED)
+  { code: 'GRI', name: 'Global Reality Index', status: 'core_locked', description: 'Aggregerat mått på samhällstillstånd', lockedAt: '2026-02-02' },
+  { code: 'MAP_ENGINE', name: 'Map Engine', status: 'core_locked', description: 'Global kartvisualisering med NUTS-nivåer', lockedAt: '2026-02-02' },
+  { code: 'CORRELATION_ENGINE', name: 'Correlation Engine', status: 'core_locked', description: 'Sambandsanalys mellan indikatorer', lockedAt: '2026-02-02' },
+  { code: 'EXPLAIN_ENGINE', name: 'Explain Engine', status: 'core_locked', description: 'Automatisk kontextualisering', lockedAt: '2026-02-02' },
+  { code: 'INDEX_SUITE', name: 'Index Suite', status: 'core_locked', description: 'GMI, resiliens, kapacitet och civilisationsindex', lockedAt: '2026-02-02' },
+  { code: 'API_CORE', name: 'API Core', status: 'core_locked', description: 'REST/GraphQL-gränssnitt', lockedAt: '2026-02-02' },
+  { code: 'GOVERNANCE_LAYER', name: 'Governance Layer', status: 'core_locked', description: 'Metodregister, ansvarskedja, transparens', lockedAt: '2026-02-02' },
+  { code: 'TRANSPARENCY_ENGINE', name: 'Transparency Engine', status: 'core_locked', description: 'Källattribution och spårbarhet', lockedAt: '2026-02-02' },
+  
+  // B. OPTIONAL (DEFAULT OFF)
+  { code: 'EXPERIMENTAL_INDICATORS', name: 'Experimentella indikatorer', status: 'optional_default_off', description: 'Indikatorer under utvärdering', reason: 'Kräver explicit aktivering' },
+  { code: 'BETA_VISUALIZATIONS', name: 'Beta-visualiseringar', status: 'optional_default_off', description: 'Nya graftyper under testning', reason: 'Kan ändras utan varning' },
+  { code: 'SIMULATION_SANDBOX', name: 'Simulerings-sandbox', status: 'optional_default_off', description: 'What-if-scenarier', reason: 'Känsligt för misstolkning' },
+  
+  // C. EXPLICITLY EXCLUDED
+  { code: 'PREDICTIVE_FUTURES', name: 'Prediktiva framtidsutsagor', status: 'excluded', description: 'Förutspår inte framtiden', reason: 'Skapar falsk säkerhet' },
+  { code: 'POLICY_RECOMMENDATIONS', name: 'Policyrekommendationer', status: 'excluded', description: 'Ger aldrig råd', reason: 'Utanför mandatet' },
+  { code: 'PERSON_RANKINGS', name: 'Personrankningar', status: 'excluded', description: 'Inga individrankningar', reason: 'Kränker integritet' },
+  { code: 'COUNTRY_RANKINGS', name: 'Best/worst-country', status: 'excluded', description: 'Ingen best/worst', reason: 'Förenklar till clickbait' },
+] as const;
+
+// 3. LAUNCH READINESS CHECKLIST
+export interface ReadinessQuestion {
+  readonly id: string;
+  readonly question: string;
+  readonly failureConsequence: string;
+  readonly category: 'clarity' | 'safety' | 'transparency' | 'resilience';
+}
+
+export const LAUNCH_READINESS_QUESTIONS: readonly ReadinessQuestion[] = [
+  { id: 'LR_01', question: 'Förstår en intelligent lekman detta på 60 sekunder?', failureConsequence: 'Förenkla presentation och språk', category: 'clarity' },
+  { id: 'LR_02', question: 'Kan detta feltolkas utan att systemet varnar?', failureConsequence: 'Lägg till misinterpretation guards', category: 'safety' },
+  { id: 'LR_03', question: 'Finns alltid kontext, källa och begränsning synlig?', failureConsequence: 'Komplettera attribution', category: 'transparency' },
+  { id: 'LR_04', question: 'Skulle detta överleva granskning av en fientlig expert?', failureConsequence: 'Red team-genomgång', category: 'resilience' },
+  { id: 'LR_05', question: 'Är alla datakällor oberoende verifierbara?', failureConsequence: 'Lägg till alternativa källor', category: 'transparency' },
+  { id: 'LR_06', question: 'Kan detta användas för propaganda utan modifiering?', failureConsequence: 'Lägg till obligatorisk kontext', category: 'safety' },
+] as const;
+
+// 4. SYSTEM IMMUNITY RULES
+export interface ImmunityRule {
+  readonly id: string;
+  readonly rule: string;
+  readonly forbiddenMotivations: readonly string[];
+  readonly allowedMotivations: readonly string[];
+}
+
+export const SYSTEM_IMMUNITY_RULES: readonly ImmunityRule[] = [
+  {
+    id: 'IMM_01',
+    rule: 'Ingen feature byggs för extern påverkan',
+    forbiddenMotivations: ['PR-värde', 'Politisk vinning', 'Investerarintresse', 'Tillfälliga narrativ', 'Mediauppmärksamhet'],
+    allowedMotivations: ['Ökad förståelse', 'Bättre jämförbarhet', 'Långsiktig stabilitet', 'Transparensförbättring'],
+  },
+  {
+    id: 'IMM_02',
+    rule: 'Enkelhet prioriteras över funktionalitet',
+    forbiddenMotivations: ['Feature-paritet', 'Användarbegäran utan metodgrund', 'Tekniktrend'],
+    allowedMotivations: ['Minskad kognitiv belastning', 'Snabbare insikt', 'Lägre felrisk'],
+  },
+  {
+    id: 'IMM_03',
+    rule: 'Systemet växer inte för tillväxtens skull',
+    forbiddenMotivations: ['Fler användare som mål', 'Fler datapunkter som mål', 'Expansion utan kvalitetsgrund'],
+    allowedMotivations: ['Bättre täckning av mandat', 'Kvalitetsförbättring', 'Metodologisk konsolidering'],
+  },
+] as const;
+
+// 5. REMOVE BEFORE ADD MECHANISM
+export const COMPLEXITY_BUDGET_RULES = {
+  maxNewFeaturesPerQuarter: 1,
+  maxNewIndicatorsPerMonth: 1,
+  requiredRemovalRatio: 1.0,
+  complexityReviewRequired: true,
+  reviewers: ['method_owner', 'ux_owner', 'governance_owner'],
+} as const;
+
+// 6. PUBLIC READINESS VIEW CONFIG
+export interface PublicViewConfig {
+  readonly features: { login: false; save: false; export: false; api: false; comments: false; sharing: false };
+  readonly availableFeatures: readonly string[];
+  readonly purpose: string;
+  readonly disclaimer: string;
+}
+
+export const PUBLIC_READINESS_VIEW: PublicViewConfig = {
+  features: { login: false, save: false, export: false, api: false, comments: false, sharing: false },
+  availableFeatures: ['Se alla indikatorer', 'Utforska kartan', 'Jämföra länder', 'Läsa förklaringar', 'Se trender', 'Förstå metod'],
+  purpose: 'Här är verkligheten – tolka den själv.',
+  disclaimer: 'Dina inställningar sparas inte i gratisläget.',
+} as const;
+
+// 7. PAID BOUNDARY CLARITY
+export interface PaidBoundary {
+  readonly principle: string;
+  readonly paidProvides: readonly string[];
+  readonly paidDoesNotProvide: readonly string[];
+  readonly publicStatement: string;
+}
+
+export const PAID_BOUNDARY: PaidBoundary = {
+  principle: 'Betalversionen ger verktyg – inte bättre data.',
+  paidProvides: ['Spara analyser', 'Exportera data', 'API-access', 'Prenumerationer', 'Delning', 'Historik'],
+  paidDoesNotProvide: ['Mer data', 'Bättre data', 'Snabbare data', 'Exklusiva indikatorer', 'Dolda insikter'],
+  publicStatement: 'Ingen kunskapsklass. Samma sanning för alla.',
+} as const;
+
+// 8. INTERNAL KILL SWITCHES
+export type KillSwitchTarget = 'indicator' | 'index' | 'data_source' | 'feature' | 'api_endpoint';
+export type KillSwitchReason = 'data_error' | 'method_challenged' | 'bias_detected' | 'source_compromised' | 'security_issue';
+
+export const KILL_SWITCH_PROTOCOL = {
+  immediateDeactivation: ['security_issue', 'data_error'] as KillSwitchReason[],
+  gracePeriodHours: { method_challenged: 72, bias_detected: 24, source_compromised: 4 },
+  requiredApprovers: 2,
+  publicNotificationRequired: true,
+  autoReviewIntervalDays: 30,
+  principle: 'Hellre mindre data än fel data.',
+} as const;
+
+// 9. POST-LAUNCH CADENCE
+export interface UpdateCadence {
+  readonly majorUpdates: { maxPerQuarter: number; requiredReviewDays: number; approvers: readonly string[] };
+  readonly newIndicators: { maxPerMonth: number; requiredTestingDays: number; experimentalPeriodMonths: number };
+  readonly bugFixes: { noMethodReviewRequired: boolean; maxResponseTimeHours: number };
+  readonly principle: string;
+}
+
+export const POST_LAUNCH_CADENCE: UpdateCadence = {
+  majorUpdates: { maxPerQuarter: 1, requiredReviewDays: 14, approvers: ['method_owner', 'governance_owner', 'technical_owner'] },
+  newIndicators: { maxPerMonth: 1, requiredTestingDays: 30, experimentalPeriodMonths: 3 },
+  bugFixes: { noMethodReviewRequired: true, maxResponseTimeHours: 24 },
+  principle: 'Tröghet = stabilitet. Snabba förändringar är fienden.',
+} as const;
+
+// 10. SYSTEM SELF-DEFINITION (CONSTITUTIONAL)
+export interface SystemConstitution {
+  readonly version: string;
+  readonly adoptedAt: string;
+  readonly frozenAt: string;
+  readonly statement: string;
+  readonly principles: readonly string[];
+  readonly immutable: boolean;
+  readonly amendmentProcess: string;
+}
+
+export const SYSTEM_CONSTITUTION: SystemConstitution = {
+  version: '1.0.0',
+  adoptedAt: '2026-02-02',
+  frozenAt: '2026-02-02',
+  immutable: true,
+  
+  statement: `Detta system existerar för att göra verkligheten begriplig.
+Inte för att tala om vad som ska göras.
+Inte för att vinna debatter.
+Utan för att göra ansvar möjligt.`,
+  
+  principles: [
+    'Verkligheten är komplex – vi förenklar utan att ljuga',
+    'Ansvar kräver fakta – vi levererar dem utan vinkling',
+    'Transparens är icke-förhandlingsbar – allt visas öppet',
+    'Neutralitet är helig – ingen politisk ställning, aldrig',
+    'Enkelhet är demokrati – alla ska kunna förstå',
+    'Djup är rättvisa – för de som vill gräva',
+    'Systemet är infrastruktur – inte en röst',
+    'Tillväxt är inte målet – förståelse är målet',
+  ],
+  
+  amendmentProcess: `Ändringar kräver: 6 månaders offentlig diskussion, extern expertgranskning, unanimous consent, publik motivering, 12 månaders övergångsperiod.`,
+} as const;
+
+// HELPER FUNCTIONS
+export function isFeatureFrozen(): boolean {
+  return new Date() >= new Date(FEATURE_FREEZE_RULES.effectiveDate);
+}
+
+export function getModulesByStatus(status: ModuleStatus): readonly SystemModule[] {
+  return CANONICAL_SYSTEM_MODULES.filter(m => m.status === status);
+}
+
+export function checkLaunchReadiness(answers: Record<string, boolean>): { ready: boolean; failures: readonly ReadinessQuestion[] } {
+  const failures = LAUNCH_READINESS_QUESTIONS.filter(q => !answers[q.id]);
+  return { ready: failures.length === 0, failures };
+}
+
+export function getSystemPurpose(): string {
+  return SYSTEM_CONSTITUTION.statement;
+}
