@@ -272,3 +272,158 @@ export function formatFalsifiedHypothesis(hyp: FalsifiedHypothesis): string {
 ${hyp.mightWorkInContexts.length > 0 ? `**Kan fungera i:** ${hyp.mightWorkInContexts.join(', ')}` : ''}
   `.trim();
 }
+
+// ============================================================
+// WAVE 9: BLOCK BW — LEARNING-AT-SCALE ENGINE
+// ============================================================
+
+export interface GlobalLearningCluster {
+  id: string;
+  patternId: string;
+  
+  // Var mönstret observerats
+  observedIn: {
+    countryCode: string;
+    regionCode?: string;
+    period: { from: string; to: string };
+    strength: number;
+    contextFactors: string[];
+  }[];
+  
+  // Var det INTE gäller (BX1)
+  counterexamples: {
+    countryCode: string;
+    period: { from: string; to: string };
+    observation: string;
+    potentialExplanations: string[];
+    confidence: number;
+  }[];
+  
+  // BW2: Learning Score
+  replicationScore: number;
+  contextDependency: 'universal' | 'high' | 'moderate' | 'low' | 'context_specific';
+  stabilityOverTime: number;
+  
+  overallQuality: 'robust' | 'moderate' | 'emerging' | 'fragile' | 'contested';
+}
+
+// ============================================================
+// WAVE 9: BLOCK BY — USER AGGREGATION MODE
+// ============================================================
+
+export interface UserAggregation {
+  id: string;
+  userId: string;
+  
+  type: 'index' | 'dashboard' | 'cluster' | 'comparison';
+  name: string;
+  description?: string;
+  
+  config: {
+    components?: { entityId: string; weight: number; direction: 'positive' | 'negative' }[];
+    methodology?: string;
+    filters?: Record<string, unknown>;
+  };
+  
+  version: number;
+  visibility: 'private' | 'unlisted' | 'public';
+  shareUrl?: string;
+  
+  createdAt: string;
+  updatedAt: string;
+  viewCount?: number;
+  forkCount?: number;
+}
+
+// ============================================================
+// WAVE 9: BLOCK BZ — "PROVE ME WRONG" MODE
+// ============================================================
+
+export interface ProveWrongConfig {
+  enabled: boolean;
+  features: ('alternative_interpretations' | 'weaknesses' | 'confounding_factors' | 'temporal_instability' | 'geographic_limits')[];
+}
+
+export interface InsightWeakness {
+  id: string;
+  insightId: string;
+  weaknessType: 'data_quality' | 'sample_size' | 'methodology' | 'confounding' | 'selection_bias' | 'measurement_error';
+  description: string;
+  severity: 'critical' | 'significant' | 'minor';
+  impact: string;
+}
+
+export const WEAKNESS_TYPE_LABELS: Record<string, { sv: string; en: string }> = {
+  data_quality: { sv: 'Datakvalitet', en: 'Data quality' },
+  sample_size: { sv: 'Urvalsstorlek', en: 'Sample size' },
+  methodology: { sv: 'Metodologi', en: 'Methodology' },
+  confounding: { sv: 'Störfaktorer', en: 'Confounding factors' },
+  selection_bias: { sv: 'Urvalsfel', en: 'Selection bias' },
+  measurement_error: { sv: 'Mätfel', en: 'Measurement error' }
+};
+
+export const DEFAULT_PROVE_WRONG_CONFIG: ProveWrongConfig = {
+  enabled: true,
+  features: ['alternative_interpretations', 'weaknesses', 'confounding_factors', 'temporal_instability', 'geographic_limits']
+};
+
+// ============================================================
+// WAVE 9: BLOCK CA — DATA LITERACY MODE
+// ============================================================
+
+export interface LiteracyExplanation {
+  id: string;
+  targetType: 'kpi' | 'index' | 'chart' | 'concept';
+  
+  levels: {
+    simple: string;      // Förskolelärartest
+    standard: string;    // Allmänbildad vuxen
+    technical: string;   // Specialist
+  };
+  
+  commonMisinterpretations: {
+    description: string;
+    whyWrong: string;
+    correctInterpretation: string;
+    frequency: 'very_common' | 'common' | 'occasional';
+  }[];
+  
+  readingGuide: {
+    whatToLookFor: string[];
+    whatToIgnore: string[];
+    questions: string[];
+  };
+}
+
+export const LITERACY_EXAMPLES: LiteracyExplanation[] = [
+  {
+    id: 'lit_correlation',
+    targetType: 'concept',
+    levels: {
+      simple: 'Korrelation betyder att två saker rör sig åt samma håll samtidigt. Det betyder INTE att det ena orsakar det andra.',
+      standard: 'Korrelation mäter hur starkt två variabler rör sig tillsammans. En korrelation på 1 betyder perfekt samrörelse, 0 betyder inget samband, och -1 betyder perfekt motsatt rörelse.',
+      technical: 'Pearsons korrelationskoefficient mäter linjärt samband mellan två kontinuerliga variabler. Signifikans beror på urvalsstorlek och bör tolkas med p-värde och konfidensintervall.'
+    },
+    commonMisinterpretations: [
+      {
+        description: 'Korrelation visar att A orsakar B',
+        whyWrong: 'Korrelation visar samrörelse, inte kausalitet. En tredje faktor kan orsaka båda.',
+        correctInterpretation: 'A och B rör sig ofta tillsammans. Mer analys krävs för att förstå varför.',
+        frequency: 'very_common'
+      }
+    ],
+    readingGuide: {
+      whatToLookFor: ['Styrkan (0-1)', 'Riktningen (+/-)', 'Signifikans', 'Tidsperiod'],
+      whatToIgnore: ['Antaget kausalsamband', 'Korrelationer utan kontext'],
+      questions: ['Vilka andra faktorer kan påverka?', 'Gäller detta i alla sammanhang?']
+    }
+  }
+];
+
+export const LITERACY_FEATURE_FLAGS = {
+  showSimpleExplanations: true,
+  showMisinterpretations: true,
+  showReadingGuide: true,
+  defaultLevel: 'simple' as const,
+  alwaysShowDisclaimer: true
+};
