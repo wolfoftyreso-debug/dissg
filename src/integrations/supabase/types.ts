@@ -1003,6 +1003,54 @@ export type Database = {
           },
         ]
       }
+      daily_learnings: {
+        Row: {
+          countries_with_updates: string[] | null
+          generated_at: string | null
+          id: string
+          kpi_categories_updated: string[] | null
+          learning_date: string
+          notable_failures: Json | null
+          replication_updates: Json | null
+          summary_text: string | null
+          top_learnings: Json | null
+          total_confirmed_patterns: number | null
+          total_falsified_patterns: number | null
+          total_new_insights: number | null
+          total_replications: number | null
+        }
+        Insert: {
+          countries_with_updates?: string[] | null
+          generated_at?: string | null
+          id?: string
+          kpi_categories_updated?: string[] | null
+          learning_date: string
+          notable_failures?: Json | null
+          replication_updates?: Json | null
+          summary_text?: string | null
+          top_learnings?: Json | null
+          total_confirmed_patterns?: number | null
+          total_falsified_patterns?: number | null
+          total_new_insights?: number | null
+          total_replications?: number | null
+        }
+        Update: {
+          countries_with_updates?: string[] | null
+          generated_at?: string | null
+          id?: string
+          kpi_categories_updated?: string[] | null
+          learning_date?: string
+          notable_failures?: Json | null
+          replication_updates?: Json | null
+          summary_text?: string | null
+          top_learnings?: Json | null
+          total_confirmed_patterns?: number | null
+          total_falsified_patterns?: number | null
+          total_new_insights?: number | null
+          total_replications?: number | null
+        }
+        Relationships: []
+      }
       daily_priority_snapshots: {
         Row: {
           calculation_duration_ms: number | null
@@ -1049,6 +1097,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      data_constitution_articles: {
+        Row: {
+          adopted_at: string | null
+          article_number: number
+          article_title: string
+          automated_check: boolean | null
+          check_function: string | null
+          created_at: string | null
+          enforcement_type: string | null
+          examples: string[] | null
+          id: string
+          principle: string
+          rationale: string
+          version: number | null
+          violations: string[] | null
+        }
+        Insert: {
+          adopted_at?: string | null
+          article_number: number
+          article_title: string
+          automated_check?: boolean | null
+          check_function?: string | null
+          created_at?: string | null
+          enforcement_type?: string | null
+          examples?: string[] | null
+          id?: string
+          principle: string
+          rationale: string
+          version?: number | null
+          violations?: string[] | null
+        }
+        Update: {
+          adopted_at?: string | null
+          article_number?: number
+          article_title?: string
+          automated_check?: boolean | null
+          check_function?: string | null
+          created_at?: string | null
+          enforcement_type?: string | null
+          examples?: string[] | null
+          id?: string
+          principle?: string
+          rationale?: string
+          version?: number | null
+          violations?: string[] | null
+        }
+        Relationships: []
       }
       data_lineage: {
         Row: {
@@ -2063,6 +2159,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      falsified_hypotheses: {
+        Row: {
+          contradicting_data: string[] | null
+          failed_in_contexts: string[] | null
+          falsification_evidence: Json
+          falsification_summary: string
+          falsified_at: string | null
+          hypothesis_code: string
+          id: string
+          might_work_in_contexts: string[] | null
+          original_hypothesis: string
+          originally_proposed_at: string | null
+          originally_proposed_by: string | null
+          related_valid_patterns: string[] | null
+          what_we_learned: string
+        }
+        Insert: {
+          contradicting_data?: string[] | null
+          failed_in_contexts?: string[] | null
+          falsification_evidence: Json
+          falsification_summary: string
+          falsified_at?: string | null
+          hypothesis_code: string
+          id?: string
+          might_work_in_contexts?: string[] | null
+          original_hypothesis: string
+          originally_proposed_at?: string | null
+          originally_proposed_by?: string | null
+          related_valid_patterns?: string[] | null
+          what_we_learned: string
+        }
+        Update: {
+          contradicting_data?: string[] | null
+          failed_in_contexts?: string[] | null
+          falsification_evidence?: Json
+          falsification_summary?: string
+          falsified_at?: string | null
+          hypothesis_code?: string
+          id?: string
+          might_work_in_contexts?: string[] | null
+          original_hypothesis?: string
+          originally_proposed_at?: string | null
+          originally_proposed_by?: string | null
+          related_valid_patterns?: string[] | null
+          what_we_learned?: string
+        }
+        Relationships: []
       }
       fast_data_sources: {
         Row: {
@@ -3700,6 +3844,48 @@ export type Database = {
           },
         ]
       }
+      interpretation_boundaries: {
+        Row: {
+          boundary_code: string
+          created_at: string | null
+          id: string
+          invalid_statements: string[] | null
+          is_active: boolean | null
+          never_allowed: string[]
+          protected_aspect: string
+          protection_type: string | null
+          requires_context: string[] | null
+          requires_disclosure: string[] | null
+          valid_statements: string[] | null
+        }
+        Insert: {
+          boundary_code: string
+          created_at?: string | null
+          id?: string
+          invalid_statements?: string[] | null
+          is_active?: boolean | null
+          never_allowed: string[]
+          protected_aspect: string
+          protection_type?: string | null
+          requires_context?: string[] | null
+          requires_disclosure?: string[] | null
+          valid_statements?: string[] | null
+        }
+        Update: {
+          boundary_code?: string
+          created_at?: string | null
+          id?: string
+          invalid_statements?: string[] | null
+          is_active?: boolean | null
+          never_allowed?: string[]
+          protected_aspect?: string
+          protection_type?: string | null
+          requires_context?: string[] | null
+          requires_disclosure?: string[] | null
+          valid_statements?: string[] | null
+        }
+        Relationships: []
+      }
       knowledge_boundaries: {
         Row: {
           assessed_at: string | null
@@ -4889,6 +5075,111 @@ export type Database = {
         }
         Relationships: []
       }
+      method_registry: {
+        Row: {
+          academic_references: string[] | null
+          applicable_to: string[]
+          assumptions: string[]
+          created_at: string | null
+          description: string
+          id: string
+          implementation_url: string | null
+          is_active: boolean | null
+          limitations: string[]
+          mathematical_formula: string | null
+          method_code: string
+          name: string
+          not_applicable_to: string[] | null
+          pseudocode: string | null
+          validated_by: string[] | null
+          validation_date: string | null
+          validation_notes: string | null
+          version: string
+        }
+        Insert: {
+          academic_references?: string[] | null
+          applicable_to: string[]
+          assumptions: string[]
+          created_at?: string | null
+          description: string
+          id?: string
+          implementation_url?: string | null
+          is_active?: boolean | null
+          limitations: string[]
+          mathematical_formula?: string | null
+          method_code: string
+          name: string
+          not_applicable_to?: string[] | null
+          pseudocode?: string | null
+          validated_by?: string[] | null
+          validation_date?: string | null
+          validation_notes?: string | null
+          version: string
+        }
+        Update: {
+          academic_references?: string[] | null
+          applicable_to?: string[]
+          assumptions?: string[]
+          created_at?: string | null
+          description?: string
+          id?: string
+          implementation_url?: string | null
+          is_active?: boolean | null
+          limitations?: string[]
+          mathematical_formula?: string | null
+          method_code?: string
+          name?: string
+          not_applicable_to?: string[] | null
+          pseudocode?: string | null
+          validated_by?: string[] | null
+          validation_date?: string | null
+          validation_notes?: string | null
+          version?: string
+        }
+        Relationships: []
+      }
+      misuse_flags: {
+        Row: {
+          flagged_at: string | null
+          flagged_by: string | null
+          flagged_content_id: string | null
+          flagged_content_type: string
+          flagged_text: string | null
+          id: string
+          reviewed_at: string | null
+          reviewer_notes: string | null
+          status: string | null
+          violated_article: number | null
+          violation_type: string
+        }
+        Insert: {
+          flagged_at?: string | null
+          flagged_by?: string | null
+          flagged_content_id?: string | null
+          flagged_content_type: string
+          flagged_text?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          status?: string | null
+          violated_article?: number | null
+          violation_type: string
+        }
+        Update: {
+          flagged_at?: string | null
+          flagged_by?: string | null
+          flagged_content_id?: string | null
+          flagged_content_type?: string
+          flagged_text?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          status?: string | null
+          violated_article?: number | null
+          violation_type?: string
+        }
+        Relationships: []
+      }
       nuts_regions: {
         Row: {
           area_km2: number | null
@@ -5090,6 +5381,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pattern_lifecycle: {
+        Row: {
+          confirmed_in_geos: string[] | null
+          contradicting_evidence: number | null
+          created_at: string | null
+          failed_in_geos: string[] | null
+          failed_replications: number | null
+          first_observed_geo: string | null
+          id: string
+          pattern_code: string
+          pattern_description: string
+          replications: number | null
+          stage: string
+          stage_changed_at: string | null
+          stage_history: Json | null
+          supporting_evidence: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          confirmed_in_geos?: string[] | null
+          contradicting_evidence?: number | null
+          created_at?: string | null
+          failed_in_geos?: string[] | null
+          failed_replications?: number | null
+          first_observed_geo?: string | null
+          id?: string
+          pattern_code: string
+          pattern_description: string
+          replications?: number | null
+          stage: string
+          stage_changed_at?: string | null
+          stage_history?: Json | null
+          supporting_evidence?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          confirmed_in_geos?: string[] | null
+          contradicting_evidence?: number | null
+          created_at?: string | null
+          failed_in_geos?: string[] | null
+          failed_replications?: number | null
+          first_observed_geo?: string | null
+          id?: string
+          pattern_code?: string
+          pattern_description?: string
+          replications?: number | null
+          stage?: string
+          stage_changed_at?: string | null
+          stage_history?: Json | null
+          supporting_evidence?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       pipeline_status: {
         Row: {
@@ -5540,6 +5885,75 @@ export type Database = {
         }
         Relationships: []
       }
+      public_experiments: {
+        Row: {
+          all_data_public: boolean | null
+          analysis_method: string
+          assumptions: string[]
+          completed_at: string | null
+          conclusion: string | null
+          created_at: string | null
+          data_sources: string[]
+          experiment_code: string
+          hypothesis: string
+          id: string
+          limitations: string[] | null
+          methodology: string
+          proposed_by: string | null
+          replication_instructions: string | null
+          result_data: Json | null
+          result_summary: string | null
+          reviewed_by: string[] | null
+          started_at: string | null
+          status: string | null
+          title: string
+        }
+        Insert: {
+          all_data_public?: boolean | null
+          analysis_method: string
+          assumptions: string[]
+          completed_at?: string | null
+          conclusion?: string | null
+          created_at?: string | null
+          data_sources: string[]
+          experiment_code: string
+          hypothesis: string
+          id?: string
+          limitations?: string[] | null
+          methodology: string
+          proposed_by?: string | null
+          replication_instructions?: string | null
+          result_data?: Json | null
+          result_summary?: string | null
+          reviewed_by?: string[] | null
+          started_at?: string | null
+          status?: string | null
+          title: string
+        }
+        Update: {
+          all_data_public?: boolean | null
+          analysis_method?: string
+          assumptions?: string[]
+          completed_at?: string | null
+          conclusion?: string | null
+          created_at?: string | null
+          data_sources?: string[]
+          experiment_code?: string
+          hypothesis?: string
+          id?: string
+          limitations?: string[] | null
+          methodology?: string
+          proposed_by?: string | null
+          replication_instructions?: string | null
+          result_data?: Json | null
+          result_summary?: string | null
+          reviewed_by?: string[] | null
+          started_at?: string | null
+          status?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       public_officials: {
         Row: {
           birth_year: number | null
@@ -5915,6 +6329,69 @@ export type Database = {
           persistence_weight?: number
           responsibility_weight?: number
           version?: number
+        }
+        Relationships: []
+      }
+      reproducibility_records: {
+        Row: {
+          created_at: string | null
+          deviation_if_any: number | null
+          entity_id: string
+          entity_type: string
+          id: string
+          is_publicly_reproducible: boolean | null
+          last_reproduced_at: string | null
+          last_reproduction_matched: boolean | null
+          method_code: string
+          method_parameters: Json
+          method_version: string
+          reproduction_count: number | null
+          reproduction_endpoint: string | null
+          reproduction_query: Json | null
+          required_data_sources: string[]
+          required_geo_scope: string[]
+          required_time_range: unknown
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          deviation_if_any?: number | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          is_publicly_reproducible?: boolean | null
+          last_reproduced_at?: string | null
+          last_reproduction_matched?: boolean | null
+          method_code: string
+          method_parameters?: Json
+          method_version: string
+          reproduction_count?: number | null
+          reproduction_endpoint?: string | null
+          reproduction_query?: Json | null
+          required_data_sources: string[]
+          required_geo_scope: string[]
+          required_time_range: unknown
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          deviation_if_any?: number | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          is_publicly_reproducible?: boolean | null
+          last_reproduced_at?: string | null
+          last_reproduction_matched?: boolean | null
+          method_code?: string
+          method_parameters?: Json
+          method_version?: string
+          reproduction_count?: number | null
+          reproduction_endpoint?: string | null
+          reproduction_query?: Json | null
+          required_data_sources?: string[]
+          required_geo_scope?: string[]
+          required_time_range?: unknown
+          updated_at?: string | null
         }
         Relationships: []
       }

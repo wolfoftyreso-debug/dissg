@@ -1,8 +1,9 @@
 /**
+ * TRANSPARENCY LAYER
+ * 
  * DEL XIV — AGGREGERINGS- & ANSVARSMODELL
  * DEL XXIV — KÄNSLIGA VYER & SPRÅKREGLER
- * 
- * Transparenskomponenter för "Vi visar – vi påstår inte"
+ * WAVE 7 — RADICAL OPENNESS & DATA CONSTITUTION
  */
 
 export { MethodologyDisclosure } from './MethodologyDisclosure';
@@ -26,3 +27,9 @@ export { SensitiveViewDisclaimer, ShowHowWeKnow, MandatoryDisclaimers } from './
 // DEL XXVIII: Version & Revision Model
 export { RevisionHistory } from './RevisionHistory';
 export { LineageViewer } from './LineageViewer';
+
+// WAVE 7: Radical Openness
+export { ReproduceButton, ReproduceLink } from './ReproduceButton';
+
+// WAVE 7: Data Constitution
+export { ConstitutionArticleCard, ViolationAlert, ConstitutionRef } from './ConstitutionArticle';
