@@ -11,8 +11,9 @@ const corsHeaders = {
 };
 
 interface ExplainRequest {
-  type: 'kpi' | 'trend' | 'comparison' | 'correlation' | 'event' | 'signal';
+  type: 'kpi' | 'trend' | 'comparison' | 'correlation' | 'event' | 'signal' | 'contextual_summary';
   data: any;
+  lang?: 'sv' | 'en';
   context?: {
     country?: string;
     language?: string;
@@ -95,6 +96,25 @@ Beskriv händelsen och dess potentiella koppling till data, utan att påstå kau
 - Utlösande faktor: {trigger}
 
 Beskriv signalen och vad den indikerar baserat på data.`,
+
+  contextual_summary: `Sammanfatta kontextuella samband för denna indikator.
+
+STRIKTA REGLER:
+- Du får INTE använda orden: borde, bör, ska, måste, rekommenderar, bättre, sämre, lyckades, misslyckades
+- Du får ENDAST använda: ökade, minskade, förändrades, sammanfaller med, avviker från, observeras, korrelerar med
+- ALDRIG ge investeringsråd
+- ALDRIG dra normativa slutsatser
+
+DATA:
+- Indikator: {indicator}
+- Värde: {value}
+- Förändring: {change}%
+- Period: {period}
+- Relaterade förändringar: {relatedChanges}
+
+Beskriv observerade samband mellan denna indikator och relaterade förändringar. Använd ENDAST neutralt språk.
+
+Beskriv signalen och vad den indikerar baserat på data.`,
 };
 
 serve(async (req) => {
@@ -103,7 +123,7 @@ serve(async (req) => {
   }
 
   try {
-    const { type, data, context }: ExplainRequest = await req.json();
+    const { type, data, context, lang }: ExplainRequest = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
@@ -119,7 +139,7 @@ serve(async (req) => {
     });
 
     // Add context
-    if (context?.language === 'en') {
+    if (context?.language === 'en' || lang === 'en') {
       prompt = `Please respond in English.\n\n${prompt}`;
     }
 
@@ -166,14 +186,26 @@ serve(async (req) => {
     const result = await response.json();
     const explanation = result.choices?.[0]?.message?.content || "Kunde inte generera förklaring.";
 
+    // For contextual_summary, return as 'summary' field for compatibility
+    const responseData = type === 'contextual_summary' 
+      ? {
+          summary: explanation,
+          message: explanation,
+          type,
+          generated_at: new Date().toISOString(),
+          disclaimer: "AI-genererad sammanfattning. Observerade samband är korrelationer, inte orsakssamband.",
+          model: "google/gemini-3-flash-preview",
+        }
+      : {
+          explanation,
+          type,
+          generated_at: new Date().toISOString(),
+          disclaimer: "AI-genererad förklaring baserad på tillgängliga data. Systemet ger inga rekommendationer.",
+          model: "google/gemini-3-flash-preview",
+        };
+
     return new Response(
-      JSON.stringify({
-        explanation,
-        type,
-        generated_at: new Date().toISOString(),
-        disclaimer: "AI-genererad förklaring baserad på tillgängliga data. Systemet ger inga rekommendationer.",
-        model: "google/gemini-3-flash-preview",
-      }),
+      JSON.stringify(responseData),
       { 
         headers: { ...corsHeaders, "Content-Type": "application/json" } 
       }
