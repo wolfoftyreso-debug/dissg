@@ -261,6 +261,40 @@ export const CHARTER_ARTICLES: CharterArticle[] = [
         'Inget mer. Inget mindre.'
       ]
     }
+  },
+  {
+    number: 11,
+    title: 'The Evidence Requirement',
+    titleLocal: { sv: 'Evidenskravet' },
+    isImmutable: true,
+    content: [
+      'Any claim that an action will improve an outcome must reference a verifiable evidence report.',
+      'Evidence reports must contain: observed data aggregation, baseline description, correlation identification, and explicit uncertainty disclosure.',
+      'Claims without evidence reports have no legitimacy within this system.',
+      'Claims contradicted by evidence reports are marked as false.',
+      'The report does not say what should be done. It says what the data actually points to.'
+    ],
+    contentLocal: {
+      sv: [
+        'Varje påstående att en åtgärd förbättrar ett utfall måste referera till en verifierbar evidensrapport.',
+        'Evidensrapporter måste innehålla: aggregering av observerad data, nulägesbeskrivning, identifiering av samband och explicit osäkerhetsredovisning.',
+        'Påståenden utan evidensrapporter har ingen legitimitet inom detta system.',
+        'Påståenden som motsägs av evidensrapporter markeras som falska.',
+        'Rapporten säger inte vad man ska göra. Den säger vad datan faktiskt pekar på.'
+      ]
+    },
+    prohibitions: [
+      'Treating policy texts as evidence reports',
+      'Accepting claims without report references',
+      'Hiding report contradictions'
+    ],
+    prohibitionsLocal: {
+      sv: [
+        'Behandla policytexter som evidensrapporter',
+        'Acceptera påståenden utan rapportreferenser',
+        'Dölja rapportmotsägelser'
+      ]
+    }
   }
 ];
 
