@@ -52,6 +52,7 @@ import SmokeTestPage from "./pages/SmokeTest";
 import TrustLogPage from "./pages/TrustLogPage";
 import BigQuestionsPage from "./pages/BigQuestionsPage";
 import BigQuestionDetailPage from "./pages/BigQuestionDetailPage";
+import AIGroundingPage from "./pages/AIGroundingPage";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,7 @@ const App = () => (
               <Route path="/trust-log" element={<TrustLogPage />} />
               <Route path="/big-questions" element={<BigQuestionsPage />} />
               <Route path="/big-questions/:code" element={<BigQuestionDetailPage />} />
+              <Route path="/ai/grounding" element={<AIGroundingPage />} />
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={
                 <ProtectedRoute>
