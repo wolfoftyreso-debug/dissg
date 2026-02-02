@@ -53,6 +53,7 @@ import TrustLogPage from "./pages/TrustLogPage";
 import BigQuestionsPage from "./pages/BigQuestionsPage";
 import BigQuestionDetailPage from "./pages/BigQuestionDetailPage";
 import AIGroundingPage from "./pages/AIGroundingPage";
+import RealityCheckDemo from "./pages/RealityCheckDemo";
 
 const queryClient = new QueryClient();
 
@@ -109,6 +110,7 @@ const App = () => (
               <Route path="/big-questions" element={<BigQuestionsPage />} />
               <Route path="/big-questions/:code" element={<BigQuestionDetailPage />} />
               <Route path="/ai/grounding" element={<AIGroundingPage />} />
+              <Route path="/reality-check" element={<RealityCheckDemo />} />
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={
                 <ProtectedRoute>
