@@ -396,6 +396,33 @@ export type Database = {
           },
         ]
       }
+      anti_influence_log: {
+        Row: {
+          attempt_description: string
+          attempt_type: string
+          attempted_at: string
+          block_reason: string
+          blocked_automatically: boolean
+          id: string
+        }
+        Insert: {
+          attempt_description: string
+          attempt_type: string
+          attempted_at?: string
+          block_reason: string
+          blocked_automatically?: boolean
+          id?: string
+        }
+        Update: {
+          attempt_description?: string
+          attempt_type?: string
+          attempted_at?: string
+          block_reason?: string
+          blocked_automatically?: boolean
+          id?: string
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           allowed_countries: string[] | null
@@ -1300,6 +1327,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      data_versions: {
+        Row: {
+          created_at: string
+          data_snapshot: Json
+          entity_id: string
+          entity_type: string
+          id: string
+          trust_log_id: string | null
+          version_checksum: string
+          version_number: number
+        }
+        Insert: {
+          created_at?: string
+          data_snapshot: Json
+          entity_id: string
+          entity_type: string
+          id?: string
+          trust_log_id?: string | null
+          version_checksum: string
+          version_number?: number
+        }
+        Update: {
+          created_at?: string
+          data_snapshot?: Json
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          trust_log_id?: string | null
+          version_checksum?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_versions_trust_log_id_fkey"
+            columns: ["trust_log_id"]
+            isOneToOne: false
+            referencedRelation: "trust_log"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       decision_milestones: {
         Row: {
@@ -3340,6 +3408,53 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "global_master_index_config"
             referencedColumns: ["version"]
+          },
+        ]
+      }
+      governance_actions: {
+        Row: {
+          action_description: string
+          action_scope: string
+          action_type: string
+          actor_id: string | null
+          actor_role: Database["public"]["Enums"]["governance_role"]
+          approval_reason: string | null
+          created_at: string
+          id: string
+          trust_log_id: string | null
+          was_approved: boolean | null
+        }
+        Insert: {
+          action_description: string
+          action_scope: string
+          action_type: string
+          actor_id?: string | null
+          actor_role: Database["public"]["Enums"]["governance_role"]
+          approval_reason?: string | null
+          created_at?: string
+          id?: string
+          trust_log_id?: string | null
+          was_approved?: boolean | null
+        }
+        Update: {
+          action_description?: string
+          action_scope?: string
+          action_type?: string
+          actor_id?: string | null
+          actor_role?: Database["public"]["Enums"]["governance_role"]
+          approval_reason?: string | null
+          created_at?: string
+          id?: string
+          trust_log_id?: string | null
+          was_approved?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_actions_trust_log_id_fkey"
+            columns: ["trust_log_id"]
+            isOneToOne: false
+            referencedRelation: "trust_log"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -6814,6 +6929,69 @@ export type Database = {
         }
         Relationships: []
       }
+      trust_log: {
+        Row: {
+          change_type: Database["public"]["Enums"]["trust_log_change_type"]
+          content_impact: string | null
+          created_at: string
+          data_changed: boolean
+          id: string
+          initiated_by: string
+          initiated_by_role:
+            | Database["public"]["Enums"]["governance_role"]
+            | null
+          log_id: string
+          method_changed: boolean
+          reason: string
+          review_status: Database["public"]["Enums"]["review_status"]
+          reviewed_at: string | null
+          reviewed_by_role:
+            | Database["public"]["Enums"]["governance_role"]
+            | null
+          scope: string
+        }
+        Insert: {
+          change_type: Database["public"]["Enums"]["trust_log_change_type"]
+          content_impact?: string | null
+          created_at?: string
+          data_changed?: boolean
+          id?: string
+          initiated_by: string
+          initiated_by_role?:
+            | Database["public"]["Enums"]["governance_role"]
+            | null
+          log_id: string
+          method_changed?: boolean
+          reason: string
+          review_status?: Database["public"]["Enums"]["review_status"]
+          reviewed_at?: string | null
+          reviewed_by_role?:
+            | Database["public"]["Enums"]["governance_role"]
+            | null
+          scope: string
+        }
+        Update: {
+          change_type?: Database["public"]["Enums"]["trust_log_change_type"]
+          content_impact?: string | null
+          created_at?: string
+          data_changed?: boolean
+          id?: string
+          initiated_by?: string
+          initiated_by_role?:
+            | Database["public"]["Enums"]["governance_role"]
+            | null
+          log_id?: string
+          method_changed?: boolean
+          reason?: string
+          review_status?: Database["public"]["Enums"]["review_status"]
+          reviewed_at?: string | null
+          reviewed_by_role?:
+            | Database["public"]["Enums"]["governance_role"]
+            | null
+          scope?: string
+        }
+        Relationships: []
+      }
       user_access: {
         Row: {
           created_at: string | null
@@ -7098,6 +7276,20 @@ export type Database = {
         }[]
       }
       compute_checksum: { Args: { data: Json }; Returns: string }
+      create_trust_log_entry: {
+        Args: {
+          p_change_type: Database["public"]["Enums"]["trust_log_change_type"]
+          p_content_impact?: string
+          p_data_changed?: boolean
+          p_initiated_by?: string
+          p_initiated_by_role?: Database["public"]["Enums"]["governance_role"]
+          p_method_changed?: boolean
+          p_reason: string
+          p_scope: string
+        }
+        Returns: string
+      }
+      generate_trust_log_id: { Args: never; Returns: string }
       get_gov_role: { Args: { _user_id: string }; Returns: string }
       has_any_role: {
         Args: {
@@ -7156,6 +7348,11 @@ export type Database = {
       delivery_method: "api" | "webhook" | "sse" | "kafka"
       feed_severity: "low" | "medium" | "high" | "critical"
       feed_tier: "open" | "plus" | "pro"
+      governance_role:
+        | "data_steward"
+        | "method_reviewer"
+        | "system_maintainer"
+        | "public_observer"
       kpi_category:
         | "demografi_halsa"
         | "arbete_produktivitet"
@@ -7183,7 +7380,15 @@ export type Database = {
         | "integration"
         | "miljo"
       responsibility_level: "nationell" | "regional" | "kommunal"
+      review_status: "pending" | "verified" | "disputed" | "resolved"
       trend_direction: "up" | "down" | "stable"
+      trust_log_change_type:
+        | "data_update"
+        | "method_update"
+        | "text_simplification"
+        | "structure_change"
+        | "bug_fix"
+        | "deprecation"
       update_frequency:
         | "realtime"
         | "daily"
@@ -7354,6 +7559,12 @@ export const Constants = {
       delivery_method: ["api", "webhook", "sse", "kafka"],
       feed_severity: ["low", "medium", "high", "critical"],
       feed_tier: ["open", "plus", "pro"],
+      governance_role: [
+        "data_steward",
+        "method_reviewer",
+        "system_maintainer",
+        "public_observer",
+      ],
       kpi_category: [
         "demografi_halsa",
         "arbete_produktivitet",
@@ -7384,7 +7595,16 @@ export const Constants = {
         "miljo",
       ],
       responsibility_level: ["nationell", "regional", "kommunal"],
+      review_status: ["pending", "verified", "disputed", "resolved"],
       trend_direction: ["up", "down", "stable"],
+      trust_log_change_type: [
+        "data_update",
+        "method_update",
+        "text_simplification",
+        "structure_change",
+        "bug_fix",
+        "deprecation",
+      ],
       update_frequency: [
         "realtime",
         "daily",
