@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import PublicDashboard from "./pages/PublicDashboard";
 import GlobalCompact from "./pages/GlobalCompact";
+import GlobalMasterIndex from "./pages/GlobalMasterIndex";
 import Admin from "./pages/Admin";
 import PublicProfiles from "./pages/PublicProfiles";
 import ProfileDemo from "./pages/ProfileDemo";
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/regional" element={<RegionalView />} />
             <Route path="/decisions" element={<DecisionTimeline />} />
             <Route path="/compact" element={<GlobalCompact />} />
+            <Route path="/gmi" element={<GlobalMasterIndex />} />
             <Route path="/profiles" element={<PublicProfiles />} />
             <Route path="/profile-demo" element={<ProfileDemo />} />
             <Route path="/wrapped" element={<WrappedDemo />} />
