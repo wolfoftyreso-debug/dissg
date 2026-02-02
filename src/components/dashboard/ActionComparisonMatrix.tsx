@@ -38,7 +38,16 @@ import {
   AlertCircle,
   ChevronDown,
   ChevronUp,
+  Download,
+  FileText,
+  FileSpreadsheet,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export interface ComparisonAction {
   id: string;
@@ -183,7 +192,127 @@ function WinnerBadge({ wins, total }: { wins: number; total: number }) {
   );
 }
 
-export function ActionComparisonMatrix({ 
+// Export functionality
+function ExportMenu({ actions }: { actions: ComparisonAction[] }) {
+  const exportToCSV = () => {
+    const headers = ['Åtgärd', 'Kategori', 'Effekt', 'Kostnad', 'Risk', 'Tidsram', 'Komplexitet', 'Prioritet'];
+    const rows = actions.map(action => [
+      action.title,
+      action.category,
+      action.effect.score.toString(),
+      action.cost.score.toString(),
+      action.risk.score.toString(),
+      action.timeframe,
+      action.implementation.complexity,
+      action.priority_score.toString()
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `jämförelsematris_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportToPDF = () => {
+    // Create a printable HTML document
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Jämförelsematris - Export</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { color: #333; font-size: 18px; margin-bottom: 10px; }
+          .meta { color: #666; font-size: 12px; margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; font-size: 11px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #f5f5f5; font-weight: bold; }
+          .score-high { color: #16a34a; }
+          .score-mid { color: #ca8a04; }
+          .score-low { color: #dc2626; }
+          .footer { margin-top: 20px; font-size: 10px; color: #999; border-top: 1px solid #eee; padding-top: 10px; }
+        </style>
+      </head>
+      <body>
+        <h1>Jämförelsematris för åtgärder</h1>
+        <p class="meta">Exporterad: ${new Date().toLocaleString('sv-SE')} | Antal åtgärder: ${actions.length}</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Åtgärd</th>
+              <th>Kategori</th>
+              <th>Effekt</th>
+              <th>Kostnad</th>
+              <th>Risk</th>
+              <th>Tidsram</th>
+              <th>Komplexitet</th>
+              <th>Prioritet</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${actions.map(action => `
+              <tr>
+                <td><strong>${action.title}</strong></td>
+                <td>${action.category}</td>
+                <td class="${action.effect.score >= 7 ? 'score-high' : action.effect.score >= 4 ? 'score-mid' : 'score-low'}">${action.effect.score}/10</td>
+                <td class="${action.cost.score <= 3 ? 'score-high' : action.cost.score <= 6 ? 'score-mid' : 'score-low'}">${action.cost.score}/10</td>
+                <td class="${action.risk.score <= 3 ? 'score-high' : action.risk.score <= 6 ? 'score-mid' : 'score-low'}">${action.risk.score}/10</td>
+                <td>${action.timeframe === 'immediate' ? 'Nu' : action.timeframe === 'short_term' ? '0-6 mån' : action.timeframe === 'medium_term' ? '6-18 mån' : '18+ mån'}</td>
+                <td>${action.implementation.complexity === 'low' ? 'Låg' : action.implementation.complexity === 'medium' ? 'Medel' : 'Hög'}</td>
+                <td><strong>${action.priority_score}</strong></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div class="footer">
+          <p>Genererad av Global Infinity System | Notera: Effekt = högre är bättre, Kostnad/Risk = lägre är bättre</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+      }, 250);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm" className="h-7 px-2 text-xs gap-1">
+          <Download className="h-3 w-3" />
+          Exportera
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={exportToPDF} className="gap-2">
+          <FileText className="h-4 w-4" />
+          Exportera som PDF
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={exportToCSV} className="gap-2">
+          <FileSpreadsheet className="h-4 w-4" />
+          Exportera som CSV
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+export function ActionComparisonMatrix({
   actions, 
   recommendedActionId,
   onSelectAction 
@@ -316,6 +445,7 @@ export function ActionComparisonMatrix({
             </Badge>
           </div>
           <div className="flex items-center gap-2">
+            <ExportMenu actions={sortedActions} />
             <Button
               variant="ghost"
               size="sm"
