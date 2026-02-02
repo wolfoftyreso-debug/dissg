@@ -1,8 +1,10 @@
 /**
- * DEL XII — OFFENTLIGA POLITIKERPROFILER (ANSVAR & UTFALL)
+ * DEL XII & XIII — OFFENTLIGA POLITIKERPROFILER (ANSVAR & UTFALL)
  * 
  * Konfiguration för språkliga skyddsräcken och juridiska disclaimers.
  * Alla formuleringar är exakta och får inte ändras utan juridisk granskning.
+ * 
+ * DEL XIII: Faktabaserat katalogsystem med Wikipedia-separation
  */
 
 // =====================================================
@@ -10,12 +12,11 @@
 // =====================================================
 
 export const LEGAL_DISCLAIMERS = {
-  // Huvuddisclaimer - visas alltid på varje profil
+  // Huvuddisclaimer - visas alltid på varje profil (fast text, oföränderlig)
   main: {
     title: 'Om denna sida',
-    text: `Utfallet påverkas av många faktorer utanför en enskild persons kontroll.
-Dessa sidor visar samband i tid – inte full kausalitet.
-All information är hämtad från offentliga källor.`,
+    text: `Profilerna visar offentliga uppdrag och hur relevanta indikatorer utvecklades under dessa perioder.
+Systemet tillskriver inte individer orsak, skuld eller intention.`,
   },
   
   // Kortare version för kompakta vyer
@@ -31,6 +32,32 @@ Det visar endast offentliga uppdrag och observerade indikatorförändringar unde
     text: `Dessa sidor sammanställer offentligt tillgänglig information om uppdrag 
 och kopplar dem till nationella indikatorer. Korrelation i tid innebär inte kausalitet.
 En persons ansvar för ett område innebär inte ensamt ansvar för alla förändringar.`,
+  },
+  
+  // DEL XIII: Wikipedia-faktaruta
+  wikipediaAttribution: {
+    title: 'Grundfakta',
+    text: 'Denna information är hämtad från Wikipedia (CC BY-SA)',
+    linkText: 'Visa ursprungskälla på Wikipedia',
+  },
+  
+  // DEL XIII: Systemanalys-sektion
+  systemAnalysis: {
+    title: 'Ansvar & observerade utfall',
+    text: 'Denna del är systemgenererad analys baserad på öppna myndighetsdata.',
+  },
+  
+  // DEL XIII: Rättelse & transparens
+  correction: {
+    title: 'Rättelse & transparens',
+    text: `Om faktauppgifter är felaktiga ber vi dig först kontrollera och uppdatera Wikipedia.
+Systemet uppdateras automatiskt därefter.`,
+  },
+  
+  // DEL XIII: Verifieringsstatus
+  verification: {
+    prefix: 'Grundfakta senast verifierad mot Wikipedia:',
+    unknown: 'Ej verifierad',
   },
 } as const;
 

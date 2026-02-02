@@ -1,22 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  User, 
-  ExternalLink, 
-  Briefcase,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  ArrowLeft
-} from 'lucide-react';
-import { LANGUAGE_TEMPLATES, ASSIGNMENT_TYPES } from '@/config/publicProfileConfig';
+import { ArrowLeft, User } from 'lucide-react';
+import { LANGUAGE_TEMPLATES } from '@/config/publicProfileConfig';
 import { LegalDisclaimer } from './LegalDisclaimer';
-import { OutcomeDistribution } from './OutcomeDistribution';
+import { WikipediaFactsSection } from './WikipediaFactsSection';
+import { SystemAnalysisSection } from './SystemAnalysisSection';
+import { CorrectionNotice } from './CorrectionNotice';
 import { AssignmentTimeline } from './AssignmentTimeline';
 import { useState } from 'react';
 
@@ -88,15 +81,6 @@ export function PublicOfficialProfile({ officialId, onBack }: PublicOfficialProf
 
   const totalMonths = aggregatedOutcomes.improved + aggregatedOutcomes.stagnant + aggregatedOutcomes.declined;
 
-  const getOutcomePercentages = () => {
-    if (totalMonths === 0) return { improved: 33.3, stagnant: 33.3, declined: 33.3 };
-    return {
-      improved: (aggregatedOutcomes.improved / totalMonths) * 100,
-      stagnant: (aggregatedOutcomes.stagnant / totalMonths) * 100,
-      declined: (aggregatedOutcomes.declined / totalMonths) * 100,
-    };
-  };
-
   if (officialLoading) {
     return (
       <div className="space-y-6">
@@ -116,8 +100,6 @@ export function PublicOfficialProfile({ officialId, onBack }: PublicOfficialProf
     );
   }
 
-  const percentages = getOutcomePercentages();
-
   return (
     <div className="space-y-6">
       {/* Back button */}
@@ -128,50 +110,31 @@ export function PublicOfficialProfile({ officialId, onBack }: PublicOfficialProf
         </Button>
       )}
 
-      {/* Profile Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-                <User className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <div>
-                <CardTitle className="text-2xl">{official.full_name}</CardTitle>
-                <CardDescription className="text-base">
-                  {labels.profileHeader.subtitle}
-                </CardDescription>
-              </div>
-            </div>
-            {official.wikipedia_url && (
-              <Button variant="outline" size="sm" asChild>
-                <a href={official.wikipedia_url} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Wikipedia
-                </a>
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {official.party_affiliation && (
-              <Badge variant="secondary">{official.party_affiliation}</Badge>
-            )}
-            {assignments && (
-              <Badge variant="outline">
-                <Briefcase className="h-3 w-3 mr-1" />
-                {assignments.length} uppdrag
-              </Badge>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {/* ===== SEKTION A: FAKTA (Wikipedia-baserat) ===== */}
+      <WikipediaFactsSection 
+        official={{
+          full_name: official.full_name,
+          party_affiliation: official.party_affiliation,
+          birth_year: official.birth_year,
+          wikipedia_url: official.wikipedia_url,
+          last_verified_at: official.last_verified_at,
+        }}
+      />
 
-      {/* Legal Disclaimer */}
+      {/* Juridisk disclaimer */}
       <LegalDisclaimer variant="main" />
 
-      {/* Main Content Grid */}
+      {/* Visuell separator */}
+      <div className="relative py-4">
+        <Separator />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="bg-background px-4 text-xs text-muted-foreground uppercase tracking-wide">
+            Systemgenererad analys
+          </span>
+        </div>
+      </div>
+
+      {/* ===== SEKTION B: ANSVAR & UTFALL (systemets data) ===== */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Left: Timeline */}
         <AssignmentTimeline
@@ -187,51 +150,20 @@ export function PublicOfficialProfile({ officialId, onBack }: PublicOfficialProf
           selectedId={selectedAssignmentId || undefined}
         />
 
-        {/* Right: Outcomes */}
-        <div className="space-y-6">
-          {/* Summary Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">{labels.responsibilitySummary.title}</CardTitle>
-              <CardDescription>
-                {labels.responsibilitySummary.description}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="p-4 rounded-lg bg-primary/10">
-                  <TrendingUp className="h-5 w-5 mx-auto mb-1 text-primary" />
-                  <div className="text-2xl font-bold">{aggregatedOutcomes.improved}</div>
-                  <div className="text-xs text-muted-foreground">månader förbättring</div>
-                </div>
-                <div className="p-4 rounded-lg bg-muted">
-                  <Minus className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
-                  <div className="text-2xl font-bold">{aggregatedOutcomes.stagnant}</div>
-                  <div className="text-xs text-muted-foreground">månader stagnation</div>
-                </div>
-                <div className="p-4 rounded-lg bg-destructive/10">
-                  <TrendingDown className="h-5 w-5 mx-auto mb-1 text-destructive" />
-                  <div className="text-2xl font-bold">{aggregatedOutcomes.declined}</div>
-                  <div className="text-xs text-muted-foreground">månader försämring</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Outcome Distribution */}
-          <OutcomeDistribution
-            improved={percentages.improved}
-            stagnant={percentages.stagnant}
-            declined={percentages.declined}
-            totalMonths={totalMonths > 0 ? totalMonths : undefined}
-          />
-        </div>
+        {/* Right: Analysis */}
+        <SystemAnalysisSection
+          outcomes={aggregatedOutcomes}
+          totalMonths={totalMonths}
+        />
       </div>
 
-      {/* Methodology Disclaimer */}
+      {/* Metoddisclaimer */}
       <LegalDisclaimer variant="methodology" />
 
-      {/* Footer */}
+      {/* Rättelse & transparens */}
+      <CorrectionNotice wikipediaUrl={official.wikipedia_url} />
+
+      {/* Footer-disclaimer */}
       <LegalDisclaimer variant="footer" />
     </div>
   );
