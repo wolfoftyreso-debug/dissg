@@ -42,3 +42,19 @@ export {
   getTrendColor,
   VERIFICATION_COLORS,
 } from '@/lib/wrapped/animationSpec';
+
+// Worthiness Engine - Auto-selection algorithm
+export { WorthinessDebugger } from './WorthinessDebugger';
+export {
+  calculateWorthinessScore,
+  selectForWrap,
+  getSelectionStats,
+  meetsMinimumQuality,
+  calculateChangeVelocity,
+  detectPatternBreak,
+  type IndicatorSnapshot,
+  type WorthinessScore,
+  type WrapSelection,
+  type RelevanceLevel,
+} from '@/lib/wrapped/worthinessEngine';
+export { useWrapWorthiness, generateMockIndicators } from '@/hooks/useWrapWorthiness';
