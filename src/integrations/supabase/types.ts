@@ -948,6 +948,413 @@ export type Database = {
           },
         ]
       }
+      eu_cluster_members: {
+        Row: {
+          cluster_id: string
+          country_code: string
+          distance_to_centroid: number | null
+          id: string
+          joined_at: string | null
+          membership_score: number | null
+          nuts_code: string
+        }
+        Insert: {
+          cluster_id: string
+          country_code: string
+          distance_to_centroid?: number | null
+          id?: string
+          joined_at?: string | null
+          membership_score?: number | null
+          nuts_code: string
+        }
+        Update: {
+          cluster_id?: string
+          country_code?: string
+          distance_to_centroid?: number | null
+          id?: string
+          joined_at?: string | null
+          membership_score?: number | null
+          nuts_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eu_cluster_members_cluster_id_fkey"
+            columns: ["cluster_id"]
+            isOneToOne: false
+            referencedRelation: "eu_clusters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eu_clusters: {
+        Row: {
+          algorithm_used: string | null
+          calculated_at: string | null
+          centroid_values: Json | null
+          cluster_type: string
+          code: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          member_count: number | null
+          name: string
+          nuts_level: number | null
+        }
+        Insert: {
+          algorithm_used?: string | null
+          calculated_at?: string | null
+          centroid_values?: Json | null
+          cluster_type: string
+          code: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          member_count?: number | null
+          name: string
+          nuts_level?: number | null
+        }
+        Update: {
+          algorithm_used?: string | null
+          calculated_at?: string | null
+          centroid_values?: Json | null
+          cluster_type?: string
+          code?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          member_count?: number | null
+          name?: string
+          nuts_level?: number | null
+        }
+        Relationships: []
+      }
+      eu_correlations: {
+        Row: {
+          analysis_method: string | null
+          calculated_at: string | null
+          correlation_coefficient: number
+          id: string
+          interpretation: string | null
+          is_significant: boolean | null
+          kpi_a_id: string
+          kpi_b_id: string
+          nuts_level: number | null
+          p_value: number | null
+          period_end: string
+          period_start: string
+          sample_size: number | null
+          stability_score: number | null
+          time_lag_months: number | null
+        }
+        Insert: {
+          analysis_method?: string | null
+          calculated_at?: string | null
+          correlation_coefficient: number
+          id?: string
+          interpretation?: string | null
+          is_significant?: boolean | null
+          kpi_a_id: string
+          kpi_b_id: string
+          nuts_level?: number | null
+          p_value?: number | null
+          period_end: string
+          period_start: string
+          sample_size?: number | null
+          stability_score?: number | null
+          time_lag_months?: number | null
+        }
+        Update: {
+          analysis_method?: string | null
+          calculated_at?: string | null
+          correlation_coefficient?: number
+          id?: string
+          interpretation?: string | null
+          is_significant?: boolean | null
+          kpi_a_id?: string
+          kpi_b_id?: string
+          nuts_level?: number | null
+          p_value?: number | null
+          period_end?: string
+          period_start?: string
+          sample_size?: number | null
+          stability_score?: number | null
+          time_lag_months?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eu_correlations_kpi_a_id_fkey"
+            columns: ["kpi_a_id"]
+            isOneToOne: false
+            referencedRelation: "eu_kpi_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eu_correlations_kpi_b_id_fkey"
+            columns: ["kpi_b_id"]
+            isOneToOne: false
+            referencedRelation: "eu_kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      eu_data_sources: {
+        Row: {
+          api_base_url: string | null
+          api_documentation_url: string | null
+          code: string
+          countries_covered: string[] | null
+          created_at: string | null
+          data_categories: string[] | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          last_error: string | null
+          last_successful_fetch: string | null
+          name: string
+          nuts_level_support: number[] | null
+          reliability_score: number | null
+          typical_lag_days: number | null
+          update_frequency: Database["public"]["Enums"]["update_frequency"]
+          updated_at: string | null
+        }
+        Insert: {
+          api_base_url?: string | null
+          api_documentation_url?: string | null
+          code: string
+          countries_covered?: string[] | null
+          created_at?: string | null
+          data_categories?: string[] | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_error?: string | null
+          last_successful_fetch?: string | null
+          name: string
+          nuts_level_support?: number[] | null
+          reliability_score?: number | null
+          typical_lag_days?: number | null
+          update_frequency?: Database["public"]["Enums"]["update_frequency"]
+          updated_at?: string | null
+        }
+        Update: {
+          api_base_url?: string | null
+          api_documentation_url?: string | null
+          code?: string
+          countries_covered?: string[] | null
+          created_at?: string | null
+          data_categories?: string[] | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_error?: string | null
+          last_successful_fetch?: string | null
+          name?: string
+          nuts_level_support?: number[] | null
+          reliability_score?: number | null
+          typical_lag_days?: number | null
+          update_frequency?: Database["public"]["Enums"]["update_frequency"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      eu_feed_definitions: {
+        Row: {
+          category: string
+          code: string
+          created_at: string | null
+          description: string | null
+          id: string
+          include_clusters: boolean | null
+          is_active: boolean | null
+          max_events_per_day: number | null
+          min_effect_threshold: number | null
+          min_nuts_level: number | null
+          name: string
+          tier: Database["public"]["Enums"]["feed_tier"]
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          include_clusters?: boolean | null
+          is_active?: boolean | null
+          max_events_per_day?: number | null
+          min_effect_threshold?: number | null
+          min_nuts_level?: number | null
+          name: string
+          tier?: Database["public"]["Enums"]["feed_tier"]
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          include_clusters?: boolean | null
+          is_active?: boolean | null
+          max_events_per_day?: number | null
+          min_effect_threshold?: number | null
+          min_nuts_level?: number | null
+          name?: string
+          tier?: Database["public"]["Enums"]["feed_tier"]
+        }
+        Relationships: []
+      }
+      eu_kpi_definitions: {
+        Row: {
+          category: string
+          code: string
+          comparability_score: number | null
+          created_at: string | null
+          data_quality_notes: string | null
+          description: string | null
+          ecb_indicator_code: string | null
+          ecdc_indicator_code: string | null
+          eurostat_indicator_code: string | null
+          gmi_component: string | null
+          gmi_weight: number | null
+          id: string
+          is_active: boolean | null
+          is_inverted: boolean | null
+          max_nuts_level: number | null
+          min_nuts_level: number | null
+          name: string
+          name_local: string | null
+          normalization_method: string | null
+          unit: string
+        }
+        Insert: {
+          category: string
+          code: string
+          comparability_score?: number | null
+          created_at?: string | null
+          data_quality_notes?: string | null
+          description?: string | null
+          ecb_indicator_code?: string | null
+          ecdc_indicator_code?: string | null
+          eurostat_indicator_code?: string | null
+          gmi_component?: string | null
+          gmi_weight?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_inverted?: boolean | null
+          max_nuts_level?: number | null
+          min_nuts_level?: number | null
+          name: string
+          name_local?: string | null
+          normalization_method?: string | null
+          unit: string
+        }
+        Update: {
+          category?: string
+          code?: string
+          comparability_score?: number | null
+          created_at?: string | null
+          data_quality_notes?: string | null
+          description?: string | null
+          ecb_indicator_code?: string | null
+          ecdc_indicator_code?: string | null
+          eurostat_indicator_code?: string | null
+          gmi_component?: string | null
+          gmi_weight?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_inverted?: boolean | null
+          max_nuts_level?: number | null
+          min_nuts_level?: number | null
+          name?: string
+          name_local?: string | null
+          normalization_method?: string | null
+          unit?: string
+        }
+        Relationships: []
+      }
+      eu_kpi_values: {
+        Row: {
+          confidence: number | null
+          country_code: string
+          created_at: string | null
+          data_source_code: string
+          estimation_method: string | null
+          flags: string[] | null
+          id: string
+          is_estimated: boolean | null
+          kpi_id: string
+          nuts_code: string
+          period_end: string
+          period_start: string
+          previous_value: number | null
+          source_indicator_code: string | null
+          source_url: string | null
+          trend: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent: number | null
+          updated_at: string | null
+          value: number
+          value_normalized: number | null
+        }
+        Insert: {
+          confidence?: number | null
+          country_code: string
+          created_at?: string | null
+          data_source_code: string
+          estimation_method?: string | null
+          flags?: string[] | null
+          id?: string
+          is_estimated?: boolean | null
+          kpi_id: string
+          nuts_code: string
+          period_end: string
+          period_start: string
+          previous_value?: number | null
+          source_indicator_code?: string | null
+          source_url?: string | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent?: number | null
+          updated_at?: string | null
+          value: number
+          value_normalized?: number | null
+        }
+        Update: {
+          confidence?: number | null
+          country_code?: string
+          created_at?: string | null
+          data_source_code?: string
+          estimation_method?: string | null
+          flags?: string[] | null
+          id?: string
+          is_estimated?: boolean | null
+          kpi_id?: string
+          nuts_code?: string
+          period_end?: string
+          period_start?: string
+          previous_value?: number | null
+          source_indicator_code?: string | null
+          source_url?: string | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          trend_percent?: number | null
+          updated_at?: string | null
+          value?: number
+          value_normalized?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eu_kpi_values_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "eu_kpi_values_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "eu_kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evaluation_weights: {
         Row: {
           cost_weight: number
@@ -2537,6 +2944,65 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "master_index_config"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      nuts_regions: {
+        Row: {
+          area_km2: number | null
+          capital_city: string | null
+          code: string
+          country_code: string
+          created_at: string | null
+          geometry_simplified: Json | null
+          id: string
+          is_active: boolean | null
+          name: string
+          name_local: string | null
+          nuts_level: number
+          parent_code: string | null
+          population: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          area_km2?: number | null
+          capital_city?: string | null
+          code: string
+          country_code: string
+          created_at?: string | null
+          geometry_simplified?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_local?: string | null
+          nuts_level: number
+          parent_code?: string | null
+          population?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          area_km2?: number | null
+          capital_city?: string | null
+          code?: string
+          country_code?: string
+          created_at?: string | null
+          geometry_simplified?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_local?: string | null
+          nuts_level?: number
+          parent_code?: string | null
+          population?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nuts_regions_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
           },
         ]
       }

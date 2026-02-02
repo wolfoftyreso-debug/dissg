@@ -620,6 +620,11 @@ export default function PublicDashboard() {
                   Beslutstidslinje
                 </Link>
               </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/eu" className="gap-2">
+                  🇪🇺 EU Dashboard
+                </Link>
+              </Button>
             </div>
 
             {/* Area Grid */}
