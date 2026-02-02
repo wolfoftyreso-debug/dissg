@@ -232,6 +232,110 @@ export type Database = {
           },
         ]
       }
+      assignment_kpi_relevance: {
+        Row: {
+          assignment_id: string
+          created_at: string
+          id: string
+          is_primary: boolean
+          kpi_id: string
+          relevance_rationale: string | null
+          relevance_weight: number
+        }
+        Insert: {
+          assignment_id: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          kpi_id: string
+          relevance_rationale?: string | null
+          relevance_weight?: number
+        }
+        Update: {
+          assignment_id?: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          kpi_id?: string
+          relevance_rationale?: string | null
+          relevance_weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignment_kpi_relevance_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "public_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignment_kpi_relevance_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assignment_outcomes: {
+        Row: {
+          assignment_id: string
+          calculated_at: string
+          calculated_for_period_end: string
+          calculated_for_period_start: string
+          calculation_version: string
+          decline_percentage: number | null
+          id: string
+          improvement_percentage: number | null
+          kpi_outcomes: Json
+          months_with_decline: number
+          months_with_improvement: number
+          months_with_stagnation: number
+          stagnation_percentage: number | null
+          total_kpis_tracked: number
+        }
+        Insert: {
+          assignment_id: string
+          calculated_at?: string
+          calculated_for_period_end: string
+          calculated_for_period_start: string
+          calculation_version?: string
+          decline_percentage?: number | null
+          id?: string
+          improvement_percentage?: number | null
+          kpi_outcomes?: Json
+          months_with_decline?: number
+          months_with_improvement?: number
+          months_with_stagnation?: number
+          stagnation_percentage?: number | null
+          total_kpis_tracked?: number
+        }
+        Update: {
+          assignment_id?: string
+          calculated_at?: string
+          calculated_for_period_end?: string
+          calculated_for_period_start?: string
+          calculation_version?: string
+          decline_percentage?: number | null
+          id?: string
+          improvement_percentage?: number | null
+          kpi_outcomes?: Json
+          months_with_decline?: number
+          months_with_improvement?: number
+          months_with_stagnation?: number
+          stagnation_percentage?: number | null
+          total_kpis_tracked?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignment_outcomes_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "public_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calculated_indicators: {
         Row: {
           created_at: string
@@ -1371,6 +1475,105 @@ export type Database = {
             | Database["public"]["Enums"]["responsibility_level"]
             | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      public_assignments: {
+        Row: {
+          assignment_type: string
+          created_at: string
+          end_date: string | null
+          governance_period_id: string | null
+          id: string
+          official_id: string
+          responsibility_areas: Database["public"]["Enums"]["responsibility_area"][]
+          responsibility_level: Database["public"]["Enums"]["responsibility_level"]
+          source_document: string | null
+          source_url: string | null
+          start_date: string
+          title: string
+        }
+        Insert: {
+          assignment_type: string
+          created_at?: string
+          end_date?: string | null
+          governance_period_id?: string | null
+          id?: string
+          official_id: string
+          responsibility_areas?: Database["public"]["Enums"]["responsibility_area"][]
+          responsibility_level?: Database["public"]["Enums"]["responsibility_level"]
+          source_document?: string | null
+          source_url?: string | null
+          start_date: string
+          title: string
+        }
+        Update: {
+          assignment_type?: string
+          created_at?: string
+          end_date?: string | null
+          governance_period_id?: string | null
+          id?: string
+          official_id?: string
+          responsibility_areas?: Database["public"]["Enums"]["responsibility_area"][]
+          responsibility_level?: Database["public"]["Enums"]["responsibility_level"]
+          source_document?: string | null
+          source_url?: string | null
+          start_date?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_assignments_governance_period_id_fkey"
+            columns: ["governance_period_id"]
+            isOneToOne: false
+            referencedRelation: "governance_periods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_assignments_official_id_fkey"
+            columns: ["official_id"]
+            isOneToOne: false
+            referencedRelation: "public_officials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_officials: {
+        Row: {
+          birth_year: number | null
+          created_at: string
+          data_sources: string[] | null
+          full_name: string
+          id: string
+          last_verified_at: string | null
+          party_affiliation: string | null
+          riksdagen_id: string | null
+          updated_at: string
+          wikipedia_url: string | null
+        }
+        Insert: {
+          birth_year?: number | null
+          created_at?: string
+          data_sources?: string[] | null
+          full_name: string
+          id?: string
+          last_verified_at?: string | null
+          party_affiliation?: string | null
+          riksdagen_id?: string | null
+          updated_at?: string
+          wikipedia_url?: string | null
+        }
+        Update: {
+          birth_year?: number | null
+          created_at?: string
+          data_sources?: string[] | null
+          full_name?: string
+          id?: string
+          last_verified_at?: string | null
+          party_affiliation?: string | null
+          riksdagen_id?: string | null
+          updated_at?: string
+          wikipedia_url?: string | null
         }
         Relationships: []
       }
