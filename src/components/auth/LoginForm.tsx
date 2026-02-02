@@ -110,6 +110,13 @@ export function LoginForm() {
               Registrera dig
             </Link>
           </p>
+          
+          <Link 
+            to="/public" 
+            className="text-xs text-muted-foreground hover:text-primary text-center block"
+          >
+            Visa publik dashboard →
+          </Link>
         </CardFooter>
       </form>
     </Card>

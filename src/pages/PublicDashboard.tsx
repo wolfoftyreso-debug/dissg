@@ -586,7 +586,7 @@ export default function PublicDashboard() {
                 Hur går det för Sverige just nu?
               </h1>
               <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                20 centrala indikatorer. Samma data som beslutsfattare använder.
+                {kpis.length} centrala indikatorer. Samma data som beslutsfattare använder.
               </p>
             </div>
 
