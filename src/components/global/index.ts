@@ -35,3 +35,6 @@ export { RiskIndicatorPanel } from './RiskIndicatorPanel';
 
 // WAVE 12: Extreme Historical Depth Layer
 export { HistoricalDepthTimeline } from './HistoricalDepthTimeline';
+
+// WAVE 12: Global Historical Sources & Ingestion
+export { SourceTransparencyPanel } from './SourceTransparencyPanel';
