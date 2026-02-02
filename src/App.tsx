@@ -40,6 +40,7 @@ import ClarityDemo from "./pages/ClarityDemo";
 import DemographyDemo from "./pages/DemographyDemo";
 import SwedenDashboard from "./pages/SwedenDashboard";
 import ScenarioDemo from "./pages/ScenarioDemo";
+import CapacityDemo from "./pages/CapacityDemo";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,7 @@ const App = () => (
               <Route path="/demography" element={<DemographyDemo />} />
               <Route path="/sweden" element={<SwedenDashboard />} />
               <Route path="/scenario" element={<ScenarioDemo />} />
+              <Route path="/capacity" element={<CapacityDemo />} />
               
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/" element={
