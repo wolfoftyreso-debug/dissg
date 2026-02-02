@@ -505,6 +505,465 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     granularity: "yearly",
     aggregation: 'sum',
   },
+
+  // ═══════════════════════════════════════════════════════════════
+  // NYA TABELLER: BNP, SYSSELSÄTTNING, BROTT
+  // ═══════════════════════════════════════════════════════════════
+
+  // ─────────────────────────────────────────────────────────────
+  // BNP - Bruttonationalprodukt, löpande priser
+  // ─────────────────────────────────────────────────────────────
+  gdp_current_prices: {
+    path: "NR/NR0103/NR0103B/NR0103ENS2010T01Kv",
+    description: "BNP löpande priser, kvartal",
+    kpiCode: "gdp_level",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["BNP"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000001W"] } },
+        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+      ],
+      response: { format: "json" }
+    },
+    valueMultiplier: 0.001,
+    unit: "miljarder SEK",
+    granularity: "quarterly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // BNP - Fasta priser, säsongsrensat
+  // ─────────────────────────────────────────────────────────────
+  gdp_constant_prices: {
+    path: "NR/NR0103/NR0103B/NR0103ENS2010T01Kv",
+    description: "BNP fasta priser referensår 2021, säsongsrensat",
+    kpiCode: "gdp_growth",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["BNP"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000002O"] } },
+        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "miljarder SEK (2021 års priser)",
+    granularity: "quarterly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // BNP - Per capita
+  // ─────────────────────────────────────────────────────────────
+  gdp_per_capita: {
+    path: "NR/NR0103/NR0103A/NR0103ENS2010T01A",
+    description: "BNP per capita, löpande priser",
+    kpiCode: "gdp_per_capita",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["BNPCap"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000001X"] } },
+        { code: "Tid", selection: { filter: "top", values: ["10"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "SEK/capita",
+    granularity: "yearly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // BNP-TILLVÄXT - Procentuell förändring
+  // ─────────────────────────────────────────────────────────────
+  gdp_growth_rate: {
+    path: "NR/NR0103/NR0103B/NR0103ENS2010T01Kv",
+    description: "BNP-förändring i procent, säsongsrensat",
+    kpiCode: "gdp_growth_rate",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["BNP"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000002P"] } }, // Procentuell förändring
+        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "%",
+    granularity: "quarterly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // SYSSELSÄTTNING - Antal sysselsatta (tusental)
+  // ─────────────────────────────────────────────────────────────
+  employed_total: {
+    path: "AM/AM0401/AM0401A/NAKUBefAkeLArb",
+    description: "Antal sysselsatta 15-74 år, tusental",
+    kpiCode: "employed_count",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["15-74"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CJ"] } },
+        { code: "Tid", selection: { filter: "top", values: ["24"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "tusental",
+    granularity: "monthly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // SYSSELSÄTTNING - Per kön
+  // ─────────────────────────────────────────────────────────────
+  employment_by_gender: {
+    path: "AM/AM0401/AM0401A/NAKUBefAkeLArb",
+    description: "Sysselsättningsgrad 20-64 år per kön",
+    kpiCode: "employment_by_gender",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["20-64"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1", "2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CK"] } },
+        { code: "Tid", selection: { filter: "top", values: ["24"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "%",
+    granularity: "monthly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // SYSSELSÄTTNING - Per åldersgrupp
+  // ─────────────────────────────────────────────────────────────
+  employment_by_age: {
+    path: "AM/AM0401/AM0401A/NAKUBefAkeLArb",
+    description: "Sysselsättningsgrad per åldersgrupp",
+    kpiCode: "employment_by_age",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["15-24", "25-34", "35-44", "45-54", "55-64", "65-74"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CK"] } },
+        { code: "Tid", selection: { filter: "top", values: ["12"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "%",
+    granularity: "monthly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // SYSSELSÄTTNING - Per födelseregion (inrikes/utrikes)
+  // ─────────────────────────────────────────────────────────────
+  employment_by_birth_region: {
+    path: "AM/AM0401/AM0401L/NAKUBefAkeLArbFoder",
+    description: "Sysselsättningsgrad efter födelseregion",
+    kpiCode: "employment_by_origin",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["20-64"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "Fodelseland", selection: { filter: "item", values: ["inrikes", "utrikes"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CK"] } },
+        { code: "Tid", selection: { filter: "top", values: ["12"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "%",
+    granularity: "monthly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // ARBETSLÖSHET - Antal arbetslösa (tusental)
+  // ─────────────────────────────────────────────────────────────
+  unemployed_total: {
+    path: "AM/AM0401/AM0401A/NAKUBefAkeLArb",
+    description: "Antal arbetslösa 15-74 år, tusental",
+    kpiCode: "unemployed_count",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["15-74"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CM"] } },
+        { code: "Tid", selection: { filter: "top", values: ["24"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "tusental",
+    granularity: "monthly",
+    aggregation: 'latest',
+    isInverted: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // LÅNGTIDSARBETSLÖSHET - Mer än 6 månader
+  // ─────────────────────────────────────────────────────────────
+  long_term_unemployed: {
+    path: "AM/AM0401/AM0401N/NAKUArbLosaTid",
+    description: "Långtidsarbetslösa (6+ månader)",
+    kpiCode: "long_term_unemployed",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["15-74"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "Tid", selection: { filter: "item", values: ["27+"] } }, // 27+ veckor
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CN"] } },
+        { code: "Tid", selection: { filter: "top", values: ["12"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "tusental",
+    granularity: "monthly",
+    aggregation: 'latest',
+    isInverted: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // ARBETADE TIMMAR - Totalt i ekonomin
+  // ─────────────────────────────────────────────────────────────
+  hours_worked: {
+    path: "AM/AM0401/AM0401A/NAKUBefAkeLArb",
+    description: "Arbetade timmar per vecka, genomsnitt",
+    kpiCode: "hours_worked",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["15-74"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CO"] } },
+        { code: "Tid", selection: { filter: "top", values: ["24"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "miljoner timmar/vecka",
+    granularity: "monthly",
+    aggregation: 'latest',
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // BROTTSSTATISTIK (via SCB rättsvårdsstatistik)
+  // ═══════════════════════════════════════════════════════════════
+
+  // ─────────────────────────────────────────────────────────────
+  // ANMÄLDA BROTT - Total (SCB har äldre data, BRÅ för nyare)
+  // ─────────────────────────────────────────────────────────────
+  crimes_reported: {
+    path: "LE/LE0101/LE0101A/AnijBrott",
+    description: "Anmälda brott efter brottstyp",
+    kpiCode: "crimes_reported",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Brottstyp", selection: { filter: "item", values: [
+          "3", // Mord, dråp
+          "4", // Misshandel
+          "5", // Våldtäkt
+          "6", // Sexualbrott
+          "7", // Rån
+          "8", // Stöld
+          "9", // Bedrägeri
+        ] } },
+        { code: "Region", selection: { filter: "item", values: ["00"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["LE0101A1"] } },
+        { code: "Tid", selection: { filter: "top", values: ["10"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal/100 000 inv",
+    granularity: "yearly",
+    aggregation: 'sum',
+    isInverted: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // VÅLDSBROTT - Misshandel
+  // ─────────────────────────────────────────────────────────────
+  violent_crimes_assault: {
+    path: "LE/LE0101/LE0101A/AnijBrott",
+    description: "Anmälda misshandelsbrott",
+    kpiCode: "violent_crime_assault",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Brottstyp", selection: { filter: "item", values: ["4"] } }, // Misshandel
+        { code: "Region", selection: { filter: "item", values: ["00"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["LE0101A1"] } },
+        { code: "Tid", selection: { filter: "top", values: ["15"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal/100 000 inv",
+    granularity: "yearly",
+    aggregation: 'latest',
+    isInverted: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // DÖDLIGT VÅLD - Mord och dråp
+  // ─────────────────────────────────────────────────────────────
+  homicides: {
+    path: "LE/LE0101/LE0101A/AnijBrott",
+    description: "Anmälda mord och dråp",
+    kpiCode: "homicides",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Brottstyp", selection: { filter: "item", values: ["3"] } }, // Mord, dråp
+        { code: "Region", selection: { filter: "item", values: ["00"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["LE0101A1"] } },
+        { code: "Tid", selection: { filter: "top", values: ["20"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal",
+    granularity: "yearly",
+    aggregation: 'sum',
+    isInverted: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // SEXUALBROTT
+  // ─────────────────────────────────────────────────────────────
+  sexual_crimes: {
+    path: "LE/LE0101/LE0101A/AnijBrott",
+    description: "Anmälda sexualbrott",
+    kpiCode: "sexual_crimes",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Brottstyp", selection: { filter: "item", values: ["5", "6"] } }, // Våldtäkt + övrigt
+        { code: "Region", selection: { filter: "item", values: ["00"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["LE0101A1"] } },
+        { code: "Tid", selection: { filter: "top", values: ["15"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal/100 000 inv",
+    granularity: "yearly",
+    aggregation: 'sum',
+    isInverted: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // STÖLD OCH RÅN
+  // ─────────────────────────────────────────────────────────────
+  theft_robbery: {
+    path: "LE/LE0101/LE0101A/AnijBrott",
+    description: "Anmälda stöld- och rånbrott",
+    kpiCode: "theft_robbery",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Brottstyp", selection: { filter: "item", values: ["7", "8"] } }, // Rån + stöld
+        { code: "Region", selection: { filter: "item", values: ["00"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["LE0101A1"] } },
+        { code: "Tid", selection: { filter: "top", values: ["15"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal/100 000 inv",
+    granularity: "yearly",
+    aggregation: 'sum',
+    isInverted: true,
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // LAGFÖRDA PERSONER
+  // ─────────────────────────────────────────────────────────────
+  convicted_persons: {
+    path: "LE/LE0102/LE0102A/LagijF",
+    description: "Lagförda personer per år",
+    kpiCode: "convicted_persons",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["LE0102A1"] } },
+        { code: "Tid", selection: { filter: "top", values: ["10"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal",
+    granularity: "yearly",
+    aggregation: 'sum',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // FÄNGELSEPOPULATION
+  // ─────────────────────────────────────────────────────────────
+  prison_population: {
+    path: "LE/LE0103/LE0103A/KriminalVD",
+    description: "Medelbeläggning kriminalvårdsanstalter",
+    kpiCode: "prison_population",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["LE0103A1"] } },
+        { code: "Tid", selection: { filter: "top", values: ["10"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal",
+    granularity: "yearly",
+    aggregation: 'latest',
+  },
+
+  // ─────────────────────────────────────────────────────────────
+  // BROTT PER REGION
+  // ─────────────────────────────────────────────────────────────
+  crimes_by_region: {
+    path: "LE/LE0101/LE0101A/AnijBrottReg",
+    description: "Anmälda brott per region",
+    kpiCode: "crimes_regional",
+    dataSourceCode: "scb_px",
+    apiVersion: '1.0',
+    query: {
+      query: [
+        { code: "Brottstyp", selection: { filter: "item", values: ["TOT"] } },
+        { code: "Region", selection: { filter: "all", values: ["*"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["LE0101A1"] } },
+        { code: "Tid", selection: { filter: "top", values: ["1"] } },
+      ],
+      response: { format: "json" }
+    },
+    unit: "antal/100 000 inv",
+    granularity: "yearly",
+    aggregation: 'sum',
+    includeRegions: true,
+    isInverted: true,
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════
