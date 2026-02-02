@@ -18,6 +18,7 @@ import { PublicOnboarding } from '@/components/onboarding';
 import { calculateKPIStatus } from '@/config/kpiThresholds';
 import { HowWeKnowSection, generateHowWeKnowData } from '@/components/transparency/HowWeKnowSection';
 import { SystemFooter } from '@/components/transparency/SystemFooter';
+import { SimpleKPITimeline } from '@/components/dashboard/SimpleKPITimeline';
 
 
 // Category groupings with human-readable names and descriptions
@@ -309,24 +310,17 @@ function KPIDetailView({
         <p className="text-muted-foreground text-sm">{kpi.description}</p>
       </div>
 
-      {/* Trend visualization placeholder */}
+      {/* Trend visualization - actual timeline */}
       <Card className="mb-6">
         <CardContent className="p-4">
-          <div className="h-32 bg-muted/50 rounded-lg flex items-center justify-center mb-4">
-            <BarChart3 className="h-8 w-8 text-muted-foreground" />
-            <span className="ml-2 text-sm text-muted-foreground">Tidslinje visas här</span>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Trend senaste 12 månader</span>
-            <span className={cn(
-              "font-medium",
-              trendPercent > 0 && "text-emerald-600",
-              trendPercent < 0 && "text-red-600",
-              trendPercent === 0 && "text-muted-foreground"
-            )}>
-              {trendPercent !== 0 ? `${trendPercent > 0 ? '+' : ''}${trendPercent.toFixed(1)}%` : 'Ingen förändring'}
-            </span>
-          </div>
+          <SimpleKPITimeline
+            currentValue={kpi.value}
+            trendPercent={trendPercent}
+            trend={kpi.trend}
+            status={kpi.status === 'neutral' ? 'neutral' : kpi.status}
+            periodLabel="senaste 12 månader"
+            height={120}
+          />
         </CardContent>
       </Card>
 
