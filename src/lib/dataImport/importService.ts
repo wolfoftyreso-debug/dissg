@@ -38,8 +38,12 @@ export const DATA_SOURCES: DataSourceInfo[] = [
     description: 'Sveriges officiella statistikmyndighet med data om befolkning, arbetsmarknad, ekonomi m.m.',
     indicators: [
       { key: 'life_expectancy', name: 'Medellivslängd', description: 'Förväntad livslängd vid födseln' },
-      { key: 'employment_rate', name: 'Sysselsättningsgrad', description: 'Andel av befolkningen i arbete' },
+      { key: 'employment_rate', name: 'Sysselsättningsgrad', description: 'Andel av befolkningen 20-64 i arbete' },
       { key: 'population', name: 'Befolkning', description: 'Total befolkningsstorlek' },
+      { key: 'gdp_by_industry', name: 'BNP per bransch', description: 'Bruttonationalprodukt uppdelat per näringsgren (SNI2007)' },
+      { key: 'labor_force_participation', name: 'Arbetskraftsdeltagande', description: 'Andel av befolkningen 15-74 i arbetskraften' },
+      { key: 'gdp_growth', name: 'BNP-tillväxt', description: 'Procentuell förändring i BNP, säsongsrensat' },
+      { key: 'gdp_per_capita', name: 'BNP per capita', description: 'Bruttonationalprodukt per invånare' },
     ]
   },
   {

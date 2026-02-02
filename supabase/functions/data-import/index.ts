@@ -16,6 +16,10 @@ const KPI_MAPPINGS: Record<string, string> = {
   'violent_crime': '5987e149-c730-4e07-9c66-61533eeaacd7',
   'excess_mortality': '2746ac6d-e3d8-455c-8635-0af8e416af7c',
   'productivity': '362ddb45-91ff-4427-856b-39b40b5cb131',
+  'gdp_by_industry': '362ddb45-91ff-4427-856b-39b40b5cb131', // Maps to productivity
+  'labor_force_participation': '9a6ef79a-a719-4133-be03-76bdc4bccf0a', // Maps to employment
+  'gdp_growth': '362ddb45-91ff-4427-856b-39b40b5cb131',
+  'gdp_per_capita': '362ddb45-91ff-4427-856b-39b40b5cb131',
 };
 
 interface ImportedValue {
@@ -41,10 +45,75 @@ const SCB_ENDPOINTS = {
     }
   },
   population: {
-    url: 'https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0101/BE0101A/BesijkvPopulAr',
+    url: 'https://api.scb.se/OV0104/v1/doris/sv/ssd/BE/BE0101/BE0101A/BeijFolkmLanK',
     query: {
       query: [
+        { code: "Region", selection: { filter: "item", values: ["00"] } },
         { code: "Tid", selection: { filter: "top", values: ["20"] } }
+      ],
+      response: { format: "json" }
+    }
+  },
+  // BNP per bransch (SNI2007)
+  gdp_by_industry: {
+    url: 'https://api.scb.se/OV0104/v1/doris/sv/ssd/NR/NR0103/NR0103A/NR0103ENS2010T01A',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: [
+          "A", "B-E", "F", "G-I", "J", "K", "L", "M-N", "O-Q", "R-U"
+        ] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000001W"] } },
+        { code: "Tid", selection: { filter: "top", values: ["10"] } }
+      ],
+      response: { format: "json" }
+    }
+  },
+  // Arbetskraftsdeltagande
+  labor_force_participation: {
+    url: 'https://api.scb.se/OV0104/v1/doris/sv/ssd/AM/AM0401/AM0401A/NAKUBefAkeLArb',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["15-74"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CI"] } }, // Arbetskraftstal
+        { code: "Tid", selection: { filter: "top", values: ["24"] } }
+      ],
+      response: { format: "json" }
+    }
+  },
+  // Sysselsättningsgrad 20-64
+  employment_rate: {
+    url: 'https://api.scb.se/OV0104/v1/doris/sv/ssd/AM/AM0401/AM0401A/NAKUBefAkeLArb',
+    query: {
+      query: [
+        { code: "Alder", selection: { filter: "item", values: ["20-64"] } },
+        { code: "Kon", selection: { filter: "item", values: ["1+2"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["000000CK"] } },
+        { code: "Tid", selection: { filter: "top", values: ["24"] } }
+      ],
+      response: { format: "json" }
+    }
+  },
+  // BNP-tillväxt
+  gdp_growth: {
+    url: 'https://api.scb.se/OV0104/v1/doris/sv/ssd/NR/NR0103/NR0103B/NR0103ENS2010T01Kv',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["BNP"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000002P"] } },
+        { code: "Tid", selection: { filter: "top", values: ["20"] } }
+      ],
+      response: { format: "json" }
+    }
+  },
+  // BNP per capita
+  gdp_per_capita: {
+    url: 'https://api.scb.se/OV0104/v1/doris/sv/ssd/NR/NR0103/NR0103A/NR0103ENS2010T01A',
+    query: {
+      query: [
+        { code: "SNI2007", selection: { filter: "item", values: ["BNPCap"] } },
+        { code: "ContentsCode", selection: { filter: "item", values: ["0000001X"] } },
+        { code: "Tid", selection: { filter: "top", values: ["10"] } }
       ],
       response: { format: "json" }
     }
