@@ -592,6 +592,16 @@ export default function PublicDashboard() {
 
             <NationalStatusBadge status={nationalStatus} summary={summary} />
 
+            {/* Quick Links */}
+            <div className="flex justify-center gap-2 mt-4">
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/regional" className="gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Jämför län
+                </Link>
+              </Button>
+            </div>
+
             {/* Area Grid */}
             <div className="mt-8">
               <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
