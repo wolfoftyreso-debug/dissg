@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { TrendingUp, GitBranch, Zap, AlertCircle, BarChart2, Layers, ArrowRight, CircleDot, Info } from 'lucide-react';
+import { TrendingUp, GitBranch, Zap, AlertCircle, BarChart2, Layers, ArrowRight, CircleDot, Info, MousePointerClick } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { KPI, CATEGORIES } from '@/types/kpi';
 import { cn } from '@/lib/utils';
+import { CorrelationCompareView } from './CorrelationCompareView';
 
 interface AnalysisPanelProps {
   kpis: KPI[];
@@ -133,6 +134,7 @@ const MOCK_ALERTS: TrendAlert[] = [
 
 export function AnalysisPanel({ kpis }: AnalysisPanelProps) {
   const [activeTab, setActiveTab] = useState<'correlations' | 'trends' | 'system'>('correlations');
+  const [selectedCorrelation, setSelectedCorrelation] = useState<Correlation | null>(null);
 
   const getKPIName = (id: string) => {
     return kpis.find(k => k.id === id)?.name || 'Okänd KPI';
@@ -269,7 +271,16 @@ export function AnalysisPanel({ kpis }: AnalysisPanelProps) {
         </TabsList>
 
         {/* Correlations Tab */}
-        <TabsContent value="correlations" className="mt-6">
+        <TabsContent value="correlations" className="mt-6 space-y-6">
+          {/* Selected correlation comparison view */}
+          {selectedCorrelation && (
+            <CorrelationCompareView 
+              correlation={selectedCorrelation}
+              kpis={kpis}
+              onClose={() => setSelectedCorrelation(null)}
+            />
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
@@ -282,10 +293,14 @@ export function AnalysisPanel({ kpis }: AnalysisPanelProps) {
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs">
                       <p>Korrelation observerad, kausalitet ej fastställd. 
-                      Sambanden baseras på historisk dataanalys.</p>
+                      Sambanden baseras på historisk dataanalys. Klicka på ett samband för att jämföra KPI:erna.</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
+                <Badge variant="outline" className="ml-auto gap-1 text-xs">
+                  <MousePointerClick className="h-3 w-3" />
+                  Klicka för jämförelse
+                </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -294,9 +309,13 @@ export function AnalysisPanel({ kpis }: AnalysisPanelProps) {
                   {MOCK_CORRELATIONS.map((corr) => (
                     <div 
                       key={corr.id}
+                      onClick={() => setSelectedCorrelation(corr)}
                       className={cn(
-                        "p-4 rounded-lg border",
-                        corr.isSignificant ? 'bg-card' : 'bg-muted/30'
+                        "p-4 rounded-lg border cursor-pointer transition-all",
+                        corr.isSignificant ? 'bg-card' : 'bg-muted/30',
+                        selectedCorrelation?.id === corr.id 
+                          ? 'ring-2 ring-primary border-primary' 
+                          : 'hover:border-primary/50 hover:bg-muted/50'
                       )}
                     >
                       <div className="flex items-center gap-3 mb-3">
