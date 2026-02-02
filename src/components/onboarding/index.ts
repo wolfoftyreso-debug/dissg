@@ -5,3 +5,4 @@
  */
 
 export { PublicOnboarding, OnboardingTrigger } from './PublicOnboarding';
+export { CoreQuestionsOnboarding, CoreQuestionsCompact } from './CoreQuestionsOnboarding';
