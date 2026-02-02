@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.scheduled-ingest]
 verify_jwt = false
+
+[functions.kpi-alerts]
+verify_jwt = false
