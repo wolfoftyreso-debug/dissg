@@ -181,11 +181,73 @@ export type Database = {
         }
         Relationships: []
       }
+      analysis_chain_revisions: {
+        Row: {
+          analysis_chain_id: string
+          analysis_method: Database["public"]["Enums"]["analysis_method"] | null
+          checksum: string
+          created_at: string
+          id: string
+          input_data_checksums: Json | null
+          level: number
+          level_content: Json
+          level_title: string
+          method_rationale: string | null
+          previous_checksum: string | null
+          revision_number: number
+          revision_reason: string | null
+        }
+        Insert: {
+          analysis_chain_id: string
+          analysis_method?:
+            | Database["public"]["Enums"]["analysis_method"]
+            | null
+          checksum: string
+          created_at?: string
+          id?: string
+          input_data_checksums?: Json | null
+          level: number
+          level_content: Json
+          level_title: string
+          method_rationale?: string | null
+          previous_checksum?: string | null
+          revision_number?: number
+          revision_reason?: string | null
+        }
+        Update: {
+          analysis_chain_id?: string
+          analysis_method?:
+            | Database["public"]["Enums"]["analysis_method"]
+            | null
+          checksum?: string
+          created_at?: string
+          id?: string
+          input_data_checksums?: Json | null
+          level?: number
+          level_content?: Json
+          level_title?: string
+          method_rationale?: string | null
+          previous_checksum?: string | null
+          revision_number?: number
+          revision_reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_chain_revisions_analysis_chain_id_fkey"
+            columns: ["analysis_chain_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_chains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analysis_chains: {
         Row: {
           alternatives_tested: Json | null
           analysis_method: Database["public"]["Enums"]["analysis_method"] | null
+          checksum: string | null
           created_at: string
+          current_revision: number | null
           id: string
           level: number
           level_content: Json
@@ -199,7 +261,9 @@ export type Database = {
           analysis_method?:
             | Database["public"]["Enums"]["analysis_method"]
             | null
+          checksum?: string | null
           created_at?: string
+          current_revision?: number | null
           id?: string
           level: number
           level_content: Json
@@ -213,7 +277,9 @@ export type Database = {
           analysis_method?:
             | Database["public"]["Enums"]["analysis_method"]
             | null
+          checksum?: string | null
           created_at?: string
+          current_revision?: number | null
           id?: string
           level?: number
           level_content?: Json
@@ -1168,13 +1234,81 @@ export type Database = {
           },
         ]
       }
-      kpi_values: {
+      kpi_value_revisions: {
         Row: {
+          checksum: string
           confidence: number
           created_at: string
+          id: string
+          is_provisional: boolean
+          kpi_value_id: string
+          previous_checksum: string | null
+          previous_value: number | null
+          revised_by: string | null
+          revision_number: number
+          revision_reason: string | null
+          revision_type: string
+          status: Database["public"]["Enums"]["kpi_status"]
+          trend: Database["public"]["Enums"]["trend_direction"]
+          trend_percent: number | null
+          value: number
+        }
+        Insert: {
+          checksum: string
+          confidence: number
+          created_at?: string
+          id?: string
+          is_provisional?: boolean
+          kpi_value_id: string
+          previous_checksum?: string | null
+          previous_value?: number | null
+          revised_by?: string | null
+          revision_number?: number
+          revision_reason?: string | null
+          revision_type?: string
+          status: Database["public"]["Enums"]["kpi_status"]
+          trend: Database["public"]["Enums"]["trend_direction"]
+          trend_percent?: number | null
+          value: number
+        }
+        Update: {
+          checksum?: string
+          confidence?: number
+          created_at?: string
+          id?: string
+          is_provisional?: boolean
+          kpi_value_id?: string
+          previous_checksum?: string | null
+          previous_value?: number | null
+          revised_by?: string | null
+          revision_number?: number
+          revision_reason?: string | null
+          revision_type?: string
+          status?: Database["public"]["Enums"]["kpi_status"]
+          trend?: Database["public"]["Enums"]["trend_direction"]
+          trend_percent?: number | null
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kpi_value_revisions_kpi_value_id_fkey"
+            columns: ["kpi_value_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_values"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kpi_values: {
+        Row: {
+          checksum: string | null
+          confidence: number
+          created_at: string
+          current_revision: number | null
           data_source_id: string | null
           granularity: string
           id: string
+          is_immutable: boolean | null
           is_provisional: boolean
           kpi_id: string
           period_end: string
@@ -1189,11 +1323,14 @@ export type Database = {
           value: number
         }
         Insert: {
+          checksum?: string | null
           confidence?: number
           created_at?: string
+          current_revision?: number | null
           data_source_id?: string | null
           granularity?: string
           id?: string
+          is_immutable?: boolean | null
           is_provisional?: boolean
           kpi_id: string
           period_end: string
@@ -1208,11 +1345,14 @@ export type Database = {
           value: number
         }
         Update: {
+          checksum?: string | null
           confidence?: number
           created_at?: string
+          current_revision?: number | null
           data_source_id?: string | null
           granularity?: string
           id?: string
+          is_immutable?: boolean | null
           is_provisional?: boolean
           kpi_id?: string
           period_end?: string
@@ -1242,6 +1382,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      lineage_chain_links: {
+        Row: {
+          created_at: string
+          id: string
+          link_type: string
+          source_checksum: string
+          source_id: string | null
+          source_type: string
+          target_checksum: string
+          target_id: string
+          target_type: string
+          transformation_applied: string | null
+          weight_used: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link_type: string
+          source_checksum: string
+          source_id?: string | null
+          source_type: string
+          target_checksum: string
+          target_id: string
+          target_type: string
+          transformation_applied?: string | null
+          weight_used?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link_type?: string
+          source_checksum?: string
+          source_id?: string | null
+          source_type?: string
+          target_checksum?: string
+          target_id?: string
+          target_type?: string
+          transformation_applied?: string | null
+          weight_used?: number | null
+        }
+        Relationships: []
       }
       master_index_components: {
         Row: {
@@ -1315,11 +1497,72 @@ export type Database = {
         }
         Relationships: []
       }
+      master_index_revisions: {
+        Row: {
+          checksum: string
+          component_checksums: Json | null
+          component_values: Json
+          confidence: number | null
+          created_at: string
+          id: string
+          master_index_value_id: string
+          previous_checksum: string | null
+          previous_value: number | null
+          revision_number: number
+          revision_reason: string | null
+          trend: Database["public"]["Enums"]["trend_direction"] | null
+          value: number
+          weight_version_used: string | null
+        }
+        Insert: {
+          checksum: string
+          component_checksums?: Json | null
+          component_values: Json
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          master_index_value_id: string
+          previous_checksum?: string | null
+          previous_value?: number | null
+          revision_number?: number
+          revision_reason?: string | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          value: number
+          weight_version_used?: string | null
+        }
+        Update: {
+          checksum?: string
+          component_checksums?: Json | null
+          component_values?: Json
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          master_index_value_id?: string
+          previous_checksum?: string | null
+          previous_value?: number | null
+          revision_number?: number
+          revision_reason?: string | null
+          trend?: Database["public"]["Enums"]["trend_direction"] | null
+          value?: number
+          weight_version_used?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "master_index_revisions_master_index_value_id_fkey"
+            columns: ["master_index_value_id"]
+            isOneToOne: false
+            referencedRelation: "master_index_values"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       master_index_values: {
         Row: {
           calculated_at: string | null
+          checksum: string | null
           component_values: Json
           confidence: number | null
+          current_revision: number | null
           id: string
           master_index_id: string
           period_end: string
@@ -1331,8 +1574,10 @@ export type Database = {
         }
         Insert: {
           calculated_at?: string | null
+          checksum?: string | null
           component_values?: Json
           confidence?: number | null
+          current_revision?: number | null
           id?: string
           master_index_id: string
           period_end: string
@@ -1344,8 +1589,10 @@ export type Database = {
         }
         Update: {
           calculated_at?: string | null
+          checksum?: string | null
           component_values?: Json
           confidence?: number | null
+          current_revision?: number | null
           id?: string
           master_index_id?: string
           period_end?: string
@@ -1365,13 +1612,77 @@ export type Database = {
           },
         ]
       }
+      observation_revisions: {
+        Row: {
+          analysis_version: string
+          checksum: string
+          confidence_level: number
+          created_at: string
+          description: string
+          id: string
+          model_version: string
+          observation_id: string
+          observation_type: Database["public"]["Enums"]["observation_type"]
+          previous_checksum: string | null
+          revision_number: number
+          revision_reason: string | null
+          signal_strength: number
+          status: Database["public"]["Enums"]["analysis_status"]
+          title: string
+        }
+        Insert: {
+          analysis_version: string
+          checksum: string
+          confidence_level: number
+          created_at?: string
+          description: string
+          id?: string
+          model_version: string
+          observation_id: string
+          observation_type: Database["public"]["Enums"]["observation_type"]
+          previous_checksum?: string | null
+          revision_number?: number
+          revision_reason?: string | null
+          signal_strength: number
+          status: Database["public"]["Enums"]["analysis_status"]
+          title: string
+        }
+        Update: {
+          analysis_version?: string
+          checksum?: string
+          confidence_level?: number
+          created_at?: string
+          description?: string
+          id?: string
+          model_version?: string
+          observation_id?: string
+          observation_type?: Database["public"]["Enums"]["observation_type"]
+          previous_checksum?: string | null
+          revision_number?: number
+          revision_reason?: string | null
+          signal_strength?: number
+          status?: Database["public"]["Enums"]["analysis_status"]
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "observation_revisions_observation_id_fkey"
+            columns: ["observation_id"]
+            isOneToOne: false
+            referencedRelation: "observations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       observations: {
         Row: {
           acknowledged_at: string | null
           acknowledged_by: string | null
           analysis_version: string
+          checksum: string | null
           confidence_level: number
           created_at: string
+          current_revision: number | null
           description: string
           detected_at: string
           id: string
@@ -1389,8 +1700,10 @@ export type Database = {
           acknowledged_at?: string | null
           acknowledged_by?: string | null
           analysis_version?: string
+          checksum?: string | null
           confidence_level: number
           created_at?: string
+          current_revision?: number | null
           description: string
           detected_at?: string
           id?: string
@@ -1408,8 +1721,10 @@ export type Database = {
           acknowledged_at?: string | null
           acknowledged_by?: string | null
           analysis_version?: string
+          checksum?: string | null
           confidence_level?: number
           created_at?: string
+          current_revision?: number | null
           description?: string
           detected_at?: string
           id?: string
@@ -1935,9 +2250,54 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_complete_lineage: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          link_type: string | null
+          source_checksum: string | null
+          source_id: string | null
+          source_name: string | null
+          source_type: string | null
+          target_checksum: string | null
+          target_id: string | null
+          target_name: string | null
+          target_type: string | null
+          transformation_applied: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          link_type?: string | null
+          source_checksum?: string | null
+          source_id?: string | null
+          source_name?: never
+          source_type?: string | null
+          target_checksum?: string | null
+          target_id?: string | null
+          target_name?: never
+          target_type?: string | null
+          transformation_applied?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          link_type?: string | null
+          source_checksum?: string | null
+          source_id?: string | null
+          source_name?: never
+          source_type?: string | null
+          target_checksum?: string | null
+          target_id?: string | null
+          target_name?: never
+          target_type?: string | null
+          transformation_applied?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      compute_checksum: { Args: { data: Json }; Returns: string }
       has_any_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]
