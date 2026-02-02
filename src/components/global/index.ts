@@ -13,3 +13,8 @@ export { GMIOverview } from './GMIOverview';
 export { GMIPillarDetail } from './GMIPillarDetail';
 export { GMITimeline } from './GMITimeline';
 export { GMIWeightEditor } from './GMIWeightEditor';
+
+// WAVE 10: Planetary Dashboard & Standards
+export { PlanetaryDashboard } from './PlanetaryDashboard';
+export { GlobalBenchmarkView } from './GlobalBenchmarkView';
+export { NeutralSummaryGenerator, NeutralSummaryText } from './NeutralSummaryGenerator';
