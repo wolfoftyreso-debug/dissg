@@ -58,6 +58,7 @@ const Index = () => {
         kpis={kpis}
         selectedPeriod={comparisonPeriod}
         onPeriodChange={setComparisonPeriod}
+        onKPIClick={setSelectedKPI}
       />
 
       {/* Main Content */}
