@@ -2,6 +2,11 @@
  * GLOBAL CARRYING CAPACITY ENGINE (GCCE)
  * 
  * "Hur många människor kan leva bra – givet energi, teknik och resurser?"
+ * 
+ * DESIGN PRINCIPLE: No abstract icons. All data points are explained with:
+ * - Clear text labels
+ * - Mini sparklines showing actual trajectories
+ * - Expandable "What this shows / does not show" sections
  */
 
 import React, { useState } from 'react';
@@ -12,24 +17,8 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Globe,
-  Zap,
-  Brain,
-  Building2,
-  Heart,
-  Users,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  AlertTriangle,
-  Info,
-  Clock,
-  Layers,
-  MapPin,
-  ChevronRight
-} from 'lucide-react';
-import { ClickableIcon } from '@/components/ui/ClickableIcon';
+import { ChevronRight, Clock, Info } from 'lucide-react';
+import { DescriptiveMetricCard } from '@/components/ui/MiniSparkline';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
@@ -52,96 +41,106 @@ import {
 import { FactorDeepDive } from './FactorDeepDive';
 import { RegionDeepDive } from './RegionDeepDive';
 
-// TrendIcon helper now replaced by ClickableIcon - kept for reference
-const _TrendIcon: React.FC<{ trend: string; size?: number }> = ({ trend, size = 16 }) => {
-  if (trend === 'growing' || trend === 'improving') return <TrendingUp size={size} className="text-primary" />;
-  if (trend === 'declining') return <TrendingDown size={size} className="text-destructive" />;
-  return <Minus size={size} className="text-muted-foreground" />;
+// Sample sparkline data for each metric (would come from API in production)
+const SPARKLINE_DATA = {
+  population: [7.2, 7.4, 7.6, 7.8, 7.9, 8.0, 8.1],
+  energy: [18.5, 19.0, 19.3, 19.8, 20.2, 20.7, 21],
+  tech: [52, 55, 58, 61, 63, 65, 67],
+  institutions: [54, 54, 53, 54, 54, 54, 54],
+  wellbeing: [62, 63, 63.5, 64, 64.2, 64.5, 65]
 };
 
-// Global status panel
+/**
+ * Global Status Panel
+ * 
+ * Replaces icon-based metrics with descriptive cards showing:
+ * - Clear metric name and explanation
+ * - Current value with unit
+ * - Sparkline showing actual trajectory
+ * - Trend description in plain text
+ */
 const GlobalStatusPanel: React.FC = () => {
   const data = GLOBAL_CAPACITY_DATA;
   
   return (
     <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
       <CardHeader className="pb-2">
-        <div className="flex items-center gap-2">
-          <Globe className="h-5 w-5 text-primary" />
-          <CardTitle className="text-lg">Global bärkraft – nuläge</CardTitle>
-        </div>
+        <CardTitle className="text-lg">Global bärkraft – nuläge</CardTitle>
+        <CardDescription>
+          Systemets kapacitet att upprätthålla mänskligt välbefinnande. Klicka på varje panel för detaljer.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-5">
+        <div className="grid gap-3 md:grid-cols-5">
           {/* Population */}
-          <div className="text-center p-3 bg-background rounded-lg">
-            <div className="flex justify-center mb-1">
-              <ClickableIcon icon={Users} registryId="users" size={20} className="text-muted-foreground" />
-            </div>
-            <p className="text-2xl font-bold">{data.population.current}B</p>
-            <p className="text-xs text-muted-foreground">Befolkning</p>
-            <div className="flex items-center justify-center gap-1 mt-1">
-              <ClickableIcon icon={TrendingUp} registryId="trending-up" size={12} />
-              <span className="text-xs">+{data.population.growthRate}%/år</span>
-            </div>
-          </div>
+          <DescriptiveMetricCard
+            title="Befolkning"
+            description="Totalt antal människor på jorden"
+            value={data.population.current}
+            unit="miljarder"
+            change={data.population.growthRate}
+            changePeriod="per år"
+            sparklineData={SPARKLINE_DATA.population}
+            whatThisShows="Demografisk utveckling baserad på FN-data"
+            whatThisDoesNotShow="Fördelning av resurser eller livskvalitet"
+          />
           
-          {/* Energy */}
-          <div className="text-center p-3 bg-background rounded-lg">
-            <div className="flex justify-center mb-1">
-              <ClickableIcon icon={Zap} registryId="zap" size={20} className="text-primary" />
-            </div>
-            <p className="text-2xl font-bold">{data.energyPerCapita.value}</p>
-            <p className="text-xs text-muted-foreground">MWh/person/år</p>
-            <div className="flex items-center justify-center gap-1 mt-1">
-              <ClickableIcon icon={TrendingUp} registryId="trending-up" size={12} />
-              <span className="text-xs">{data.energyPerCapita.changePercent > 0 ? '+' : ''}{data.energyPerCapita.changePercent}%</span>
-            </div>
-          </div>
+          {/* Energy per capita */}
+          <DescriptiveMetricCard
+            title="Energi per person"
+            description="Genomsnittlig energianvändning"
+            value={data.energyPerCapita.value}
+            unit="MWh/år"
+            change={data.energyPerCapita.changePercent}
+            changePeriod="senaste 5 åren"
+            sparklineData={SPARKLINE_DATA.energy}
+            whatThisShows="Tillgänglig energi för produktion och konsumtion"
+            whatThisDoesNotShow="Energikvalitet eller fördelning mellan länder"
+          />
           
           {/* Tech efficiency */}
-          <div className="text-center p-3 bg-background rounded-lg">
-            <div className="flex justify-center mb-1">
-              <ClickableIcon icon={Brain} registryId="database" size={20} className="text-primary" />
-            </div>
-            <p className="text-2xl font-bold">{data.technicalEfficiency.index}</p>
-            <p className="text-xs text-muted-foreground">Teknikindex</p>
-            <div className="flex items-center justify-center gap-1 mt-1">
-              <ClickableIcon icon={TrendingUp} registryId="trending-up" size={12} />
-              <span className="text-xs">+{data.technicalEfficiency.changePercent}%</span>
-            </div>
-          </div>
+          <DescriptiveMetricCard
+            title="Teknikeffektivitet"
+            description="Hur väl vi omvandlar resurser till nytta"
+            value={data.technicalEfficiency.index}
+            unit="index"
+            change={data.technicalEfficiency.changePercent}
+            changePeriod="senaste 5 åren"
+            sparklineData={SPARKLINE_DATA.tech}
+            whatThisShows="Teknologisk produktivitet per energienhet"
+            whatThisDoesNotShow="Miljöpåverkan eller hållbarhet"
+          />
           
           {/* Institutions */}
-          <div className="text-center p-3 bg-background rounded-lg">
-            <div className="flex justify-center mb-1">
-              <ClickableIcon icon={Building2} registryId="building-2" size={20} className="text-primary" />
-            </div>
-            <p className="text-2xl font-bold">{data.institutionalQuality.index}</p>
-            <p className="text-xs text-muted-foreground">Institutionsindex</p>
-            <div className="flex items-center justify-center gap-1 mt-1">
-              <ClickableIcon icon={Minus} registryId="minus" size={12} />
-              <span className="text-xs">{data.institutionalQuality.changePercent}%</span>
-            </div>
-          </div>
+          <DescriptiveMetricCard
+            title="Institutioner"
+            description="Samhällsorganisationens kvalitet"
+            value={data.institutionalQuality.index}
+            unit="index"
+            change={data.institutionalQuality.changePercent}
+            changePeriod="senaste 5 åren"
+            sparklineData={SPARKLINE_DATA.institutions}
+            whatThisShows="Rättsstat, korruption, administrativa system"
+            whatThisDoesNotShow="Kulturella faktorer eller lokal variation"
+          />
           
-          {/* HWI */}
-          <div className="text-center p-3 bg-background rounded-lg">
-            <div className="flex justify-center mb-1">
-              <ClickableIcon icon={Heart} registryId="heart" size={20} className="text-destructive" />
-            </div>
-            <p className="text-2xl font-bold">{data.humanWellbeing.index}</p>
-            <p className="text-xs text-muted-foreground">Välbefinnande</p>
-            <div className="flex items-center justify-center gap-1 mt-1">
-              <ClickableIcon icon={TrendingUp} registryId="trending-up" size={12} />
-              <span className="text-xs">{data.humanWellbeing.changePercent > 0 ? '+' : ''}{data.humanWellbeing.changePercent}%</span>
-            </div>
-          </div>
+          {/* Wellbeing */}
+          <DescriptiveMetricCard
+            title="Välbefinnande"
+            description="Aggregerat mått på livskvalitet"
+            value={data.humanWellbeing.index}
+            unit="index"
+            change={data.humanWellbeing.changePercent}
+            changePeriod="senaste 5 åren"
+            sparklineData={SPARKLINE_DATA.wellbeing}
+            whatThisShows="Hälsa, utbildning, ekonomisk trygghet"
+            whatThisDoesNotShow="Subjektiv lycka eller meningsfullhet"
+          />
         </div>
         
         <Alert>
-          <Info className="h-4 w-4" />
           <AlertDescription className="text-sm">
+            <span className="font-medium">Systemtolkning: </span>
             {KEY_MESSAGES.currentState.sv}
           </AlertDescription>
         </Alert>
@@ -215,46 +214,53 @@ const ThreeAxesPanel: React.FC = () => {
 const PressZonesPanel: React.FC<{ onZoneClick: (zone: PressZone) => void }> = ({ onZoneClick }) => (
   <Card>
     <CardHeader>
-      <div className="flex items-center gap-2">
-        <ClickableIcon icon={AlertTriangle} registryId="alert-triangle" size={16} className="text-primary" />
-        <CardTitle className="text-base">Tryckzoner</CardTitle>
-      </div>
-      <CardDescription>Där systemet är under press – inte "överbefolkning" – klicka för att fördjupa</CardDescription>
+      <CardTitle className="text-base">Tryckzoner</CardTitle>
+      <CardDescription>
+        Regioner där systemet är under press — inte "överbefolkning", utan strukturella obalanser. 
+        Klicka för att se fullständig analys.
+      </CardDescription>
     </CardHeader>
     <CardContent className="space-y-3">
       {PRESS_ZONES.map(zone => (
         <button
           key={zone.id}
           onClick={() => onZoneClick(zone)}
-          className={`w-full text-left p-3 border rounded-lg transition-all cursor-pointer group hover:border-primary/50 ${
+          className={`w-full text-left p-4 border rounded-lg transition-all cursor-pointer group hover:border-primary/50 ${
             zone.severity === 'high' ? 'border-destructive/30 bg-destructive/5 hover:bg-destructive/10' :
             zone.severity === 'moderate' ? 'border-primary/30 bg-primary/5 hover:bg-primary/10' :
             'border-secondary bg-secondary/30 hover:bg-secondary/50'
           }`}
         >
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <ClickableIcon icon={MapPin} registryId="map-pin" size={16} />
+              <div className="flex items-center gap-2 mb-2">
                 <span className="font-medium text-sm group-hover:text-primary transition-colors">{zone.regionSv}</span>
                 <Badge variant={zone.severity === 'high' ? 'destructive' : 'secondary'} className="text-xs">
-                  {zone.severity === 'high' ? 'Hög' : zone.severity === 'moderate' ? 'Måttlig' : 'Framväxande'}
+                  {zone.severity === 'high' ? 'Hög belastning' : zone.severity === 'moderate' ? 'Måttlig belastning' : 'Framväxande risk'}
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">{zone.descriptionSv}</p>
+              <p className="text-xs text-muted-foreground mb-2">{zone.descriptionSv}</p>
+              
+              {/* Factor tags - text-based instead of icons */}
+              <div className="flex flex-wrap gap-1.5">
+                {zone.factors.energyPressure && (
+                  <Badge variant="outline" className="text-xs bg-primary/10">Energibrist</Badge>
+                )}
+                {zone.factors.populationGrowth && (
+                  <Badge variant="outline" className="text-xs bg-primary/10">Befolkningstillväxt</Badge>
+                )}
+                {zone.factors.institutionalWeakness && (
+                  <Badge variant="outline" className="text-xs bg-destructive/10 text-destructive">Svaga institutioner</Badge>
+                )}
+              </div>
             </div>
-            <div className="flex gap-1 items-center">
-              {zone.factors.energyPressure && <ClickableIcon icon={Zap} registryId="zap" size={16} className="text-primary" />}
-              {zone.factors.populationGrowth && <ClickableIcon icon={Users} registryId="users" size={16} className="text-primary" />}
-              {zone.factors.institutionalWeakness && <ClickableIcon icon={Building2} registryId="building-2" size={16} className="text-destructive" />}
-              <ClickableIcon icon={ChevronRight} registryId="chevron-right" size={16} className="text-muted-foreground group-hover:text-primary transition-colors ml-2" />
-            </div>
+            <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors mt-1 shrink-0" />
           </div>
         </button>
       ))}
       
-      <Alert className="bg-primary/5">
-        <ClickableIcon icon={Info} registryId="info" size={16} />
+      <Alert className="bg-primary/5 mt-4">
+        <Info className="h-4 w-4" />
         <AlertDescription className="text-xs font-medium">
           {KEY_MESSAGES.notOverpopulation.sv}
         </AlertDescription>
@@ -301,27 +307,30 @@ const PositiveFactorsPanel: React.FC<{ onFactorClick: (factor: CapacityFactor) =
 const EnergyHonestyPanel: React.FC = () => (
   <Card className="border-primary/30 bg-primary/5">
     <CardHeader>
-      <div className="flex items-center gap-2">
-        <ClickableIcon icon={Zap} registryId="zap" size={20} className="text-primary" />
-        <CardTitle className="text-base">Energy Honesty Layer</CardTitle>
-      </div>
+      <CardTitle className="text-base">Energiärlighet</CardTitle>
+      <CardDescription>
+        Grundläggande fysiska begränsningar som sätter ramarna för all bärkraft
+      </CardDescription>
     </CardHeader>
     <CardContent className="space-y-4">
       <div className="p-4 bg-background rounded-lg">
-        <p className="text-sm">
+        <p className="text-sm font-medium mb-2">Baslinje:</p>
+        <p className="text-sm text-muted-foreground">
           {ENERGY_HONESTY.baseline.sv.replace('{x}', '21')}
         </p>
       </div>
       
       <div className="p-4 bg-background rounded-lg border-l-4 border-primary">
-        <p className="text-sm font-medium">
+        <p className="text-sm font-medium mb-2">Konsekvens:</p>
+        <p className="text-sm text-muted-foreground">
           {ENERGY_HONESTY.consequence.sv}
         </p>
       </div>
       
       <Alert>
-        <ClickableIcon icon={Info} registryId="info" size={16} />
-        <AlertDescription className="text-sm font-medium">
+        <Info className="h-4 w-4" />
+        <AlertDescription className="text-sm">
+          <span className="font-medium">Fysikalisk lag: </span>
           {ENERGY_HONESTY.physics.sv}
         </AlertDescription>
       </Alert>
@@ -436,29 +445,28 @@ const HistoricalTimelinePanel: React.FC = () => (
   </Card>
 );
 
-// System connections
+// System connections - descriptive cards without abstract icons
 const SystemConnectionsPanel: React.FC = () => (
   <Card className="bg-muted/30">
     <CardHeader>
-      <div className="flex items-center gap-2">
-        <Layers className="h-4 w-4" />
-        <CardTitle className="text-base">Koppling till andra system</CardTitle>
-      </div>
-      <CardDescription>GCCE kopplas direkt till alla andra moduler</CardDescription>
+      <CardTitle className="text-base">Systemkopplingar</CardTitle>
+      <CardDescription>
+        Bärkraftsmotorn är navet som alla andra moduler refererar till
+      </CardDescription>
     </CardHeader>
     <CardContent>
       <div className="grid gap-2 md:grid-cols-3">
         {SYSTEM_CONNECTIONS.map(conn => (
           <Button key={conn.id} variant="outline" className="justify-start h-auto py-3">
-            <span className="text-xl mr-2">{conn.icon}</span>
             <span className="text-sm">{conn.labelSv}</span>
           </Button>
         ))}
       </div>
       
       <Alert className="mt-4 bg-primary/5 border-primary/20">
-        <AlertDescription className="text-sm text-center font-medium">
-          📌 Allt landar här.
+        <AlertDescription className="text-sm text-center">
+          <span className="font-medium">Systemprincip: </span>
+          Alla välfärdsfrågor bottnar i fysisk kapacitet — därför landar allt här.
         </AlertDescription>
       </Alert>
     </CardContent>
@@ -487,14 +495,12 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
         onOpenChange={(open) => !open && setSelectedZone(null)} 
       />
       
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="flex items-center justify-center gap-2">
-          <Globe className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold">Global Carrying Capacity Engine</h1>
-        </div>
-        <p className="text-muted-foreground max-w-xl mx-auto">
-          Hur många människor kan leva bra – givet energi, teknik och resurser?
+      {/* Header - descriptive text, no abstract icons */}
+      <div className="text-center space-y-3">
+        <h1 className="text-2xl font-bold">Global Carrying Capacity Engine</h1>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Hur många människor kan leva bra — givet energi, teknik och resurser? 
+          Detta är systemets kärnmodul som kvantifierar de fysiska begränsningarna för mänskligt välbefinnande.
         </p>
       </div>
 

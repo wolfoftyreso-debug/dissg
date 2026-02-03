@@ -18,17 +18,6 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  Globe, 
-  MapPin, 
-  Building2, 
-  Heart,
-  Briefcase,
-  GraduationCap,
-  Shield,
-  Home,
-  Leaf,
-  Zap,
-  Scale,
   ChevronDown,
   ChevronRight,
   Info,
@@ -81,233 +70,234 @@ interface HumanNeedDomain {
 }
 
 // Governance levels - universal across all jurisdictions
+// Using descriptive labels instead of abstract icons
 const GOVERNANCE_LEVELS: GovernanceLevel[] = [
   {
     id: 'global',
     name: 'Global',
     description: 'International bodies, treaties, and cross-border coordination',
-    icon: <Globe className="h-4 w-4" />,
+    icon: <span className="text-xs font-medium">🌐</span>,
     typicalActors: ['UN agencies', 'WHO', 'ILO', 'World Bank', 'IMF', 'WTO'],
     jurisdictionExamples: ['Paris Agreement', 'SDGs', 'IHR', 'Basel Accords']
   },
   {
     id: 'continental',
-    name: 'Continental / Bloc',
+    name: 'Kontinental / Block',
     description: 'Regional economic and political unions',
-    icon: <Layers className="h-4 w-4" />,
+    icon: <span className="text-xs font-medium">🗺️</span>,
     typicalActors: ['EU', 'AU', 'ASEAN', 'Mercosur', 'NAFTA/USMCA'],
     jurisdictionExamples: ['EU Directives', 'AU Protocols', 'ASEAN Framework']
   },
   {
     id: 'national',
-    name: 'National',
+    name: 'Nationell',
     description: 'Sovereign state legislation and policy',
-    icon: <MapPin className="h-4 w-4" />,
+    icon: <span className="text-xs font-medium">🏛️</span>,
     typicalActors: ['Parliament', 'Federal agencies', 'National ministries'],
     jurisdictionExamples: ['National constitution', 'Federal law', 'National budget']
   },
   {
     id: 'regional',
-    name: 'Regional / Provincial',
+    name: 'Regional / Provinsiell',
     description: 'Sub-national administrative units',
-    icon: <Target className="h-4 w-4" />,
+    icon: <span className="text-xs font-medium">📍</span>,
     typicalActors: ['States', 'Provinces', 'Länder', 'Regions', 'Counties'],
     jurisdictionExamples: ['State law', 'Regional planning', 'Provincial services']
   },
   {
     id: 'local',
-    name: 'Local / Municipal',
+    name: 'Lokal / Kommunal',
     description: 'Cities, municipalities, and communities',
-    icon: <Building2 className="h-4 w-4" />,
+    icon: <span className="text-xs font-medium">🏘️</span>,
     typicalActors: ['City councils', 'Mayors', 'Municipal agencies'],
     jurisdictionExamples: ['Zoning', 'Local services', 'Community programs']
   }
 ];
 
-// Universal human needs domains - applicable everywhere
+// Universal human needs domains - using descriptive labels
 const HUMAN_NEEDS_DOMAINS: HumanNeedDomain[] = [
   {
     id: 'life-health',
     code: 'LH',
-    name: 'Life & Health',
-    icon: <Heart className="h-5 w-5" />,
-    color: 'bg-red-500/20 text-red-400 border-red-500/30',
-    description: 'Survival, physical health, mental wellbeing, healthcare access',
+    name: 'Liv & Hälsa',
+    icon: <span className="text-base">Hälsa</span>,
+    color: 'bg-destructive/10 text-destructive border-destructive/30',
+    description: 'Överlevnad, fysisk hälsa, psykiskt välbefinnande, sjukvårdstillgång',
     universalIndicators: [
-      { code: 'LH01', name: 'Life expectancy at birth', unit: 'years', description: 'Average years a newborn can expect to live', dataAvailability: 'high' },
-      { code: 'LH02', name: 'Healthy life expectancy', unit: 'years', description: 'Years lived in full health', dataAvailability: 'medium' },
-      { code: 'LH03', name: 'Infant mortality rate', unit: 'per 1,000', description: 'Deaths before age 1 per 1,000 live births', dataAvailability: 'high' },
-      { code: 'LH04', name: 'Maternal mortality ratio', unit: 'per 100,000', description: 'Maternal deaths per 100,000 live births', dataAvailability: 'high' },
-      { code: 'LH05', name: 'Healthcare access index', unit: 'index 0-100', description: 'Access to essential health services', dataAvailability: 'medium' },
-      { code: 'LH06', name: 'Mental health treatment gap', unit: '%', description: 'Untreated mental disorders', dataAvailability: 'low' }
+      { code: 'LH01', name: 'Förväntad livslängd vid födsel', unit: 'år', description: 'Genomsnittliga år en nyfödd kan förväntas leva', dataAvailability: 'high' },
+      { code: 'LH02', name: 'Frisk livslängd', unit: 'år', description: 'År levda i full hälsa', dataAvailability: 'medium' },
+      { code: 'LH03', name: 'Spädbarnsdödlighet', unit: 'per 1 000', description: 'Dödsfall före 1 års ålder per 1 000 levande födda', dataAvailability: 'high' },
+      { code: 'LH04', name: 'Mödradödlighet', unit: 'per 100 000', description: 'Mödradödsfall per 100 000 levande födda', dataAvailability: 'high' },
+      { code: 'LH05', name: 'Sjukvårdstillgång', unit: 'index 0-100', description: 'Tillgång till grundläggande sjukvård', dataAvailability: 'medium' },
+      { code: 'LH06', name: 'Psykisk ohälsa (behandlingsgap)', unit: '%', description: 'Obehandlade psykiska störningar', dataAvailability: 'low' }
     ],
     governanceLevels: {
-      global: ['WHO guidelines', 'IHR compliance', 'Pandemic preparedness'],
-      continental: ['Regional health frameworks', 'Cross-border health', 'Joint procurement'],
-      national: ['Health system design', 'Universal coverage policy', 'Drug regulation'],
-      regional: ['Hospital networks', 'Emergency services', 'Public health'],
-      local: ['Primary care access', 'Community health', 'Local clinics']
+      global: ['WHO-riktlinjer', 'IHR-efterlevnad', 'Pandemiberedskap'],
+      continental: ['Regionala hälsoramverk', 'Gränsöverskridande hälsa', 'Gemensam upphandling'],
+      national: ['Hälsosystemdesign', 'Universell täckning', 'Läkemedelsreglering'],
+      regional: ['Sjukhusnätverk', 'Akutsjukvård', 'Folkhälsa'],
+      local: ['Primärvård', 'Lokala kliniker', 'Förebyggande vård']
     }
   },
   {
     id: 'livelihood-work',
     code: 'LW',
-    name: 'Livelihood & Work',
-    icon: <Briefcase className="h-5 w-5" />,
-    color: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-    description: 'Employment, income, economic participation, labor rights',
+    name: 'Försörjning & Arbete',
+    icon: <span className="text-base">Arbete</span>,
+    color: 'bg-amber-500/10 text-amber-500 border-amber-500/30',
+    description: 'Sysselsättning, inkomst, ekonomiskt deltagande, arbetsrätt',
     universalIndicators: [
-      { code: 'LW01', name: 'Employment rate', unit: '%', description: 'Working-age population in employment', dataAvailability: 'high' },
-      { code: 'LW02', name: 'Youth unemployment', unit: '%', description: 'Unemployed 15-24 year olds', dataAvailability: 'high' },
-      { code: 'LW03', name: 'Median income (PPP)', unit: 'USD/year', description: 'Purchasing-power adjusted median income', dataAvailability: 'medium' },
-      { code: 'LW04', name: 'Working poverty rate', unit: '%', description: 'Employed but below poverty line', dataAvailability: 'medium' },
-      { code: 'LW05', name: 'Labor force participation', unit: '%', description: 'Active labor force share', dataAvailability: 'high' },
-      { code: 'LW06', name: 'Income inequality (Gini)', unit: 'index 0-1', description: 'Income distribution inequality', dataAvailability: 'high' }
+      { code: 'LW01', name: 'Sysselsättningsgrad', unit: '%', description: 'Andel av befolkningen i arbetsför ålder som arbetar', dataAvailability: 'high' },
+      { code: 'LW02', name: 'Ungdomsarbetslöshet', unit: '%', description: 'Arbetslösa 15-24 år', dataAvailability: 'high' },
+      { code: 'LW03', name: 'Medianinkomst (PPP)', unit: 'USD/år', description: 'Köpkraftsjusterad medianinkomst', dataAvailability: 'medium' },
+      { code: 'LW04', name: 'Fattigdom trots arbete', unit: '%', description: 'Arbetande under fattigdomsgränsen', dataAvailability: 'medium' },
+      { code: 'LW05', name: 'Arbetskraftsdeltagande', unit: '%', description: 'Aktiv arbetskraftsandel', dataAvailability: 'high' },
+      { code: 'LW06', name: 'Inkomstojämlikhet (Gini)', unit: 'index 0-1', description: 'Ojämlikhet i inkomstfördelning', dataAvailability: 'high' }
     ],
     governanceLevels: {
-      global: ['ILO standards', 'Trade agreements', 'Migration frameworks'],
-      continental: ['Labor mobility', 'Minimum standards', 'Social security coordination'],
-      national: ['Labor law', 'Minimum wage', 'Social insurance', 'Tax policy'],
-      regional: ['Labor market programs', 'Skills matching', 'Regional development'],
-      local: ['Job centers', 'Local employers', 'Community employment']
+      global: ['ILO-standarder', 'Handelsavtal', 'Migrationsramverk'],
+      continental: ['Arbetskraftsrörlighet', 'Minimistandarder', 'Socialförsäkringskoordinering'],
+      national: ['Arbetsrätt', 'Minimilön', 'Socialförsäkring', 'Skattepolitik'],
+      regional: ['Arbetsmarknadsprogram', 'Kompetensmatching', 'Regional utveckling'],
+      local: ['Arbetsförmedlingar', 'Lokala arbetsgivare', 'Kommunal sysselsättning']
     }
   },
   {
     id: 'knowledge-skills',
     code: 'KS',
-    name: 'Knowledge & Skills',
-    icon: <GraduationCap className="h-5 w-5" />,
-    color: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    description: 'Education, literacy, skill development, lifelong learning',
+    name: 'Kunskap & Kompetens',
+    icon: <span className="text-base">Utbildning</span>,
+    color: 'bg-blue-500/10 text-blue-500 border-blue-500/30',
+    description: 'Utbildning, läskunnighet, kompetensutveckling, livslångt lärande',
     universalIndicators: [
-      { code: 'KS01', name: 'Adult literacy rate', unit: '%', description: 'Adults who can read and write', dataAvailability: 'high' },
-      { code: 'KS02', name: 'Mean years of schooling', unit: 'years', description: 'Average education completed', dataAvailability: 'high' },
-      { code: 'KS03', name: 'Expected years of schooling', unit: 'years', description: 'Years child can expect to attend', dataAvailability: 'high' },
-      { code: 'KS04', name: 'PISA score average', unit: 'score', description: 'International student assessment', dataAvailability: 'medium' },
-      { code: 'KS05', name: 'Tertiary enrollment', unit: '%', description: 'Higher education participation', dataAvailability: 'high' },
-      { code: 'KS06', name: 'Digital literacy', unit: '%', description: 'Basic digital skills', dataAvailability: 'low' }
+      { code: 'KS01', name: 'Läskunnighet bland vuxna', unit: '%', description: 'Vuxna som kan läsa och skriva', dataAvailability: 'high' },
+      { code: 'KS02', name: 'Genomsnittlig skolgång', unit: 'år', description: 'Genomsnittlig avslutad utbildning', dataAvailability: 'high' },
+      { code: 'KS03', name: 'Förväntad skolgång', unit: 'år', description: 'År ett barn kan förväntas gå i skolan', dataAvailability: 'high' },
+      { code: 'KS04', name: 'PISA-poäng (genomsnitt)', unit: 'poäng', description: 'Internationell elevbedömning', dataAvailability: 'medium' },
+      { code: 'KS05', name: 'Högskoleinskrivning', unit: '%', description: 'Deltagande i högre utbildning', dataAvailability: 'high' },
+      { code: 'KS06', name: 'Digital kompetens', unit: '%', description: 'Grundläggande digitala färdigheter', dataAvailability: 'low' }
     ],
     governanceLevels: {
-      global: ['UNESCO standards', 'SDG 4 monitoring', 'Recognition frameworks'],
-      continental: ['Bologna Process', 'Qualification frameworks', 'Student mobility'],
-      national: ['Curriculum standards', 'Teacher certification', 'University system'],
-      regional: ['School networks', 'Vocational training', 'Higher education'],
-      local: ['Schools operation', 'Early childhood', 'Adult education']
+      global: ['UNESCO-standarder', 'SDG 4-uppföljning', 'Erkännanderamverk'],
+      continental: ['Bolognaprocessen', 'Kvalifikationsramverk', 'Studentmobilitet'],
+      national: ['Läroplaner', 'Lärarcertifiering', 'Högskolesystem'],
+      regional: ['Skolnätverk', 'Yrkesutbildning', 'Högre utbildning'],
+      local: ['Skolverksamhet', 'Förskola', 'Vuxenutbildning']
     }
   },
   {
     id: 'safety-security',
     code: 'SS',
-    name: 'Safety & Security',
-    icon: <Shield className="h-5 w-5" />,
-    color: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-    description: 'Physical safety, rule of law, conflict, emergency response',
+    name: 'Trygghet & Säkerhet',
+    icon: <span className="text-base">Säkerhet</span>,
+    color: 'bg-orange-500/10 text-orange-500 border-orange-500/30',
+    description: 'Fysisk säkerhet, rättsstat, konflikter, krisberedskap',
     universalIndicators: [
-      { code: 'SS01', name: 'Homicide rate', unit: 'per 100,000', description: 'Intentional homicides', dataAvailability: 'high' },
-      { code: 'SS02', name: 'Global Peace Index', unit: 'index 1-5', description: 'Overall peacefulness', dataAvailability: 'high' },
-      { code: 'SS03', name: 'Rule of Law Index', unit: 'index 0-1', description: 'Legal system strength', dataAvailability: 'medium' },
-      { code: 'SS04', name: 'Displacement rate', unit: 'per 100,000', description: 'Internally displaced persons', dataAvailability: 'medium' },
-      { code: 'SS05', name: 'Perceived safety', unit: '%', description: 'Feel safe walking at night', dataAvailability: 'medium' },
-      { code: 'SS06', name: 'Disaster preparedness', unit: 'index 0-100', description: 'Emergency response capacity', dataAvailability: 'low' }
+      { code: 'SS01', name: 'Mordfrekvens', unit: 'per 100 000', description: 'Avsiktliga mord', dataAvailability: 'high' },
+      { code: 'SS02', name: 'Global Peace Index', unit: 'index 1-5', description: 'Övergripande fredlighet', dataAvailability: 'high' },
+      { code: 'SS03', name: 'Rule of Law Index', unit: 'index 0-1', description: 'Rättssystemets styrka', dataAvailability: 'medium' },
+      { code: 'SS04', name: 'Internflyktingar', unit: 'per 100 000', description: 'Internt fördrivna personer', dataAvailability: 'medium' },
+      { code: 'SS05', name: 'Upplevd trygghet', unit: '%', description: 'Känner sig trygg att gå ut på natten', dataAvailability: 'medium' },
+      { code: 'SS06', name: 'Katastrofberedskap', unit: 'index 0-100', description: 'Krishanteringskapacitet', dataAvailability: 'low' }
     ],
     governanceLevels: {
-      global: ['UN peacekeeping', 'International law', 'Arms treaties'],
-      continental: ['Regional security', 'Interpol', 'Border coordination'],
-      national: ['Defense', 'Justice system', 'Police', 'Emergency management'],
-      regional: ['Regional police', 'Courts', 'Emergency services'],
-      local: ['Local police', 'Fire services', 'Community safety']
+      global: ['FN-fredsbevarande', 'Internationell rätt', 'Vapennedrustning'],
+      continental: ['Regional säkerhet', 'Interpol', 'Gränskoordinering'],
+      national: ['Försvar', 'Rättsväsende', 'Polis', 'Krishantering'],
+      regional: ['Regional polis', 'Domstolar', 'Räddningstjänst'],
+      local: ['Lokal polis', 'Brandförsvar', 'Trygghetsskapande']
     }
   },
   {
     id: 'shelter-infrastructure',
     code: 'SI',
-    name: 'Shelter & Infrastructure',
-    icon: <Home className="h-5 w-5" />,
-    color: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
-    description: 'Housing, water, sanitation, transport, connectivity',
+    name: 'Boende & Infrastruktur',
+    icon: <span className="text-base">Bostad</span>,
+    color: 'bg-teal-500/10 text-teal-500 border-teal-500/30',
+    description: 'Bostäder, vatten, sanitet, transport, uppkoppling',
     universalIndicators: [
-      { code: 'SI01', name: 'Access to safe water', unit: '%', description: 'Population with safe drinking water', dataAvailability: 'high' },
-      { code: 'SI02', name: 'Access to sanitation', unit: '%', description: 'Population with adequate sanitation', dataAvailability: 'high' },
-      { code: 'SI03', name: 'Housing affordability', unit: 'ratio', description: 'Housing cost to income ratio', dataAvailability: 'medium' },
-      { code: 'SI04', name: 'Overcrowding rate', unit: '%', description: 'Living in overcrowded conditions', dataAvailability: 'medium' },
-      { code: 'SI05', name: 'Internet access', unit: '%', description: 'Households with internet', dataAvailability: 'high' },
-      { code: 'SI06', name: 'Transport access', unit: 'index', description: 'Access to public transport', dataAvailability: 'low' }
+      { code: 'SI01', name: 'Tillgång till rent vatten', unit: '%', description: 'Befolkning med säkert dricksvatten', dataAvailability: 'high' },
+      { code: 'SI02', name: 'Tillgång till sanitet', unit: '%', description: 'Befolkning med adekvat sanitet', dataAvailability: 'high' },
+      { code: 'SI03', name: 'Bostadsöverkomlighet', unit: 'kvot', description: 'Boendekostnad i förhållande till inkomst', dataAvailability: 'medium' },
+      { code: 'SI04', name: 'Trångboddhet', unit: '%', description: 'Boende i trånga förhållanden', dataAvailability: 'medium' },
+      { code: 'SI05', name: 'Internettillgång', unit: '%', description: 'Hushåll med internet', dataAvailability: 'high' },
+      { code: 'SI06', name: 'Kollektivtrafiktillgång', unit: 'index', description: 'Tillgång till kollektivtrafik', dataAvailability: 'low' }
     ],
     governanceLevels: {
-      global: ['SDG targets', 'Habitat agenda', 'Climate adaptation'],
-      continental: ['Infrastructure networks', 'Energy grids', 'Digital corridors'],
-      national: ['Housing policy', 'Infrastructure investment', 'Utility regulation'],
-      regional: ['Regional planning', 'Transport networks', 'Water systems'],
-      local: ['Zoning', 'Local utilities', 'Housing provision', 'Roads']
+      global: ['SDG-mål', 'Habitat-agendan', 'Klimatanpassning'],
+      continental: ['Infrastrukturnätverk', 'Elnät', 'Digitala korridorer'],
+      national: ['Bostadspolitik', 'Infrastrukturinvesteringar', 'Reglering av allmännyttiga tjänster'],
+      regional: ['Regional planering', 'Transportnät', 'Vattensystem'],
+      local: ['Detaljplanering', 'Lokala nyttigheter', 'Bostadsförsörjning', 'Vägar']
     }
   },
   {
     id: 'environment-resources',
     code: 'ER',
-    name: 'Environment & Resources',
-    icon: <Leaf className="h-5 w-5" />,
-    color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-    description: 'Air quality, climate, biodiversity, resource sustainability',
+    name: 'Miljö & Resurser',
+    icon: <span className="text-base">Miljö</span>,
+    color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
+    description: 'Luftkvalitet, klimat, biologisk mångfald, resurshållbarhet',
     universalIndicators: [
-      { code: 'ER01', name: 'Air quality (PM2.5)', unit: 'μg/m³', description: 'Fine particulate matter concentration', dataAvailability: 'high' },
-      { code: 'ER02', name: 'CO2 per capita', unit: 'tonnes/year', description: 'Carbon emissions per person', dataAvailability: 'high' },
-      { code: 'ER03', name: 'Renewable energy share', unit: '%', description: 'Energy from renewables', dataAvailability: 'high' },
-      { code: 'ER04', name: 'Protected land area', unit: '%', description: 'Land under protection', dataAvailability: 'high' },
-      { code: 'ER05', name: 'Water stress', unit: 'index 0-5', description: 'Freshwater withdrawal vs availability', dataAvailability: 'medium' },
-      { code: 'ER06', name: 'Waste recycling rate', unit: '%', description: 'Municipal waste recycled', dataAvailability: 'medium' }
+      { code: 'ER01', name: 'Luftkvalitet (PM2.5)', unit: 'μg/m³', description: 'Koncentration av fina partiklar', dataAvailability: 'high' },
+      { code: 'ER02', name: 'CO2 per capita', unit: 'ton/år', description: 'Koldioxidutsläpp per person', dataAvailability: 'high' },
+      { code: 'ER03', name: 'Förnybar energi', unit: '%', description: 'Energi från förnybara källor', dataAvailability: 'high' },
+      { code: 'ER04', name: 'Skyddad mark', unit: '%', description: 'Mark under skydd', dataAvailability: 'high' },
+      { code: 'ER05', name: 'Vattenstress', unit: 'index 0-5', description: 'Sötvattensuttag vs tillgång', dataAvailability: 'medium' },
+      { code: 'ER06', name: 'Återvinningsgrad', unit: '%', description: 'Kommunalt avfall som återvinns', dataAvailability: 'medium' }
     ],
     governanceLevels: {
-      global: ['Paris Agreement', 'CBD', 'Montreal Protocol', 'Basel Convention'],
-      continental: ['Emissions trading', 'Environmental standards', 'Transboundary'],
-      national: ['Environmental law', 'Climate targets', 'Protected areas'],
-      regional: ['Regional conservation', 'Air quality', 'Watershed management'],
-      local: ['Waste management', 'Local conservation', 'Urban green space']
+      global: ['Parisavtalet', 'CBD', 'Montrealprotokollet', 'Baselkonventionen'],
+      continental: ['Utsläppshandel', 'Miljöstandarder', 'Gränsöverskridande'],
+      national: ['Miljölagstiftning', 'Klimatmål', 'Naturskyddsområden'],
+      regional: ['Regional naturvård', 'Luftkvalitet', 'Avrinningsområden'],
+      local: ['Avfallshantering', 'Lokalt naturskydd', 'Stadsgrönska']
     }
   },
   {
     id: 'energy-food',
     code: 'EF',
-    name: 'Energy & Food',
-    icon: <Zap className="h-5 w-5" />,
-    color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    description: 'Energy access, food security, nutrition, agriculture',
+    name: 'Energi & Mat',
+    icon: <span className="text-base">Energi</span>,
+    color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30',
+    description: 'Energitillgång, livsmedelssäkerhet, nutrition, jordbruk',
     universalIndicators: [
-      { code: 'EF01', name: 'Electricity access', unit: '%', description: 'Population with electricity', dataAvailability: 'high' },
-      { code: 'EF02', name: 'Food insecurity', unit: '%', description: 'Moderate or severe food insecurity', dataAvailability: 'high' },
-      { code: 'EF03', name: 'Undernourishment', unit: '%', description: 'Insufficient caloric intake', dataAvailability: 'high' },
-      { code: 'EF04', name: 'Child stunting', unit: '%', description: 'Children under 5 with stunted growth', dataAvailability: 'high' },
-      { code: 'EF05', name: 'Energy intensity', unit: 'MJ/USD GDP', description: 'Energy use per economic output', dataAvailability: 'high' },
-      { code: 'EF06', name: 'Agricultural productivity', unit: 'USD/worker', description: 'Value added per agricultural worker', dataAvailability: 'medium' }
+      { code: 'EF01', name: 'Eltillgång', unit: '%', description: 'Befolkning med elektricitet', dataAvailability: 'high' },
+      { code: 'EF02', name: 'Livsmedelsotrygghet', unit: '%', description: 'Måttlig eller svår livsmedelsotrygghet', dataAvailability: 'high' },
+      { code: 'EF03', name: 'Undernäring', unit: '%', description: 'Otillräckligt kaloriintag', dataAvailability: 'high' },
+      { code: 'EF04', name: 'Hämmad tillväxt hos barn', unit: '%', description: 'Barn under 5 med hämmad tillväxt', dataAvailability: 'high' },
+      { code: 'EF05', name: 'Energiintensitet', unit: 'MJ/USD BNP', description: 'Energianvändning per ekonomisk produktion', dataAvailability: 'high' },
+      { code: 'EF06', name: 'Jordbruksproduktivitet', unit: 'USD/arbetare', description: 'Förädlingsvärde per jordbruksarbetare', dataAvailability: 'medium' }
     ],
     governanceLevels: {
-      global: ['FAO', 'WFP', 'IEA', 'Trade agreements'],
-      continental: ['Energy unions', 'Agricultural policy', 'Food standards'],
-      national: ['Energy policy', 'Agricultural subsidies', 'Food safety'],
-      regional: ['Grid operation', 'Agricultural extension', 'Food distribution'],
-      local: ['Local markets', 'Urban farming', 'Energy cooperatives']
+      global: ['FAO', 'WFP', 'IEA', 'Handelsavtal'],
+      continental: ['Energiunioner', 'Jordbrukspolitik', 'Livsmedelsstandarder'],
+      national: ['Energipolitik', 'Jordbrukssubventioner', 'Livsmedelssäkerhet'],
+      regional: ['Elnätsoperatörer', 'Jordbruksrådgivning', 'Livsmedelsdistribution'],
+      local: ['Lokala marknader', 'Stadsodling', 'Energikooperativ']
     }
   },
   {
     id: 'governance-rights',
     code: 'GR',
-    name: 'Governance & Rights',
-    icon: <Scale className="h-5 w-5" />,
-    color: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
-    description: 'Democratic participation, human rights, transparency, inclusion',
+    name: 'Styrning & Rättigheter',
+    icon: <span className="text-base">Demokrati</span>,
+    color: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/30',
+    description: 'Demokratiskt deltagande, mänskliga rättigheter, transparens, inkludering',
     universalIndicators: [
-      { code: 'GR01', name: 'Democracy Index', unit: 'index 0-10', description: 'Overall democratic quality', dataAvailability: 'high' },
-      { code: 'GR02', name: 'Electoral participation', unit: '%', description: 'Voter turnout', dataAvailability: 'high' },
-      { code: 'GR03', name: 'Press Freedom Index', unit: 'index 0-100', description: 'Media independence', dataAvailability: 'high' },
-      { code: 'GR04', name: 'Corruption Perception', unit: 'index 0-100', description: 'Perceived public sector corruption', dataAvailability: 'high' },
-      { code: 'GR05', name: 'Gender equality index', unit: 'index 0-1', description: 'Gender gap closure', dataAvailability: 'high' },
-      { code: 'GR06', name: 'Human rights score', unit: 'index 0-1', description: 'Rights protection', dataAvailability: 'medium' }
+      { code: 'GR01', name: 'Demokratiindex', unit: 'index 0-10', description: 'Övergripande demokratisk kvalitet', dataAvailability: 'high' },
+      { code: 'GR02', name: 'Valdeltagande', unit: '%', description: 'Valdeltagande', dataAvailability: 'high' },
+      { code: 'GR03', name: 'Pressfrihet', unit: 'index 0-100', description: 'Medieoberoende', dataAvailability: 'high' },
+      { code: 'GR04', name: 'Korruptionsuppfattning', unit: 'index 0-100', description: 'Uppfattad korruption i offentlig sektor', dataAvailability: 'high' },
+      { code: 'GR05', name: 'Jämställdhetsindex', unit: 'index 0-1', description: 'Utjämning av könsgap', dataAvailability: 'high' },
+      { code: 'GR06', name: 'Mänskliga rättigheter', unit: 'index 0-1', description: 'Rättighetsskydd', dataAvailability: 'medium' }
     ],
     governanceLevels: {
-      global: ['UN Human Rights', 'ICC', 'International treaties'],
-      continental: ['Regional courts', 'Human rights charters', 'Democratic standards'],
-      national: ['Constitution', 'Elections', 'Courts', 'Rights legislation'],
-      regional: ['Regional government', 'Administrative courts', 'Ombudsman'],
-      local: ['Local democracy', 'Citizen participation', 'Transparency']
+      global: ['FN:s råd för mänskliga rättigheter', 'ICC', 'Internationella fördrag'],
+      continental: ['Regionala domstolar', 'MR-stadgor', 'Demokratistandarder'],
+      national: ['Konstitution', 'Val', 'Domstolar', 'Rättighetslagstiftning'],
+      regional: ['Regional förvaltning', 'Förvaltningsdomstolar', 'Ombudsmän'],
+      local: ['Lokal demokrati', 'Medborgardeltagande', 'Transparens']
     }
   }
 ];
@@ -496,19 +486,15 @@ const UniversalResponsibilityMap: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header - descriptive text instead of icons */}
       <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
         <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
-              <Globe className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-xl">Universal Responsibility Map</CardTitle>
-              <CardDescription>
-                Globalt ramverk för mänskliga behov, indikatorer och styrningsnivåer – oberoende av jurisdiktion
-              </CardDescription>
-            </div>
+          <div>
+            <CardTitle className="text-xl">Universell Ansvarsmatris</CardTitle>
+            <CardDescription className="mt-2">
+              Globalt ramverk för mänskliga behov, indikatorer och styrningsnivåer — oberoende av jurisdiktion. 
+              Varje behov kan spåras från individnivå upp till globala fördrag.
+            </CardDescription>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
@@ -525,11 +511,10 @@ const UniversalResponsibilityMap: React.FC = () => {
         </AlertDescription>
       </Alert>
 
-      {/* Level filter */}
+      {/* Level filter - text-based tabs */}
       <Tabs value={selectedLevel} onValueChange={setSelectedLevel}>
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="all" className="gap-1.5">
-            <Scale className="h-3.5 w-3.5" />
             Alla nivåer
           </TabsTrigger>
           {GOVERNANCE_LEVELS.map((level) => (
