@@ -642,6 +642,12 @@ export default function PublicDashboard() {
             {/* Quick Links - better mobile grid */}
             <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-center gap-2 mt-4">
               <Button variant="outline" size="sm" className="h-9 text-xs px-3" asChild>
+                <Link to="/prioritized" className="gap-1.5">
+                  <span>⚡</span>
+                  <span className="truncate">Prioriterat</span>
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" className="h-9 text-xs px-3" asChild>
                 <Link to="/reality-index" className="gap-1.5">
                   <span>📊</span>
                   <span className="truncate">Reality Index</span>
