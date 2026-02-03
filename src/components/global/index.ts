@@ -75,3 +75,6 @@ export { LambdaYearInReview } from './LambdaYearInReview';
 
 // LAMBDA AI Text Generation Protocol
 export { LambdaAITextGenerator, LambdaValueJudgmentResponse } from './LambdaAITextGenerator';
+
+// LAMBDA Self-Calibration & Model Evolution
+export { LambdaSelfCalibration } from './LambdaSelfCalibration';
