@@ -16,6 +16,9 @@ export {
   INDEX_CATEGORIES,
 } from './index-registry';
 
+// Normalization
+export * from './normalization';
+
 // Correlation Engine
 export {
   calculateCorrelation,
@@ -67,3 +70,6 @@ export {
   presentPerformance,
   type ClickPathLevel,
 } from './presentation';
+
+// Legal Protection
+export * from './legal-protection';
