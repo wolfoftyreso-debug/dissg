@@ -37,8 +37,8 @@ export function SystemFooter({
 
   if (variant === 'compact') {
     return (
-      <footer className={`border-t pt-6 mt-8 ${className}`}>
-        <div className="max-w-4xl mx-auto space-y-4">
+      <footer className={`border-t pt-5 sm:pt-6 mt-6 sm:mt-8 ${className}`}>
+        <div className="max-w-4xl mx-auto px-4 space-y-4">
           {/* Officiell position - alltid synlig */}
           <div className="flex items-start gap-3 text-xs text-muted-foreground">
             <Shield className="h-4 w-4 shrink-0 mt-0.5 text-primary/60" />
@@ -54,9 +54,9 @@ export function SystemFooter({
 
           <Separator />
 
-          {/* Länkar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 text-[10px] text-muted-foreground">
-            <div className="flex items-center gap-4">
+          {/* Länkar - stacks better on mobile */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-[10px] text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
               <span>© {currentYear} NOGF</span>
               <a href="/about" className="underline underline-offset-2 hover:text-foreground transition-colors">
                 {lang === 'sv' ? 'Om systemet' : 'About'}
@@ -78,14 +78,14 @@ export function SystemFooter({
 
   // Full variant
   return (
-    <footer className={`border-t pt-8 mt-12 pb-8 ${className}`}>
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Huvudsektion */}
-        <div className="grid md:grid-cols-2 gap-8">
+    <footer className={`border-t pt-6 sm:pt-8 mt-8 sm:mt-12 pb-6 sm:pb-8 ${className}`}>
+      <div className="max-w-4xl mx-auto px-4 space-y-5 sm:space-y-6">
+        {/* Huvudsektion - stacks on mobile */}
+        <div className="grid gap-6 sm:gap-8 md:grid-cols-2">
           {/* Officiell position */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
+              <Shield className="h-5 w-5 text-primary shrink-0" />
               <h3 className="text-sm font-semibold">
                 {lang === 'sv' ? 'Om plattformens datahantering' : 'About platform data handling'}
               </h3>
@@ -98,13 +98,13 @@ export function SystemFooter({
             </p>
           </div>
 
-          {/* Länkar och info */}
+          {/* Länkar och info - horizontal on mobile */}
           <div className="space-y-4">
             <div className="space-y-2">
               <h3 className="text-sm font-semibold">
                 {lang === 'sv' ? 'Resurser' : 'Resources'}
               </h3>
-              <ul className="space-y-1 text-xs">
+              <ul className="flex flex-wrap gap-x-4 gap-y-1 sm:flex-col sm:gap-1 text-xs">
                 <li>
                   <a href="/about" className="text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors">
                     {lang === 'sv' ? 'Om systemet' : 'About the system'}
@@ -132,17 +132,17 @@ export function SystemFooter({
               <h3 className="text-sm font-semibold">
                 {lang === 'sv' ? 'Öppenhet' : 'Transparency'}
               </h3>
-              <ul className="space-y-1 text-xs text-muted-foreground">
+              <ul className="flex flex-wrap gap-x-4 gap-y-1 sm:flex-col sm:gap-1 text-xs text-muted-foreground">
                 <li className="flex items-center gap-1.5">
-                  <Shield className="h-3 w-3 text-green-600" />
+                  <Shield className="h-3 w-3 text-green-600 shrink-0" />
                   {lang === 'sv' ? 'Ingen data modifieras' : 'No data is modified'}
                 </li>
                 <li className="flex items-center gap-1.5">
-                  <Shield className="h-3 w-3 text-green-600" />
+                  <Shield className="h-3 w-3 text-green-600 shrink-0" />
                   {lang === 'sv' ? 'Alla metoder är publika' : 'All methods are public'}
                 </li>
                 <li className="flex items-center gap-1.5">
-                  <Shield className="h-3 w-3 text-green-600" />
+                  <Shield className="h-3 w-3 text-green-600 shrink-0" />
                   {lang === 'sv' ? 'Full spårbarhet' : 'Full traceability'}
                 </li>
               </ul>
@@ -152,9 +152,9 @@ export function SystemFooter({
 
         <Separator />
 
-        {/* Copyright */}
-        <div className="flex flex-wrap items-center justify-between gap-4 text-[10px] text-muted-foreground">
-          <span>© {currentYear} NOGF — Nationellt Observationssystem för Grundläggande Funktioner</span>
+        {/* Copyright - stacks on mobile */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-[10px] text-muted-foreground">
+          <span className="text-center sm:text-left">© {currentYear} NOGF</span>
           <AboutSystemDialog lang={lang} />
         </div>
       </div>
