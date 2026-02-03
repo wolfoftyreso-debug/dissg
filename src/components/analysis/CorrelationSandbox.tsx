@@ -9,7 +9,7 @@
  * - "Other factors changing"
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   LineChart,
   Line,
@@ -25,7 +26,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine
 } from 'recharts';
 import {
   TrendingUp,
@@ -33,37 +33,39 @@ import {
   AlertTriangle,
   Info,
   XCircle,
-  Plus,
-  X,
   ArrowRight,
   Shuffle,
   Clock,
   Users,
-  BarChart2
+  BarChart2,
+  Database,
+  Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SystemBreadcrumbs } from '@/components/navigation';
-import { DataQualityBadge, type DataQualityMetrics, calculateQualityLevel } from '@/components/quality';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 // === TYPES ===
 
 interface Indicator {
   id: string;
+  code: string;
   name: string;
-  nameSv: string;
   category: string;
   unit: string;
-  isInverted?: boolean; // Lower = better (e.g., unemployment)
+  isInverted?: boolean;
 }
 
 interface DataPoint {
+  period: string;
   year: number;
-  [key: string]: number;
+  [key: string]: string | number;
 }
 
 interface CorrelationResult {
-  coefficient: number;      // -1 to 1
-  pValue: number;          // 0 to 1
+  coefficient: number;
+  pValue: number;
   sampleSize: number;
   timeLagMonths: number;
   isSignificant: boolean;
@@ -71,37 +73,65 @@ interface CorrelationResult {
 }
 
 interface CorrelationWarning {
-  type: 'time' | 'sample' | 'extreme' | 'causation' | 'confounding';
+  type: 'time' | 'sample' | 'extreme' | 'causation' | 'confounding' | 'data';
   severity: 'info' | 'warning' | 'critical';
   message: string;
   messageSv: string;
 }
 
-// === AVAILABLE INDICATORS ===
+// === FETCH INDICATORS FROM DATABASE ===
 
-const AVAILABLE_INDICATORS: Indicator[] = [
-  { id: 'gdp_per_capita', name: 'GDP per capita', nameSv: 'BNP per capita', category: 'Ekonomi', unit: 'USD PPP' },
-  { id: 'unemployment', name: 'Unemployment rate', nameSv: 'Arbetslöshet', category: 'Ekonomi', unit: '%', isInverted: true },
-  { id: 'inflation', name: 'Inflation rate', nameSv: 'Inflation', category: 'Ekonomi', unit: '%' },
-  { id: 'life_expectancy', name: 'Life expectancy', nameSv: 'Förväntad livslängd', category: 'Hälsa', unit: 'år' },
-  { id: 'infant_mortality', name: 'Infant mortality', nameSv: 'Spädbarnsdödlighet', category: 'Hälsa', unit: 'per 1000', isInverted: true },
-  { id: 'education_years', name: 'Years of education', nameSv: 'Utbildningsår', category: 'Utbildning', unit: 'år' },
-  { id: 'co2_per_capita', name: 'CO2 emissions per capita', nameSv: 'CO2-utsläpp per capita', category: 'Miljö', unit: 'ton' },
-  { id: 'energy_consumption', name: 'Energy consumption', nameSv: 'Energiförbrukning', category: 'Energi', unit: 'kWh/capita' },
-  { id: 'trust_government', name: 'Trust in government', nameSv: 'Tillit till myndigheter', category: 'Samhälle', unit: '%' },
-  { id: 'gini_coefficient', name: 'Gini coefficient', nameSv: 'Gini-koefficient', category: 'Ojämlikhet', unit: 'index', isInverted: true },
-];
+const fetchIndicators = async (): Promise<Indicator[]> => {
+  const { data, error } = await supabase
+    .from('kpi_definitions')
+    .select('id, code, name, category, unit')
+    .eq('is_active', true)
+    .order('category', { ascending: true });
 
-// === MOCK DATA GENERATOR ===
+  if (error) throw error;
 
-const generateMockTimeSeries = (indicator: Indicator, years: number = 20): DataPoint[] => {
-  const baseValue = Math.random() * 50 + 25;
-  const trend = (Math.random() - 0.5) * 2;
-  
-  return Array.from({ length: years }, (_, i) => ({
-    year: 2005 + i,
-    [indicator.id]: baseValue + trend * i + (Math.random() - 0.5) * 10
+  return (data || []).map(kpi => ({
+    id: kpi.id,
+    code: kpi.code,
+    name: kpi.name,
+    category: kpi.category,
+    unit: kpi.unit || '',
+    isInverted: kpi.code.includes('mortality') || kpi.code.includes('crime') || kpi.code.includes('exclusion'),
   }));
+};
+
+// === FETCH TIME SERIES DATA ===
+
+const fetchTimeSeriesData = async (
+  kpiIdA: string,
+  kpiIdB: string
+): Promise<{ dataA: { period: string; value: number }[]; dataB: { period: string; value: number }[] }> => {
+  const [resultA, resultB] = await Promise.all([
+    supabase
+      .from('kpi_values')
+      .select('period_start, value')
+      .eq('kpi_id', kpiIdA)
+      .order('period_start', { ascending: true }),
+    supabase
+      .from('kpi_values')
+      .select('period_start, value')
+      .eq('kpi_id', kpiIdB)
+      .order('period_start', { ascending: true }),
+  ]);
+
+  if (resultA.error) throw resultA.error;
+  if (resultB.error) throw resultB.error;
+
+  return {
+    dataA: (resultA.data || []).map(row => ({
+      period: row.period_start,
+      value: Number(row.value),
+    })),
+    dataB: (resultB.data || []).map(row => ({
+      period: row.period_start,
+      value: Number(row.value),
+    })),
+  };
 };
 
 // === CORRELATION CALCULATOR ===
@@ -134,9 +164,9 @@ const calculateCorrelation = (
     ? 0 
     : numerator / Math.sqrt(denom1 * denom2);
 
-  // Approximate p-value (simplified)
-  const t = coefficient * Math.sqrt((n - 2) / (1 - coefficient * coefficient));
-  const pValue = Math.min(1, Math.max(0, 1 - Math.abs(t) / 10));
+  // Approximate p-value (simplified t-test)
+  const tStat = coefficient * Math.sqrt((n - 2) / (1 - coefficient * coefficient + 0.0001));
+  const pValue = Math.min(1, Math.max(0, 2 * (1 - Math.min(0.99, Math.abs(tStat) / (Math.abs(tStat) + n)))));
 
   const absCoeff = Math.abs(coefficient);
   const strength = 
@@ -150,7 +180,7 @@ const calculateCorrelation = (
     pValue,
     sampleSize: n,
     timeLagMonths: 0,
-    isSignificant: pValue < 0.05,
+    isSignificant: pValue < 0.05 && n >= 5,
     strength
   };
 };
@@ -159,36 +189,34 @@ const calculateCorrelation = (
 
 const generateWarnings = (
   result: CorrelationResult,
-  yearRange: [number, number]
+  dataPointCount: number
 ): CorrelationWarning[] => {
   const warnings: CorrelationWarning[] = [];
   
-  const periodLength = yearRange[1] - yearRange[0];
-  
-  // Short time period
-  if (periodLength < 5) {
+  // Check data availability
+  if (dataPointCount === 0) {
     warnings.push({
-      type: 'time',
+      type: 'data',
       severity: 'critical',
-      message: 'Very short time period may exaggerate patterns',
-      messageSv: 'Mycket kort tidsperiod kan förstärka mönster'
+      message: 'No overlapping data points found',
+      messageSv: 'Inga överlappande datapunkter hittades'
     });
-  } else if (periodLength < 10) {
-    warnings.push({
-      type: 'time',
-      severity: 'warning',
-      message: 'Short time period - patterns may not be stable',
-      messageSv: 'Kort tidsperiod – mönster kanske inte är stabila'
-    });
+    return warnings;
   }
 
-  // Small sample
-  if (result.sampleSize < 10) {
+  if (dataPointCount < 5) {
+    warnings.push({
+      type: 'sample',
+      severity: 'critical',
+      message: `Very few data points (n=${dataPointCount}) - results unreliable`,
+      messageSv: `Mycket få datapunkter (n=${dataPointCount}) – resultaten är opålitliga`
+    });
+  } else if (dataPointCount < 10) {
     warnings.push({
       type: 'sample',
       severity: 'warning',
-      message: `Small sample size (n=${result.sampleSize}) increases uncertainty`,
-      messageSv: `Litet urval (n=${result.sampleSize}) ökar osäkerheten`
+      message: `Small sample size (n=${dataPointCount}) increases uncertainty`,
+      messageSv: `Litet urval (n=${dataPointCount}) ökar osäkerheten`
     });
   }
 
@@ -213,44 +241,96 @@ const generateWarnings = (
   return warnings;
 };
 
+// === CATEGORY LABELS ===
+
+const categoryLabels: Record<string, string> = {
+  demografi_halsa: 'Demografi & Hälsa',
+  arbete_produktivitet: 'Arbete & Produktivitet',
+  ekonomisk_barkraft: 'Ekonomisk Bärkraft',
+  social_stabilitet: 'Social Stabilitet',
+  systemrisk_styrning: 'Systemrisk & Styrning',
+  infrastruktur: 'Infrastruktur',
+  karnsystem_funktion: 'Kärnsystem',
+};
+
 // === MAIN COMPONENT ===
 
 export const CorrelationSandbox: React.FC = () => {
   const [indicatorA, setIndicatorA] = useState<Indicator | null>(null);
   const [indicatorB, setIndicatorB] = useState<Indicator | null>(null);
-  const [yearRange, setYearRange] = useState<[number, number]>([2010, 2024]);
-  const [showAnalysis, setShowAnalysis] = useState(false);
 
-  // Generate data when indicators are selected
-  const { data, result, warnings, otherFactors } = useMemo(() => {
-    if (!indicatorA || !indicatorB) {
-      return { data: [], result: null, warnings: [], otherFactors: [] };
+  // Fetch available indicators from database
+  const { data: indicators, isLoading: loadingIndicators, error: indicatorsError } = useQuery({
+    queryKey: ['correlation-indicators'],
+    queryFn: fetchIndicators,
+  });
+
+  // Fetch time series when both indicators are selected
+  const { data: timeSeriesData, isLoading: loadingTimeSeries, error: timeSeriesError } = useQuery({
+    queryKey: ['correlation-timeseries', indicatorA?.id, indicatorB?.id],
+    queryFn: () => fetchTimeSeriesData(indicatorA!.id, indicatorB!.id),
+    enabled: !!indicatorA && !!indicatorB,
+  });
+
+  // Calculate correlation result
+  const { chartData, result, warnings, otherFactors } = useMemo(() => {
+    if (!indicatorA || !indicatorB || !timeSeriesData) {
+      return { chartData: [], result: null, warnings: [], otherFactors: [] };
     }
 
-    const dataA = generateMockTimeSeries(indicatorA, yearRange[1] - yearRange[0] + 1);
-    const dataB = generateMockTimeSeries(indicatorB, yearRange[1] - yearRange[0] + 1);
+    const { dataA, dataB } = timeSeriesData;
 
-    // Merge data
-    const merged = dataA.map((d, i) => ({
-      year: yearRange[0] + i,
-      [indicatorA.id]: d[indicatorA.id],
-      [indicatorB.id]: dataB[i]?.[indicatorB.id] || 0
-    }));
+    // Create a map of periods to values
+    const mapA = new Map(dataA.map(d => [d.period, d.value]));
+    const mapB = new Map(dataB.map(d => [d.period, d.value]));
 
-    const values1 = merged.map(d => d[indicatorA.id]);
-    const values2 = merged.map(d => d[indicatorB.id]);
+    // Find overlapping periods
+    const allPeriods = new Set([...mapA.keys(), ...mapB.keys()]);
+    const merged: DataPoint[] = [];
+
+    for (const period of allPeriods) {
+      if (mapA.has(period) && mapB.has(period)) {
+        const year = new Date(period).getFullYear();
+        merged.push({
+          period,
+          year,
+          [indicatorA.code]: mapA.get(period)!,
+          [indicatorB.code]: mapB.get(period)!,
+        });
+      }
+    }
+
+    // Sort by period
+    merged.sort((a, b) => a.period.localeCompare(b.period));
+
+    if (merged.length === 0) {
+      return { 
+        chartData: [], 
+        result: null, 
+        warnings: [{ 
+          type: 'data' as const, 
+          severity: 'critical' as const, 
+          message: 'No overlapping data', 
+          messageSv: 'Inga överlappande data' 
+        }], 
+        otherFactors: [] 
+      };
+    }
+
+    const values1 = merged.map(d => d[indicatorA.code] as number);
+    const values2 = merged.map(d => d[indicatorB.code] as number);
 
     const corr = calculateCorrelation(values1, values2);
-    const warns = generateWarnings(corr, yearRange);
+    const warns = generateWarnings(corr, merged.length);
 
     // Suggest other factors
-    const others = AVAILABLE_INDICATORS
+    const others = (indicators || [])
       .filter(i => i.id !== indicatorA.id && i.id !== indicatorB.id)
       .slice(0, 3)
-      .map(i => i.nameSv);
+      .map(i => i.name);
 
-    return { data: merged, result: corr, warnings: warns, otherFactors: others };
-  }, [indicatorA, indicatorB, yearRange]);
+    return { chartData: merged, result: corr, warnings: warns, otherFactors: others };
+  }, [indicatorA, indicatorB, timeSeriesData, indicators]);
 
   const strengthLabels = {
     none: { sv: 'Ingen', color: 'text-muted-foreground' },
@@ -259,6 +339,17 @@ export const CorrelationSandbox: React.FC = () => {
     strong: { sv: 'Stark', color: 'text-primary' },
     very_strong: { sv: 'Mycket stark', color: 'text-status-critical' }
   };
+
+  // Group indicators by category
+  const groupedIndicators = useMemo(() => {
+    if (!indicators) return {};
+    return indicators.reduce((acc, ind) => {
+      const cat = ind.category;
+      if (!acc[cat]) acc[cat] = [];
+      acc[cat].push(ind);
+      return acc;
+    }, {} as Record<string, Indicator[]>);
+  }, [indicators]);
 
   return (
     <div className="p-4 max-w-5xl mx-auto space-y-4">
@@ -278,115 +369,172 @@ export const CorrelationSandbox: React.FC = () => {
         <p className="text-muted-foreground max-w-xl mx-auto">
           Utforska samband mellan indikatorer – med tydliga varningar mot övertolkning.
         </p>
+        <Badge variant="outline" className="text-xs">
+          <Database className="h-3 w-3 mr-1" />
+          Live data från databasen
+        </Badge>
       </div>
+
+      {/* Error states */}
+      {indicatorsError && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            Kunde inte hämta indikatorer: {(indicatorsError as Error).message}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Indicator Selection */}
       <Card>
         <CardHeader>
           <CardTitle className="text-sm">Välj indikatorer att jämföra</CardTitle>
+          <CardDescription>
+            Data hämtas direkt från databasen
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="flex-1 min-w-48">
-              <label className="text-xs text-muted-foreground mb-1 block">Indikator A</label>
-              <Select 
-                value={indicatorA?.id || ''} 
-                onValueChange={(v) => setIndicatorA(AVAILABLE_INDICATORS.find(i => i.id === v) || null)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Välj indikator..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {AVAILABLE_INDICATORS.map(ind => (
-                    <SelectItem key={ind.id} value={ind.id}>
-                      <span className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">{ind.category}</Badge>
-                        {ind.nameSv}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          {loadingIndicators ? (
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
             </div>
+          ) : (
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex-1 min-w-48">
+                <label className="text-xs text-muted-foreground mb-1 block">Indikator A</label>
+                <Select 
+                  value={indicatorA?.id || ''} 
+                  onValueChange={(v) => setIndicatorA(indicators?.find(i => i.id === v) || null)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Välj indikator..." />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-80">
+                    {Object.entries(groupedIndicators).map(([category, items]) => (
+                      <div key={category}>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
+                          {categoryLabels[category] || category}
+                        </div>
+                        {items.map(ind => (
+                          <SelectItem key={ind.id} value={ind.id}>
+                            <span className="flex items-center gap-2">
+                              {ind.name}
+                              <span className="text-xs text-muted-foreground">({ind.unit})</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <ArrowRight className="h-5 w-5 text-muted-foreground hidden sm:block" />
+              <ArrowRight className="h-5 w-5 text-muted-foreground hidden sm:block" />
 
-            <div className="flex-1 min-w-48">
-              <label className="text-xs text-muted-foreground mb-1 block">Indikator B</label>
-              <Select 
-                value={indicatorB?.id || ''} 
-                onValueChange={(v) => setIndicatorB(AVAILABLE_INDICATORS.find(i => i.id === v) || null)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Välj indikator..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {AVAILABLE_INDICATORS.filter(i => i.id !== indicatorA?.id).map(ind => (
-                    <SelectItem key={ind.id} value={ind.id}>
-                      <span className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">{ind.category}</Badge>
-                        {ind.nameSv}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex-1 min-w-48">
+                <label className="text-xs text-muted-foreground mb-1 block">Indikator B</label>
+                <Select 
+                  value={indicatorB?.id || ''} 
+                  onValueChange={(v) => setIndicatorB(indicators?.find(i => i.id === v) || null)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Välj indikator..." />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-80">
+                    {Object.entries(groupedIndicators).map(([category, items]) => (
+                      <div key={category}>
+                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
+                          {categoryLabels[category] || category}
+                        </div>
+                        {items.filter(i => i.id !== indicatorA?.id).map(ind => (
+                          <SelectItem key={ind.id} value={ind.id}>
+                            <span className="flex items-center gap-2">
+                              {ind.name}
+                              <span className="text-xs text-muted-foreground">({ind.unit})</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
-
-          {/* Year range */}
-          <div className="mt-4">
-            <label className="text-xs text-muted-foreground mb-2 block flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              Tidsperiod: {yearRange[0]} – {yearRange[1]}
-            </label>
-            <Slider
-              value={yearRange}
-              min={1990}
-              max={2024}
-              step={1}
-              onValueChange={(v) => setYearRange(v as [number, number])}
-              className="mt-2"
-            />
-          </div>
+          )}
         </CardContent>
       </Card>
 
+      {/* Loading state for time series */}
+      {loadingTimeSeries && indicatorA && indicatorB && (
+        <Card>
+          <CardContent className="py-12 flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Hämtar tidsseriedata...</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Time series error */}
+      {timeSeriesError && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            Kunde inte hämta tidsseriedata: {(timeSeriesError as Error).message}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Results */}
-      {indicatorA && indicatorB && result && (
+      {indicatorA && indicatorB && result && chartData.length > 0 && (
         <>
+          {/* Data info */}
+          <Alert>
+            <Database className="h-4 w-4" />
+            <AlertDescription>
+              Visar {chartData.length} överlappande datapunkter från{' '}
+              {chartData[0]?.period.substring(0, 7)} till{' '}
+              {chartData[chartData.length - 1]?.period.substring(0, 7)}
+            </AlertDescription>
+          </Alert>
+
           {/* Chart */}
           <Card>
             <CardContent className="pt-4">
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={data}>
+                <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="year" tick={{ fontSize: 12 }} />
+                  <XAxis 
+                    dataKey="period" 
+                    tick={{ fontSize: 12 }} 
+                    tickFormatter={(v) => v.substring(0, 7)}
+                  />
                   <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
                   <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'hsl(var(--card))', 
                       border: '1px solid hsl(var(--border))' 
-                    }} 
+                    }}
+                    labelFormatter={(v) => `Period: ${v}`}
                   />
                   <Line
                     yAxisId="left"
                     type="monotone"
-                    dataKey={indicatorA.id}
+                    dataKey={indicatorA.code}
                     stroke="hsl(var(--primary))"
                     strokeWidth={2}
-                    dot={false}
-                    name={indicatorA.nameSv}
+                    dot={chartData.length < 20}
+                    name={indicatorA.name}
                   />
                   <Line
                     yAxisId="right"
                     type="monotone"
-                    dataKey={indicatorB.id}
+                    dataKey={indicatorB.code}
                     stroke="hsl(var(--status-warning))"
                     strokeWidth={2}
-                    dot={false}
-                    name={indicatorB.nameSv}
+                    dot={chartData.length < 20}
+                    name={indicatorB.name}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -394,11 +542,11 @@ export const CorrelationSandbox: React.FC = () => {
               <div className="flex justify-center gap-6 mt-2 text-xs">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-0.5 bg-primary" />
-                  <span>{indicatorA.nameSv}</span>
+                  <span>{indicatorA.name} ({indicatorA.unit})</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-0.5 bg-status-warning" />
-                  <span>{indicatorB.nameSv}</span>
+                  <span>{indicatorB.name} ({indicatorB.unit})</span>
                 </div>
               </div>
             </CardContent>
@@ -429,7 +577,7 @@ export const CorrelationSandbox: React.FC = () => {
                     <span className="font-data">n = {result.sampleSize}</span>
                   </div>
                   <div className="text-muted-foreground">
-                    p = {result.pValue.toFixed(3)}
+                    p ≈ {result.pValue.toFixed(3)}
                     {result.isSignificant && (
                       <Badge variant="outline" className="ml-1 text-xs">Signifikant</Badge>
                     )}
@@ -438,12 +586,12 @@ export const CorrelationSandbox: React.FC = () => {
               </div>
 
               <p className="text-sm">
-                Under perioden {yearRange[0]}–{yearRange[1]} 
+                Under den observerade perioden
                 {result.coefficient > 0 
-                  ? ` tenderar ${indicatorA.nameSv} och ${indicatorB.nameSv} att röra sig i samma riktning.`
+                  ? ` tenderar ${indicatorA.name} och ${indicatorB.name} att röra sig i samma riktning.`
                   : result.coefficient < 0
-                  ? ` tenderar ${indicatorA.nameSv} och ${indicatorB.nameSv} att röra sig i motsatt riktning.`
-                  : ` syns inget tydligt samband mellan ${indicatorA.nameSv} och ${indicatorB.nameSv}.`
+                  ? ` tenderar ${indicatorA.name} och ${indicatorB.name} att röra sig i motsatt riktning.`
+                  : ` syns inget tydligt samband mellan ${indicatorA.name} och ${indicatorB.name}.`
                 }
               </p>
             </CardContent>
@@ -483,66 +631,82 @@ export const CorrelationSandbox: React.FC = () => {
             </Card>
           )}
 
-          {/* What this does NOT say */}
-          <Card className="bg-destructive/5 border-destructive/20">
+          {/* What this does NOT show */}
+          <Card className="border-status-critical/30 bg-status-critical/5">
             <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <XCircle className="h-4 w-4 text-destructive" />
-                <CardTitle className="text-sm">Detta säger INTE:</CardTitle>
-              </div>
+              <CardTitle className="text-sm flex items-center gap-2 text-status-critical">
+                <XCircle className="h-4 w-4" />
+                Vad detta INTE visar
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="text-xs border-destructive/30">
-                  ❌ att {indicatorA.nameSv} orsakar {indicatorB.nameSv}
-                </Badge>
-                <Badge variant="outline" className="text-xs border-destructive/30">
-                  ❌ att sambandet är stabilt över tid
-                </Badge>
-                <Badge variant="outline" className="text-xs border-destructive/30">
-                  ❌ att det gäller alla länder/regioner
-                </Badge>
-                <Badge variant="outline" className="text-xs border-destructive/30">
-                  ❌ att detta kommer fortsätta
-                </Badge>
-              </div>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="text-status-critical">•</span>
+                  <span>Att det ena <strong>orsakar</strong> det andra (kausalitet)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-status-critical">•</span>
+                  <span>Att sambandet gäller i alla regioner eller tidsperioder</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-status-critical">•</span>
+                  <span>Att det inte finns andra variabler som driver båda (störfaktorer)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-status-critical">•</span>
+                  <span>Styrkan i eventuellt orsakssamband</span>
+                </li>
+              </ul>
             </CardContent>
           </Card>
 
           {/* Other factors */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Shuffle className="h-4 w-4" />
-                Andra faktorer som kan spela roll
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Dessa indikatorer förändrades också under samma period
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {otherFactors.map((factor, i) => (
-                  <Badge key={i} variant="secondary" className="text-xs">
-                    {factor}
+          {otherFactors.length > 0 && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Info className="h-4 w-4" />
+                  Andra faktorer som kan påverka
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {otherFactors.map((factor, i) => (
+                    <Badge key={i} variant="outline" className="text-xs">
+                      {factor}
+                    </Badge>
+                  ))}
+                  <Badge variant="secondary" className="text-xs">
+                    + fler möjliga konfundrar...
                   </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
 
+      {/* No data state */}
+      {indicatorA && indicatorB && !loadingTimeSeries && chartData.length === 0 && timeSeriesData && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            Inga överlappande datapunkter hittades för de valda indikatorerna.
+            Prova att välja andra indikatorer.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Empty state */}
-      {(!indicatorA || !indicatorB) && (
+      {!indicatorA && !indicatorB && !loadingIndicators && (
         <Card className="bg-muted/30">
           <CardContent className="py-12 text-center">
-            <Shuffle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">
-              Välj två indikatorer ovan för att utforska samband.
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              Det ska vara lätt att analysera – svårt att ljuga.
+            <Shuffle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="font-medium mb-2">Välj två indikatorer</h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Välj indikatorer ovan för att utforska korrelationer baserat på 
+              verklig data från databasen.
             </p>
           </CardContent>
         </Card>
