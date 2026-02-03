@@ -26,7 +26,8 @@ import {
   Info,
   Clock,
   Layers,
-  MapPin
+  MapPin,
+  ChevronRight
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -43,8 +44,10 @@ import {
   REGIONAL_CAPACITY_DATA,
   HISTORICAL_TIMELINE,
   SYSTEM_CONNECTIONS,
-  KEY_MESSAGES
+  KEY_MESSAGES,
+  type CapacityFactor
 } from '@/config/carryingCapacityConfig';
+import { FactorDeepDive } from './FactorDeepDive';
 
 // Trend icon helper
 const TrendIcon: React.FC<{ trend: string; size?: number }> = ({ trend, size = 16 }) => {
@@ -243,21 +246,25 @@ const PressZonesPanel: React.FC = () => (
 );
 
 // What increases capacity
-const PositiveFactorsPanel: React.FC = () => (
+const PositiveFactorsPanel: React.FC<{ onFactorClick: (factor: CapacityFactor) => void }> = ({ onFactorClick }) => (
   <Card>
     <CardHeader>
       <CardTitle className="text-base">Vad ökar bärkraften?</CardTitle>
-      <CardDescription>Datadrivet, inte slogans</CardDescription>
+      <CardDescription>Datadrivet, inte slogans — klicka för att fördjupa</CardDescription>
     </CardHeader>
     <CardContent className="space-y-3">
       {POSITIVE_FACTORS.map(factor => (
-        <div key={factor.id} className="flex items-start gap-3 p-3 border rounded-lg hover:bg-muted/30 transition-colors">
+        <button
+          key={factor.id}
+          onClick={() => onFactorClick(factor)}
+          className="w-full flex items-start gap-3 p-3 border rounded-lg hover:bg-muted/30 hover:border-primary/50 transition-all cursor-pointer text-left group"
+        >
           <div className={`w-2 h-2 rounded-full mt-2 ${
             factor.impact === 'high' ? 'bg-green-500' : 'bg-yellow-500'
           }`} />
           <div className="flex-1">
             <div className="flex items-center justify-between">
-              <span className="font-medium text-sm">{factor.labelSv}</span>
+              <span className="font-medium text-sm group-hover:text-primary transition-colors">{factor.labelSv}</span>
               <Badge variant="outline" className="text-xs">{factor.timeframeSv}</Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-1">{factor.descriptionSv}</p>
@@ -265,7 +272,8 @@ const PositiveFactorsPanel: React.FC = () => (
           {factor.historicalEvidence && (
             <Badge variant="secondary" className="text-xs shrink-0">✓ Historisk evidens</Badge>
           )}
-        </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors mt-1" />
+        </button>
       ))}
     </CardContent>
   </Card>
@@ -442,9 +450,16 @@ const SystemConnectionsPanel: React.FC = () => (
 // Main component
 const GlobalCarryingCapacityEngine: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedFactor, setSelectedFactor] = useState<CapacityFactor | null>(null);
 
   return (
     <div className="space-y-6 p-4 max-w-6xl mx-auto">
+      {/* Factor Deep Dive Dialog */}
+      <FactorDeepDive 
+        factor={selectedFactor} 
+        open={selectedFactor !== null} 
+        onOpenChange={(open) => !open && setSelectedFactor(null)} 
+      />
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2">
@@ -489,7 +504,7 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="factors" className="mt-4 space-y-6">
-          <PositiveFactorsPanel />
+          <PositiveFactorsPanel onFactorClick={(factor) => setSelectedFactor(factor)} />
           <EnergyHonestyPanel />
         </TabsContent>
 
