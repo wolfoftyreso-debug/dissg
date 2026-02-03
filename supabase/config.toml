@@ -65,3 +65,6 @@ verify_jwt = false
 
 [functions.ai-observation]
 verify_jwt = false
+
+[functions.ai-answer]
+verify_jwt = false
