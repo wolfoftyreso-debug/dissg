@@ -69,6 +69,7 @@ import CitationAPI from "./pages/CitationAPI";
 import AIDiscovery from "./pages/AIDiscovery";
 import HistoricalReplay from "./pages/HistoricalReplay";
 import AIAdoption from "./pages/AIAdoption";
+import CQAIS from "./pages/CQAIS";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -140,6 +141,7 @@ const App = () => (
               <Route path="/ai-discovery" element={<AIDiscovery />} />
               <Route path="/replay" element={<HistoricalReplay />} />
               <Route path="/ai-adoption" element={<AIAdoption />} />
+              <Route path="/cqais" element={<CQAIS />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
