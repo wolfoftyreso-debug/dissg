@@ -45,9 +45,11 @@ import {
   HISTORICAL_TIMELINE,
   SYSTEM_CONNECTIONS,
   KEY_MESSAGES,
-  type CapacityFactor
+  type CapacityFactor,
+  type PressZone
 } from '@/config/carryingCapacityConfig';
 import { FactorDeepDive } from './FactorDeepDive';
+import { RegionDeepDive } from './RegionDeepDive';
 
 // Trend icon helper
 const TrendIcon: React.FC<{ trend: string; size?: number }> = ({ trend, size = 16 }) => {
@@ -198,41 +200,46 @@ const ThreeAxesPanel: React.FC = () => {
   );
 };
 
-// Press zones panel
-const PressZonesPanel: React.FC = () => (
+// Press zones panel - CLICKABLE for deep dive
+const PressZonesPanel: React.FC<{ onZoneClick: (zone: PressZone) => void }> = ({ onZoneClick }) => (
   <Card>
     <CardHeader>
       <div className="flex items-center gap-2">
         <AlertTriangle className="h-4 w-4 text-yellow-500" />
         <CardTitle className="text-base">Tryckzoner</CardTitle>
       </div>
-      <CardDescription>Där systemet är under press – inte "överbefolkning"</CardDescription>
+      <CardDescription>Där systemet är under press – inte "överbefolkning" – klicka för att fördjupa</CardDescription>
     </CardHeader>
     <CardContent className="space-y-3">
       {PRESS_ZONES.map(zone => (
-        <div key={zone.id} className={`p-3 border rounded-lg ${
-          zone.severity === 'high' ? 'border-red-200 bg-red-50/50 dark:bg-red-950/20' :
-          zone.severity === 'moderate' ? 'border-yellow-200 bg-yellow-50/50 dark:bg-yellow-950/20' :
-          'border-blue-200 bg-blue-50/50 dark:bg-blue-950/20'
-        }`}>
+        <button
+          key={zone.id}
+          onClick={() => onZoneClick(zone)}
+          className={`w-full text-left p-3 border rounded-lg transition-all cursor-pointer group hover:border-primary/50 ${
+            zone.severity === 'high' ? 'border-red-200 bg-red-50/50 dark:bg-red-950/20 hover:bg-red-100/50' :
+            zone.severity === 'moderate' ? 'border-yellow-200 bg-yellow-50/50 dark:bg-yellow-950/20 hover:bg-yellow-100/50' :
+            'border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 hover:bg-blue-100/50'
+          }`}
+        >
           <div className="flex items-start justify-between">
-            <div>
+            <div className="flex-1">
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                <span className="font-medium text-sm">{zone.regionSv}</span>
+                <span className="font-medium text-sm group-hover:text-primary transition-colors">{zone.regionSv}</span>
                 <Badge variant={zone.severity === 'high' ? 'destructive' : 'secondary'} className="text-xs">
                   {zone.severity === 'high' ? 'Hög' : zone.severity === 'moderate' ? 'Måttlig' : 'Framväxande'}
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground mt-1">{zone.descriptionSv}</p>
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-1 items-center">
               {zone.factors.energyPressure && <Zap className="h-4 w-4 text-yellow-500" />}
               {zone.factors.populationGrowth && <Users className="h-4 w-4 text-blue-500" />}
               {zone.factors.institutionalWeakness && <Building2 className="h-4 w-4 text-red-500" />}
+              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors ml-2" />
             </div>
           </div>
-        </div>
+        </button>
       ))}
       
       <Alert className="bg-primary/5">
@@ -451,6 +458,7 @@ const SystemConnectionsPanel: React.FC = () => (
 const GlobalCarryingCapacityEngine: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedFactor, setSelectedFactor] = useState<CapacityFactor | null>(null);
+  const [selectedZone, setSelectedZone] = useState<PressZone | null>(null);
 
   return (
     <div className="space-y-6 p-4 max-w-6xl mx-auto">
@@ -460,6 +468,14 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
         open={selectedFactor !== null} 
         onOpenChange={(open) => !open && setSelectedFactor(null)} 
       />
+      
+      {/* Region Deep Dive Dialog */}
+      <RegionDeepDive 
+        zone={selectedZone} 
+        open={selectedZone !== null} 
+        onOpenChange={(open) => !open && setSelectedZone(null)} 
+      />
+      
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2">
@@ -500,7 +516,7 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
         <TabsContent value="overview" className="mt-4 space-y-6">
           <GlobalStatusPanel />
           <ThreeAxesPanel />
-          <PressZonesPanel />
+          <PressZonesPanel onZoneClick={(zone) => setSelectedZone(zone)} />
         </TabsContent>
 
         <TabsContent value="factors" className="mt-4 space-y-6">
