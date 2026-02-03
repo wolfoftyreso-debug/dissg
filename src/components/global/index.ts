@@ -53,3 +53,4 @@ export * from '../doctrine';
 export { LambdaSetpointDisplay, LambdaBadge, LambdaSensorBreakdown } from './LambdaSetpointDisplay';
 export { LambdaPedagogicalView } from './LambdaPedagogicalView';
 export { LambdaFormalDefinition } from './LambdaFormalDefinition';
+export { LambdaPublicExplainer } from './LambdaPublicExplainer';

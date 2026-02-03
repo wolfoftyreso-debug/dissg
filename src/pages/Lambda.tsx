@@ -32,6 +32,7 @@ import {
 } from '@/components/global/LambdaSetpointDisplay';
 import { LambdaPedagogicalView } from '@/components/global/LambdaPedagogicalView';
 import { LambdaFormalDefinition } from '@/components/global/LambdaFormalDefinition';
+import { LambdaPublicExplainer } from '@/components/global/LambdaPublicExplainer';
 
 const LambdaPage: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState<string>('national');
@@ -94,15 +95,19 @@ const LambdaPage: React.FC = () => {
       </section>
 
       <div className="container max-w-6xl mx-auto px-4 py-12">
-        <Tabs defaultValue="pedagogy" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="pedagogy" className="gap-2">
+        <Tabs defaultValue="public" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="public" className="gap-2">
               <GraduationCap className="h-4 w-4" />
-              Förklaring
+              För alla
+            </TabsTrigger>
+            <TabsTrigger value="pedagogy" className="gap-2">
+              <Layers className="h-4 w-4" />
+              Djupdykning
             </TabsTrigger>
             <TabsTrigger value="definition" className="gap-2">
               <BookOpen className="h-4 w-4" />
-              Definition
+              ISO-specifikation
             </TabsTrigger>
             <TabsTrigger value="demo" className="gap-2">
               <Activity className="h-4 w-4" />
@@ -118,7 +123,12 @@ const LambdaPage: React.FC = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Pedagogy Tab - NEW */}
+          {/* Public Tab - Lambda för alla */}
+          <TabsContent value="public" className="space-y-8">
+            <LambdaPublicExplainer />
+          </TabsContent>
+
+          {/* Deep Dive Tab - Pedagogy layers */}
           <TabsContent value="pedagogy" className="space-y-8">
             <Card>
               <CardHeader>
