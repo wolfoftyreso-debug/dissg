@@ -49,6 +49,10 @@ import {
 } from 'lucide-react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
 import type { CapacityFactor } from '@/config/carryingCapacityConfig';
+import { 
+  getFactorEvidence, 
+  type FactorEvidence 
+} from '@/lib/registry/factorEvidenceRegistry';
 
 interface FactorDeepDiveProps {
   factor: CapacityFactor | null;
@@ -56,73 +60,7 @@ interface FactorDeepDiveProps {
   onOpenChange: (open: boolean) => void;
 }
 
-// Comprehensive evidence data structure
-interface FactorEvidence {
-  // L1: Observation
-  observation: {
-    summary: string;
-    keyMetric: { value: number; unit: string; change: number; period: string };
-    globalPattern: string;
-    thisShows: string[];
-    thisDoesNotShow: string[];
-  };
-  // L2: Mechanism
-  mechanism: {
-    causalChain: Array<{ step: number; description: string; confidence: 'high' | 'medium' | 'low' }>;
-    primaryDrivers: Array<{ name: string; contribution: number; description: string }>;
-    feedbackLoops: Array<{ type: 'positive' | 'negative'; description: string }>;
-    timelag: { min: number; max: number; unit: string; explanation: string };
-  };
-  // L3: Method
-  methodology: {
-    dataCollection: { method: string; frequency: string; coverage: number };
-    statisticalApproach: string;
-    validationMethod: string;
-    peerReview: { status: 'yes' | 'partial' | 'no'; details: string };
-    replicationAttempts: { total: number; successful: number; details: string };
-    alternativeInterpretations: string[];
-  };
-  // L4: Limitations
-  limitations: {
-    dataGaps: Array<{ gap: string; impact: 'critical' | 'moderate' | 'minor' }>;
-    methodologicalWeaknesses: string[];
-    confoundingFactors: Array<{ factor: string; controlled: boolean }>;
-    geographicLimitations: string[];
-    temporalLimitations: string[];
-    expertDissent: Array<{ perspective: string; source: string }>;
-  };
-  // L5: Raw Data
-  rawData: {
-    timeSeries: Array<{ year: number; value: number; source: string }>;
-    regionalBreakdown: Array<{ region: string; value: number; trend: 'up' | 'down' | 'stable' }>;
-    sources: Array<{ 
-      name: string; 
-      type: 'official' | 'academic' | 'institutional';
-      url: string;
-      lastUpdated: string;
-      reliability: number;
-    }>;
-    downloadFormats: string[];
-  };
-  // Historical cases
-  cases: Array<{
-    region: string;
-    period: string;
-    description: string;
-    impact: string;
-    outcome: 'positive' | 'negative' | 'mixed';
-    source: string;
-    methodology: string;
-    dataPoints: Array<{ label: string; before: number; after: number; unit: string }>;
-  }>;
-  // Related indicators
-  relatedIndicators: Array<{
-    code: string;
-    name: string;
-    correlation: number;
-    description: string;
-  }>;
-}
+// Evidence types now imported from factorEvidenceRegistry
 
 // Mock comprehensive evidence data
 const getFactorEvidence = (factorId: string): FactorEvidence | null => {
