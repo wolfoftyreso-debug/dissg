@@ -72,3 +72,6 @@ export { LambdaProtectionSummary } from './LambdaProtectionSummary';
 
 // LAMBDA Year in Review
 export { LambdaYearInReview } from './LambdaYearInReview';
+
+// LAMBDA AI Text Generation Protocol
+export { LambdaAITextGenerator, LambdaValueJudgmentResponse } from './LambdaAITextGenerator';
