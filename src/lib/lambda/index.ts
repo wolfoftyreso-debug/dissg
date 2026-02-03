@@ -94,3 +94,9 @@ export * from './evidence-link';
 
 // Explanation Engine
 export * from './explanation-engine';
+
+// Probable Cause Engine
+export * from './probable-cause-engine';
+
+// Setpoint & Tolerance System
+export * from './setpoint-tolerance';

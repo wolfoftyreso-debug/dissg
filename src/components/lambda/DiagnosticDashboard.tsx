@@ -6,14 +6,13 @@
  * 
  * Design rules:
  * - No decoration without function
- * - No "cool" animations
+ * - No icons (text only)
  * - No emojis
  * - No political colors
  * - Same structure globally
  */
 
 import { useState } from 'react';
-import { Activity, AlertTriangle, BarChart3, FileText, Radio } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatusOverview } from './StatusOverview';
@@ -97,8 +96,7 @@ export function DiagnosticDashboard({
         <div className="container flex h-14 items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-primary" />
-              <span className="font-mono text-sm font-semibold">
+              <span className="font-mono text-sm font-semibold tracking-wider">
                 LAMBDA SYSTEM
               </span>
             </div>
@@ -107,11 +105,11 @@ export function DiagnosticDashboard({
             </span>
           </div>
           
-          {/* Quick status indicators */}
+          {/* Quick status indicators - text only */}
           <div className="flex items-center gap-6">
             {/* Lambda value */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">λ</span>
+              <span className="text-xs text-muted-foreground font-mono">λ</span>
               <span className={cn(
                 'font-mono text-sm font-bold',
                 globalLambda >= 0.90 && globalLambda <= 1.10 
@@ -122,24 +120,24 @@ export function DiagnosticDashboard({
               )}>
                 {globalLambda.toFixed(2)}
               </span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground font-mono">
                 ±{lambdaUncertainty.toFixed(2)}
               </span>
             </div>
             
-            {/* Warnings */}
+            {/* Warnings - text badge */}
             {activeWarnings > 0 && (
-              <div className="flex items-center gap-1.5 text-amber-500">
-                <AlertTriangle className="h-4 w-4" />
-                <span className="font-mono text-sm">{activeWarnings}</span>
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-500/10 text-amber-500">
+                <span className="text-xs font-medium">VARNING</span>
+                <span className="font-mono text-sm font-bold">{activeWarnings}</span>
               </div>
             )}
             
-            {/* Critical */}
+            {/* Critical - text badge */}
             {criticalDeviations > 0 && (
-              <div className="flex items-center gap-1.5 text-red-500">
-                <Radio className="h-4 w-4 animate-pulse" />
-                <span className="font-mono text-sm">{criticalDeviations}</span>
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-red-500/10 text-red-500">
+                <span className="text-xs font-medium">KRITISK</span>
+                <span className="font-mono text-sm font-bold">{criticalDeviations}</span>
               </div>
             )}
           </div>
@@ -150,16 +148,13 @@ export function DiagnosticDashboard({
       <main className="container py-6">
         <Tabs value={mode} onValueChange={(v) => setMode(v as DiagnosticMode)}>
           <TabsList className="grid w-full max-w-md grid-cols-3 mb-6">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
+            <TabsTrigger value="overview" className="font-mono text-xs">
               {modeLabels.overview[language]}
             </TabsTrigger>
-            <TabsTrigger value="live" className="flex items-center gap-2">
-              <Activity className="h-4 w-4" />
+            <TabsTrigger value="live" className="font-mono text-xs">
               {modeLabels.live[language]}
             </TabsTrigger>
-            <TabsTrigger value="diagnostik" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
+            <TabsTrigger value="diagnostik" className="font-mono text-xs">
               {modeLabels.diagnostik[language]}
             </TabsTrigger>
           </TabsList>

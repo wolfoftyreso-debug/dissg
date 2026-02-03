@@ -10,12 +10,13 @@
  * - When detected
  * - Historical comparisons
  * - Confidence level
+ * - PROBABLE CAUSES with examination schema
  * 
  * CRITICAL: No action suggestions. Only state descriptions.
+ * NO ICONS - text only as per design doctrine.
  */
 
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Clock, Database, Link2, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +30,13 @@ import {
   getDomainLabel,
   formatDTCCode 
 } from '@/lib/lambda/diagnostic-codes';
+import { 
+  analyzeProbableCauses, 
+  formatProbability,
+  getConfidenceLabel,
+  type CauseAnalysis,
+  type ProbableCause,
+} from '@/lib/lambda/probable-cause-engine';
 
 interface DiagnosticCodeListProps {
   activeCodes: DiagnosticCode[];
@@ -73,6 +81,9 @@ export function DiagnosticCodeList({
     triangulation: { sv: 'Triangulering', en: 'Triangulation' },
     sources: { sv: 'Källor', en: 'Sources' },
     stateOnly: { sv: 'Endast tillståndsbeskrivning – inga åtgärdsförslag', en: 'State description only – no action suggestions' },
+    probableCauses: { sv: 'Sannolika orsaker', en: 'Probable causes' },
+    examinationSchema: { sv: 'Kontrollschema', en: 'Examination schema' },
+    unexplained: { sv: 'Oförklarat', en: 'Unexplained' },
   };
   
   return (
@@ -86,15 +97,15 @@ export function DiagnosticCodeList({
       
       <Tabs defaultValue="active">
         <TabsList className="grid w-full max-w-xs grid-cols-2">
-          <TabsTrigger value="active" className="flex items-center gap-2">
+          <TabsTrigger value="active" className="flex items-center gap-2 font-mono text-xs">
             {labels.active[language]}
             {activeCodes.length > 0 && (
-              <Badge variant="secondary" className="ml-1">
+              <Badge variant="secondary" className="ml-1 font-mono">
                 {activeCodes.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="historical">
+          <TabsTrigger value="historical" className="font-mono text-xs">
             {labels.historical[language]}
           </TabsTrigger>
         </TabsList>
@@ -170,6 +181,11 @@ function DiagnosticCodeCard({
 }: DiagnosticCodeCardProps) {
   const severityColor = getSeverityColor(code.severity);
   
+  // Get probable causes analysis
+  const causeAnalysis = isExpanded 
+    ? analyzeProbableCauses(code.code, 'GLOBAL')
+    : null;
+  
   return (
     <Card className={cn(
       'transition-colors',
@@ -180,11 +196,10 @@ function DiagnosticCodeCard({
           <CardHeader className="cursor-pointer hover:bg-muted/30 transition-colors py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                {isExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                )}
+                {/* Expand indicator - text */}
+                <span className="text-xs text-muted-foreground font-mono w-4">
+                  {isExpanded ? '−' : '+'}
+                </span>
                 
                 {/* Code badge */}
                 <Badge 
@@ -196,12 +211,12 @@ function DiagnosticCodeCard({
                 </Badge>
                 
                 {/* Severity */}
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs font-mono">
                   {getSeverityLabel(code.severity, language)}
                 </Badge>
                 
                 {/* Domain */}
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground font-mono">
                   {getDomainLabel(code.domain, language)}
                 </span>
               </div>
@@ -217,7 +232,7 @@ function DiagnosticCodeCard({
                   </span>
                 </div>
                 
-                {/* Triangulation indicator */}
+                {/* Triangulation indicator - text only */}
                 <TriangulationBadge status={code.triangulation_status} language={language} />
               </div>
             </div>
@@ -240,8 +255,7 @@ function DiagnosticCodeCard({
             <div className="grid gap-4 md:grid-cols-2 ml-7">
               {/* Timing */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
+                <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                   {labels.detectedAt[language]}
                 </div>
                 <p className="text-sm font-mono">
@@ -250,9 +264,9 @@ function DiagnosticCodeCard({
                 
                 <div className="flex items-center gap-4 text-xs">
                   <span>
-                    {labels.occurrences[language]}: <strong>{code.occurrence_count}</strong>
+                    {labels.occurrences[language]}: <strong className="font-mono">{code.occurrence_count}</strong>
                   </span>
-                  <span>
+                  <span className="font-mono">
                     {code.duration_hours}h
                   </span>
                 </div>
@@ -260,15 +274,14 @@ function DiagnosticCodeCard({
               
               {/* Values */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <TrendingUp className="h-3 w-3" />
+                <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                   {labels.observed[language]} vs {labels.threshold[language]}
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-lg font-mono font-bold">
                     {code.observed_value.toFixed(1)}
                   </span>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-sm text-muted-foreground font-mono">
                     / {code.threshold_value} {code.unit}
                   </span>
                 </div>
@@ -278,8 +291,7 @@ function DiagnosticCodeCard({
             {/* Affected indices */}
             {code.related_kpi_codes.length > 0 && (
               <div className="ml-7">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                  <Database className="h-3 w-3" />
+                <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">
                   {labels.affectedIndices[language]}
                 </div>
                 <div className="flex flex-wrap gap-1">
@@ -295,8 +307,7 @@ function DiagnosticCodeCard({
             {/* Related codes */}
             {code.related_dtcs.length > 0 && (
               <div className="ml-7">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                  <Link2 className="h-3 w-3" />
+                <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-2">
                   {labels.relatedCodes[language]}
                 </div>
                 <div className="flex flex-wrap gap-1">
@@ -309,9 +320,24 @@ function DiagnosticCodeCard({
               </div>
             )}
             
+            {/* PROBABLE CAUSES SECTION */}
+            {causeAnalysis && causeAnalysis.probable_causes.length > 0 && (
+              <div className="ml-7 mt-6 pt-4 border-t">
+                <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-3">
+                  {labels.probableCauses[language]}
+                </div>
+                
+                <ProbableCausesList 
+                  analysis={causeAnalysis} 
+                  language={language}
+                  labels={labels}
+                />
+              </div>
+            )}
+            
             {/* Data sources */}
             <div className="ml-7 pt-2 border-t">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+              <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">
                 {labels.sources[language]}
               </div>
               <p className="text-xs font-mono text-muted-foreground">
@@ -326,8 +352,9 @@ function DiagnosticCodeCard({
                   variant="outline"
                   size="sm"
                   onClick={() => onSelect(code)}
+                  className="font-mono text-xs"
                 >
-                  {language === 'sv' ? 'Visa detaljer' : 'View details'}
+                  {language === 'sv' ? 'Visa detaljer →' : 'View details →'}
                 </Button>
               </div>
             )}
@@ -339,7 +366,137 @@ function DiagnosticCodeCard({
 }
 
 // =============================================================================
-// TRIANGULATION BADGE
+// PROBABLE CAUSES LIST
+// =============================================================================
+
+interface ProbableCausesListProps {
+  analysis: CauseAnalysis;
+  language: 'sv' | 'en';
+  labels: Record<string, Record<'sv' | 'en', string>>;
+}
+
+function ProbableCausesList({ analysis, language, labels }: ProbableCausesListProps) {
+  return (
+    <div className="space-y-3">
+      {analysis.probable_causes.map((cause, index) => (
+        <ProbableCauseItem 
+          key={cause.id} 
+          cause={cause} 
+          rank={index + 1}
+          language={language}
+          labels={labels}
+        />
+      ))}
+      
+      {/* Unexplained variance */}
+      <div className="flex items-center justify-between p-3 rounded bg-muted/50">
+        <span className="text-sm text-muted-foreground">
+          {labels.unexplained[language]} / {language === 'sv' ? 'Okänd faktor' : 'Unknown factor'}
+        </span>
+        <span className="font-mono text-sm font-medium">
+          {formatProbability(analysis.unexplained_variance)}
+        </span>
+      </div>
+      
+      {/* Disclaimer */}
+      <p className="text-xs text-muted-foreground italic mt-2">
+        {analysis.disclaimer}
+      </p>
+    </div>
+  );
+}
+
+// =============================================================================
+// PROBABLE CAUSE ITEM
+// =============================================================================
+
+interface ProbableCauseItemProps {
+  cause: ProbableCause;
+  rank: number;
+  language: 'sv' | 'en';
+  labels: Record<string, Record<'sv' | 'en', string>>;
+}
+
+function ProbableCauseItem({ cause, rank, language, labels }: ProbableCauseItemProps) {
+  const [showSchema, setShowSchema] = useState(false);
+  
+  return (
+    <div className="border rounded-lg p-3 space-y-2">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-mono font-bold">
+            {rank}
+          </span>
+          <div>
+            <h5 className="text-sm font-medium">
+              {language === 'sv' ? cause.cause_sv : cause.cause_en}
+            </h5>
+            <p className="text-xs text-muted-foreground">
+              {language === 'sv' ? cause.mechanism_sv : cause.mechanism_en}
+            </p>
+          </div>
+        </div>
+        <div className="text-right">
+          <span className="text-lg font-mono font-bold">
+            {formatProbability(cause.probability)}
+          </span>
+          <p className="text-xs text-muted-foreground">
+            {getConfidenceLabel(cause.confidence_level, language)}
+          </p>
+        </div>
+      </div>
+      
+      {/* Meta */}
+      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+        <span>
+          {language === 'sv' ? 'Historiska fall' : 'Historical cases'}: {cause.historical_occurrences}
+        </span>
+        <span className="font-mono">
+          {cause.geo_contexts.slice(0, 3).join(', ')}
+        </span>
+      </div>
+      
+      {/* Examination schema toggle */}
+      <button
+        onClick={() => setShowSchema(!showSchema)}
+        className="text-xs text-primary hover:underline font-medium"
+      >
+        {showSchema 
+          ? (language === 'sv' ? 'Dölj kontrollschema' : 'Hide examination schema')
+          : (language === 'sv' ? 'Visa kontrollschema →' : 'Show examination schema →')
+        }
+      </button>
+      
+      {/* Examination schema */}
+      {showSchema && cause.examination_schema.length > 0 && (
+        <div className="mt-2 pt-2 border-t space-y-2">
+          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+            {labels.examinationSchema[language]}
+          </p>
+          <div className="space-y-1">
+            {cause.examination_schema.map((item) => (
+              <div key={item.indicator_code} className="flex items-center justify-between text-xs p-2 rounded bg-muted/30">
+                <div>
+                  <span className="font-mono">{item.indicator_code}</span>
+                  <span className="text-muted-foreground ml-2">
+                    {language === 'sv' ? item.indicator_name_sv : item.indicator_name_en}
+                  </span>
+                </div>
+                <span className="text-muted-foreground font-mono">
+                  {item.expected_if_cause_true}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =============================================================================
+// TRIANGULATION BADGE - TEXT ONLY
 // =============================================================================
 
 interface TriangulationBadgeProps {
@@ -350,15 +507,15 @@ interface TriangulationBadgeProps {
 function TriangulationBadge({ status, language }: TriangulationBadgeProps) {
   const config = {
     confirmed: {
-      color: 'bg-blue-500',
+      color: 'text-blue-500',
       label: { sv: '3+ källor', en: '3+ sources' },
     },
     partial: {
-      color: 'bg-amber-500',
+      color: 'text-amber-500',
       label: { sv: '2 källor', en: '2 sources' },
     },
     single_source: {
-      color: 'bg-muted',
+      color: 'text-muted-foreground',
       label: { sv: '1 källa', en: '1 source' },
     },
   };
@@ -366,12 +523,9 @@ function TriangulationBadge({ status, language }: TriangulationBadgeProps) {
   const { color, label } = config[status];
   
   return (
-    <div className="flex items-center gap-1.5">
-      <div className={cn('w-2 h-2 rounded-full', color)} />
-      <span className="text-xs text-muted-foreground">
-        {label[language]}
-      </span>
-    </div>
+    <span className={cn('text-xs font-mono', color)}>
+      [{label[language]}]
+    </span>
   );
 }
 
