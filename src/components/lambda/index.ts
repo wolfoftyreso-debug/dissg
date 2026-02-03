@@ -12,3 +12,4 @@ export { DiagnosticDashboard } from './DiagnosticDashboard';
 export { StatusOverview } from './StatusOverview';
 export { DiagnosticCodeList } from './DiagnosticCodeList';
 export { TriangulationPanel } from './TriangulationPanel';
+export { EvidenceLinkBadge } from './EvidenceLinkBadge';

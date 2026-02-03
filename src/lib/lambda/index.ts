@@ -88,3 +88,6 @@ export * from './sensor-triangulation';
 
 // Simulation Engine
 export * from './simulation-engine';
+
+// Evidence Link System
+export * from './evidence-link';
