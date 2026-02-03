@@ -77,6 +77,7 @@ import InfiniteDepthDemo from "./pages/InfiniteDepthDemo";
 import RelevanceWeightManager from "./pages/RelevanceWeightManager";
 import OscilloscopeViewPage from "./pages/OscilloscopeViewPage";
 import GmiWeightEditor from "./pages/GmiWeightEditor";
+import SystemAuditPage from "./pages/SystemAudit";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -157,6 +158,7 @@ const App = () => (
               <Route path="/relevance-weight-manager" element={<RelevanceWeightManager />} />
               <Route path="/oscilloscope-view" element={<OscilloscopeViewPage />} />
               <Route path="/gmi-weight-editor" element={<GmiWeightEditor />} />
+              <Route path="/system-audit" element={<SystemAuditPage />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
