@@ -891,12 +891,12 @@ export default function RealityIndex() {
         {/* Hero */}
         <section className="text-center space-y-3">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Reality Index
+            Global Reality Index
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base">
-            Hur utvecklas de grundläggande förutsättningarna för mänskligt liv och samhällsfunktion?
+            Composite measurement framework for fundamental societal conditions.
             <br />
-            <span className="text-xs">Ingen åsikt. Endast observation.</span>
+            <span className="text-xs">Observable data. Decomposable methodology. No editorial judgment.</span>
           </p>
         </section>
 
@@ -968,23 +968,23 @@ export default function RealityIndex() {
             <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
             <div className="text-sm text-muted-foreground space-y-3">
               <div>
-                <strong className="text-foreground">Vad detta visar:</strong>
-                <p>Ett viktat genomsnitt av 5 grundläggande samhällsdomäner, 
-                var och en byggd på 4 underliggande indikatorer.</p>
+                <strong className="text-foreground">Methodology Overview:</strong>
+                <p>Weighted composite of five fundamental societal domains, 
+                each constructed from four underlying indicators with documented data lineage.</p>
               </div>
               <div>
-                <strong className="text-foreground">Vad detta INTE visar:</strong>
+                <strong className="text-foreground">Scope Limitations:</strong>
                 <ul className="list-disc ml-4 mt-1 space-y-0.5">
-                  <li>Orsakssamband mellan variabler</li>
-                  <li>Policyrekommendationer</li>
-                  <li>Framtidsprognoser</li>
-                  <li>Värdering av om något är "bra" eller "dåligt"</li>
+                  <li>Does not establish causation between variables</li>
+                  <li>Does not provide policy recommendations</li>
+                  <li>Does not generate predictive forecasts</li>
+                  <li>Does not assign normative judgments</li>
                 </ul>
               </div>
               <div>
-                <strong className="text-foreground">Metod:</strong>
-                <p>Alla vikter är lika (20% per domän). Alla indikatorer normaliseras till 0-100 
-                baserat på global distribution. Viktningen är öppen och kan justeras av användaren.</p>
+                <strong className="text-foreground">Calculation Transparency:</strong>
+                <p>Equal domain weights (20% per domain). All indicators normalized to 0-100 
+                scale based on global distribution. Weighting methodology is open and auditable.</p>
               </div>
             </div>
           </div>
@@ -993,19 +993,19 @@ export default function RealityIndex() {
         {/* Citation Block */}
         <CitationBlock score={compositeScore} timestamp={timestamp} />
 
-        {/* What the system never says */}
+        {/* Epistemic boundaries */}
         <Card className="p-4 bg-rose-500/5 border-rose-500/20">
           <div className="flex gap-3">
             <AlertCircle className="h-5 w-5 text-rose-500 shrink-0" />
             <div className="text-sm">
-              <strong className="text-foreground">Vad systemet aldrig säger:</strong>
+              <strong className="text-foreground">Platform Epistemic Boundaries:</strong>
               <ul className="mt-1 text-muted-foreground space-y-0.5">
-                <li>❌ "Detta land misslyckas"</li>
-                <li>❌ "Detta är bra/dåligt"</li>
-                <li>❌ "Detta borde göras"</li>
+                <li>— Does not characterize jurisdictions as "successful" or "failing"</li>
+                <li>— Does not assign positive or negative valuation</li>
+                <li>— Does not recommend actions or policies</li>
               </ul>
               <p className="mt-2 text-foreground">
-                ✓ "Under denna period förändrades grundförutsättningarna så här."
+                Platform outputs: "During this observation period, baseline conditions changed as follows."
               </p>
             </div>
           </div>
@@ -1015,19 +1015,17 @@ export default function RealityIndex() {
         <div className="grid grid-cols-2 gap-4">
           <Link to="/cities">
             <Card className="p-4 hover:bg-muted/50 transition-colors h-full">
-              <div className="text-lg mb-1">🏙️</div>
-              <div className="font-medium text-sm">Städer</div>
-              <div className="text-xs text-muted-foreground">
-                Reality Index för svenska städer
+              <div className="font-medium text-sm">City-Level Analysis</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Reality Index disaggregated to municipal level
               </div>
             </Card>
           </Link>
           <Link to="/cite">
             <Card className="p-4 hover:bg-muted/50 transition-colors h-full">
-              <div className="text-lg mb-1">🤖</div>
-              <div className="font-medium text-sm">Citation API</div>
-              <div className="text-xs text-muted-foreground">
-                Maskinläsbar data för AI & media
+              <div className="font-medium text-sm">API Documentation</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Machine-readable endpoints for integration
               </div>
             </Card>
           </Link>
@@ -1035,9 +1033,9 @@ export default function RealityIndex() {
 
         {/* Footer */}
         <footer className="text-center text-xs text-muted-foreground pt-4 border-t">
-          <p>Reality Index 1.0 · Uppdaterad: {timestamp}</p>
+          <p>Global Reality Index v1.0 · Last updated: {timestamp}</p>
           <p className="mt-1">
-            "Reality Index is not a verdict. It is a baseline."
+            "Reality Index is not a verdict. It is a baseline measurement."
           </p>
         </footer>
       </main>
