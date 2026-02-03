@@ -8,12 +8,13 @@ import { CategorySection } from '@/components/dashboard/CategorySection';
 import { KPIDetailPanel } from '@/components/dashboard/KPIDetailPanel';
 import { IndicatorsPanel } from '@/components/dashboard/IndicatorsPanel';
 import { DecisionsTimelinePanel } from '@/components/dashboard/DecisionsTimelinePanel';
-import { ResponsibilityPanel } from '@/components/dashboard/ResponsibilityPanel';
+
 import { AnalysisPanel } from '@/components/dashboard/AnalysisPanel';
 import { RoleBasedDashboard } from '@/components/dashboard/RoleBasedDashboard';
 import { GovRoleDashboard } from '@/components/dashboard/GovRoleDashboard';
 import { AlertNotificationPanel } from '@/components/dashboard/AlertNotificationPanel';
 import { PrioritizedDashboard } from '@/components/relevance/PrioritizedDashboard';
+import { SwedenResponsibilityMap } from '@/components/responsibility/SwedenResponsibilityMap';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { useGovRole } from '@/hooks/useGovRole';
 import { getRoleConfig } from '@/config/roleViewConfig';
@@ -117,7 +118,7 @@ const Index = () => {
             )}
             
             {activeNav === 'responsibility' && (
-              <ResponsibilityPanel kpis={kpis} />
+              <SwedenResponsibilityMap />
             )}
             
             {activeNav === 'analysis' && (
