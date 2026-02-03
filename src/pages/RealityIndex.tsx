@@ -29,7 +29,8 @@ import {
   Layers,
   Copy,
   Check,
-  AlertCircle
+  AlertCircle,
+  MapPin
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -496,72 +497,188 @@ function TimelineView({ domainScores }: { domainScores: DomainScore[] }) {
   );
 }
 
-function DistributionView({ domainScores }: { domainScores: DomainScore[] }) {
-  // Simulated global distribution
-  const percentiles = [
-    { label: 'Topp 10%', range: '75-100', count: 22 },
-    { label: 'Övre kvartil', range: '60-74', count: 45 },
-    { label: 'Median', range: '45-59', count: 68 },
-    { label: 'Nedre kvartil', range: '30-44', count: 42 },
-    { label: 'Botten 10%', range: '0-29', count: 18 },
+function DistributionView({ domainScores, countryName }: { domainScores: DomainScore[]; countryName: string }) {
+  // Global distribution - all 195 countries grouped
+  const groups = [
+    { 
+      label: 'Topp 10%', 
+      description: 'De 20 länder med högst poäng', 
+      examples: 'Norge, Schweiz, Danmark',
+      count: 20, 
+      color: 'bg-emerald-500/80',
+      scoreRange: '80–100'
+    },
+    { 
+      label: 'Övre kvartil', 
+      description: 'Länder med poäng över genomsnittet',
+      examples: 'Japan, Tyskland, Frankrike',
+      count: 45, 
+      color: 'bg-emerald-400/60',
+      scoreRange: '60–79'
+    },
+    { 
+      label: 'Mitten', 
+      description: 'Genomsnittliga länder globalt sett',
+      examples: 'Brasilien, Thailand, Turkiet',
+      count: 68, 
+      color: 'bg-blue-400/50',
+      scoreRange: '40–59'
+    },
+    { 
+      label: 'Under mitten', 
+      description: 'Länder med poäng under genomsnittet',
+      examples: 'Egypten, Indonesien, Filippinerna',
+      count: 42, 
+      color: 'bg-amber-400/50',
+      scoreRange: '20–39'
+    },
+    { 
+      label: 'Botten 10%', 
+      description: 'De 20 länder med lägst poäng',
+      examples: 'Jemen, Sydsudan, Afghanistan',
+      count: 20, 
+      color: 'bg-rose-400/50',
+      scoreRange: '0–19'
+    },
   ];
 
   const compositeScore = Math.round(
     domainScores.reduce((acc, d) => acc + d.score * 0.2, 0)
   );
   
-  // Determine which percentile this score falls into
-  const currentPercentile = compositeScore >= 75 ? 0 : 
+  // Which group does the score fall into?
+  const currentGroupIndex = compositeScore >= 80 ? 0 : 
                             compositeScore >= 60 ? 1 : 
-                            compositeScore >= 45 ? 2 : 
-                            compositeScore >= 30 ? 3 : 4;
+                            compositeScore >= 40 ? 2 : 
+                            compositeScore >= 20 ? 3 : 4;
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <h3 className="font-semibold mb-1">Global distribution</h3>
-        <p className="text-sm text-muted-foreground">
-          Var befinner sig detta värde i global jämförelse? Ingen ranking – endast fördelning.
-        </p>
-      </div>
-
-      <Card className="p-6">
+      {/* Clear intro explanation */}
+      <Card className="p-5 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
         <div className="space-y-3">
-          {percentiles.map((p, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div className="w-24 text-xs text-muted-foreground">{p.label}</div>
-              <div className="flex-1 h-8 bg-muted/30 rounded relative overflow-hidden">
-                <motion.div 
-                  className={cn(
-                    "h-full rounded",
-                    i === currentPercentile ? "bg-primary" : "bg-muted"
-                  )}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(p.count / 70) * 100}%` }}
-                  transition={{ delay: i * 0.1, duration: 0.5 }}
-                />
-                {i === currentPercentile && (
-                  <div className="absolute inset-0 flex items-center justify-center text-xs font-medium text-primary-foreground">
-                    Du är här
-                  </div>
-                )}
-              </div>
-              <div className="w-16 text-xs text-right text-muted-foreground">
-                {p.count} länder
-              </div>
+          <h3 className="text-lg font-semibold text-center">
+            Hur står sig {countryName} jämfört med världen?
+          </h3>
+          <p className="text-sm text-center text-muted-foreground">
+            Vi har jämfört {countryName} med alla 195 länder i världen. 
+            Diagrammet nedan visar var {countryName} hamnar.
+          </p>
+          
+          {/* Score callout */}
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-3 px-4 py-2 bg-background rounded-full border">
+              <span className="text-sm text-muted-foreground">{countryName}s poäng:</span>
+              <span className="text-2xl font-bold text-primary">{compositeScore}</span>
+              <span className="text-sm text-muted-foreground">av 100</span>
             </div>
-          ))}
+          </div>
         </div>
       </Card>
 
+      {/* Visual distribution */}
+      <Card className="p-6 space-y-4">
+        <div className="text-center mb-4">
+          <p className="text-sm font-medium">Fördelning av alla 195 länder</p>
+          <p className="text-xs text-muted-foreground">Varje stapel = en grupp länder</p>
+        </div>
+
+        <div className="space-y-4">
+          {groups.map((group, i) => {
+            const isCurrentGroup = i === currentGroupIndex;
+            
+            return (
+              <div key={i} className="space-y-1">
+                {/* Label row */}
+                <div className="flex items-center justify-between text-xs">
+                  <span className={cn(
+                    "font-medium",
+                    isCurrentGroup ? "text-primary" : "text-muted-foreground"
+                  )}>
+                    {group.label}
+                    <span className="text-muted-foreground font-normal ml-2">
+                      ({group.scoreRange} poäng)
+                    </span>
+                  </span>
+                  <span className="text-muted-foreground">{group.count} länder</span>
+                </div>
+                
+                {/* Bar */}
+                <div className="relative">
+                  <div className="h-10 bg-muted/20 rounded-lg overflow-hidden">
+                    <motion.div 
+                      className={cn(
+                        "h-full rounded-lg flex items-center",
+                        isCurrentGroup ? "bg-primary" : group.color
+                      )}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(group.count / 70) * 100}%` }}
+                      transition={{ delay: i * 0.1, duration: 0.5 }}
+                    >
+                      {/* Country indicator */}
+                      {isCurrentGroup && (
+                        <motion.div 
+                          className="ml-auto mr-2 px-3 py-1 bg-white/90 rounded-full shadow-sm flex items-center gap-1.5"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.5 }}
+                        >
+                          <MapPin className="h-3 w-3 text-primary" />
+                          <span className="text-xs font-semibold text-primary">{countryName}</span>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  </div>
+                </div>
+                
+                {/* Examples */}
+                <p className="text-[10px] text-muted-foreground/70">
+                  T.ex: {group.examples}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Plain language summary */}
+      <Card className="p-4 bg-muted/30">
+        <div className="flex gap-3">
+          <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+          <div className="space-y-2">
+            <p className="text-sm font-medium">
+              Vad betyder detta?
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {currentGroupIndex === 0 && (
+                <>{countryName} tillhör de 10% bäst presterande länderna i världen enligt detta index. Det innebär att de flesta grundläggande livsvillkor ligger på hög nivå jämfört med resten av världen.</>
+              )}
+              {currentGroupIndex === 1 && (
+                <>{countryName} ligger över världsgenomsnittet. De flesta grundläggande livsvillkor är bättre än vad majoriteten av världens befolkning upplever.</>
+              )}
+              {currentGroupIndex === 2 && (
+                <>{countryName} ligger ungefär på världsgenomsnittet. Livsvillkoren är varken särskilt höga eller låga i global jämförelse.</>
+              )}
+              {currentGroupIndex === 3 && (
+                <>{countryName} ligger under världsgenomsnittet. Det finns utrymme för förbättring inom flera grundläggande områden.</>
+              )}
+              {currentGroupIndex === 4 && (
+                <>{countryName} tillhör de 10% länder med lägst poäng. Grundläggande livsvillkor är utmanande jämfört med resten av världen.</>
+              )}
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Why no ranking disclaimer */}
       <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
         <div className="flex gap-3">
           <AlertCircle className="h-5 w-5 text-amber-600 shrink-0" />
-          <div className="text-sm text-muted-foreground">
-            <p><strong>Varför ingen ranking?</strong></p>
-            <p className="mt-1">
-              Ranking skapar falsk precision och uppmuntrar cherry-picking. 
-              Fördelningar visar var ett värde befinner sig utan att påstå att position 47 är meningsfullt annorlunda än position 48.
+          <div className="text-sm">
+            <p className="font-medium text-foreground">Varför visar vi inte exakt ranking?</p>
+            <p className="mt-1 text-muted-foreground">
+              Att säga "Sverige är plats 7" ger en falsk precision. Skillnaden mellan plats 7 och plats 12 
+              kan vara statistiskt betydelselös. Grupper ger en ärligare bild av var ett land befinner sig.
             </p>
           </div>
         </div>
@@ -841,7 +958,7 @@ export default function RealityIndex() {
           </TabsContent>
 
           <TabsContent value="distribution" className="mt-6">
-            <DistributionView domainScores={domainScores} />
+            <DistributionView domainScores={domainScores} countryName={selectedCountry.nameLocal} />
           </TabsContent>
         </Tabs>
 
