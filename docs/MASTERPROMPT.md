@@ -219,7 +219,7 @@ Systemet skapar ett **kollektivt minne**.
 
 > **Om intelligens krävs för att förstå → systemet har misslyckats.**
 
-### Tre simultana förståelsenivåer:
+### 7.1 Tre simultana förståelsenivåer:
 
 | Nivå | Målgrupp | Innehåll |
 |------|----------|----------|
@@ -227,7 +227,7 @@ Systemet skapar ett **kollektivt minne**.
 | **2** | Professionell | Orsakskedja, 2-3 faktorer |
 | **3** | Expert | Full metodik, rådata, osäkerhet |
 
-### Absolut språklig standard:
+### 7.2 Absolut språklig standard:
 
 - ❌ Akademiskt jargong
 - ❌ Byråkratsvenska
@@ -237,6 +237,85 @@ Systemet skapar ett **kollektivt minne**.
 - ✅ Konkreta exempel
 
 > **Systemet förklarar utan att förenkla bort samband. Respekterar utan att idealisera användaren.**
+
+---
+
+### 7.3 ZERO DEAD-ENDS PROTOCOL — ALLT ÄR KLICKBART
+
+#### Grundprincipen:
+
+> **Om något visas, ska det gå att förstå. Om det inte går att klicka sig djupare — ta bort det.**
+
+#### Varje synligt element måste leda till:
+
+| Klicknivå | Innehåll | Exempel |
+|-----------|----------|---------|
+| **Klick 1** | Definition på vardagsspråk | "R-tal = hur många nya smittar en person i snitt" |
+| **Klick 2** | Mekanism och kontext | "Varför det spelar roll, hur det beräknas" |
+| **Klick 3** | Källa, metod, begränsningar | "SCB:s definition, samlingsintervall, osäkerhet" |
+
+#### Exempel: "R-tal = 1.2"
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  R-tal = 1.2                                          [?]   │
+├─────────────────────────────────────────────────────────────┤
+│  Klick 1:                                                   │
+│  "Reproduktionstalet visar hur många nya personer           │
+│   en smittad person i genomsnitt smittar vidare."           │
+│                                                             │
+│  R > 1 = spridningen ökar                                   │
+│  R < 1 = spridningen minskar                                │
+│  R = 1 = stabilt läge                                       │
+├─────────────────────────────────────────────────────────────┤
+│  Klick 2:                                                   │
+│  "Beräknas genom att jämföra nya fall över tid.             │
+│   Påverkas av testkapacitet, rapporteringseftersläpning     │
+│   och säsongsvariation."                                    │
+│                                                             │
+│  Konfidensintervall: 1.1 – 1.3                              │
+│  Senast uppdaterad: 2024-01-15                              │
+├─────────────────────────────────────────────────────────────┤
+│  Klick 3:                                                   │
+│  Källa: Folkhälsomyndigheten                                │
+│  Metod: Cori et al. (2013), glidande 7-dagars fönster       │
+│  Begränsningar:                                             │
+│  - Känsligt för rapporteringsavbrott                        │
+│  - Mäter inte faktisk smittsamhet, bara observerad          │
+│  - Variation mellan regioner ej medräknad                   │
+│                                                             │
+│  [→ Visa rådata]  [→ Metoddokumentation]                    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Tekniska krav:
+
+| Krav | Implementation |
+|------|----------------|
+| **Ingen siffra utan hover/klick** | Varje numeriskt värde har tooltip eller expanderbar ruta |
+| **Inga förkortningar utan förklaring** | R-tal, BNP, λ → alltid definierade vid första förekomst |
+| **Inga grafer utan legend** | Varje linje/färg förklaras i 1 mening |
+| **Inga aggregat utan dekonstruktion** | Index kan klickas ner till delkomponenter |
+| **Inget djup tar slut** | Om data saknas → explicit "Här tar vår data slut" |
+
+#### Djuptest (obligatoriskt för varje vy):
+
+```
+1. Kan en 18-åring förstå vad siffran betyder? (Nivå 1)
+2. Kan en professionell förstå varför den ser ut så? (Nivå 2)
+3. Kan en expert verifiera beräkningen? (Nivå 3)
+4. Finns källa, metod, begränsningar tillgängliga? (Nivå 3)
+5. Finns "vad detta INTE visar" synligt? (Obligatoriskt block)
+```
+
+> **Om något inte klarar djuptestet → det visas inte.**
+
+#### Konsekvens:
+
+- Användaren lär sig genom att klicka, inte genom att googla
+- Misstolkning blir svårare — kontexten följer alltid med
+- Experter och nybörjare ser samma sak — på olika djup
+- Systemet kan aldrig "luras" genom att dölja komplexitet
 
 ---
 
