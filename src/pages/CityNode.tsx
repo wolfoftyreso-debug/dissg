@@ -25,10 +25,10 @@ import {
   ChevronDown,
   Clock,
   BarChart3,
-  Users,
-  Building2,
   Info,
-  Layers
+  Layers,
+  Building2,
+  Users
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -38,6 +38,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ClickableIndicatorRow } from '@/components/indicators/IndicatorExplorer';
 
 // ============================================================================
 // CITY DATABASE (Simulated - would come from backend)
@@ -515,12 +516,18 @@ function IndicatorCategory({
   category, 
   indicators,
   isExpanded,
-  onToggle
+  onToggle,
+  cityName,
+  countryName,
+  allIndicators,
 }: { 
   category: string;
   indicators: CityIndicator[];
   isExpanded: boolean;
   onToggle: () => void;
+  cityName: string;
+  countryName: string;
+  allIndicators: CityIndicator[];
 }) {
   const categoryLabels: Record<string, { label: string; icon: string }> = {
     population: { label: 'Befolkning & Struktur', icon: '👥' },
@@ -566,40 +573,55 @@ function IndicatorCategory({
         <CollapsibleContent>
           <div className="border-t bg-muted/20 p-4 space-y-4">
             {indicators.map((indicator) => (
-              <div key={indicator.code} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {getTrendIcon(indicator.trend)}
-                    <span className="text-sm font-medium">{indicator.name}</span>
+              <ClickableIndicatorRow
+                key={indicator.code}
+                indicator={indicator}
+                cityName={cityName}
+                countryName={countryName}
+                allIndicators={allIndicators}
+              >
+                <div className="space-y-2 flex-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {getTrendIcon(indicator.trend)}
+                      <span className="text-sm font-medium">{indicator.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {indicator.dataAvailable ? (
+                        <Badge variant="outline" className="text-xs">
+                          {indicator.source}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-xs">
+                          Data saknas
+                        </Badge>
+                      )}
+                      {indicator.dataAvailable && (
+                        <span className="text-xs text-primary font-medium">
+                          Percentil: {indicator.percentileGlobal}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  {indicator.dataAvailable ? (
-                    <Badge variant="outline" className="text-xs">
-                      {indicator.source}
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary" className="text-xs">
-                      Data saknas
-                    </Badge>
+                  
+                  {indicator.dataAvailable && indicator.percentileGlobal !== null && (
+                    <ComparisonBar
+                      label=""
+                      cityValue={indicator.percentileGlobal}
+                      nationalValue={(indicator.nationalValue || 50) / (indicator.value || 1) * (indicator.percentileGlobal || 50)}
+                      globalValue={50}
+                      percentile={indicator.percentileGlobal}
+                    />
+                  )}
+                  
+                  {!indicator.dataAvailable && (
+                    <div className="p-2 rounded bg-muted/50 text-xs text-muted-foreground">
+                      Denna indikator saknar data för denna stad. 
+                      Ingen uppskattning görs – endast observerade värden visas.
+                    </div>
                   )}
                 </div>
-                
-                {indicator.dataAvailable && indicator.percentileGlobal !== null && (
-                  <ComparisonBar
-                    label=""
-                    cityValue={indicator.percentileGlobal}
-                    nationalValue={(indicator.nationalValue || 50) / (indicator.value || 1) * (indicator.percentileGlobal || 50)}
-                    globalValue={50}
-                    percentile={indicator.percentileGlobal}
-                  />
-                )}
-                
-                {!indicator.dataAvailable && (
-                  <div className="p-2 rounded bg-muted/50 text-xs text-muted-foreground">
-                    Denna indikator saknar data för denna stad. 
-                    Ingen uppskattning görs – endast observerade värden visas.
-                  </div>
-                )}
-              </div>
+              </ClickableIndicatorRow>
             ))}
           </div>
         </CollapsibleContent>
@@ -853,6 +875,9 @@ export default function CityNode() {
                   indicators={cityData.indicators.filter(i => i.category === category)}
                   isExpanded={expandedCategories.includes(category)}
                   onToggle={() => toggleCategory(category)}
+                  cityName={cityData.city.name}
+                  countryName={cityData.city.country}
+                  allIndicators={cityData.indicators}
                 />
               ))}
             </div>
