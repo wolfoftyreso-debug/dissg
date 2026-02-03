@@ -69,3 +69,6 @@ export { LambdaCumulativeEffects } from './LambdaCumulativeEffects';
 export { LambdaAntiManipulationGuard } from './LambdaAntiManipulationGuard';
 export { LambdaVerificationBadge } from './LambdaVerificationBadge';
 export { LambdaProtectionSummary } from './LambdaProtectionSummary';
+
+// LAMBDA Year in Review
+export { LambdaYearInReview } from './LambdaYearInReview';
