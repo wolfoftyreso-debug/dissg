@@ -23,7 +23,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Index = () => {
   const [selectedKPI, setSelectedKPI] = useState<KPI | null>(null);
-  const [activeNav, setActiveNav] = useState<NavItem>('priority');
+  const [activeNav, setActiveNav] = useState<NavItem>('overview');
   const [comparisonPeriod, setComparisonPeriod] = useState<'week' | 'month3' | 'month12'>('week');
   const [viewMode, setViewMode] = useState<'standard' | 'role'>('role');
   
@@ -88,6 +88,9 @@ const Index = () => {
         {/* Alert Notification Panel */}
         <AlertNotificationPanel />
 
+        {/* Prioriterad vy - alltid överst */}
+        <PrioritizedDashboard />
+
         {viewMode === 'role' ? (
           <>
             <GovRoleDashboard />
@@ -95,10 +98,6 @@ const Index = () => {
           </>
         ) : (
           <>
-            {activeNav === 'priority' && (
-              <PrioritizedDashboard />
-            )}
-
             {activeNav === 'overview' && kpisByCategory.map(({ category, kpis }, index) => (
               <CategorySection
                 key={category.id}
