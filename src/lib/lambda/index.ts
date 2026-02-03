@@ -91,3 +91,6 @@ export * from './simulation-engine';
 
 // Evidence Link System
 export * from './evidence-link';
+
+// Explanation Engine
+export * from './explanation-engine';
