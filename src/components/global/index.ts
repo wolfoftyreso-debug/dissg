@@ -81,3 +81,8 @@ export { LambdaSelfCalibration } from './LambdaSelfCalibration';
 
 // LAMBDA Governance, Immunity & Protection
 export { LambdaGovernancePanel } from './LambdaGovernancePanel';
+
+// LAMBDA Launch Protocol, AI Grounding & First Global Index
+export { LambdaLaunchProtocol } from './LambdaLaunchProtocol';
+export { LambdaAIGroundingPanel } from './LambdaAIGroundingPanel';
+export { LambdaFirstGlobalIndex } from './LambdaFirstGlobalIndex';
