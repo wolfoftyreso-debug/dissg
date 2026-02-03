@@ -47,23 +47,73 @@ import {
 } from '@/config/demographyCorrelationConfig';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
-// Mock data for demonstration
-const generateMockData = (years: number) => {
+// Seeded random for reproducible indicator-specific data
+const seededRandom = (seed: number) => {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+};
+
+// Hash string to number for seeding
+const hashString = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+};
+
+// Generate unique data based on indicator selections
+const generateMockData = (
+  startYear: number, 
+  endYear: number, 
+  demographicId: string, 
+  societalId: string
+) => {
   const data = [];
-  const startYear = 2024 - years;
-  let demographic = 50 + Math.random() * 20;
-  let societal = 40 + Math.random() * 30;
+  const seed1 = hashString(demographicId);
+  const seed2 = hashString(societalId);
   
-  for (let i = 0; i <= years; i++) {
-    demographic += (Math.random() - 0.4) * 5;
-    societal += (Math.random() - 0.45) * 4;
+  // Different base values and trends per indicator
+  let demographic = 30 + seededRandom(seed1) * 40;
+  let societal = 20 + seededRandom(seed2) * 50;
+  
+  // Trend factors unique to each indicator
+  const demographicTrend = (seededRandom(seed1 + 1) - 0.5) * 0.3;
+  const societalTrend = (seededRandom(seed2 + 1) - 0.5) * 0.25;
+  
+  for (let year = startYear; year <= endYear; year++) {
+    const yearSeed = year * 1000;
+    
+    // Add historical events/noise
+    const historicalNoise = year < 1900 ? 0.5 : year < 1950 ? 0.3 : 0.1;
+    
+    demographic += demographicTrend + (seededRandom(seed1 + yearSeed) - 0.5) * (5 + historicalNoise * 10);
+    societal += societalTrend + (seededRandom(seed2 + yearSeed) - 0.5) * (4 + historicalNoise * 8);
+    
+    // Mark pre-1850 as estimates
+    const isEstimate = year < 1850;
+    
     data.push({
-      year: startYear + i,
-      demographic: Math.max(0, demographic),
-      societal: Math.max(0, societal)
+      year,
+      demographic: Math.max(0, Math.min(100, demographic)),
+      societal: Math.max(0, Math.min(100, societal)),
+      isEstimate
     });
   }
   return data;
+};
+
+// Calculate start year based on time period selection
+const getStartYear = (timePeriod: TimePeriod): number => {
+  switch (timePeriod) {
+    case '5y': return 2019;
+    case '10y': return 2014;
+    case '20y': return 2004;
+    case 'max': return 1800; // Much longer historical view
+    default: return 1800;
+  }
 };
 
 export const SocietalCorrelationEngine: React.FC = () => {
@@ -79,8 +129,12 @@ export const SocietalCorrelationEngine: React.FC = () => {
   const selectedTimePeriod = TIME_PERIODS.find(t => t.id === timePeriod);
   const selectedGeoLevel = GEO_LEVELS.find(g => g.id === geoLevel);
 
-  const years = timePeriod === '5y' ? 5 : timePeriod === '10y' ? 10 : timePeriod === '20y' ? 20 : 30;
-  const mockData = useMemo(() => generateMockData(years), [years]);
+  const startYear = getStartYear(timePeriod);
+  const endYear = 2024;
+  const mockData = useMemo(
+    () => generateMockData(startYear, endYear, demographicIndicator, societalOutcome), 
+    [startYear, demographicIndicator, societalOutcome]
+  );
   
   // Mock correlation coefficient
   const mockCorrelation = 0.52;
@@ -273,7 +327,13 @@ export const SocietalCorrelationEngine: React.FC = () => {
               {/* Data footer */}
               <div className="mt-4 pt-4 border-t text-xs text-muted-foreground space-y-1">
                 <div>Period: {mockData[0]?.year}–{mockData[mockData.length - 1]?.year}</div>
-                <div>Källa: SCB, BRÅ (demonstrationsdata)</div>
+                {startYear < 1850 && (
+                  <div className="text-yellow-600 dark:text-yellow-500 flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    Data före 1850 är rekonstruerade estimat
+                  </div>
+                )}
+                <div>Källa: SCB, BRÅ, Eurostat (demonstrationsdata)</div>
                 <div>Senast uppdaterad: 2024-01-15</div>
               </div>
             </CardContent>
