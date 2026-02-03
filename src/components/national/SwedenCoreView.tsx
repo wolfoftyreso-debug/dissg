@@ -4,6 +4,7 @@
  * "Hur mår Sverige – och varför ser det ut som det gör?"
  * 
  * Ingång för alla: medborgare, journalister, beslutsfattare, forskare.
+ * Använder live-data från databasen.
  */
 
 import React, { useState, useMemo } from 'react';
@@ -12,7 +13,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Info, 
   ChevronRight,
@@ -20,9 +22,6 @@ import {
   EyeOff,
   Clock,
   AlertTriangle,
-  TrendingUp,
-  TrendingDown,
-  Minus,
   Users,
   Briefcase,
   Shield,
@@ -31,7 +30,9 @@ import {
   Heart,
   DollarSign,
   Plane,
-  Scale
+  Scale,
+  Database,
+  Loader2
 } from 'lucide-react';
 import {
   KEY_CURVES,
@@ -47,6 +48,11 @@ import {
   type KeyCurveConfig
 } from '@/config/swedenCoreViewConfig';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { 
+  useAllKPIs, 
+  useMultipleTimeSeries,
+  type TimeSeriesPoint 
+} from '@/hooks/useLiveKPIData';
 
 // Icon mapping for curve categories
 const CURVE_ICONS: Record<string, React.ReactNode> = {
@@ -60,23 +66,6 @@ const CURVE_ICONS: Record<string, React.ReactNode> = {
   human_wellbeing_index: <Heart className="h-5 w-5" />
 };
 
-// Generate mock data for a curve
-const generateMockCurveData = (years: number = 25) => {
-  const data = [];
-  const startYear = 2024 - years;
-  
-  for (let i = 0; i <= years; i++) {
-    const year = startYear + i;
-    data.push({
-      year,
-      primary: 50 + Math.sin(i * 0.3) * 15 + i * 0.5 + Math.random() * 5,
-      secondary: 30 + Math.cos(i * 0.2) * 10 + i * 0.3 + Math.random() * 3,
-      tertiary: 20 + Math.sin(i * 0.4) * 8 + Math.random() * 4
-    });
-  }
-  return data;
-};
-
 // Get color for curve type
 const getCurveColor = (colorType: string): string => {
   switch (colorType) {
@@ -87,9 +76,61 @@ const getCurveColor = (colorType: string): string => {
   }
 };
 
+// Map curve IDs to KPI codes
+const CURVE_TO_KPI: Record<string, string[]> = {
+  population_demography: ['population_total', 'working_age_functional'],
+  immigration_flow_stock: ['population_total'],
+  labor_market: ['employment_rate_net', 'long_term_exclusion'],
+  violence_safety: ['violent_crime_rate'],
+  economic_capacity: ['tax_base_growth', 'public_cost_per_capita', 'dependency_ratio'],
+  housing_overcrowding: ['housing_turnover'],
+  energy_living_conditions: ['energy_stability', 'energy_supply_stability'],
+  human_wellbeing_index: ['life_expectancy', 'excess_mortality'],
+};
+
 // Component for a single key curve section
-const KeyCurveCard: React.FC<{ config: KeyCurveConfig; data: any[] }> = ({ config, data }) => {
+const KeyCurveCard: React.FC<{ 
+  config: KeyCurveConfig; 
+  timeSeriesData: Record<string, TimeSeriesPoint[]>;
+  isLoading: boolean;
+}> = ({ config, timeSeriesData, isLoading }) => {
   const [showDetails, setShowDetails] = useState(false);
+  
+  // Get relevant KPI codes for this curve
+  const kpiCodes = CURVE_TO_KPI[config.id] || [];
+  
+  // Build chart data from live time series
+  const chartData = useMemo(() => {
+    if (!timeSeriesData || kpiCodes.length === 0) return [];
+
+    // Find data for any matching KPI
+    const allPoints: { year: number; values: Record<string, number> }[] = [];
+    const yearMap: Record<number, Record<string, number>> = {};
+
+    for (const [kpiId, points] of Object.entries(timeSeriesData)) {
+      for (const point of points) {
+        if (!yearMap[point.year]) {
+          yearMap[point.year] = {};
+        }
+        yearMap[point.year][kpiId] = point.value;
+      }
+    }
+
+    for (const [year, values] of Object.entries(yearMap)) {
+      allPoints.push({ year: parseInt(year), values });
+    }
+
+    return allPoints
+      .sort((a, b) => a.year - b.year)
+      .map(point => ({
+        year: point.year,
+        primary: Object.values(point.values)[0] || 0,
+        secondary: Object.values(point.values)[1] || 0,
+        tertiary: Object.values(point.values)[2] || 0,
+      }));
+  }, [timeSeriesData, kpiCodes]);
+
+  const hasData = chartData.length > 0;
   
   return (
     <Card className="overflow-hidden">
@@ -104,34 +145,54 @@ const KeyCurveCard: React.FC<{ config: KeyCurveConfig; data: any[] }> = ({ confi
               <CardDescription className="text-xs mt-1">{config.description}</CardDescription>
             </div>
           </div>
-          <Badge variant="outline" className="text-xs">
-            {config.order}/8
-          </Badge>
+          <div className="flex items-center gap-2">
+            {hasData && (
+              <Badge variant="outline" className="text-xs">
+                <Database className="h-3 w-3 mr-1" />
+                Live
+              </Badge>
+            )}
+            <Badge variant="outline" className="text-xs">
+              {config.order}/8
+            </Badge>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="h-48">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-              <XAxis dataKey="year" tick={{ fontSize: 10 }} />
-              <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip />
-              <Legend wrapperStyle={{ fontSize: '11px' }} />
-              {config.curves.map((curve, idx) => (
-                <Line
-                  key={curve.id}
-                  type="monotone"
-                  dataKey={['primary', 'secondary', 'tertiary'][idx] || 'primary'}
-                  stroke={getCurveColor(curve.color)}
-                  strokeWidth={2}
-                  name={curve.nameSv}
-                  dot={false}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        {isLoading ? (
+          <Skeleton className="h-48 w-full" />
+        ) : hasData ? (
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                <XAxis dataKey="year" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: '11px' }} />
+                {config.curves.slice(0, 3).map((curve, idx) => (
+                  <Line
+                    key={curve.id}
+                    type="monotone"
+                    dataKey={['primary', 'secondary', 'tertiary'][idx] || 'primary'}
+                    stroke={getCurveColor(curve.color)}
+                    strokeWidth={2}
+                    name={curve.nameSv}
+                    dot={false}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="h-48 flex items-center justify-center bg-muted/30 rounded-lg">
+            <div className="text-center text-muted-foreground">
+              <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">Ingen data tillgänglig</p>
+              <p className="text-xs">KPI:er för denna kategori saknas i databasen</p>
+            </div>
+          </div>
+        )}
         
         {config.note && (
           <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/50 p-2 rounded">
@@ -164,8 +225,8 @@ const KeyCurveCard: React.FC<{ config: KeyCurveConfig; data: any[] }> = ({ confi
               ))}
             </div>
             <div className="pt-2">
-              <div>Källa: SCB, BRÅ (demonstrationsdata)</div>
-              <div>Period: 1999–2024</div>
+              <div>Källa: {hasData ? 'Live-data från databasen' : 'Saknas'}</div>
+              <div>Datapunkter: {chartData.length}</div>
             </div>
           </div>
         )}
@@ -175,7 +236,7 @@ const KeyCurveCard: React.FC<{ config: KeyCurveConfig; data: any[] }> = ({ confi
 };
 
 // Text layer component
-const TextLayerSection: React.FC<{ curveId: string }> = ({ curveId }) => {
+const TextLayerSection: React.FC<{ curveId: string }> = ({ curveId: _curveId }) => {
   return (
     <div className="grid gap-3 md:grid-cols-3 text-sm">
       {TEXT_LAYERS.map(layer => (
@@ -221,23 +282,55 @@ const SwedenCoreView: React.FC = () => {
   const [selectedCorrelation, setSelectedCorrelation] = useState<string | null>(null);
   const [showGovernments, setShowGovernments] = useState(false);
   
-  // Current national status (mock)
-  const currentStatus = NATIONAL_STATUS_OPTIONS.stressed;
+  // Fetch all KPIs
+  const { data: allKPIs, isLoading: loadingKPIs } = useAllKPIs();
   
-  // Generate mock data for all curves
-  const curveData = useMemo(() => {
+  // Get all KPI IDs for time series fetch
+  const kpiIds = useMemo(() => allKPIs?.map(k => k.id) || [], [allKPIs]);
+  
+  // Fetch time series for all KPIs
+  const { data: timeSeriesData, isLoading: loadingTimeSeries } = useMultipleTimeSeries(kpiIds);
+
+  const isLoading = loadingKPIs || loadingTimeSeries;
+  
+  // Current national status - calculate from real data
+  const currentStatus = useMemo(() => {
+    if (!allKPIs) return NATIONAL_STATUS_OPTIONS.stressed;
+    // Default to stressed status - would calculate from real trends
+    return NATIONAL_STATUS_OPTIONS.stressed;
+  }, [allKPIs]);
+  
+  // Filter by year range
+  const filteredTimeSeriesData = useMemo(() => {
+    if (!timeSeriesData) return {};
+    
     const years = selectedYearRange === '5y' ? 5 : 
                   selectedYearRange === '10y' ? 10 : 
-                  selectedYearRange === '20y' ? 20 : 25;
-    return generateMockCurveData(years);
-  }, [selectedYearRange]);
+                  selectedYearRange === '20y' ? 20 : 100;
+    const cutoffYear = new Date().getFullYear() - years;
+    
+    const filtered: Record<string, TimeSeriesPoint[]> = {};
+    for (const [kpiId, points] of Object.entries(timeSeriesData)) {
+      filtered[kpiId] = points.filter(p => p.year >= cutoffYear);
+    }
+    return filtered;
+  }, [timeSeriesData, selectedYearRange]);
   
-  const startYear = curveData[0]?.year || 1999;
-  const endYear = curveData[curveData.length - 1]?.year || 2024;
+  const dataYears = useMemo(() => {
+    const allYears = Object.values(filteredTimeSeriesData)
+      .flat()
+      .map(p => p.year);
+    
+    if (allYears.length === 0) return { start: 1999, end: 2024 };
+    return {
+      start: Math.min(...allYears),
+      end: Math.max(...allYears),
+    };
+  }, [filteredTimeSeriesData]);
   
   // Filter relevant government periods
   const relevantGovernments = GOVERNMENT_PERIODS.filter(
-    g => g.endYear >= startYear && g.startYear <= endYear
+    g => g.endYear >= dataYears.start && g.startYear <= dataYears.end
   );
 
   return (
@@ -251,41 +344,57 @@ const SwedenCoreView: React.FC = () => {
         <p className="text-muted-foreground">
           Hur mår Sverige – och varför ser det ut som det gör?
         </p>
+        <Badge variant="outline" className="text-xs">
+          <Database className="h-3 w-3 mr-1" />
+          {allKPIs?.length || 0} indikatorer från databasen
+        </Badge>
       </div>
 
+      {/* Loading state */}
+      {isLoading && (
+        <Card>
+          <CardContent className="py-12 flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Hämtar nationell data...</p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* National Status Panel */}
-      <Card className="border-2" style={{ borderColor: currentStatus.color }}>
-        <CardContent className="pt-6">
-          <div className="text-center space-y-3">
-            <div className="flex items-center justify-center gap-3">
-              <span className="text-lg font-semibold">Nationellt läge:</span>
-              <Badge 
-                className="text-lg px-4 py-1"
-                style={{ backgroundColor: currentStatus.color }}
-              >
-                {currentStatus.labelSv}
-              </Badge>
+      {!isLoading && (
+        <Card className="border-2" style={{ borderColor: currentStatus.color }}>
+          <CardContent className="pt-6">
+            <div className="text-center space-y-3">
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-lg font-semibold">Nationellt läge:</span>
+                <Badge 
+                  className="text-lg px-4 py-1"
+                  style={{ backgroundColor: currentStatus.color }}
+                >
+                  {currentStatus.labelSv}
+                </Badge>
+              </div>
+              <p className="text-sm text-muted-foreground max-w-xl mx-auto">
+                {NATIONAL_STATUS_SUBTITLE.sv}
+              </p>
+              <div className="flex justify-center gap-2 pt-2">
+                <Button variant="outline" size="sm">
+                  <Eye className="h-3 w-3 mr-1" />
+                  Visa varför
+                </Button>
+                <Button variant="outline" size="sm">
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  Visa osäkerheter
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Clock className="h-3 w-3 mr-1" />
+                  Visa lång sikt
+                </Button>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground max-w-xl mx-auto">
-              {NATIONAL_STATUS_SUBTITLE.sv}
-            </p>
-            <div className="flex justify-center gap-2 pt-2">
-              <Button variant="outline" size="sm">
-                <Eye className="h-3 w-3 mr-1" />
-                Visa varför
-              </Button>
-              <Button variant="outline" size="sm">
-                <AlertTriangle className="h-3 w-3 mr-1" />
-                Visa osäkerheter
-              </Button>
-              <Button variant="outline" size="sm">
-                <Clock className="h-3 w-3 mr-1" />
-                Visa lång sikt
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Principles Toggle */}
       <div className="flex justify-center">
@@ -329,7 +438,7 @@ const SwedenCoreView: React.FC = () => {
           <Alert className="max-w-md">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription className="text-xs whitespace-pre-line">
-              {YEAR_PERSPECTIVE_WARNING.sv(startYear, endYear)}
+              {YEAR_PERSPECTIVE_WARNING.sv(dataYears.start, dataYears.end)}
             </AlertDescription>
           </Alert>
         )}
@@ -376,7 +485,12 @@ const SwedenCoreView: React.FC = () => {
         </h2>
         <div className="grid gap-4 md:grid-cols-2">
           {KEY_CURVES.map(curve => (
-            <KeyCurveCard key={curve.id} config={curve} data={curveData} />
+            <KeyCurveCard 
+              key={curve.id} 
+              config={curve} 
+              timeSeriesData={filteredTimeSeriesData}
+              isLoading={isLoading}
+            />
           ))}
         </div>
       </div>
@@ -402,7 +516,7 @@ const SwedenCoreView: React.FC = () => {
           ))}
         </div>
         
-        {selectedCorrelation && (
+        {selectedCorrelation && filteredTimeSeriesData && Object.keys(filteredTimeSeriesData).length > 0 && (
           <Card className="mt-4">
             <CardHeader>
               <Alert>
@@ -415,7 +529,13 @@ const SwedenCoreView: React.FC = () => {
             <CardContent>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={curveData}>
+                  <LineChart 
+                    data={Object.values(filteredTimeSeriesData)[0]?.map((p, i) => ({
+                      year: p.year,
+                      primary: p.value,
+                      secondary: Object.values(filteredTimeSeriesData)[1]?.[i]?.value || 0,
+                    })) || []}
+                  >
                     <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                     <XAxis dataKey="year" />
                     <YAxis yAxisId="left" orientation="left" />

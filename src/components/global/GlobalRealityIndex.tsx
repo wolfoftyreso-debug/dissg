@@ -3,15 +3,16 @@
  * 
  * "Hur mår världen – just nu – i ett mänskligt och strukturellt perspektiv?"
  * 
- * Sammansatt realtidsöversikt baserad på sex bärande pelare.
+ * Sammansatt realtidsöversikt baserad på live-data från databasen.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Globe,
   TrendingUp,
@@ -22,7 +23,9 @@ import {
   ChevronDown,
   ChevronUp,
   XCircle,
-  MapPin
+  MapPin,
+  Database,
+  Loader2
 } from 'lucide-react';
 import {
   GRI_IDENTITY,
@@ -37,85 +40,30 @@ import {
   type PillarId,
   type TrendDirection
 } from '@/config/globalRealityIndexConfig';
+import { 
+  useCategoryAggregates, 
+  useKPIsWithLatestValues,
+  getTrendDirection 
+} from '@/hooks/useLiveKPIData';
 
-// Mock data for pillars
+// Map database categories to GRI pillars
+const CATEGORY_TO_PILLAR: Record<string, PillarId> = {
+  demografi_halsa: 'human_wellbeing',
+  arbete_produktivitet: 'economic_space',
+  ekonomisk_barkraft: 'economic_space',
+  social_stabilitet: 'institutional_capacity',
+  systemrisk_styrning: 'global_stability',
+  infrastruktur: 'energy_capacity',
+  karnsystem_funktion: 'institutional_capacity',
+};
+
 interface PillarData {
   id: PillarId;
-  level: number; // 0-100
+  level: number;
   trend: TrendDirection;
-  uncertainty: number; // 0-100
+  uncertainty: number;
   drivers: { name: string; contribution: number; direction: TrendDirection }[];
 }
-
-const MOCK_PILLAR_DATA: PillarData[] = [
-  {
-    id: 'human_wellbeing',
-    level: 62,
-    trend: 'stable',
-    uncertainty: 15,
-    drivers: [
-      { name: 'Livslängd', contribution: 35, direction: 'improving' },
-      { name: 'Mental hälsa', contribution: 28, direction: 'declining' },
-      { name: 'Materiell standard', contribution: 22, direction: 'stable' },
-      { name: 'Social tillit', contribution: 15, direction: 'declining' }
-    ]
-  },
-  {
-    id: 'energy_capacity',
-    level: 48,
-    trend: 'declining',
-    uncertainty: 22,
-    drivers: [
-      { name: 'Energipris', contribution: 40, direction: 'declining' },
-      { name: 'Försörjningstrygghet', contribution: 35, direction: 'declining' },
-      { name: 'Förnybar kapacitet', contribution: 25, direction: 'improving' }
-    ]
-  },
-  {
-    id: 'economic_space',
-    level: 41,
-    trend: 'declining',
-    uncertainty: 18,
-    drivers: [
-      { name: 'Offentlig skuld', contribution: 38, direction: 'declining' },
-      { name: 'Investeringskvot', contribution: 32, direction: 'declining' },
-      { name: 'Real löneutveckling', contribution: 30, direction: 'stable' }
-    ]
-  },
-  {
-    id: 'demographic_balance',
-    level: 55,
-    trend: 'declining',
-    uncertainty: 12,
-    drivers: [
-      { name: 'Försörjningskvot', contribution: 40, direction: 'declining' },
-      { name: 'Fertilitet', contribution: 30, direction: 'declining' },
-      { name: 'Migration', contribution: 30, direction: 'stable' }
-    ]
-  },
-  {
-    id: 'institutional_capacity',
-    level: 58,
-    trend: 'stable',
-    uncertainty: 25,
-    drivers: [
-      { name: 'Genomförandeförmåga', contribution: 35, direction: 'stable' },
-      { name: 'Rättsstatens styrka', contribution: 35, direction: 'stable' },
-      { name: 'Politisk legitimitet', contribution: 30, direction: 'declining' }
-    ]
-  },
-  {
-    id: 'global_stability',
-    level: 44,
-    trend: 'declining',
-    uncertainty: 30,
-    drivers: [
-      { name: 'Väpnade konflikter', contribution: 40, direction: 'declining' },
-      { name: 'Handelsspänningar', contribution: 35, direction: 'declining' },
-      { name: 'Geopolitisk fragmentering', contribution: 25, direction: 'declining' }
-    ]
-  }
-];
 
 // Trend icon component
 const TrendIcon: React.FC<{ trend: TrendDirection; size?: 'sm' | 'md' }> = ({ trend, size = 'md' }) => {
@@ -195,12 +143,12 @@ const PillarBar: React.FC<{
       </button>
       
       {/* Expanded view - Drivers */}
-      {expanded && (
+      {expanded && data.drivers.length > 0 && (
         <Card className="ml-4 bg-muted/30 border-l-4" style={{ borderLeftColor: pillar.color }}>
           <CardHeader className="py-2 pb-1">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Info className="h-3 w-3" />
-              Vad driver förändringen?
+              <Database className="h-3 w-3" />
+              Vad driver förändringen? (Live-data)
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 pb-3">
@@ -268,8 +216,88 @@ export const GlobalRealityIndex: React.FC = () => {
   const [timePeriod, setTimePeriod] = useState('today');
   const [showValues, setShowValues] = useState(false);
 
+  // Fetch live data
+  const { data: categoryAggregates, isLoading: loadingCategories } = useCategoryAggregates();
+  const { data: kpisWithValues, isLoading: loadingKPIs } = useKPIsWithLatestValues();
+
+  const isLoading = loadingCategories || loadingKPIs;
+
+  // Calculate pillar data from live database
+  const pillarData: PillarData[] = useMemo(() => {
+    if (!categoryAggregates || !kpisWithValues) {
+      // Return empty pillar data with neutral values
+      return GRI_PILLARS.map(pillar => ({
+        id: pillar.id,
+        level: 50,
+        trend: 'stable' as TrendDirection,
+        uncertainty: 20,
+        drivers: [],
+      }));
+    }
+
+    // Group KPIs by pillar
+    const pillarKPIs: Record<PillarId, typeof kpisWithValues> = {
+      human_wellbeing: [],
+      energy_capacity: [],
+      economic_space: [],
+      demographic_balance: [],
+      institutional_capacity: [],
+      global_stability: [],
+    };
+
+    for (const kpi of kpisWithValues) {
+      const pillarId = CATEGORY_TO_PILLAR[kpi.category];
+      if (pillarId) {
+        pillarKPIs[pillarId].push(kpi);
+      }
+    }
+
+    return GRI_PILLARS.map(pillar => {
+      const kpis = pillarKPIs[pillar.id] || [];
+      
+      // Calculate aggregate trend
+      let improving = 0;
+      let declining = 0;
+      let totalValue = 0;
+      let valueCount = 0;
+
+      for (const kpi of kpis) {
+        if (kpi.latestTrend === 'up') improving++;
+        else if (kpi.latestTrend === 'down') declining++;
+        
+        if (kpi.latestValue !== null) {
+          totalValue += Math.min(100, Math.max(0, kpi.latestValue));
+          valueCount++;
+        }
+      }
+
+      const trend: TrendDirection = 
+        improving > declining ? 'improving' :
+        declining > improving ? 'declining' : 'stable';
+
+      // Calculate level (normalized 0-100)
+      const avgValue = valueCount > 0 ? totalValue / valueCount : 50;
+      const level = Math.min(100, Math.max(0, avgValue));
+
+      // Create drivers from actual KPIs
+      const drivers = kpis.slice(0, 4).map(kpi => ({
+        name: kpi.name,
+        contribution: Math.round(100 / kpis.length),
+        direction: getTrendDirection(kpi.latestTrend),
+      }));
+
+      return {
+        id: pillar.id,
+        level: Math.round(level),
+        trend,
+        uncertainty: Math.round(15 + (kpis.length < 3 ? 15 : 0)), // Higher uncertainty with less data
+        drivers,
+      };
+    });
+  }, [categoryAggregates, kpisWithValues]);
+
   // Calculate global status from pillar trends
-  const pillarTrends = MOCK_PILLAR_DATA.reduce((acc, p) => {
+  const pillarTrends = pillarData.reduce((acc, p) => {
     acc[p.id] = p.trend;
     return acc;
   }, {} as Record<PillarId, TrendDirection>);
@@ -294,34 +322,50 @@ export const GlobalRealityIndex: React.FC = () => {
         <p className="text-muted-foreground max-w-xl mx-auto">
           {GRI_IDENTITY.question.sv}
         </p>
+        <Badge variant="outline" className="text-xs">
+          <Database className="h-3 w-3 mr-1" />
+          Live data från databasen
+        </Badge>
       </div>
 
+      {/* Loading state */}
+      {isLoading && (
+        <Card>
+          <CardContent className="py-12 flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Hämtar global data...</p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Global Status Card */}
-      <Card 
-        className="border-2"
-        style={{ borderColor: statusConfig?.color }}
-      >
-        <CardContent className="pt-6">
-          <div className="text-center space-y-3">
-            <div className="flex items-center justify-center gap-3">
-              <span className="text-sm text-muted-foreground">Globalt läge:</span>
-              <Badge 
-                className="text-lg px-4 py-1"
-                style={{ backgroundColor: statusConfig?.color }}
-              >
-                {statusConfig?.labelSv}
-              </Badge>
+      {!isLoading && (
+        <Card 
+          className="border-2"
+          style={{ borderColor: statusConfig?.color }}
+        >
+          <CardContent className="pt-6">
+            <div className="text-center space-y-3">
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-sm text-muted-foreground">Globalt läge:</span>
+                <Badge 
+                  className="text-lg px-4 py-1"
+                  style={{ backgroundColor: statusConfig?.color }}
+                >
+                  {statusConfig?.labelSv}
+                </Badge>
+              </div>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                {statusConfig?.descriptionSv}
+              </p>
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                <Clock className="h-3 w-3" />
+                <span>Uppdaterat: {lastUpdate}</span>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground max-w-md mx-auto">
-              {statusConfig?.descriptionSv}
-            </p>
-            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-              <Clock className="h-3 w-3" />
-              <span>Uppdaterat: {lastUpdate}</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Time Period Selector */}
       <div className="flex items-center justify-between">
@@ -357,26 +401,34 @@ export const GlobalRealityIndex: React.FC = () => {
         <CardHeader>
           <CardTitle className="text-lg">De sex pelarna</CardTitle>
           <CardDescription>
-            Varje pelare är ett klickbart universum
+            Varje pelare är ett klickbart universum • {kpisWithValues?.length || 0} indikatorer
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-1">
-          {GRI_PILLARS.map(pillar => {
-            const data = MOCK_PILLAR_DATA.find(d => d.id === pillar.id);
-            if (!data) return null;
-            return (
-              <PillarBar
-                key={pillar.id}
-                pillar={pillar}
-                data={data}
-                expanded={expandedPillar === pillar.id}
-                onToggle={() => setExpandedPillar(
-                  expandedPillar === pillar.id ? null : pillar.id
-                )}
-                showValues={showValues}
-              />
-            );
-          })}
+          {isLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          ) : (
+            GRI_PILLARS.map(pillar => {
+              const data = pillarData.find(d => d.id === pillar.id);
+              if (!data) return null;
+              return (
+                <PillarBar
+                  key={pillar.id}
+                  pillar={pillar}
+                  data={data}
+                  expanded={expandedPillar === pillar.id}
+                  onToggle={() => setExpandedPillar(
+                    expandedPillar === pillar.id ? null : pillar.id
+                  )}
+                  showValues={showValues}
+                />
+              );
+            })
+          )}
         </CardContent>
       </Card>
 
