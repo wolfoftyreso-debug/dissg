@@ -13,3 +13,6 @@ export { StatusOverview } from './StatusOverview';
 export { DiagnosticCodeList } from './DiagnosticCodeList';
 export { TriangulationPanel } from './TriangulationPanel';
 export { EvidenceLinkBadge } from './EvidenceLinkBadge';
+export { ExplanationCard } from './ExplanationCard';
+export { AssumptionExposer } from './AssumptionExposer';
+export { NumberWithContext, CompactNumber } from './NumberWithContext';
