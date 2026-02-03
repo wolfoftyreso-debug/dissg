@@ -142,8 +142,7 @@ export function FullLegalDialog({ trigger }: FullLegalDialogProps) {
         <div className="space-y-6 mt-4">
           {Object.entries(legalDisclaimers).map(([key, disclaimer]) => (
             <div key={key} className="space-y-2">
-              <h3 className="font-semibold flex items-center gap-2">
-                <Shield className="h-4 w-4 text-primary" />
+              <h3 className="font-semibold">
                 {disclaimer.title}
               </h3>
               <p className="text-sm text-muted-foreground whitespace-pre-line">
