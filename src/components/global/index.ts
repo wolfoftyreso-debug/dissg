@@ -60,3 +60,7 @@ export { LambdaGauge } from './LambdaGauge';
 export { LambdaSensorBreakdownBars } from './LambdaSensorBreakdownBars';
 export { LambdaChangeExplanation } from './LambdaChangeExplanation';
 export { LambdaComparisonWarning } from './LambdaComparisonWarning';
+
+// LAMBDA Decision → Outcome Mapping
+export { LambdaDecisionTimeline } from './LambdaDecisionTimeline';
+export { LambdaCumulativeEffects } from './LambdaCumulativeEffects';
