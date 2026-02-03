@@ -60,232 +60,25 @@ interface FactorDeepDiveProps {
   onOpenChange: (open: boolean) => void;
 }
 
-// Evidence types now imported from factorEvidenceRegistry
-
-// Mock comprehensive evidence data
-const getFactorEvidence = (factorId: string): FactorEvidence | null => {
-  const evidenceMap: Record<string, FactorEvidence> = {
-    stable_energy: {
-      observation: {
-        summary: 'Regioner med stabil elproduktion (låg intermittens) uppvisar konsekvent högre industriell output och lägre energikostnader per enhet BNP.',
-        keyMetric: { value: 2.8, unit: '× högre industriproduktion', change: 180, period: '1950–2020' },
-        globalPattern: 'Mönstret observeras i 34 av 38 OECD-länder under perioden 1960–2020.',
-        thisShows: [
-          'Korrelation mellan energistabilitet och industriell tillväxt',
-          'Samband mellan basproduktion och låga spotpriser',
-          'Historiskt mönster i industrialiserade ekonomier'
-        ],
-        thisDoesNotShow: [
-          'Att stabil energi ORSAKAR tillväxt (kausalitet ej bevisad)',
-          'Att intermittent energi inte kan fungera med rätt infrastruktur',
-          'Framtida teknologiska lösningar (lagring, smarta nät)',
-          'Optimala energimixen för specifika länder'
-        ]
-      },
-      mechanism: {
-        causalChain: [
-          { step: 1, description: 'Stabil basproduktion sänker osäkerhet i energipriser', confidence: 'high' },
-          { step: 2, description: 'Lägre osäkerhet minskar riskpremie för investeringar', confidence: 'medium' },
-          { step: 3, description: 'Fler investeringar i energiintensiv industri', confidence: 'medium' },
-          { step: 4, description: 'Ökad industrikapacitet och sysselsättning', confidence: 'high' },
-          { step: 5, description: 'Högre BNP per capita och levnadsstandard', confidence: 'medium' }
-        ],
-        primaryDrivers: [
-          { name: 'Kapacitetsfaktor', contribution: 35, description: 'Andel av maximal produktion som faktiskt levereras' },
-          { name: 'Prognosbarhet', contribution: 30, description: 'Förmåga att förutsäga produktion 24–48h framåt' },
-          { name: 'Systemkostnad', contribution: 25, description: 'Total kostnad inklusive backup och nätförstärkning' },
-          { name: 'Reglerbarhet', contribution: 10, description: 'Förmåga att snabbt justera produktion efter behov' }
-        ],
-        feedbackLoops: [
-          { type: 'positive', description: 'Låga energipriser → fler industrier → högre efterfrågan → stordriftsfördelar → lägre priser' },
-          { type: 'negative', description: 'Hög stabilitet → lägre incitament för lagringsutveckling → teknologisk lock-in' }
-        ],
-        timelag: { min: 5, max: 15, unit: 'år', explanation: 'Industriinvesteringar tar 5–10 år att realisera, effekter på BNP syns efter ytterligare 3–5 år' }
-      },
-      methodology: {
-        dataCollection: { method: 'Officiell statistik från nationella energimyndigheter och IEA', frequency: 'Årlig', coverage: 92 },
-        statisticalApproach: 'Panelregression med fasta effekter för land och år, kontrollvariabler för utbildning, institutioner och öppenhet',
-        validationMethod: 'Out-of-sample prediktion på 10 länder som hölls utanför ursprunglig analys',
-        peerReview: { status: 'yes', details: 'Publicerad i Energy Economics (2019) och replikerad av oberoende forskare' },
-        replicationAttempts: { total: 4, successful: 3, details: '3/4 replikationer bekräftade huvudresultaten. 1 studie fann svagare effekt i tropiska klimat.' },
-        alternativeInterpretations: [
-          'Omvänd kausalitet: Rika länder har råd med stabil energi, inte tvärtom',
-          'Utelämnad variabel: Institutionell kvalitet driver både energival och tillväxt',
-          'Historisk path dependency: Kolländer industrialiserades tidigare av andra skäl'
-        ]
-      },
-      limitations: {
-        dataGaps: [
-          { gap: 'Saknar granulär data från utvecklingsländer före 1990', impact: 'moderate' },
-          { gap: 'Intermittens-data standardiserades först 2010', impact: 'moderate' },
-          { gap: 'Systemkostnader ofta underskattas i officiell statistik', impact: 'critical' }
-        ],
-        methodologicalWeaknesses: [
-          'Svårt att isolera energieffekt från andra industrialiseringsfaktorer',
-          'Korta tidsserier för förnybar energi (< 20 år i de flesta länder)',
-          'Definitioner av "stabil" varierar mellan studier'
-        ],
-        confoundingFactors: [
-          { factor: 'Utbildningsnivå', controlled: true },
-          { factor: 'Institutionell kvalitet (Governance Index)', controlled: true },
-          { factor: 'Geografiskt läge', controlled: false },
-          { factor: 'Historisk industristruktur', controlled: false },
-          { factor: 'Handelsöppenhet', controlled: true }
-        ],
-        geographicLimitations: [
-          'Huvudsakligen baserat på OECD-länder',
-          'Tropiska länder underrepresenterade',
-          'Oljeexporterande länder exkluderade (endogenitet)'
-        ],
-        temporalLimitations: [
-          'Data före 1960 saknar standardiserade definitioner',
-          'Energimarknaderna har förändrats radikalt sedan 2000',
-          'Framtida teknologier (fusion, avancerad lagring) kan förändra mönstret'
-        ],
-        expertDissent: [
-          { perspective: 'Med moderna smarta nät och lagring kan intermittent energi vara lika stabil', source: 'Jacobson et al., 2017' },
-          { perspective: 'Effekten överdrivs av fossilintressenfinansierad forskning', source: 'Greenpeace Energy Report' },
-          { perspective: 'Kärnkraft medför dolda kostnader som inte inkluderas', source: 'DIW Berlin, 2019' }
-        ]
-      },
-      rawData: {
-        timeSeries: [
-          { year: 1960, value: 45, source: 'IEA' },
-          { year: 1970, value: 62, source: 'IEA' },
-          { year: 1980, value: 78, source: 'IEA' },
-          { year: 1990, value: 89, source: 'IEA' },
-          { year: 2000, value: 94, source: 'IEA' },
-          { year: 2010, value: 91, source: 'IEA' },
-          { year: 2020, value: 85, source: 'IEA' }
-        ],
-        regionalBreakdown: [
-          { region: 'Norden', value: 95, trend: 'stable' },
-          { region: 'Centraleuropa', value: 78, trend: 'down' },
-          { region: 'Nordamerika', value: 88, trend: 'stable' },
-          { region: 'Östasien', value: 92, trend: 'up' },
-          { region: 'Sydamerika', value: 72, trend: 'down' }
-        ],
-        sources: [
-          { name: 'IEA World Energy Outlook', type: 'institutional', url: 'https://iea.org/weo', lastUpdated: '2024-10', reliability: 95 },
-          { name: 'Eurostat Energy Statistics', type: 'official', url: 'https://ec.europa.eu/eurostat/energy', lastUpdated: '2024-09', reliability: 92 },
-          { name: 'Energy Economics Journal', type: 'academic', url: 'https://www.journals.elsevier.com/energy-economics', lastUpdated: '2024-08', reliability: 88 }
-        ],
-        downloadFormats: ['CSV', 'JSON', 'Excel']
-      },
-      cases: [
-        {
-          region: 'Sverige',
-          period: '1950–1985',
-          description: 'Massiv utbyggnad av vattenkraft och kärnkraft gav stabil basproduktion med >90% kapacitetsfaktor',
-          impact: 'Industriproduktionen ökade 4.2× medan elanvändningen ökade 6×. Elpriset förblev bland de lägsta i Europa.',
-          outcome: 'positive',
-          source: 'SCB, Energimyndigheten, Vattenfall historik',
-          methodology: 'Jämförelse av industri-index (1950=100) mot energiproduktion med kontroll för befolkningstillväxt',
-          dataPoints: [
-            { label: 'Industriproduktion (index)', before: 100, after: 420, unit: '1950=100' },
-            { label: 'Elpris (realt)', before: 100, after: 85, unit: 'öre/kWh, 2020 års penningvärde' },
-            { label: 'Kapacitetsfaktor', before: 45, after: 91, unit: '%' }
-          ]
-        },
-        {
-          region: 'Tyskland',
-          period: '2000–2023',
-          description: 'Energiewende med snabb utbyggnad av sol och vind, avveckling av kärnkraft',
-          impact: 'Elpriset fördubblades (2010–2022). Intermittens ökade till 40%. Industriproduktion planade ut.',
-          outcome: 'mixed',
-          source: 'Destatis, Bundesnetzagentur, BDEW',
-          methodology: 'Tidsserieanalys av elpris, CO2-utsläpp och industriproduktion med strukturella brytpunkter',
-          dataPoints: [
-            { label: 'Hushållselpris', before: 14, after: 32, unit: 'cent/kWh' },
-            { label: 'CO2-intensitet el', before: 500, after: 380, unit: 'g/kWh' },
-            { label: 'Industriproduktion (index)', before: 100, after: 105, unit: '2010=100' }
-          ]
-        },
-        {
-          region: 'Frankrike',
-          period: '1974–2000',
-          description: 'Messmer-planen: 58 kärnreaktorer byggdes efter oljekrisen 1973',
-          impact: 'Energioberoende ökade från 23% till 51%. Elpriset blev Europas lägsta. Kraftig industriexpansion.',
-          outcome: 'positive',
-          source: 'INSEE, RTE, CEA',
-          methodology: 'Difference-in-differences mot jämförbara länder (Italien, Spanien) som valde annan energimix',
-          dataPoints: [
-            { label: 'Energioberoende', before: 23, after: 51, unit: '%' },
-            { label: 'Elpris (relativt EU-snitt)', before: 100, after: 70, unit: 'EU-snitt=100' },
-            { label: 'Kärnkraftens andel', before: 8, after: 78, unit: '% av elproduktion' }
-          ]
-        }
-      ],
-      relatedIndicators: [
-        { code: 'ELEC_PRICE', name: 'Elpris (hushåll)', correlation: -0.72, description: 'Stabil produktion korrelerar med lägre priser' },
-        { code: 'GRID_STABILITY', name: 'Nätfrekvensavvikelser', correlation: -0.68, description: 'Färre avbrott med stabil basproduktion' },
-        { code: 'IND_OUTPUT', name: 'Industriproduktion', correlation: 0.81, description: 'Stark positiv korrelation observerad' },
-        { code: 'ENERGY_INTENSITY', name: 'Energiintensitet BNP', correlation: -0.45, description: 'Svagt samband, många confounders' }
-      ]
-    }
-  };
-  
-  return evidenceMap[factorId] || createDefaultEvidence(factorId);
-};
-
-// Default evidence for factors without full data
-const createDefaultEvidence = (_factorId: string): FactorEvidence => ({
-  observation: {
-    summary: 'Detaljerad evidens för denna faktor samlas in.',
-    keyMetric: { value: 0, unit: '', change: 0, period: '' },
-    globalPattern: 'Mönster under analys.',
-    thisShows: ['Data under insamling'],
-    thisDoesNotShow: ['Fullständig analys ej tillgänglig ännu']
-  },
-  mechanism: {
-    causalChain: [{ step: 1, description: 'Analys pågår', confidence: 'low' }],
-    primaryDrivers: [],
-    feedbackLoops: [],
-    timelag: { min: 0, max: 0, unit: 'år', explanation: 'Okänt' }
-  },
-  methodology: {
-    dataCollection: { method: 'Under utveckling', frequency: '', coverage: 0 },
-    statisticalApproach: 'Ej definierat',
-    validationMethod: 'Ej utförd',
-    peerReview: { status: 'no', details: 'Ej granskad' },
-    replicationAttempts: { total: 0, successful: 0, details: 'Inga försök' },
-    alternativeInterpretations: []
-  },
-  limitations: {
-    dataGaps: [{ gap: 'Fullständig data saknas', impact: 'critical' }],
-    methodologicalWeaknesses: ['Metodologi under utveckling'],
-    confoundingFactors: [],
-    geographicLimitations: ['Ej kartlagt'],
-    temporalLimitations: ['Ej kartlagt'],
-    expertDissent: []
-  },
-  rawData: {
-    timeSeries: [],
-    regionalBreakdown: [],
-    sources: [],
-    downloadFormats: []
-  },
-  cases: [],
-  relatedIndicators: []
-});
+// Evidence is now imported from factorEvidenceRegistry - no local definitions needed
 
 // Sub-components
 const ConfidenceBadge: React.FC<{ level: 'high' | 'medium' | 'low' }> = ({ level }) => {
   const config = {
-    high: { label: 'Hög konfidens', className: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
-    medium: { label: 'Medel konfidens', className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' },
-    low: { label: 'Låg konfidens', className: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }
+    high: { label: 'Hög konfidens', variant: 'default' as const },
+    medium: { label: 'Medel konfidens', variant: 'secondary' as const },
+    low: { label: 'Låg konfidens', variant: 'destructive' as const }
   };
-  return <Badge className={config[level].className}>{config[level].label}</Badge>;
+  return <Badge variant={config[level].variant}>{config[level].label}</Badge>;
 };
 
 const ImpactBadge: React.FC<{ impact: 'critical' | 'moderate' | 'minor' }> = ({ impact }) => {
   const config = {
-    critical: { label: 'Kritisk', className: 'bg-red-100 text-red-800' },
-    moderate: { label: 'Måttlig', className: 'bg-yellow-100 text-yellow-800' },
-    minor: { label: 'Mindre', className: 'bg-green-100 text-green-800' }
+    critical: { label: 'Kritisk', variant: 'destructive' as const },
+    moderate: { label: 'Måttlig', variant: 'secondary' as const },
+    minor: { label: 'Mindre', variant: 'default' as const }
   };
-  return <Badge className={config[impact].className}>{config[impact].label}</Badge>;
+  return <Badge variant={config[impact].variant}>{config[impact].label}</Badge>;
 };
 
 const SourceReliabilityBar: React.FC<{ reliability: number }> = ({ reliability }) => (
@@ -321,11 +114,11 @@ const CaseStudyDetail: React.FC<{
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 {caseStudy.outcome === 'positive' ? (
-                  <TrendingUp className="h-4 w-4 text-green-600" />
+                  <TrendingUp className="h-4 w-4 text-primary" />
                 ) : caseStudy.outcome === 'negative' ? (
-                  <TrendingDown className="h-4 w-4 text-red-600" />
+                  <TrendingDown className="h-4 w-4 text-destructive" />
                 ) : (
-                  <Scale className="h-4 w-4 text-yellow-600" />
+                  <Scale className="h-4 w-4 text-muted-foreground" />
                 )}
                 Observerat utfall
               </CardTitle>
@@ -335,7 +128,7 @@ const CaseStudyDetail: React.FC<{
             </CardContent>
           </Card>
           
-          {/* Data points comparison */}
+          {/* Key figures comparison */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm">Kvantitativ jämförelse</CardTitle>
@@ -343,33 +136,33 @@ const CaseStudyDetail: React.FC<{
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {caseStudy.dataPoints.map((dp, idx) => (
+                {caseStudy.keyFigures.map((kf, idx) => (
                   <div key={idx} className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="font-medium">{dp.label}</span>
-                      <span className="text-muted-foreground">{dp.unit}</span>
+                      <span className="font-medium">{kf.labelSv || kf.label}</span>
+                      <span className="text-muted-foreground">{kf.unit}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1">
                         <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                          <span>Före: {dp.before}</span>
-                          <span>Efter: {dp.after}</span>
+                          <span>Före: {kf.before}</span>
+                          <span>Efter: {kf.after}</span>
                         </div>
                         <div className="h-3 bg-muted rounded-full overflow-hidden flex">
                           <div 
                             className="h-full bg-muted-foreground/30" 
-                            style={{ width: `${(dp.before / Math.max(dp.before, dp.after)) * 100}%` }} 
+                            style={{ width: `${(kf.before / Math.max(kf.before, kf.after)) * 100}%` }} 
                           />
                         </div>
                         <div className="h-3 bg-primary/20 rounded-full overflow-hidden flex mt-1">
                           <div 
                             className="h-full bg-primary" 
-                            style={{ width: `${(dp.after / Math.max(dp.before, dp.after)) * 100}%` }} 
+                            style={{ width: `${(kf.after / Math.max(kf.before, kf.after)) * 100}%` }} 
                           />
                         </div>
                       </div>
-                      <div className={`text-sm font-medium ${dp.after > dp.before ? 'text-green-600' : 'text-red-600'}`}>
-                        {dp.after > dp.before ? '+' : ''}{Math.round((dp.after - dp.before) / dp.before * 100)}%
+                      <div className={`text-sm font-medium ${kf.changePercent >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                        {kf.changePercent >= 0 ? '+' : ''}{kf.changePercent}%
                       </div>
                     </div>
                   </div>
@@ -503,11 +296,11 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                     <Card className="bg-primary/5 border-primary/20">
                       <CardContent className="pt-6">
                         <div className="text-center">
-                          <div className="text-4xl font-bold text-primary">
+                        <div className="text-4xl font-bold text-primary">
                             {evidence.observation.keyMetric.value}{evidence.observation.keyMetric.unit}
                           </div>
                           <p className="text-sm text-muted-foreground mt-2">
-                            {evidence.observation.keyMetric.period}
+                            {evidence.observation.keyMetric.changePeriod}
                           </p>
                         </div>
                       </CardContent>
@@ -528,9 +321,9 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                     
                     {/* This shows / does not show */}
                     <div className="grid md:grid-cols-2 gap-4">
-                      <Card className="border-green-200 dark:border-green-900">
+                      <Card className="border-primary/30">
                         <CardHeader className="pb-2">
-                          <CardTitle className="text-sm flex items-center gap-2 text-green-700 dark:text-green-400">
+                          <CardTitle className="text-sm flex items-center gap-2 text-primary">
                             <CheckCircle2 className="h-4 w-4" />
                             Detta visar
                           </CardTitle>
@@ -539,7 +332,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                           <ul className="space-y-2">
                             {evidence.observation.thisShows.map((item, idx) => (
                               <li key={idx} className="text-sm flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 shrink-0" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
                                 <span>{item}</span>
                               </li>
                             ))}
@@ -547,9 +340,9 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                         </CardContent>
                       </Card>
                       
-                      <Card className="border-red-200 dark:border-red-900">
+                      <Card className="border-destructive/30">
                         <CardHeader className="pb-2">
-                          <CardTitle className="text-sm flex items-center gap-2 text-red-700 dark:text-red-400">
+                          <CardTitle className="text-sm flex items-center gap-2 text-destructive">
                             <XCircle className="h-4 w-4" />
                             Detta visar INTE
                           </CardTitle>
@@ -558,7 +351,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                           <ul className="space-y-2">
                             {evidence.observation.thisDoesNotShow.map((item, idx) => (
                               <li key={idx} className="text-sm flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 shrink-0" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-destructive mt-2 shrink-0" />
                                 <span>{item}</span>
                               </li>
                             ))}
@@ -590,9 +383,9 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                               </div>
                               <div className="flex items-center gap-2">
                                 <Badge variant="outline">{caseStudy.period}</Badge>
-                                {caseStudy.outcome === 'positive' && <TrendingUp className="h-4 w-4 text-green-600" />}
-                                {caseStudy.outcome === 'negative' && <TrendingDown className="h-4 w-4 text-red-600" />}
-                                {caseStudy.outcome === 'mixed' && <Scale className="h-4 w-4 text-yellow-600" />}
+                                {caseStudy.outcome === 'positive' && <TrendingUp className="h-4 w-4 text-primary" />}
+                                {caseStudy.outcome === 'negative' && <TrendingDown className="h-4 w-4 text-destructive" />}
+                                {caseStudy.outcome === 'mixed' && <Scale className="h-4 w-4 text-muted-foreground" />}
                                 <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
                               </div>
                             </div>
@@ -762,7 +555,9 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                             {evidence.methodology.peerReview.status === 'yes' ? 'Ja' : evidence.methodology.peerReview.status === 'partial' ? 'Delvis' : 'Nej'}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">{evidence.methodology.peerReview.details}</p>
+                        {evidence.methodology.peerReview.journals.length > 0 && (
+                          <p className="text-sm text-muted-foreground">Publicerad i: {evidence.methodology.peerReview.journals.join(', ')}</p>
+                        )}
                       </CardContent>
                     </Card>
                     
@@ -774,7 +569,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                       <CardContent>
                         <div className="flex items-center gap-4 mb-4">
                           <div className="text-center">
-                            <div className="text-2xl font-bold text-green-600">{evidence.methodology.replicationAttempts.successful}</div>
+                            <div className="text-2xl font-bold text-primary">{evidence.methodology.replicationAttempts.successful}</div>
                             <div className="text-xs text-muted-foreground">Lyckade</div>
                           </div>
                           <div className="text-muted-foreground">/</div>
@@ -783,7 +578,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                             <div className="text-xs text-muted-foreground">Totalt</div>
                           </div>
                         </div>
-                        <p className="text-sm text-muted-foreground">{evidence.methodology.replicationAttempts.details}</p>
+                        <p className="text-sm text-muted-foreground">{evidence.methodology.replicationAttempts.detailsSv || evidence.methodology.replicationAttempts.details}</p>
                       </CardContent>
                     </Card>
                     
@@ -800,9 +595,11 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                         <Accordion type="single" collapsible>
                           {evidence.methodology.alternativeInterpretations.map((alt, idx) => (
                             <AccordionItem key={idx} value={`alt-${idx}`}>
-                              <AccordionTrigger className="text-sm">{alt.split(':')[0]}</AccordionTrigger>
+                              <AccordionTrigger className="text-sm">{alt.interpretationSv || alt.interpretation}</AccordionTrigger>
                               <AccordionContent className="text-sm text-muted-foreground">
-                                {alt}
+                                <p>{alt.interpretationSv || alt.interpretation}</p>
+                                {alt.proponents && <p className="mt-2 text-xs">Förespråkare: {alt.proponents}</p>}
+                                {alt.counterEvidence && <p className="mt-1 text-xs">Motbevis: {alt.counterEvidence}</p>}
                               </AccordionContent>
                             </AccordionItem>
                           ))}
@@ -831,7 +628,12 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                       <CardContent className="space-y-3">
                         {evidence.limitations.dataGaps.map((gap, idx) => (
                           <div key={idx} className="flex items-start justify-between p-3 border rounded-lg">
-                            <span className="text-sm flex-1">{gap.gap}</span>
+                            <div className="flex-1">
+                              <span className="text-sm">{gap.gapSv || gap.gap}</span>
+                              {gap.potentialSolution && (
+                                <p className="text-xs text-muted-foreground mt-1">Möjlig lösning: {gap.potentialSolution}</p>
+                              )}
+                            </div>
                             <ImpactBadge impact={gap.impact} />
                           </div>
                         ))}
@@ -845,10 +647,13 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                       </CardHeader>
                       <CardContent>
                         <ul className="space-y-2">
-                          {evidence.limitations.methodologicalWeaknesses.map((weakness, idx) => (
+                          {evidence.limitations.methodologicalWeaknesses.map((w, idx) => (
                             <li key={idx} className="text-sm flex items-start gap-2">
-                              <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 shrink-0" />
-                              <span>{weakness}</span>
+                              <AlertTriangle className={`h-4 w-4 mt-0.5 shrink-0 ${w.severity === 'high' ? 'text-destructive' : w.severity === 'medium' ? 'text-yellow-600' : 'text-muted-foreground'}`} />
+                              <div>
+                                <span>{w.weaknessSv || w.weakness}</span>
+                                {w.mitigation && <p className="text-xs text-muted-foreground mt-1">Åtgärd: {w.mitigation}</p>}
+                              </div>
                             </li>
                           ))}
                         </ul>
@@ -865,7 +670,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                         <div className="space-y-2">
                           {evidence.limitations.confoundingFactors.map((cf, idx) => (
                             <div key={idx} className="flex items-center justify-between p-2 border rounded">
-                              <span className="text-sm">{cf.factor}</span>
+                              <span className="text-sm">{cf.factorSv || cf.factor}</span>
                               <Badge variant={cf.controlled ? 'default' : 'destructive'}>
                                 {cf.controlled ? 'Kontrollerad' : 'Ej kontrollerad'}
                               </Badge>
@@ -884,10 +689,15 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                       <CardContent className="space-y-3">
                         {evidence.limitations.expertDissent.map((dissent, idx) => (
                           <div key={idx} className="p-3 border rounded-lg bg-muted/30">
-                            <p className="text-sm italic">"{dissent.perspective}"</p>
-                            <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-                              <BookOpen className="h-3 w-3" />
-                              <span>{dissent.source}</span>
+                            <p className="text-sm italic">"{dissent.perspectiveSv || dissent.perspective}"</p>
+                            <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1">
+                                <BookOpen className="h-3 w-3" />
+                                <span>{dissent.source} ({dissent.year})</span>
+                              </div>
+                              <Badge variant="outline" className="text-xs">
+                                {dissent.credibility === 'high' ? 'Hög trovärdighet' : dissent.credibility === 'medium' ? 'Medel' : 'Låg'}
+                              </Badge>
                             </div>
                           </div>
                         ))}
@@ -1008,8 +818,8 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                                 r = {indicator.correlation > 0 ? '+' : ''}{indicator.correlation.toFixed(2)}
                               </Badge>
                             </div>
-                            <div className="font-medium text-sm">{indicator.name}</div>
-                            <p className="text-xs text-muted-foreground mt-1">{indicator.description}</p>
+                            <div className="font-medium text-sm">{indicator.nameSv || indicator.name}</div>
+                            <p className="text-xs text-muted-foreground mt-1">{indicator.descriptionSv || indicator.description}</p>
                           </button>
                         ))}
                       </CardContent>
