@@ -571,6 +571,13 @@ export default function PublicDashboard() {
             <span className="font-semibold text-sm">Nationellt Läge</span>
           </div>
           <div className="flex items-center gap-2">
+            <Link 
+              to="/decisions"
+              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+            >
+              <Calendar className="h-3 w-3" />
+              Beslutstidslinje
+            </Link>
             <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
