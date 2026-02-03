@@ -75,6 +75,7 @@ import CQAIS from "./pages/CQAIS";
 import Lambda from "./pages/Lambda";
 import InfiniteDepthDemo from "./pages/InfiniteDepthDemo";
 import RelevanceWeightManager from "./pages/RelevanceWeightManager";
+import OscilloscopeViewPage from "./pages/OscilloscopeViewPage";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -153,6 +154,7 @@ const App = () => (
               <Route path="/lambda" element={<Lambda />} />
               <Route path="/depth" element={<InfiniteDepthDemo />} />
               <Route path="/relevance-weight-manager" element={<RelevanceWeightManager />} />
+              <Route path="/oscilloscope-view" element={<OscilloscopeViewPage />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
