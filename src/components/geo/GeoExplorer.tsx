@@ -352,18 +352,132 @@ function MetricCard({
   );
 }
 
-function DataTierBadge({ tier }: { tier: 'A' | 'B' | 'C' | 'D' }) {
-  const config = {
-    A: { label: 'Full täckning', className: 'border-green-500/50 text-green-600 bg-green-50' },
-    B: { label: 'God täckning', className: 'border-blue-500/50 text-blue-600 bg-blue-50' },
-    C: { label: 'Partiell', className: 'border-orange-500/50 text-orange-600 bg-orange-50' },
-    D: { label: 'Begränsad', className: 'border-red-500/50 text-red-600 bg-red-50' },
-  };
+// Data Coverage definitions for transparency
+const DATA_COVERAGE_LEVELS = {
+  A: {
+    label: 'Full täckning',
+    description: 'Alla primära indikatorer tillgängliga med hög kvalitet',
+    criteria: [
+      'Officiell statistik från nationell myndighet',
+      'Minst 95% av kärnindikatorerna täckta',
+      'Årlig eller oftare uppdatering',
+      'Verifierad av minst 2 internationella källor'
+    ],
+    className: 'border-green-500/50 text-green-600 bg-green-50 dark:bg-green-950/30'
+  },
+  B: {
+    label: 'God täckning',
+    description: 'De flesta indikatorer tillgängliga med acceptabel kvalitet',
+    criteria: [
+      'Primärkällor kompletterade med estimat',
+      '70–94% av kärnindikatorerna täckta',
+      'Uppdatering minst vartannat år',
+      'Verifierad av minst 1 internationell källa'
+    ],
+    className: 'border-blue-500/50 text-blue-600 bg-blue-50 dark:bg-blue-950/30'
+  },
+  C: {
+    label: 'Delvis täckning',
+    description: 'Grundläggande data finns, men med betydande luckor',
+    criteria: [
+      'Blandning av officiella data och modellestimater',
+      '40–69% av kärnindikatorerna täckta',
+      'Data kan vara 3–5 år gammal',
+      'Högre osäkerhetsintervall'
+    ],
+    className: 'border-orange-500/50 text-orange-600 bg-orange-50 dark:bg-orange-950/30'
+  },
+  D: {
+    label: 'Begränsad täckning',
+    description: 'Endast basdata, ofta modellerad eller interpolerad',
+    criteria: [
+      'Huvudsakligen baserat på modelleringar',
+      'Under 40% av kärnindikatorerna från primärkälla',
+      'Data kan vara äldre än 5 år',
+      'Höga osäkerhetsmarginaler (±15% eller mer)'
+    ],
+    className: 'border-red-500/50 text-red-600 bg-red-50 dark:bg-red-950/30'
+  },
+};
+
+function DataTierBadge({ tier, showExplanation = false }: { tier: 'A' | 'B' | 'C' | 'D'; showExplanation?: boolean }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const config = DATA_COVERAGE_LEVELS[tier];
+  
+  if (!showExplanation) {
+    return (
+      <Badge variant="outline" className={cn("text-xs font-mono", config.className)}>
+        {tier}
+      </Badge>
+    );
+  }
   
   return (
-    <Badge variant="outline" className={cn("text-xs", config[tier].className)}>
-      {tier}: {config[tier].label}
-    </Badge>
+    <>
+      <button 
+        onClick={() => setIsOpen(true)}
+        className="focus:outline-none focus:ring-2 focus:ring-primary/20 rounded"
+      >
+        <Badge 
+          variant="outline" 
+          className={cn(
+            "text-xs cursor-pointer hover:opacity-80 transition-opacity",
+            config.className
+          )}
+        >
+          {config.label}
+        </Badge>
+      </button>
+      
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <Badge variant="outline" className={cn("text-sm", config.className)}>
+                Nivå {tier}
+              </Badge>
+              <span>{config.label}</span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              {config.description}
+            </p>
+            
+            <div>
+              <h4 className="text-sm font-medium mb-2">Kriterier för denna nivå:</h4>
+              <ul className="space-y-1">
+                {config.criteria.map((criterion, i) => (
+                  <li key={i} className="text-sm flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span>{criterion}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div className="pt-4 border-t">
+              <h4 className="text-sm font-medium mb-3">Alla täckningsnivåer:</h4>
+              <div className="grid grid-cols-2 gap-2">
+                {(['A', 'B', 'C', 'D'] as const).map(t => (
+                  <div 
+                    key={t}
+                    className={cn(
+                      "p-2 rounded border text-xs",
+                      t === tier ? "ring-2 ring-primary" : "opacity-70",
+                      DATA_COVERAGE_LEVELS[t].className
+                    )}
+                  >
+                    <div className="font-medium">{t}: {DATA_COVERAGE_LEVELS[t].label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -429,6 +543,19 @@ function RegionDetail({
   onSelectCountry: (c: CountryData) => void;
   onSelectRegion: (r: RegionData) => void;
 }) {
+  // Group countries by subregion for better organization
+  const groupedCountries = useMemo(() => {
+    const groups: Record<string, CountryData[]> = {};
+    countries.forEach(country => {
+      const subregion = country.subregion || 'Övriga';
+      if (!groups[subregion]) groups[subregion] = [];
+      groups[subregion].push(country);
+    });
+    // Sort each group alphabetically
+    Object.values(groups).forEach(group => group.sort((a, b) => a.nameSv.localeCompare(b.nameSv, 'sv')));
+    return groups;
+  }, [countries]);
+
   if (activeTab === 'sources') {
     return (
       <div className="space-y-4">
@@ -470,26 +597,39 @@ function RegionDetail({
   }
   
   return (
-    <div className="space-y-6">
-      {/* Countries in region */}
-      <div>
-        <h3 className="font-medium mb-3">Länder i regionen</h3>
+    <div className="space-y-8">
+      {/* Data coverage legend */}
+      <div className="p-4 rounded-lg border bg-muted/30">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-sm font-medium">Datatäckningsnivåer</h4>
+          <span className="text-xs text-muted-foreground">Klicka på ett land för detaljer</span>
+        </div>
         <div className="flex flex-wrap gap-2">
-          {countries.map(country => (
-            <button
-              key={country.code}
-              onClick={() => onSelectCountry(country)}
-              className="px-3 py-1.5 rounded-md border bg-card hover:bg-muted/50 transition-colors text-sm"
-            >
-              {country.nameSv}
-            </button>
+          {(['A', 'B', 'C', 'D'] as const).map(tier => (
+            <DataTierBadge key={tier} tier={tier} showExplanation />
           ))}
         </div>
       </div>
+
+      {/* Countries grid - organized by subregion */}
+      {Object.entries(groupedCountries).map(([subregion, subregionCountries]) => (
+        <div key={subregion}>
+          <h3 className="font-medium mb-3 text-sm text-muted-foreground uppercase tracking-wide">{subregion}</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {subregionCountries.map(country => (
+              <CountryCard
+                key={country.code}
+                country={country}
+                onClick={() => onSelectCountry(country)}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
       
       {/* Related regions */}
       {relatedRegions.length > 0 && (
-        <div>
+        <div className="pt-4 border-t">
           <h3 className="font-medium mb-3">Relaterade regioner</h3>
           <div className="flex flex-wrap gap-2">
             {relatedRegions.map(r => (
@@ -506,7 +646,7 @@ function RegionDetail({
       )}
       
       {/* Key indicators */}
-      <div>
+      <div className="pt-4 border-t">
         <h3 className="font-medium mb-3">Nyckelindikatorer</h3>
         <div className="grid gap-3">
           {region.keyIndicators.map((indicator, i) => (
@@ -521,6 +661,41 @@ function RegionDetail({
         </div>
       </div>
     </div>
+  );
+}
+
+// Professional country card for grid display
+function CountryCard({ country, onClick }: { country: CountryData; onClick: () => void }) {
+  const tierConfig = DATA_COVERAGE_LEVELS[country.dataTier];
+  
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "p-4 rounded-lg border text-left transition-all",
+        "hover:shadow-md hover:border-primary/30 hover:scale-[1.02]",
+        "bg-card"
+      )}
+    >
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <span className="font-mono text-lg font-bold text-primary">
+          {country.code}
+        </span>
+        <Badge 
+          variant="outline" 
+          className={cn("text-xs shrink-0", tierConfig.className)}
+        >
+          {tierConfig.label}
+        </Badge>
+      </div>
+      <div className="text-sm font-medium truncate" title={country.nameSv}>
+        {country.nameSv}
+      </div>
+      <div className="text-2xl font-bold mt-2 text-foreground">
+        {country.population ? formatLargeNumber(country.population) : '—'}
+      </div>
+      <div className="text-xs text-muted-foreground">invånare</div>
+    </button>
   );
 }
 
@@ -551,6 +726,17 @@ function CountryDetail({ country, activeTab }: { country: CountryData; activeTab
   
   return (
     <div className="space-y-6">
+      {/* Data coverage explanation */}
+      <div className="p-4 rounded-lg border bg-muted/30">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-sm font-medium">Datatäckning:</span>
+          <DataTierBadge tier={country.dataTier} showExplanation />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {DATA_COVERAGE_LEVELS[country.dataTier].description}
+        </p>
+      </div>
+
       {/* Basic info */}
       <div className="grid grid-cols-2 gap-4">
         <div className="p-3 rounded-lg border bg-card">
