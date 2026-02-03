@@ -20,7 +20,8 @@ import {
   ArrowRight,
   Layers,
   Cpu,
-  Scale
+  Scale,
+  GraduationCap
 } from 'lucide-react';
 import {
   LAMBDA_DEFINITION,
@@ -34,6 +35,7 @@ import {
   LambdaBadge,
   LambdaSensorBreakdown 
 } from '@/components/global/LambdaSetpointDisplay';
+import { LambdaPedagogicalView } from '@/components/global/LambdaPedagogicalView';
 
 const LambdaPage: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState<string>('national');
@@ -69,7 +71,7 @@ const LambdaPage: React.FC = () => {
           <div className="grid md:grid-cols-3 gap-6 mt-8">
             <Card className="bg-card/50">
               <CardContent className="pt-6">
-                <div className="text-4xl font-mono font-bold text-emerald-500">λ = 1.0</div>
+                <div className="text-4xl font-mono font-bold text-primary">λ = 1.0</div>
                 <p className="text-sm text-muted-foreground mt-2">
                   Maximum efficiency • Minimal stress • Stable operation
                 </p>
@@ -77,7 +79,7 @@ const LambdaPage: React.FC = () => {
             </Card>
             <Card className="bg-card/50">
               <CardContent className="pt-6">
-                <div className="text-4xl font-mono font-bold text-amber-500">λ &lt; 0.9</div>
+                <div className="text-4xl font-mono font-bold text-secondary-foreground">λ &lt; 0.9</div>
                 <p className="text-sm text-muted-foreground mt-2">
                   System overload • "Too rich" • Inefficiency buildup
                 </p>
@@ -85,7 +87,7 @@ const LambdaPage: React.FC = () => {
             </Card>
             <Card className="bg-card/50">
               <CardContent className="pt-6">
-                <div className="text-4xl font-mono font-bold text-red-500">λ &gt; 1.1</div>
+                <div className="text-4xl font-mono font-bold text-destructive">λ &gt; 1.1</div>
                 <p className="text-sm text-muted-foreground mt-2">
                   Resource strain • "Too lean" • Collapse risk
                 </p>
@@ -96,8 +98,12 @@ const LambdaPage: React.FC = () => {
       </section>
 
       <div className="container max-w-6xl mx-auto px-4 py-12">
-        <Tabs defaultValue="definition" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="pedagogy" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="pedagogy" className="gap-2">
+              <GraduationCap className="h-4 w-4" />
+              Förklaring
+            </TabsTrigger>
             <TabsTrigger value="definition" className="gap-2">
               <BookOpen className="h-4 w-4" />
               Definition
@@ -115,6 +121,29 @@ const LambdaPage: React.FC = () => {
               Levels
             </TabsTrigger>
           </TabsList>
+
+          {/* Pedagogy Tab - NEW */}
+          <TabsContent value="pedagogy" className="space-y-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <GraduationCap className="h-5 w-5" />
+                  Lambda förklarad i 5 lager
+                </CardTitle>
+                <CardDescription>
+                  Från 18-åring (15 sekunder) till ISO-specifikation (full transparens)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LambdaPedagogicalView 
+                  startLevel="L0" 
+                  language="sv"
+                  entityName="Världen"
+                  lambdaValue={0.94}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Definition Tab */}
           <TabsContent value="definition" className="space-y-8">

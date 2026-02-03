@@ -51,3 +51,4 @@ export * from '../doctrine';
 
 // LAMBDA 1.0: Global Reality Setpoint
 export { LambdaSetpointDisplay, LambdaBadge, LambdaSensorBreakdown } from './LambdaSetpointDisplay';
+export { LambdaPedagogicalView } from './LambdaPedagogicalView';
