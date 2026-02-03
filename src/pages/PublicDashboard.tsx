@@ -621,15 +621,30 @@ export default function PublicDashboard() {
             {/* Quick Links */}
             <div className="flex flex-wrap justify-center gap-2 mt-4">
               <Button variant="outline" size="sm" asChild>
+                <Link to="/reality-index" className="gap-2">
+                  📊 Reality Index
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
                 <Link to="/regional" className="gap-2">
                   <BarChart3 className="h-4 w-4" />
                   Jämför län
                 </Link>
               </Button>
               <Button variant="outline" size="sm" asChild>
+                <Link to="/cities" className="gap-2">
+                  🏙️ Städer
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
                 <Link to="/decisions" className="gap-2">
                   <Calendar className="h-4 w-4" />
                   Beslutstidslinje
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/replay" className="gap-2">
+                  📜 Historisk replay
                 </Link>
               </Button>
               <Button variant="outline" size="sm" asChild>
@@ -640,6 +655,11 @@ export default function PublicDashboard() {
               <Button variant="outline" size="sm" asChild>
                 <Link to="/gmi" className="gap-2">
                   🌍 Global Master Index
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/cite" className="gap-2">
+                  🤖 AI Citation API
                 </Link>
               </Button>
               <Button variant="outline" size="sm" asChild>

@@ -62,7 +62,10 @@ import RealityCheckDemo from "./pages/RealityCheckDemo";
 import OnboardingPage from "./pages/OnboardingPage";
 import SpotlessPage from "./pages/SpotlessPage";
 import PrioritizedPage from "./pages/PrioritizedPage";
-
+import RealityIndex from "./pages/RealityIndex";
+import CityNodes from "./pages/CityNodes";
+import CitationAPI from "./pages/CitationAPI";
+import HistoricalReplay from "./pages/HistoricalReplay";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -127,6 +130,10 @@ const App = () => (
               <Route path="/onboarding" element={<OnboardingPage />} />
               <Route path="/spotless" element={<SpotlessPage />} />
               <Route path="/prioritized" element={<PrioritizedPage />} />
+              <Route path="/reality-index" element={<RealityIndex />} />
+              <Route path="/cities" element={<CityNodes />} />
+              <Route path="/cite" element={<CitationAPI />} />
+              <Route path="/replay" element={<HistoricalReplay />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
