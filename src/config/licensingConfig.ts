@@ -1,17 +1,15 @@
 /**
- * API-POLICY & LICENSSTRATEGI
+ * API POLICY & LICENSING FRAMEWORK
  * 
- * "Öppen verklighet. Betald förståelse."
- * 
- * All data är öppen att se. All intelligens är möjlig att köpa.
+ * Enterprise data licensing architecture with transparent access tiers.
+ * Open data visibility. Licensed intelligence.
  */
 
-// Licensnivåer
+// License tier definitions
 export type LicenseTier = 'open' | 'plus' | 'pro' | 'enterprise';
 
 export const licenseTiers: Record<LicenseTier, {
   name: string;
-  icon: string;
   color: string;
   description: string;
   price: string;
@@ -35,16 +33,15 @@ export const licenseTiers: Record<LicenseTier, {
   typicalUsers: string[];
 }> = {
   open: {
-    name: 'Open License',
-    icon: '🟢',
+    name: 'Open Access',
     color: 'text-green-500',
-    description: 'Gratis för icke-kommersiell användning',
-    price: 'Gratis',
+    description: 'Non-commercial access to all public data',
+    price: 'Free',
     features: [
-      'Läsning av alla öppna data',
-      'Delning med attribution',
-      'Media-citering',
-      'Utbildningssyfte',
+      'Full read access to aggregated public data',
+      'Data sharing with mandatory attribution',
+      'Media and journalistic use',
+      'Educational and research purposes',
     ],
     limits: {
       ratePerMinute: 30,
@@ -62,21 +59,20 @@ export const licenseTiers: Record<LicenseTier, {
       customIntegration: false,
       sla: false,
     },
-    typicalUsers: ['Allmänhet', 'Skolor', 'Studenter', 'Journalister'],
+    typicalUsers: ['General public', 'Educational institutions', 'Researchers', 'Journalists'],
   },
   plus: {
     name: 'Commercial License',
-    icon: '🔵',
     color: 'text-blue-500',
-    description: 'För kommersiell användning och publicering',
-    price: 'Från 4 900 kr/mån',
+    description: 'Commercial use and third-party publication rights',
+    price: 'From SEK 4,900/month',
     features: [
-      'Allt i Open',
-      'Kommersiell användning',
-      'Publicering i egna produkter',
-      'Analys & rapporter',
-      'Regional data (NUTS 2)',
-      'Grundläggande korrelationer',
+      'All Open Access features',
+      'Commercial use authorization',
+      'Third-party publication rights',
+      'Analytics and reporting applications',
+      'Regional data access (NUTS 2)',
+      'Basic correlation analysis',
     ],
     limits: {
       ratePerMinute: 120,
@@ -94,23 +90,22 @@ export const licenseTiers: Record<LicenseTier, {
       customIntegration: false,
       sla: false,
     },
-    typicalUsers: ['Mediahus', 'Konsultbolag', 'Analysföretag', 'Nyhetsredaktioner'],
+    typicalUsers: ['Media organizations', 'Consulting firms', 'Analytics providers', 'News agencies'],
   },
   pro: {
     name: 'Intelligence License',
-    icon: '🟣',
     color: 'text-purple-500',
-    description: 'Full integration och premium-intelligens',
-    price: 'Från 14 900 kr/mån',
+    description: 'Full integration capabilities and premium analytics',
+    price: 'From SEK 14,900/month',
     features: [
-      'Allt i Plus',
-      'White-label tillåten',
-      'Interna beslutsstöd',
-      'Automatiska feeds',
-      'Bulk & streaming',
-      'Finmaskig data (NUTS 3)',
-      'Avancerade korrelationer',
-      'Relevansscore',
+      'All Commercial License features',
+      'White-label deployment authorization',
+      'Internal decision support systems',
+      'Automated data feeds',
+      'Bulk export and streaming access',
+      'Granular data (NUTS 3)',
+      'Advanced correlation engine',
+      'Relevance scoring algorithms',
     ],
     limits: {
       ratePerMinute: 600,
@@ -128,22 +123,21 @@ export const licenseTiers: Record<LicenseTier, {
       customIntegration: true,
       sla: true,
     },
-    typicalUsers: ['Myndigheter', 'Regioner', 'Stora företag', 'Banker'],
+    typicalUsers: ['Government agencies', 'Regional authorities', 'Large enterprises', 'Financial institutions'],
   },
   enterprise: {
-    name: 'Enterprise License',
-    icon: '🏢',
+    name: 'Enterprise Agreement',
     color: 'text-amber-500',
-    description: 'Anpassad för stora organisationer',
-    price: 'Kontakta oss',
+    description: 'Customized solutions for large-scale deployments',
+    price: 'Contact sales',
     features: [
-      'Allt i Pro',
-      'Anpassade SLA',
-      'Dedikerad support',
-      'Juridiska tillägg per land',
-      'On-premise option',
-      'Anpassade feeds',
-      'Prioriterad utveckling',
+      'All Intelligence License features',
+      'Custom service level agreements',
+      'Dedicated technical support',
+      'Jurisdiction-specific legal addenda',
+      'On-premise deployment option',
+      'Custom data feed configuration',
+      'Priority feature development',
     ],
     limits: {
       ratePerMinute: 3000,
@@ -161,219 +155,215 @@ export const licenseTiers: Record<LicenseTier, {
       customIntegration: true,
       sla: true,
     },
-    typicalUsers: ['Regeringar', 'Internationella organisationer', 'Storföretag'],
+    typicalUsers: ['National governments', 'International organizations', 'Global enterprises'],
   },
 };
 
-// Juridiska skyddsklausuler (globalt giltiga)
+// Legal disclaimer framework (globally applicable)
 export const legalDisclaimers = {
   noAdvice: {
     id: 'no_advice',
-    title: 'Ingen rådgivning',
-    shortText: 'Information, inte rådgivning',
-    fullText: `Tjänsten tillhandahåller systemgenererade indikationer baserade på öppna data. 
-Informationen utgör inte rådgivning, rekommendationer eller beslut. 
-Användaren bör alltid konsultera relevanta experter innan beslut fattas.`,
+    title: 'Informational Purpose Only',
+    shortText: 'Observation, not recommendation',
+    fullText: `This platform provides system-generated indicators derived from publicly available data sources. 
+The information presented constitutes observation and aggregation, not advice, recommendations, or decision-making guidance. 
+Users should consult qualified professionals before taking action based on presented information.`,
   },
   noCausality: {
     id: 'no_causality',
-    title: 'Ingen kausalitet',
-    shortText: 'Korrelation ≠ orsak',
-    fullText: `Visade samband indikerar samvariation över tid. 
-Kausalitet fastställs inte av systemet. 
-Statistiska mönster bör tolkas med försiktighet och i sitt sammanhang.`,
+    title: 'Correlation Disclaimer',
+    shortText: 'Correlation does not establish causation',
+    fullText: `Displayed relationships indicate statistical covariation over time. 
+Causal relationships are not established, implied, or verified by this system. 
+Statistical patterns require contextual interpretation and professional analysis.`,
   },
   liabilityLimit: {
     id: 'liability_limit',
-    title: 'Ansvarsbegränsning',
-    shortText: 'Användaren ansvarar för beslut',
-    fullText: `Användaren ansvarar själv för hur informationen används i beslutsfattande. 
-Plattformen ansvarar inte för konsekvenser av beslut baserade på presenterad information.`,
+    title: 'Limitation of Liability',
+    shortText: 'User assumes decision responsibility',
+    fullText: `Users bear sole responsibility for decisions made using platform information. 
+The platform operator accepts no liability for consequences arising from user decisions based on presented data or analysis.`,
   },
   dataQuality: {
     id: 'data_quality',
-    title: 'Datakvalitet',
-    shortText: 'Aggregering, inte källdata',
-    fullText: `Plattformen ansvarar för aggregering, normalisering och presentation. 
-Ansvar för underliggande källdata ligger hos respektive datakälla. 
-All data visas med angivna osäkerhetsnivåer och senaste uppdateringstid.`,
+    title: 'Data Quality Framework',
+    shortText: 'Aggregation responsibility only',
+    fullText: `The platform is responsible for aggregation, normalization, and presentation processes. 
+Underlying source data quality remains the responsibility of respective data providers. 
+All data points include uncertainty indicators and timestamp documentation.`,
   },
 };
 
-// Datakategorier (strikt åtskilda)
+// Data category definitions (strict separation)
 export const dataCategories = {
   openSource: {
-    name: 'Öppen källdata',
-    description: 'Data från myndigheter, statistikbyråer, internationella organisationer',
-    ownership: 'Ej ägt av plattformen',
+    name: 'Public Source Data',
+    description: 'Data originating from government agencies, statistical offices, and international organizations',
+    ownership: 'Not owned by platform',
     policy: [
-      'Alltid attribution',
-      'Länk till ursprung',
-      'Licenser respekteras',
-      'Inga ändringar i rådata',
+      'Mandatory source attribution',
+      'Direct links to original sources',
+      'License compliance verification',
+      'No modification of raw data',
     ],
-    examples: ['SCB', 'Eurostat', 'WHO', 'Världsbanken', 'Wikipedia (CC BY-SA)'],
+    examples: ['Statistics Sweden (SCB)', 'Eurostat', 'WHO', 'World Bank', 'OECD'],
   },
   systemGenerated: {
-    name: 'Systemgenererad data',
-    description: 'Bearbetning, aggregering och intelligens producerad av plattformen',
-    ownership: 'Ägt av plattformen',
+    name: 'Platform-Generated Intelligence',
+    description: 'Processed data, aggregations, and analytical outputs produced by platform algorithms',
+    ownership: 'Platform intellectual property',
     policy: [
-      'Licensieras kommersiellt',
-      'Kan återanvändas enligt villkor',
-      'White-label tillåten i Pro/Enterprise',
+      'Commercial licensing applies',
+      'Reuse permitted per license terms',
+      'White-label rights in Pro/Enterprise tiers',
     ],
     examples: [
-      'Normaliseringar',
-      'Aggregeringar',
-      'Index',
-      'Relevansscore',
-      'Kluster',
-      'Korrelationer',
-      'Indikationer',
-      'Feeds',
+      'Normalizations',
+      'Aggregations',
+      'Composite indices',
+      'Relevance scores',
+      'Cluster analysis',
+      'Correlation outputs',
+      'Signal indicators',
+      'Automated feeds',
     ],
   },
 };
 
-// Attribution-krav
+// Attribution requirements
 export const attributionConfig = {
   required: {
-    template: 'Data och analyser tillhandahålls av {{platform}}. {{source_url}}',
-    shortTemplate: 'Källa: {{platform}}',
-    placement: 'Synlig i anslutning till presenterad data',
+    template: 'Data and analytics provided by {{platform}}. {{source_url}}',
+    shortTemplate: 'Source: {{platform}}',
+    placement: 'Visible adjacent to presented data',
   },
   recommended: {
-    template: 'Baserat på data från {{platform}}',
+    template: 'Based on data from {{platform}}',
     shortTemplate: '{{platform}}',
-    placement: 'Footer eller datakälla-sektion',
+    placement: 'Footer or data source section',
   },
   optional: {
     template: null,
     shortTemplate: null,
-    placement: 'Valfritt',
+    placement: 'At user discretion',
   },
 };
 
-// Anti-misuse policy
+// Anti-misuse policy framework
 export const antiMisusePolicy = {
   prohibited: [
-    'Mass-replikering av databas',
-    'Skrapning för konkurrerande tjänst',
-    'Försök att återskapa rådata från aggregeringar',
-    'Missbruk som bryter privacy-spärrar',
-    'Vidareförsäljning utan licens',
-    'Automatiserad replikering av feeds',
+    'Mass database replication',
+    'Scraping for competing services',
+    'Reverse engineering of aggregated data',
+    'Privacy protection circumvention',
+    'Unlicensed resale or redistribution',
+    'Automated feed replication',
   ],
   technicalProtections: [
-    'Rate-limits per API-nyckel',
-    'Query-complexity caps',
-    'Audit logs på all användning',
-    'Automatisk avstängning vid brott',
-    'IP-baserad throttling',
-    'Pattern detection för skrapning',
+    'Rate limiting per API key',
+    'Query complexity thresholds',
+    'Complete usage audit logging',
+    'Automated violation detection',
+    'IP-based throttling',
+    'Scraping pattern detection',
   ],
   violationActions: {
-    warning: 'Första överträdelse - varning via e-post',
-    temporaryBlock: 'Upprepade överträdelser - tillfällig avstängning (24-72h)',
-    permanentBlock: 'Allvarliga överträdelser - permanent avstängning',
+    warning: 'Initial violation: email notification',
+    temporaryBlock: 'Repeated violations: temporary suspension (24-72 hours)',
+    permanentBlock: 'Severe violations: permanent access revocation',
   },
 };
 
-// Jurisdiktionsspecifika tillägg
+// Jurisdiction-specific addenda
 export const jurisdictionAdditions = {
   EU: {
-    name: 'EU/EES',
-    notes: 'GDPR säkrat via aggregering och anonymisering',
+    name: 'European Union / EEA',
+    notes: 'GDPR compliance through aggregation and anonymization',
     additionalTerms: [
-      'Databehandlingsavtal (DPA) tillgängligt',
-      'Servrar inom EU',
-      'Privacy by design',
+      'Data Processing Agreement (DPA) available',
+      'EU-based server infrastructure',
+      'Privacy by design implementation',
     ],
   },
   US: {
-    name: 'USA',
-    notes: 'Liability disclaimers förstärkta',
+    name: 'United States',
+    notes: 'Enhanced liability disclaimers',
     additionalTerms: [
       'No warranty disclaimer',
-      'Limitation of liability',
-      'Choice of law clause',
+      'Limitation of liability clause',
+      'Choice of law provision',
     ],
   },
   PUBLIC_SECTOR: {
-    name: 'Offentlig sektor',
-    notes: 'Upphandlingsbilagor tillgängliga',
+    name: 'Public Sector',
+    notes: 'Procurement-compliant documentation available',
     additionalTerms: [
-      'LOU-kompatibla villkor',
-      'Standardavtal för IT-tjänster',
-      'Möjlighet till ramavtal',
+      'Public procurement compatible terms',
+      'Standard IT service agreements',
+      'Framework agreement eligibility',
     ],
   },
 };
 
-// Prissättningslogik
+// Pricing logic transparency
 export const pricingLogic = {
   basedOn: [
-    'Djup (NUTS-nivå)',
-    'Frekvens (realtid vs daglig)',
-    'Ansvarsnära signaler (feeds)',
-    'SLA-nivå',
+    'Geographic granularity (NUTS level)',
+    'Update frequency (real-time versus daily)',
+    'Decision-proximity signals (automated feeds)',
+    'Service level agreement tier',
   ],
   notBasedOn: [
-    'Antal datapunkter',
-    'Antal förfrågningar (inom rimligt tak)',
-    'Antal användare (inom organisation)',
+    'Number of data points accessed',
+    'Request volume (within reasonable limits)',
+    'Number of users (within organization)',
   ],
 };
 
 // Platform identity
 export const platformIdentity = {
-  name: 'NOGF',
-  tagline: 'Öppen verklighet. Betald förståelse.',
-  mission: 'Infrastruktur för hur samhällen mäts och förstås.',
+  name: 'STRIM',
+  tagline: 'Open observation. Licensed intelligence.',
+  mission: 'Infrastructure for measuring and understanding societal conditions.',
   principles: [
-    'All data är öppen att se',
-    'All intelligens är möjlig att köpa',
-    'Metoder är transparenta',
-    'Vikter är synliga',
-    'Versioner är spårbara',
-    'Historik är oföränderlig',
+    'All data remains visible to all users',
+    'All processed intelligence is available for licensing',
+    'All methodologies are documented and transparent',
+    'All weights are visible and auditable',
+    'All versions are tracked and traceable',
+    'All historical data is immutable',
   ],
 };
 
-// ============================================================
-// WAVE 12: BLOCK CU — ECONOMIC SUSTAINABILITY
-// BLOCK CV — LEGAL & IMMUNITY HARDENING
-// ============================================================
-
+// Economic sustainability framework
 export interface RevenueStream {
   id: string;
-  name_sv: string;
+  name: string;
   type: 'usage' | 'subscription' | 'enterprise' | 'value_add';
-  gates_public_data: false; // Never gates public data
+  gates_public_data: false; // Public data access is never gated
   target_segment: string;
 }
 
 export const REVENUE_STREAMS: RevenueStream[] = [
-  { id: 'rs_api_volume', name_sv: 'API-anrop (volym)', type: 'usage', gates_public_data: false, target_segment: 'Developers' },
-  { id: 'rs_automation', name_sv: 'Automation & feeds', type: 'subscription', gates_public_data: false, target_segment: 'Newsrooms' },
-  { id: 'rs_whitelabel', name_sv: 'White-label', type: 'value_add', gates_public_data: false, target_segment: 'Organizations' },
-  { id: 'rs_enterprise_sla', name_sv: 'Enterprise SLA', type: 'enterprise', gates_public_data: false, target_segment: 'Governments' }
+  { id: 'rs_api_volume', name: 'API Request Volume', type: 'usage', gates_public_data: false, target_segment: 'Developers' },
+  { id: 'rs_automation', name: 'Automation & Feed Services', type: 'subscription', gates_public_data: false, target_segment: 'Media organizations' },
+  { id: 'rs_whitelabel', name: 'White-Label Deployment', type: 'value_add', gates_public_data: false, target_segment: 'Enterprise clients' },
+  { id: 'rs_enterprise_sla', name: 'Enterprise SLA', type: 'enterprise', gates_public_data: false, target_segment: 'Government agencies' }
 ];
 
-// CV1: Legal Core Clauses — Immunity Hardening
+// Legal core clauses for immunity hardening
 export interface LegalClause {
   id: string;
-  name_sv: string;
+  name: string;
   principle: string;
   implementation: string;
 }
 
 export const LEGAL_CORE_CLAUSES: LegalClause[] = [
-  { id: 'lc_non_ownership', name_sv: 'Non-ownership av data', principle: 'Systemet äger aldrig data som passerar genom det', implementation: 'All data behåller ursprunglig licens' },
-  { id: 'lc_attribution', name_sv: 'Attribution by design', principle: 'Alla datapunkter kräver källhänvisning', implementation: 'Data utan källa visas inte' },
-  { id: 'lc_no_advisory', name_sv: 'No advisory', principle: 'Systemet ger aldrig råd eller rekommendationer', implementation: 'All output märkt som observation' },
-  { id: 'lc_jurisdiction_neutral', name_sv: 'Jurisdiction-neutral API', principle: 'API fungerar oavsett lokal lagstiftning', implementation: 'Ingen data kräver specifik jurisdiktion' }
+  { id: 'lc_non_ownership', name: 'Data Non-Ownership', principle: 'The system never claims ownership of data passing through it', implementation: 'All data retains original source license' },
+  { id: 'lc_attribution', name: 'Attribution by Design', principle: 'All data points require source attribution', implementation: 'Data without verified source is not displayed' },
+  { id: 'lc_no_advisory', name: 'Non-Advisory Declaration', principle: 'The system never provides advice or recommendations', implementation: 'All output labeled as observation' },
+  { id: 'lc_jurisdiction_neutral', name: 'Jurisdiction-Neutral API', principle: 'API functions independently of local legislation', implementation: 'No data requires specific jurisdictional compliance' }
 ];
 
-export const LEGAL_CORE_STATEMENT = 'Systemet pekar. Användaren tolkar.' as const;
+export const LEGAL_CORE_STATEMENT = 'The system observes. The user interprets.' as const;

@@ -49,8 +49,10 @@ export function LicenseTierCard({ tier, isCurrentTier, onSelect, compact = false
       )}
       
       <CardHeader>
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">{config.icon}</span>
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-lg ${config.color.replace('text-', 'bg-').replace('-500', '-500/20')}`}>
+            <TierIcon className={`h-5 w-5 ${config.color}`} />
+          </div>
           <div>
             <CardTitle className="text-lg">{config.name}</CardTitle>
             <CardDescription>{config.description}</CardDescription>

@@ -1,14 +1,8 @@
 /**
- * BLOCK 19: SEO & INDEXING – SEN, MEN RÄTT
+ * SEO & INDEXING CONFIGURATION
  * 
- * "Indexering sist. Integritet först."
- * 
- * Förbered nu:
- * - Canonical URLs
- * - Stable slugs
- * - Structured data (schema.org)
- * - OpenGraph korrekt
- * - Noindex på WIP
+ * Enterprise-grade search engine optimization for global data intelligence platform.
+ * Structured data, canonical URLs, and comprehensive metadata.
  */
 
 export interface SeoConfig {
@@ -20,17 +14,28 @@ export interface SeoConfig {
   ogImage?: string;
   twitterCard?: 'summary' | 'summary_large_image';
   structuredData?: object;
+  keywords?: string[];
 }
 
-// Default SEO values
+// Default SEO values - optimized for enterprise search
 export const DEFAULT_SEO: SeoConfig = {
-  title: 'NOGF – Nationellt Operativt Guidande Faktasystem',
-  description: 'Öppen verklighet. Betald förståelse. En global infrastruktur för hur samhällen mäts och förstås.',
+  title: 'STRIM – Global Data Intelligence Platform | Real-Time Societal Analytics',
+  description: 'Enterprise data intelligence platform providing real-time societal analytics, transparent methodologies, and actionable insights from verified public sources across 195 countries.',
   ogType: 'website',
   twitterCard: 'summary_large_image',
+  keywords: [
+    'data intelligence',
+    'societal analytics',
+    'real-time data',
+    'public data aggregation',
+    'global statistics',
+    'policy analytics',
+    'enterprise data platform',
+    'transparent methodology'
+  ],
 };
 
-// Pages that should NOT be indexed (WIP, internal, etc.)
+// Pages that should NOT be indexed (internal, development, etc.)
 export const NOINDEX_ROUTES: string[] = [
   '/admin',
   '/admin/*',
@@ -41,69 +46,109 @@ export const NOINDEX_ROUTES: string[] = [
   '/internal/*',
 ];
 
-// Route-specific SEO configs
+// Route-specific SEO configs - enterprise language, keyword-rich
 export const ROUTE_SEO: Record<string, SeoConfig> = {
   '/': {
-    title: 'NOGF – Global Reality Dashboard',
-    description: 'Se världen som den är. Data från officiella källor, aggregerad och förklarad.',
+    title: 'STRIM – Global Societal Data Intelligence | Enterprise Analytics Platform',
+    description: 'Access verified data from 195 countries. Real-time societal indicators, transparent aggregation methods, and enterprise-grade analytics for informed decision-making.',
     ogType: 'website',
+    keywords: ['global data', 'societal indicators', 'enterprise analytics', 'data aggregation'],
   },
   '/reality': {
-    title: 'Global Reality Index (GRI) – NOGF',
-    description: 'Hur mår världen just nu? Sex pelare, realtidsdata, full transparens.',
+    title: 'Global Reality Index | Composite Societal Measurement Framework',
+    description: 'Comprehensive baseline index measuring societal conditions across five fundamental domains: health, livelihood, knowledge, stability, and sustainability. Fully decomposable methodology.',
     ogType: 'website',
+    keywords: ['reality index', 'composite index', 'societal measurement', 'global baseline'],
   },
   '/sweden': {
-    title: 'Sverige Dashboard – NOGF',
-    description: 'Sveriges nyckelindikatorer: ekonomi, demografi, hälsa, energi. Uppdateras dagligen.',
+    title: 'Sweden Data Dashboard | National Indicator Analytics',
+    description: 'Real-time Swedish national indicators: economic performance, demographic trends, public health metrics, and energy statistics. Daily updates from official sources.',
     ogType: 'website',
+    keywords: ['Sweden data', 'Swedish statistics', 'national indicators', 'SCB data'],
   },
   '/eu': {
-    title: 'EU Dashboard – NOGF',
-    description: 'EU27 och NUTS-regioner. Jämför länder, se trender, förstå skillnader.',
+    title: 'European Union Data Dashboard | EU27 Regional Analytics',
+    description: 'EU27 and NUTS-classified regional data. Cross-country comparisons, temporal trend analysis, and Eurostat-harmonized statistical coverage.',
     ogType: 'website',
+    keywords: ['EU data', 'Eurostat', 'NUTS regions', 'European statistics', 'EU27'],
   },
   '/map': {
-    title: 'Global Karta – NOGF',
-    description: 'Choropleth-kartor för alla indikatorer. Klicka för tidsserie och korrelation.',
+    title: 'Global Data Visualization | Interactive Choropleth Maps',
+    description: 'Interactive geographic visualization of global indicators. Choropleth maps with temporal drill-down, correlation analysis, and export capabilities.',
     ogType: 'website',
+    keywords: ['data visualization', 'choropleth map', 'global map', 'geographic data'],
   },
   '/correlation': {
-    title: 'Korrelationsanalys – NOGF',
-    description: 'Analysera samband mellan indikatorer. Transparenta metoder, tydliga varningar.',
+    title: 'Correlation Analysis Engine | Statistical Pattern Detection',
+    description: 'Advanced correlation analysis with transparent methodology, confidence intervals, and stability testing. Clear distinction between correlation and causation.',
     ogType: 'website',
+    keywords: ['correlation analysis', 'statistical patterns', 'data correlation', 'covariation'],
   },
   '/indices': {
-    title: 'Index Engine – NOGF',
-    description: 'Alla systemindex: GRI, HWI, Resilience, Fairness, Institutional, Energy.',
+    title: 'Composite Index Library | Decomposable Analytics Framework',
+    description: 'Complete library of composite indices: Reality Index, Resilience Capacity, Intergenerational Fairness, and Institutional Stability. Every weight visible, every calculation traceable.',
     ogType: 'website',
+    keywords: ['composite index', 'data indices', 'analytics framework', 'index methodology'],
   },
   '/profiles': {
-    title: 'Politikerprofiler – NOGF',
-    description: 'Ansvarsspårning utan anklagelse. Se vem som var ansvarig när.',
+    title: 'Accountability Mapping | Decision Timeline Documentation',
+    description: 'Systematic documentation of decision-maker responsibilities and outcome correlations. Temporal alignment without attribution claims.',
     ogType: 'website',
+    keywords: ['accountability', 'decision tracking', 'responsibility mapping', 'governance'],
   },
   '/api-licensing': {
-    title: 'API & Licensing – NOGF',
-    description: 'Developer portal, API-dokumentation, prissättning. REST + GraphQL.',
+    title: 'API Access & Licensing | Enterprise Data Integration',
+    description: 'RESTful and GraphQL APIs for enterprise integration. Tiered licensing from open access to white-label solutions. Complete documentation and SLA options.',
     ogType: 'website',
+    keywords: ['API', 'data API', 'enterprise integration', 'data licensing', 'REST API'],
   },
   '/about': {
-    title: 'Om NOGF – Metodik & Transparens',
-    description: 'Hur systemet fungerar. Metoder, källor, vikter, begränsningar.',
+    title: 'Methodology & Governance | Platform Documentation',
+    description: 'Complete methodological documentation: data sources, aggregation procedures, weighting rationale, and limitation disclosures. Full transparency by design.',
     ogType: 'website',
+    keywords: ['methodology', 'data governance', 'transparency', 'documentation'],
+  },
+  '/demography': {
+    title: 'Demographic Correlation Engine | Societal Covariation Analysis',
+    description: 'Rigorous analysis of demographic indicators and societal outcomes. Extended historical data from 1800, transparent control variables, mandatory causation disclaimers.',
+    ogType: 'website',
+    keywords: ['demographic analysis', 'societal correlation', 'population data', 'migration statistics'],
+  },
+  '/capacity': {
+    title: 'Global Carrying Capacity Analysis | Resource Sustainability Metrics',
+    description: 'Systematic assessment of resource capacity, population sustainability, and long-term viability indicators across geographic regions.',
+    ogType: 'website',
+    keywords: ['carrying capacity', 'sustainability', 'resource analysis', 'viability metrics'],
+  },
+  '/fairness': {
+    title: 'Intergenerational Fairness Index | Long-Term Equity Measurement',
+    description: 'Quantified assessment of resource allocation equity across generations. Environmental debt, pension sustainability, and infrastructure investment analysis.',
+    ogType: 'website',
+    keywords: ['intergenerational fairness', 'equity measurement', 'generational analysis'],
+  },
+  '/resilience': {
+    title: 'Resilience Capacity Dashboard | Systemic Stability Assessment',
+    description: 'Multi-domain resilience measurement: institutional capacity, supply chain robustness, financial buffers, and adaptive capability indicators.',
+    ogType: 'website',
+    keywords: ['resilience', 'systemic stability', 'risk assessment', 'capacity analysis'],
   },
 };
 
-// Structured data templates (Schema.org)
+// Structured data templates (Schema.org) - enterprise-grade
 export const STRUCTURED_DATA = {
   organization: {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'NOGF',
-    url: 'https://nogf.se',
-    description: 'Nationellt Operativt Guidande Faktasystem',
+    name: 'STRIM',
+    url: 'https://strim.se',
+    description: 'Global data intelligence platform for societal analytics',
+    foundingDate: '2024',
     sameAs: [],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'enterprise sales',
+      availableLanguage: ['Swedish', 'English'],
+    },
   },
   
   dataset: (name: string, description: string, dateModified: string) => ({
@@ -112,24 +157,58 @@ export const STRUCTURED_DATA = {
     name,
     description,
     dateModified,
-    license: 'https://nogf.se/license',
+    license: 'https://strim.se/license',
     creator: {
       '@type': 'Organization',
-      name: 'NOGF',
+      name: 'STRIM',
+      url: 'https://strim.se',
+    },
+    distribution: {
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      contentUrl: 'https://api.strim.se/v1/',
     },
   }),
   
   webApplication: {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'NOGF',
-    applicationCategory: 'DataVisualization',
+    name: 'STRIM Data Intelligence Platform',
+    applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
+    applicationSubCategory: 'Data Analytics',
+    offers: [
+      {
+        '@type': 'Offer',
+        name: 'Open Access',
+        price: '0',
+        priceCurrency: 'SEK',
+        description: 'Full data visibility with attribution requirement',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Enterprise',
+        price: '14900',
+        priceCurrency: 'SEK',
+        priceSpecification: {
+          '@type': 'UnitPriceSpecification',
+          billingDuration: 'P1M',
+        },
+        description: 'Full API access, white-label rights, SLA',
+      },
+    ],
+  },
+
+  softwareApplication: {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'STRIM API',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'All',
     offers: {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'SEK',
-      description: 'Free tier with full data visibility',
     },
   },
 };
@@ -145,7 +224,7 @@ export const OG_IMAGE_CONFIG = {
 
 // Canonical URL generator
 export function getCanonicalUrl(path: string): string {
-  const baseUrl = 'https://nogf.se';
+  const baseUrl = 'https://strim.se';
   // Remove trailing slashes and query params
   const cleanPath = path.split('?')[0].replace(/\/+$/, '');
   return `${baseUrl}${cleanPath || '/'}`;
@@ -175,7 +254,7 @@ export function getSeoConfig(path: string): SeoConfig {
   };
 }
 
-// Generate meta tags
+// Generate meta tags - complete set for enterprise SEO
 export function generateMetaTags(config: SeoConfig): Record<string, string> {
   const tags: Record<string, string> = {
     title: config.title,
@@ -188,18 +267,26 @@ export function generateMetaTags(config: SeoConfig): Record<string, string> {
   
   if (config.noindex) {
     tags['robots'] = 'noindex, nofollow';
+  } else {
+    tags['robots'] = 'index, follow, max-snippet:-1, max-image-preview:large';
+  }
+  
+  // Keywords (still used by some engines)
+  if (config.keywords) {
+    tags['keywords'] = config.keywords.join(', ');
   }
   
   // OpenGraph
   tags['og:title'] = config.title;
   tags['og:description'] = config.description;
   tags['og:type'] = config.ogType || 'website';
+  tags['og:site_name'] = 'STRIM';
   if (config.ogImage) {
     tags['og:image'] = config.ogImage;
   }
   
   // Twitter
-  tags['twitter:card'] = config.twitterCard || 'summary';
+  tags['twitter:card'] = config.twitterCard || 'summary_large_image';
   tags['twitter:title'] = config.title;
   tags['twitter:description'] = config.description;
   

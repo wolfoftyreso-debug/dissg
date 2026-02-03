@@ -143,9 +143,9 @@ export const SocietalCorrelationEngine: React.FC = () => {
     <div className="space-y-6 p-4 max-w-6xl mx-auto">
       {/* Header */}
       <div className="text-center space-y-3">
-        <h1 className="text-2xl font-bold">Demografi & Samhällsutfall</h1>
+        <h1 className="text-2xl font-bold">Demographic Correlation Analysis</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Utforska hur demografiska förändringar samvarierar med samhällsutfall över tid
+          Statistical covariation analysis between demographic indicators and societal outcomes over extended time periods
         </p>
       </div>
 
@@ -160,8 +160,8 @@ export const SocietalCorrelationEngine: React.FC = () => {
       {/* Selection Panel */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Välj indikatorer</CardTitle>
-          <CardDescription>3-4 klick för att se samvariation</CardDescription>
+          <CardTitle className="text-lg">Indicator Selection</CardTitle>
+          <CardDescription>Configure analysis parameters in 3-4 steps</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -169,7 +169,7 @@ export const SocietalCorrelationEngine: React.FC = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                Demografisk indikator
+                Demographic Indicator
               </label>
               <Select value={demographicIndicator} onValueChange={setDemographicIndicator}>
                 <SelectTrigger>
@@ -192,7 +192,7 @@ export const SocietalCorrelationEngine: React.FC = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <Building className="h-4 w-4" />
-                Samhällsutfall
+                Societal Outcome Metric
               </label>
               <Select value={societalOutcome} onValueChange={setSocietalOutcome}>
                 <SelectTrigger>
@@ -217,7 +217,7 @@ export const SocietalCorrelationEngine: React.FC = () => {
           <div className="grid gap-4 md:grid-cols-2">
             {/* Time Period */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Tidsperiod</label>
+              <label className="text-sm font-medium">Analysis Period</label>
               <Select value={timePeriod} onValueChange={(v) => setTimePeriod(v as TimePeriod)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -240,7 +240,7 @@ export const SocietalCorrelationEngine: React.FC = () => {
 
             {/* Geographic Level */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Geografisk nivå</label>
+              <label className="text-sm font-medium">Geographic Granularity</label>
               <Select value={geoLevel} onValueChange={(v) => setGeoLevel(v as GeoLevel)}>
                 <SelectTrigger>
                   <SelectValue />

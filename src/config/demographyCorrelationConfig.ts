@@ -1,6 +1,9 @@
-// Demography & Societal Correlation Engine (DSCE)
-// "Visa hur demografiska förändringar samvarierar med samhällsutfall – korrekt och begripligt."
-// Detta är en av de mest känsliga modulerna → därför måste den vara den mest rigorösa.
+/**
+ * Demographic Correlation Analysis Configuration
+ * 
+ * Statistical covariation framework for demographic and societal indicators.
+ * High-sensitivity module requiring rigorous epistemic controls.
+ */
 
 // === 1. DEMOGRAPHIC INDICATORS ===
 
@@ -16,55 +19,55 @@ export interface DemographicIndicator {
 export const DEMOGRAPHIC_INDICATORS: DemographicIndicator[] = [
   {
     id: 'total_immigration',
-    name: 'Total immigration per year',
+    name: 'Annual Immigration Volume',
     nameSv: 'Total invandring per år',
-    description: 'Antal personer som invandrat under ett år',
-    unit: 'personer',
+    description: 'Total number of persons immigrating during calendar year',
+    unit: 'persons',
     category: 'flow'
   },
   {
     id: 'net_migration',
-    name: 'Net migration',
+    name: 'Net Migration Balance',
     nameSv: 'Nettoinvandring',
-    description: 'Invandring minus utvandring',
-    unit: 'personer',
+    description: 'Immigration minus emigration (net population change from migration)',
+    unit: 'persons',
     category: 'flow'
   },
   {
     id: 'foreign_born_share',
-    name: 'Share born abroad',
+    name: 'Foreign-Born Population Share',
     nameSv: 'Andel utrikes födda',
-    description: 'Andel av befolkningen som är födda utanför landet',
+    description: 'Percentage of population born outside the jurisdiction',
     unit: '%',
     category: 'stock'
   },
   {
     id: 'immigration_per_1000',
-    name: 'Immigration per 1,000 inhabitants',
+    name: 'Immigration Rate per 1,000',
     nameSv: 'Invandring per 1 000 invånare',
-    description: 'Årlig invandring i förhållande till befolkningsstorlek',
-    unit: 'per 1 000',
+    description: 'Annual immigration relative to total population',
+    unit: 'per 1,000',
     category: 'flow'
   },
   {
     id: 'age_distribution',
-    name: 'Age distribution',
+    name: 'Population Age Structure',
     nameSv: 'Åldersfördelning',
-    description: 'Fördelning av åldersgrupper i befolkningen',
+    description: 'Distribution of age cohorts in the population',
     unit: '%',
     category: 'structure'
   },
   {
     id: 'time_in_country',
-    name: 'Time in country (cohorts)',
+    name: 'Residence Duration Cohorts',
     nameSv: 'Tid i landet (kohorter)',
-    description: 'Fördelning baserat på ankomsttid',
-    unit: 'år',
+    description: 'Distribution based on arrival year cohorts',
+    unit: 'years',
     category: 'structure'
   }
 ];
 
-// === 2. SOCIETAL OUTCOMES ===
+// === 2. SOCIETAL OUTCOME METRICS ===
 
 export interface SocietalOutcome {
   id: string;
@@ -79,75 +82,75 @@ export interface SocietalOutcome {
 export const SOCIETAL_OUTCOMES: SocietalOutcome[] = [
   {
     id: 'violent_crime',
-    name: 'Reported violent crimes',
+    name: 'Reported Violent Crime Rate',
     nameSv: 'Anmälda våldsbrott',
-    description: 'Antal anmälda våldsbrott per 100 000 invånare',
-    unit: 'per 100 000',
+    description: 'Reported violent crime incidents per 100,000 population',
+    unit: 'per 100,000',
     category: 'crime',
-    subTypes: ['Misshandel', 'Rån', 'Sexualbrott', 'Mord och dråp']
+    subTypes: ['Assault', 'Robbery', 'Sexual offenses', 'Homicide']
   },
   {
     id: 'unemployment_total',
-    name: 'Unemployment rate (total)',
+    name: 'Total Unemployment Rate',
     nameSv: 'Arbetslöshet (total)',
-    description: 'Andel av arbetskraften utan arbete',
+    description: 'Percentage of labor force without employment',
     unit: '%',
     category: 'labor'
   },
   {
     id: 'unemployment_youth',
-    name: 'Youth unemployment',
+    name: 'Youth Unemployment Rate',
     nameSv: 'Ungdomsarbetslöshet',
-    description: 'Arbetslöshet bland personer 15-24 år',
+    description: 'Unemployment rate among persons aged 15-24',
     unit: '%',
     category: 'labor'
   },
   {
     id: 'unemployment_longterm',
-    name: 'Long-term unemployment',
+    name: 'Long-Term Unemployment',
     nameSv: 'Långtidsarbetslöshet',
-    description: 'Arbetslösa i mer än 12 månader',
+    description: 'Unemployed for more than 12 consecutive months',
     unit: '%',
     category: 'labor'
   },
   {
     id: 'employment_rate',
-    name: 'Employment rate',
+    name: 'Employment Rate',
     nameSv: 'Sysselsättningsgrad',
-    description: 'Andel av befolkningen 20-64 år i arbete',
+    description: 'Percentage of population aged 20-64 in employment',
     unit: '%',
     category: 'labor'
   },
   {
     id: 'education_outcomes',
-    name: 'Educational outcomes',
+    name: 'Educational Attainment',
     nameSv: 'Utbildningsutfall',
-    description: 'Andel som uppnår gymnasiebehörighet',
+    description: 'Percentage achieving upper secondary qualification eligibility',
     unit: '%',
     category: 'education'
   },
   {
     id: 'income_distribution',
-    name: 'Income distribution',
+    name: 'Income Distribution Index',
     nameSv: 'Inkomstfördelning',
-    description: 'Gini-koefficient för inkomstfördelning',
+    description: 'Gini coefficient for income distribution',
     unit: 'index',
     category: 'economy'
   },
   {
     id: 'overcrowding',
-    name: 'Overcrowding',
+    name: 'Housing Overcrowding Rate',
     nameSv: 'Trångboddhet',
-    description: 'Andel boende i trångbodda hushåll',
+    description: 'Percentage living in overcrowded housing conditions',
     unit: '%',
     category: 'housing'
   },
   {
     id: 'municipal_costs',
-    name: 'Municipal costs',
+    name: 'Municipal Expenditure per Capita',
     nameSv: 'Kommunala kostnader',
-    description: 'Kommunens kostnad per invånare',
-    unit: 'SEK/invånare',
+    description: 'Municipal government cost per resident',
+    unit: 'SEK/capita',
     category: 'municipal'
   }
 ];
