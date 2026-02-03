@@ -64,3 +64,8 @@ export { LambdaComparisonWarning } from './LambdaComparisonWarning';
 // LAMBDA Decision → Outcome Mapping
 export { LambdaDecisionTimeline } from './LambdaDecisionTimeline';
 export { LambdaCumulativeEffects } from './LambdaCumulativeEffects';
+
+// LAMBDA Anti-Manipulation Framework
+export { LambdaAntiManipulationGuard } from './LambdaAntiManipulationGuard';
+export { LambdaVerificationBadge } from './LambdaVerificationBadge';
+export { LambdaProtectionSummary } from './LambdaProtectionSummary';
