@@ -4,6 +4,8 @@
 
 export { 
   SystemBreadcrumbs, 
-  SystemLocationIndicator, 
-  SystemHierarchyPath 
-} from './SystemBreadcrumbs';
+  LocationIndicator, 
+  HierarchyPathComponent,
+  HierarchyPathComponent as SystemHierarchyPath,
+  type BreadcrumbItem
+} from '@/components/truth/SystemBreadcrumbs';

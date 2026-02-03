@@ -6,7 +6,7 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { SystemBreadcrumbs, SystemHierarchyPath } from '@/components/navigation';
+import { SystemBreadcrumbs, HierarchyPathComponent } from '@/components/navigation';
 import { UnifiedIndexViewer } from '@/components/indices';
 import { 
   INDEX_DEFINITIONS, 
@@ -83,16 +83,18 @@ const IndexEngineDemo: React.FC = () => {
       {/* Navigation */}
       <SystemBreadcrumbs
         items={[
-          { label: 'World', labelSv: 'Världen', level: 'world', href: '/' },
-          { label: 'Indices', labelSv: 'Index', level: 'indicator', href: '/indices' },
-          { label: currentIndex.code, labelSv: currentIndex.code, level: 'method' }
+          { id: 'world', label: 'World', labelSv: 'Världen', level: 'world', href: '/' },
+          { id: 'indices', label: 'Indices', labelSv: 'Index', level: 'indicator', href: '/indices' },
+          { id: 'current', label: currentIndex.code, labelSv: currentIndex.code, level: 'method' }
         ]}
       />
 
-      <SystemHierarchyPath
-        world="Global"
-        indicator="Index Engine"
-        method={currentIndex.nameSv}
+      <HierarchyPathComponent
+        path={{
+          civilization: 'Global',
+          system: 'Index Engine',
+          indicator: currentIndex.nameSv
+        }}
       />
 
       {/* Index selector */}

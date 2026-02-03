@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SpotlessProvider } from "@/context/SpotlessContext";
 import { InfiniteDepthProvider, DepthExplorer } from "@/components/data";
+import { TruthLayerProvider } from "@/components/truth";
 import Index from "./pages/Index";
 import PublicDashboard from "./pages/PublicDashboard";
 import GlobalCompact from "./pages/GlobalCompact";
@@ -81,11 +82,12 @@ const App = () => (
       <AuthProvider>
         <SpotlessProvider>
           <InfiniteDepthProvider>
-            <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <DepthExplorer />
-            <BrowserRouter>
+            <TruthLayerProvider>
+              <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <DepthExplorer />
+              <BrowserRouter>
             <Routes>
               {/* Publika routes */}
               <Route path="/login" element={<Login />} />
@@ -171,8 +173,9 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-            </TooltipProvider>
+            </BrowserRouter>
+              </TooltipProvider>
+            </TruthLayerProvider>
           </InfiniteDepthProvider>
         </SpotlessProvider>
       </AuthProvider>
