@@ -3433,6 +3433,42 @@ export type Database = {
           },
         ]
       }
+      feature_usage: {
+        Row: {
+          created_at: string
+          feature_key: string
+          id: string
+          period_end: string
+          period_start: string
+          updated_at: string
+          usage_count: number
+          usage_limit: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature_key: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feature_key?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       feed_definitions: {
         Row: {
           category: string
@@ -5320,6 +5356,74 @@ export type Database = {
           source_code?: string | null
         }
         Relationships: []
+      }
+      institutional_access_requests: {
+        Row: {
+          approved_subscription_id: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
+          countries_of_interest: string[] | null
+          created_at: string
+          custom_pricing_eur: number | null
+          expected_users: number | null
+          id: string
+          organization_name: string
+          organization_type: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          use_case_description: string
+        }
+        Insert: {
+          approved_subscription_id?: string | null
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
+          countries_of_interest?: string[] | null
+          created_at?: string
+          custom_pricing_eur?: number | null
+          expected_users?: number | null
+          id?: string
+          organization_name: string
+          organization_type: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          use_case_description: string
+        }
+        Update: {
+          approved_subscription_id?: string | null
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
+          countries_of_interest?: string[] | null
+          created_at?: string
+          custom_pricing_eur?: number | null
+          expected_users?: number | null
+          id?: string
+          organization_name?: string
+          organization_type?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          use_case_description?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institutional_access_requests_approved_subscription_id_fkey"
+            columns: ["approved_subscription_id"]
+            isOneToOne: false
+            referencedRelation: "user_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       internal_notes: {
         Row: {
@@ -8581,6 +8685,59 @@ export type Database = {
           },
         ]
       }
+      subscription_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          from_tier: Database["public"]["Enums"]["subscription_tier"] | null
+          id: string
+          ip_address: unknown
+          metadata: Json | null
+          source: string
+          stripe_event_id: string | null
+          subscription_id: string | null
+          to_tier: Database["public"]["Enums"]["subscription_tier"] | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          from_tier?: Database["public"]["Enums"]["subscription_tier"] | null
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          source?: string
+          stripe_event_id?: string | null
+          subscription_id?: string | null
+          to_tier?: Database["public"]["Enums"]["subscription_tier"] | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          from_tier?: Database["public"]["Enums"]["subscription_tier"] | null
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          source?: string
+          stripe_event_id?: string | null
+          subscription_id?: string | null
+          to_tier?: Database["public"]["Enums"]["subscription_tier"] | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_audit_log_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "user_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       substance_data: {
         Row: {
           age_group: string | null
@@ -9095,6 +9252,75 @@ export type Database = {
           },
         ]
       }
+      user_subscriptions: {
+        Row: {
+          cancel_at: string | null
+          canceled_at: string | null
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          data_usage_policy_accepted_at: string | null
+          grace_period_ends_at: string | null
+          id: string
+          payment_failed_at: string | null
+          payment_retry_count: number | null
+          responsibility_accepted_at: string | null
+          scenario_disclaimer_accepted_at: string | null
+          status: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id: string | null
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
+          terms_accepted_at: string | null
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          data_usage_policy_accepted_at?: string | null
+          grace_period_ends_at?: string | null
+          id?: string
+          payment_failed_at?: string | null
+          payment_retry_count?: number | null
+          responsibility_accepted_at?: string | null
+          scenario_disclaimer_accepted_at?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          terms_accepted_at?: string | null
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          data_usage_policy_accepted_at?: string | null
+          grace_period_ends_at?: string | null
+          id?: string
+          payment_failed_at?: string | null
+          payment_retry_count?: number | null
+          responsibility_accepted_at?: string | null
+          scenario_disclaimer_accepted_at?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          terms_accepted_at?: string | null
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_ui_preferences: {
         Row: {
           created_at: string | null
@@ -9226,6 +9452,10 @@ export type Database = {
       }
       generate_trust_log_id: { Args: never; Returns: string }
       get_gov_role: { Args: { _user_id: string }; Returns: string }
+      get_user_tier: {
+        Args: { p_user_id: string }
+        Returns: Database["public"]["Enums"]["subscription_tier"]
+      }
       has_any_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]
@@ -9248,7 +9478,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_tier_access: {
+        Args: {
+          p_required_tier: Database["public"]["Enums"]["subscription_tier"]
+          p_user_id: string
+        }
+        Returns: boolean
+      }
       increment_node_view: { Args: { p_node_id: string }; Returns: undefined }
+      is_in_grace_period: { Args: { p_user_id: string }; Returns: boolean }
       track_deeper_click: { Args: { p_node_id: string }; Returns: undefined }
       validate_data_contract: { Args: { p_data: Json }; Returns: Json }
     }
@@ -9326,6 +9564,15 @@ export type Database = {
         | "miljo"
       responsibility_level: "nationell" | "regional" | "kommunal"
       review_status: "pending" | "verified" | "disputed" | "resolved"
+      subscription_status:
+        | "active"
+        | "trialing"
+        | "past_due"
+        | "canceled"
+        | "unpaid"
+        | "paused"
+        | "incomplete"
+      subscription_tier: "guest" | "observer" | "analyst" | "institutional"
       trend_direction: "up" | "down" | "stable"
       trust_log_change_type:
         | "data_update"
@@ -9549,6 +9796,16 @@ export const Constants = {
       ],
       responsibility_level: ["nationell", "regional", "kommunal"],
       review_status: ["pending", "verified", "disputed", "resolved"],
+      subscription_status: [
+        "active",
+        "trialing",
+        "past_due",
+        "canceled",
+        "unpaid",
+        "paused",
+        "incomplete",
+      ],
+      subscription_tier: ["guest", "observer", "analyst", "institutional"],
       trend_direction: ["up", "down", "stable"],
       trust_log_change_type: [
         "data_update",
