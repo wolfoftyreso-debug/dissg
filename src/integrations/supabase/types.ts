@@ -8882,6 +8882,622 @@ export type Database = {
           },
         ]
       }
+      strim_diagnoses: {
+        Row: {
+          canonical_slug: string
+          checksum: string | null
+          common_comorbidities: string[] | null
+          created_at: string
+          definition: string
+          diagnostic_criteria: Json | null
+          dsm_5_code: string | null
+          icd_10_code: string | null
+          icd_11_code: string | null
+          id: string
+          name_en: string | null
+          name_sv: string
+          sources: Json
+          status: Database["public"]["Enums"]["strim_entity_status"] | null
+          treatment_principles: Json | null
+          typical_onset_age: string | null
+          typical_progression: string | null
+          updated_at: string
+          version: number | null
+        }
+        Insert: {
+          canonical_slug: string
+          checksum?: string | null
+          common_comorbidities?: string[] | null
+          created_at?: string
+          definition: string
+          diagnostic_criteria?: Json | null
+          dsm_5_code?: string | null
+          icd_10_code?: string | null
+          icd_11_code?: string | null
+          id?: string
+          name_en?: string | null
+          name_sv: string
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          treatment_principles?: Json | null
+          typical_onset_age?: string | null
+          typical_progression?: string | null
+          updated_at?: string
+          version?: number | null
+        }
+        Update: {
+          canonical_slug?: string
+          checksum?: string | null
+          common_comorbidities?: string[] | null
+          created_at?: string
+          definition?: string
+          diagnostic_criteria?: Json | null
+          dsm_5_code?: string | null
+          icd_10_code?: string | null
+          icd_11_code?: string | null
+          id?: string
+          name_en?: string | null
+          name_sv?: string
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          treatment_principles?: Json | null
+          typical_onset_age?: string | null
+          typical_progression?: string | null
+          updated_at?: string
+          version?: number | null
+        }
+        Relationships: []
+      }
+      strim_legal: {
+        Row: {
+          amendments: Json | null
+          canonical_slug: string
+          checksum: string | null
+          created_at: string
+          eu_reference: string | null
+          id: string
+          impact_on_care: string | null
+          impact_on_society: string | null
+          jurisdiction: string
+          jurisdiction_level: string | null
+          key_provisions: Json | null
+          name_en: string | null
+          name_sv: string
+          sfs_number: string | null
+          short_name: string | null
+          sources: Json
+          status: Database["public"]["Enums"]["strim_entity_status"] | null
+          summary: string
+          updated_at: string
+          valid_from: string
+          valid_to: string | null
+          version: number | null
+        }
+        Insert: {
+          amendments?: Json | null
+          canonical_slug: string
+          checksum?: string | null
+          created_at?: string
+          eu_reference?: string | null
+          id?: string
+          impact_on_care?: string | null
+          impact_on_society?: string | null
+          jurisdiction?: string
+          jurisdiction_level?: string | null
+          key_provisions?: Json | null
+          name_en?: string | null
+          name_sv: string
+          sfs_number?: string | null
+          short_name?: string | null
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          summary: string
+          updated_at?: string
+          valid_from: string
+          valid_to?: string | null
+          version?: number | null
+        }
+        Update: {
+          amendments?: Json | null
+          canonical_slug?: string
+          checksum?: string | null
+          created_at?: string
+          eu_reference?: string | null
+          id?: string
+          impact_on_care?: string | null
+          impact_on_society?: string | null
+          jurisdiction?: string
+          jurisdiction_level?: string | null
+          key_provisions?: Json | null
+          name_en?: string | null
+          name_sv?: string
+          sfs_number?: string | null
+          short_name?: string | null
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          summary?: string
+          updated_at?: string
+          valid_from?: string
+          valid_to?: string | null
+          version?: number | null
+        }
+        Relationships: []
+      }
+      strim_legal_history: {
+        Row: {
+          created_at: string
+          id: string
+          jurisdiction: string
+          legal_reference: string | null
+          legal_status: Database["public"]["Enums"]["strim_legal_status"]
+          notes: string | null
+          substance_id: string
+          valid_from: string
+          valid_to: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          jurisdiction?: string
+          legal_reference?: string | null
+          legal_status: Database["public"]["Enums"]["strim_legal_status"]
+          notes?: string | null
+          substance_id: string
+          valid_from: string
+          valid_to?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          jurisdiction?: string
+          legal_reference?: string | null
+          legal_status?: Database["public"]["Enums"]["strim_legal_status"]
+          notes?: string | null
+          substance_id?: string
+          valid_from?: string
+          valid_to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strim_legal_history_substance_id_fkey"
+            columns: ["substance_id"]
+            isOneToOne: false
+            referencedRelation: "strim_substances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      strim_relations: {
+        Row: {
+          context: string | null
+          created_at: string
+          evidence_level:
+            | Database["public"]["Enums"]["strim_evidence_level"]
+            | null
+          id: string
+          relation_strength: number | null
+          relation_type: Database["public"]["Enums"]["strim_relation_type"]
+          source_id: string
+          source_slug: string
+          source_type: string
+          sources: Json | null
+          target_id: string
+          target_slug: string
+          target_type: string
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          evidence_level?:
+            | Database["public"]["Enums"]["strim_evidence_level"]
+            | null
+          id?: string
+          relation_strength?: number | null
+          relation_type: Database["public"]["Enums"]["strim_relation_type"]
+          source_id: string
+          source_slug: string
+          source_type: string
+          sources?: Json | null
+          target_id: string
+          target_slug: string
+          target_type: string
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          evidence_level?:
+            | Database["public"]["Enums"]["strim_evidence_level"]
+            | null
+          id?: string
+          relation_strength?: number | null
+          relation_type?: Database["public"]["Enums"]["strim_relation_type"]
+          source_id?: string
+          source_slug?: string
+          source_type?: string
+          sources?: Json | null
+          target_id?: string
+          target_slug?: string
+          target_type?: string
+        }
+        Relationships: []
+      }
+      strim_statistics: {
+        Row: {
+          canonical_slug: string
+          checksum: string | null
+          confidence_interval: Json | null
+          created_at: string
+          data_source: string
+          data_source_url: string | null
+          first_available_year: number | null
+          geography_codes: string[] | null
+          geography_level: string | null
+          id: string
+          indicator_code: string | null
+          indicator_name_en: string | null
+          indicator_name_sv: string
+          last_available_year: number | null
+          measurement_type: string | null
+          measures_diagnosis_slugs: string[] | null
+          measures_substance_slugs: string[] | null
+          sources: Json
+          status: Database["public"]["Enums"]["strim_entity_status"] | null
+          time_granularity: string | null
+          trend_direction: string | null
+          trend_period: string | null
+          uncertainty_description: string | null
+          unit: string
+          updated_at: string
+          version: number | null
+        }
+        Insert: {
+          canonical_slug: string
+          checksum?: string | null
+          confidence_interval?: Json | null
+          created_at?: string
+          data_source: string
+          data_source_url?: string | null
+          first_available_year?: number | null
+          geography_codes?: string[] | null
+          geography_level?: string | null
+          id?: string
+          indicator_code?: string | null
+          indicator_name_en?: string | null
+          indicator_name_sv: string
+          last_available_year?: number | null
+          measurement_type?: string | null
+          measures_diagnosis_slugs?: string[] | null
+          measures_substance_slugs?: string[] | null
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          time_granularity?: string | null
+          trend_direction?: string | null
+          trend_period?: string | null
+          uncertainty_description?: string | null
+          unit: string
+          updated_at?: string
+          version?: number | null
+        }
+        Update: {
+          canonical_slug?: string
+          checksum?: string | null
+          confidence_interval?: Json | null
+          created_at?: string
+          data_source?: string
+          data_source_url?: string | null
+          first_available_year?: number | null
+          geography_codes?: string[] | null
+          geography_level?: string | null
+          id?: string
+          indicator_code?: string | null
+          indicator_name_en?: string | null
+          indicator_name_sv?: string
+          last_available_year?: number | null
+          measurement_type?: string | null
+          measures_diagnosis_slugs?: string[] | null
+          measures_substance_slugs?: string[] | null
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          time_granularity?: string | null
+          trend_direction?: string | null
+          trend_period?: string | null
+          uncertainty_description?: string | null
+          unit?: string
+          updated_at?: string
+          version?: number | null
+        }
+        Relationships: []
+      }
+      strim_statistics_values: {
+        Row: {
+          confidence_lower: number | null
+          confidence_upper: number | null
+          created_at: string
+          geography_code: string | null
+          id: string
+          is_preliminary: boolean | null
+          period_month: number | null
+          period_year: number
+          revision_number: number | null
+          statistic_id: string
+          value: number
+          value_per_100k: number | null
+        }
+        Insert: {
+          confidence_lower?: number | null
+          confidence_upper?: number | null
+          created_at?: string
+          geography_code?: string | null
+          id?: string
+          is_preliminary?: boolean | null
+          period_month?: number | null
+          period_year: number
+          revision_number?: number | null
+          statistic_id: string
+          value: number
+          value_per_100k?: number | null
+        }
+        Update: {
+          confidence_lower?: number | null
+          confidence_upper?: number | null
+          created_at?: string
+          geography_code?: string | null
+          id?: string
+          is_preliminary?: boolean | null
+          period_month?: number | null
+          period_year?: number
+          revision_number?: number | null
+          statistic_id?: string
+          value?: number
+          value_per_100k?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strim_statistics_values_statistic_id_fkey"
+            columns: ["statistic_id"]
+            isOneToOne: false
+            referencedRelation: "strim_statistics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      strim_substances: {
+        Row: {
+          canonical_slug: string
+          checksum: string | null
+          classification_primary: string
+          classification_secondary: string | null
+          created_at: string
+          current_legal_status:
+            | Database["public"]["Enums"]["strim_legal_status"]
+            | null
+          dependence_potential:
+            | Database["public"]["Enums"]["strim_risk_category"]
+            | null
+          first_documented_use: string | null
+          historical_context: string | null
+          id: string
+          name_en: string | null
+          name_sv: string
+          names_alternative: string[] | null
+          overdose_risk:
+            | Database["public"]["Enums"]["strim_risk_category"]
+            | null
+          pharmacological_class: string | null
+          pharmacology: Json | null
+          risk_category:
+            | Database["public"]["Enums"]["strim_risk_category"]
+            | null
+          sources: Json
+          status: Database["public"]["Enums"]["strim_entity_status"] | null
+          updated_at: string
+          version: number | null
+        }
+        Insert: {
+          canonical_slug: string
+          checksum?: string | null
+          classification_primary: string
+          classification_secondary?: string | null
+          created_at?: string
+          current_legal_status?:
+            | Database["public"]["Enums"]["strim_legal_status"]
+            | null
+          dependence_potential?:
+            | Database["public"]["Enums"]["strim_risk_category"]
+            | null
+          first_documented_use?: string | null
+          historical_context?: string | null
+          id?: string
+          name_en?: string | null
+          name_sv: string
+          names_alternative?: string[] | null
+          overdose_risk?:
+            | Database["public"]["Enums"]["strim_risk_category"]
+            | null
+          pharmacological_class?: string | null
+          pharmacology?: Json | null
+          risk_category?:
+            | Database["public"]["Enums"]["strim_risk_category"]
+            | null
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          updated_at?: string
+          version?: number | null
+        }
+        Update: {
+          canonical_slug?: string
+          checksum?: string | null
+          classification_primary?: string
+          classification_secondary?: string | null
+          created_at?: string
+          current_legal_status?:
+            | Database["public"]["Enums"]["strim_legal_status"]
+            | null
+          dependence_potential?:
+            | Database["public"]["Enums"]["strim_risk_category"]
+            | null
+          first_documented_use?: string | null
+          historical_context?: string | null
+          id?: string
+          name_en?: string | null
+          name_sv?: string
+          names_alternative?: string[] | null
+          overdose_risk?:
+            | Database["public"]["Enums"]["strim_risk_category"]
+            | null
+          pharmacological_class?: string | null
+          pharmacology?: Json | null
+          risk_category?:
+            | Database["public"]["Enums"]["strim_risk_category"]
+            | null
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          updated_at?: string
+          version?: number | null
+        }
+        Relationships: []
+      }
+      strim_terms: {
+        Row: {
+          alternative_definitions: Json | null
+          antonyms: string[] | null
+          canonical_slug: string
+          checksum: string | null
+          created_at: string
+          definition_en: string | null
+          definition_sv: string
+          historical_meaning: string | null
+          id: string
+          meaning_changed: boolean | null
+          related_terms: string[] | null
+          sources: Json
+          status: Database["public"]["Enums"]["strim_entity_status"] | null
+          synonyms: string[] | null
+          term_en: string | null
+          term_sv: string
+          updated_at: string
+          usage_context: string[] | null
+          version: number | null
+        }
+        Insert: {
+          alternative_definitions?: Json | null
+          antonyms?: string[] | null
+          canonical_slug: string
+          checksum?: string | null
+          created_at?: string
+          definition_en?: string | null
+          definition_sv: string
+          historical_meaning?: string | null
+          id?: string
+          meaning_changed?: boolean | null
+          related_terms?: string[] | null
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          synonyms?: string[] | null
+          term_en?: string | null
+          term_sv: string
+          updated_at?: string
+          usage_context?: string[] | null
+          version?: number | null
+        }
+        Update: {
+          alternative_definitions?: Json | null
+          antonyms?: string[] | null
+          canonical_slug?: string
+          checksum?: string | null
+          created_at?: string
+          definition_en?: string | null
+          definition_sv?: string
+          historical_meaning?: string | null
+          id?: string
+          meaning_changed?: boolean | null
+          related_terms?: string[] | null
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          synonyms?: string[] | null
+          term_en?: string | null
+          term_sv?: string
+          updated_at?: string
+          usage_context?: string[] | null
+          version?: number | null
+        }
+        Relationships: []
+      }
+      strim_treatments: {
+        Row: {
+          acronym: string | null
+          applicable_for: string[] | null
+          canonical_slug: string
+          checksum: string | null
+          contraindications: string[] | null
+          created_at: string
+          development_history: string | null
+          evidence_level:
+            | Database["public"]["Enums"]["strim_evidence_level"]
+            | null
+          evidence_summary: string | null
+          first_used: string | null
+          id: string
+          method_type: string
+          name_en: string | null
+          name_sv: string
+          risks: Json | null
+          sources: Json
+          status: Database["public"]["Enums"]["strim_entity_status"] | null
+          treatment_setting: string | null
+          updated_at: string
+          version: number | null
+        }
+        Insert: {
+          acronym?: string | null
+          applicable_for?: string[] | null
+          canonical_slug: string
+          checksum?: string | null
+          contraindications?: string[] | null
+          created_at?: string
+          development_history?: string | null
+          evidence_level?:
+            | Database["public"]["Enums"]["strim_evidence_level"]
+            | null
+          evidence_summary?: string | null
+          first_used?: string | null
+          id?: string
+          method_type: string
+          name_en?: string | null
+          name_sv: string
+          risks?: Json | null
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          treatment_setting?: string | null
+          updated_at?: string
+          version?: number | null
+        }
+        Update: {
+          acronym?: string | null
+          applicable_for?: string[] | null
+          canonical_slug?: string
+          checksum?: string | null
+          contraindications?: string[] | null
+          created_at?: string
+          development_history?: string | null
+          evidence_level?:
+            | Database["public"]["Enums"]["strim_evidence_level"]
+            | null
+          evidence_summary?: string | null
+          first_used?: string | null
+          id?: string
+          method_type?: string
+          name_en?: string | null
+          name_sv?: string
+          risks?: Json | null
+          sources?: Json
+          status?: Database["public"]["Enums"]["strim_entity_status"] | null
+          treatment_setting?: string | null
+          updated_at?: string
+          version?: number | null
+        }
+        Relationships: []
+      }
       subscription_audit_log: {
         Row: {
           action: string
@@ -9833,6 +10449,38 @@ export type Database = {
         | "miljo"
       responsibility_level: "nationell" | "regional" | "kommunal"
       review_status: "pending" | "verified" | "disputed" | "resolved"
+      strim_entity_status: "active" | "historical" | "deprecated" | "draft"
+      strim_evidence_level:
+        | "level_1a"
+        | "level_1b"
+        | "level_2a"
+        | "level_2b"
+        | "level_3"
+        | "level_4"
+        | "level_5"
+        | "unknown"
+      strim_legal_status:
+        | "legal"
+        | "prescription"
+        | "controlled_i"
+        | "controlled_ii"
+        | "controlled_iii"
+        | "controlled_iv"
+        | "controlled_v"
+        | "prohibited"
+        | "unscheduled"
+      strim_relation_type:
+        | "causes"
+        | "treated_by"
+        | "regulated_by"
+        | "affects"
+        | "measures"
+        | "defines"
+        | "related_to"
+        | "replaced_by"
+        | "part_of"
+        | "contraindicates"
+      strim_risk_category: "low" | "moderate" | "high" | "very_high" | "unknown"
       subscription_status:
         | "active"
         | "trialing"
@@ -10080,6 +10728,41 @@ export const Constants = {
       ],
       responsibility_level: ["nationell", "regional", "kommunal"],
       review_status: ["pending", "verified", "disputed", "resolved"],
+      strim_entity_status: ["active", "historical", "deprecated", "draft"],
+      strim_evidence_level: [
+        "level_1a",
+        "level_1b",
+        "level_2a",
+        "level_2b",
+        "level_3",
+        "level_4",
+        "level_5",
+        "unknown",
+      ],
+      strim_legal_status: [
+        "legal",
+        "prescription",
+        "controlled_i",
+        "controlled_ii",
+        "controlled_iii",
+        "controlled_iv",
+        "controlled_v",
+        "prohibited",
+        "unscheduled",
+      ],
+      strim_relation_type: [
+        "causes",
+        "treated_by",
+        "regulated_by",
+        "affects",
+        "measures",
+        "defines",
+        "related_to",
+        "replaced_by",
+        "part_of",
+        "contraindicates",
+      ],
+      strim_risk_category: ["low", "moderate", "high", "very_high", "unknown"],
       subscription_status: [
         "active",
         "trialing",
