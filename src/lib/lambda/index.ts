@@ -79,3 +79,12 @@ export * from './signal-terminology';
 
 // Oscilloscope Mode
 export * from './oscilloscope-mode';
+
+// Diagnostic Codes (DTC)
+export * from './diagnostic-codes';
+
+// Sensor Triangulation
+export * from './sensor-triangulation';
+
+// Simulation Engine
+export * from './simulation-engine';
