@@ -19,6 +19,7 @@ import {
   EyeOff,
   MapPin
 } from 'lucide-react';
+import { ExplanationTrigger } from './ExplanationPyramid';
 import {
   LineChart,
   Line,
@@ -423,9 +424,17 @@ const GlobalDataMapEngine: React.FC = () => {
           </Select>
         </div>
         
-        {/* Mode */}
+        {/* Mode with explanation trigger */}
         <div>
-          <label className="text-sm font-medium mb-1 block">Jämförelseläge</label>
+          <label className="text-sm font-medium mb-1 block flex items-center gap-1">
+            Jämförelseläge
+            <ExplanationTrigger 
+              type="comparison_mode" 
+              id={selectedMode} 
+              label=""
+              className="text-muted-foreground"
+            />
+          </label>
           <Select value={selectedMode} onValueChange={setSelectedMode}>
             <SelectTrigger>
               <SelectValue />
@@ -441,12 +450,20 @@ const GlobalDataMapEngine: React.FC = () => {
         </div>
       </div>
       
-      {/* Indicator description */}
+      {/* Indicator description with deep-link */}
       <Card className="bg-muted/20">
         <CardContent className="pt-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h3 className="font-medium">{indicator.labelSv}</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-medium">{indicator.labelSv}</h3>
+                <ExplanationTrigger 
+                  type="indicator" 
+                  id={indicator.id} 
+                  label="Fördjupning"
+                  className="text-xs"
+                />
+              </div>
               <p className="text-sm text-muted-foreground">{indicator.descriptionSv}</p>
               {indicator.dataNoteSv && (
                 <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
