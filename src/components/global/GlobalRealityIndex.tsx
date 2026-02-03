@@ -27,6 +27,7 @@ import {
   Database,
   Loader2
 } from 'lucide-react';
+import { GeoExplorer } from '@/components/geo/GeoExplorer';
 import {
   GRI_IDENTITY,
   GRI_PILLARS,
@@ -173,23 +174,29 @@ const PillarBar: React.FC<{
   );
 };
 
-// Region code to geo path mapping
-const REGION_TO_GEO_PATH: Record<string, string> = {
-  'EUR': '/geo/europe',
-  'NAM': '/geo/north-america',
-  'EAS': '/geo/east-asia',
-  'SAS': '/geo/south-asia',
-  'AFR': '/geo/africa',
-  'LAM': '/geo/latin-america',
-  'MNA': '/geo/mena',
-  'OCE': '/geo/oceania',
+// Region code to GeoExplorer region ID mapping
+const REGION_CODE_TO_GEO_ID: Record<string, string> = {
+  'EUR': 'europe',
+  'NAM': 'north_america',
+  'EAS': 'east_asia',
+  'SAS': 'south_asia',
+  'AFR': 'sub_saharan_africa',
+  'LAM': 'latin_america',
+  'MNA': 'mena',
+  'OCE': 'oceania',
 };
 
-// Regional map (clickable grid representation with drill-down)
-const RegionalMap: React.FC = () => {
+// Regional map (clickable grid representation with drill-down via GeoExplorer dialog)
+interface RegionalMapProps {
+  onRegionClick: (regionId: string) => void;
+}
+
+const RegionalMap: React.FC<RegionalMapProps> = ({ onRegionClick }) => {
   const handleRegionClick = (regionCode: string) => {
-    const path = REGION_TO_GEO_PATH[regionCode] || `/geo?region=${regionCode}`;
-    window.location.href = path;
+    const geoId = REGION_CODE_TO_GEO_ID[regionCode];
+    if (geoId) {
+      onRegionClick(geoId);
+    }
   };
 
   return (
@@ -237,6 +244,15 @@ export const GlobalRealityIndex: React.FC = () => {
   const [expandedPillar, setExpandedPillar] = useState<PillarId | null>(null);
   const [timePeriod, setTimePeriod] = useState('today');
   const [showValues, setShowValues] = useState(false);
+  
+  // GeoExplorer state
+  const [geoExplorerOpen, setGeoExplorerOpen] = useState(false);
+  const [selectedRegion, setSelectedRegion] = useState<string | undefined>(undefined);
+  
+  const handleRegionClick = (regionId: string) => {
+    setSelectedRegion(regionId);
+    setGeoExplorerOpen(true);
+  };
 
   // Fetch live data
   const { data: categoryAggregates, isLoading: loadingCategories } = useCategoryAggregates();
@@ -455,7 +471,7 @@ export const GlobalRealityIndex: React.FC = () => {
       </Card>
 
       {/* Regional differentiation */}
-      <RegionalMap />
+      <RegionalMap onRegionClick={handleRegionClick} />
 
       {/* Responsibility notice */}
       <Alert className="bg-primary/5 border-primary/20">
@@ -513,6 +529,13 @@ export const GlobalRealityIndex: React.FC = () => {
           Detta är inte ett verktyg. Det är en gemensam referensram för mänskligheten.
         </p>
       </div>
+      
+      {/* GeoExplorer Dialog for regional drill-down */}
+      <GeoExplorer
+        isOpen={geoExplorerOpen}
+        onClose={() => setGeoExplorerOpen(false)}
+        initialRegion={selectedRegion}
+      />
     </div>
   );
 };
