@@ -7,9 +7,9 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -29,6 +29,7 @@ import {
   MapPin,
   ChevronRight
 } from 'lucide-react';
+import { ClickableIcon } from '@/components/ui/ClickableIcon';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
@@ -51,10 +52,10 @@ import {
 import { FactorDeepDive } from './FactorDeepDive';
 import { RegionDeepDive } from './RegionDeepDive';
 
-// Trend icon helper
-const TrendIcon: React.FC<{ trend: string; size?: number }> = ({ trend, size = 16 }) => {
-  if (trend === 'growing' || trend === 'improving') return <TrendingUp size={size} className="text-green-500" />;
-  if (trend === 'declining') return <TrendingDown size={size} className="text-red-500" />;
+// TrendIcon helper now replaced by ClickableIcon - kept for reference
+const _TrendIcon: React.FC<{ trend: string; size?: number }> = ({ trend, size = 16 }) => {
+  if (trend === 'growing' || trend === 'improving') return <TrendingUp size={size} className="text-primary" />;
+  if (trend === 'declining') return <TrendingDown size={size} className="text-destructive" />;
   return <Minus size={size} className="text-muted-foreground" />;
 };
 
@@ -74,55 +75,65 @@ const GlobalStatusPanel: React.FC = () => {
         <div className="grid gap-4 md:grid-cols-5">
           {/* Population */}
           <div className="text-center p-3 bg-background rounded-lg">
-            <Users className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
+            <div className="flex justify-center mb-1">
+              <ClickableIcon icon={Users} registryId="users" size={20} className="text-muted-foreground" />
+            </div>
             <p className="text-2xl font-bold">{data.population.current}B</p>
             <p className="text-xs text-muted-foreground">Befolkning</p>
             <div className="flex items-center justify-center gap-1 mt-1">
-              <TrendIcon trend={data.population.trend} size={12} />
+              <ClickableIcon icon={TrendingUp} registryId="trending-up" size={12} />
               <span className="text-xs">+{data.population.growthRate}%/år</span>
             </div>
           </div>
           
           {/* Energy */}
           <div className="text-center p-3 bg-background rounded-lg">
-            <Zap className="h-5 w-5 mx-auto mb-1 text-yellow-500" />
+            <div className="flex justify-center mb-1">
+              <ClickableIcon icon={Zap} registryId="zap" size={20} className="text-primary" />
+            </div>
             <p className="text-2xl font-bold">{data.energyPerCapita.value}</p>
             <p className="text-xs text-muted-foreground">MWh/person/år</p>
             <div className="flex items-center justify-center gap-1 mt-1">
-              <TrendIcon trend={data.energyPerCapita.trend} size={12} />
+              <ClickableIcon icon={TrendingUp} registryId="trending-up" size={12} />
               <span className="text-xs">{data.energyPerCapita.changePercent > 0 ? '+' : ''}{data.energyPerCapita.changePercent}%</span>
             </div>
           </div>
           
           {/* Tech efficiency */}
           <div className="text-center p-3 bg-background rounded-lg">
-            <Brain className="h-5 w-5 mx-auto mb-1 text-purple-500" />
+            <div className="flex justify-center mb-1">
+              <ClickableIcon icon={Brain} registryId="database" size={20} className="text-primary" />
+            </div>
             <p className="text-2xl font-bold">{data.technicalEfficiency.index}</p>
             <p className="text-xs text-muted-foreground">Teknikindex</p>
             <div className="flex items-center justify-center gap-1 mt-1">
-              <TrendIcon trend={data.technicalEfficiency.trend} size={12} />
+              <ClickableIcon icon={TrendingUp} registryId="trending-up" size={12} />
               <span className="text-xs">+{data.technicalEfficiency.changePercent}%</span>
             </div>
           </div>
           
           {/* Institutions */}
           <div className="text-center p-3 bg-background rounded-lg">
-            <Building2 className="h-5 w-5 mx-auto mb-1 text-blue-500" />
+            <div className="flex justify-center mb-1">
+              <ClickableIcon icon={Building2} registryId="building-2" size={20} className="text-primary" />
+            </div>
             <p className="text-2xl font-bold">{data.institutionalQuality.index}</p>
             <p className="text-xs text-muted-foreground">Institutionsindex</p>
             <div className="flex items-center justify-center gap-1 mt-1">
-              <TrendIcon trend={data.institutionalQuality.trend} size={12} />
+              <ClickableIcon icon={Minus} registryId="minus" size={12} />
               <span className="text-xs">{data.institutionalQuality.changePercent}%</span>
             </div>
           </div>
           
           {/* HWI */}
           <div className="text-center p-3 bg-background rounded-lg">
-            <Heart className="h-5 w-5 mx-auto mb-1 text-red-500" />
+            <div className="flex justify-center mb-1">
+              <ClickableIcon icon={Heart} registryId="heart" size={20} className="text-destructive" />
+            </div>
             <p className="text-2xl font-bold">{data.humanWellbeing.index}</p>
             <p className="text-xs text-muted-foreground">Välbefinnande</p>
             <div className="flex items-center justify-center gap-1 mt-1">
-              <TrendIcon trend={data.humanWellbeing.trend} size={12} />
+              <ClickableIcon icon={TrendingUp} registryId="trending-up" size={12} />
               <span className="text-xs">{data.humanWellbeing.changePercent > 0 ? '+' : ''}{data.humanWellbeing.changePercent}%</span>
             </div>
           </div>
@@ -205,7 +216,7 @@ const PressZonesPanel: React.FC<{ onZoneClick: (zone: PressZone) => void }> = ({
   <Card>
     <CardHeader>
       <div className="flex items-center gap-2">
-        <AlertTriangle className="h-4 w-4 text-yellow-500" />
+        <ClickableIcon icon={AlertTriangle} registryId="alert-triangle" size={16} className="text-primary" />
         <CardTitle className="text-base">Tryckzoner</CardTitle>
       </div>
       <CardDescription>Där systemet är under press – inte "överbefolkning" – klicka för att fördjupa</CardDescription>
@@ -216,15 +227,15 @@ const PressZonesPanel: React.FC<{ onZoneClick: (zone: PressZone) => void }> = ({
           key={zone.id}
           onClick={() => onZoneClick(zone)}
           className={`w-full text-left p-3 border rounded-lg transition-all cursor-pointer group hover:border-primary/50 ${
-            zone.severity === 'high' ? 'border-red-200 bg-red-50/50 dark:bg-red-950/20 hover:bg-red-100/50' :
-            zone.severity === 'moderate' ? 'border-yellow-200 bg-yellow-50/50 dark:bg-yellow-950/20 hover:bg-yellow-100/50' :
-            'border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 hover:bg-blue-100/50'
+            zone.severity === 'high' ? 'border-destructive/30 bg-destructive/5 hover:bg-destructive/10' :
+            zone.severity === 'moderate' ? 'border-primary/30 bg-primary/5 hover:bg-primary/10' :
+            'border-secondary bg-secondary/30 hover:bg-secondary/50'
           }`}
         >
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
+                <ClickableIcon icon={MapPin} registryId="map-pin" size={16} />
                 <span className="font-medium text-sm group-hover:text-primary transition-colors">{zone.regionSv}</span>
                 <Badge variant={zone.severity === 'high' ? 'destructive' : 'secondary'} className="text-xs">
                   {zone.severity === 'high' ? 'Hög' : zone.severity === 'moderate' ? 'Måttlig' : 'Framväxande'}
@@ -233,17 +244,17 @@ const PressZonesPanel: React.FC<{ onZoneClick: (zone: PressZone) => void }> = ({
               <p className="text-xs text-muted-foreground mt-1">{zone.descriptionSv}</p>
             </div>
             <div className="flex gap-1 items-center">
-              {zone.factors.energyPressure && <Zap className="h-4 w-4 text-yellow-500" />}
-              {zone.factors.populationGrowth && <Users className="h-4 w-4 text-blue-500" />}
-              {zone.factors.institutionalWeakness && <Building2 className="h-4 w-4 text-red-500" />}
-              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors ml-2" />
+              {zone.factors.energyPressure && <ClickableIcon icon={Zap} registryId="zap" size={16} className="text-primary" />}
+              {zone.factors.populationGrowth && <ClickableIcon icon={Users} registryId="users" size={16} className="text-primary" />}
+              {zone.factors.institutionalWeakness && <ClickableIcon icon={Building2} registryId="building-2" size={16} className="text-destructive" />}
+              <ClickableIcon icon={ChevronRight} registryId="chevron-right" size={16} className="text-muted-foreground group-hover:text-primary transition-colors ml-2" />
             </div>
           </div>
         </button>
       ))}
       
       <Alert className="bg-primary/5">
-        <Info className="h-4 w-4" />
+        <ClickableIcon icon={Info} registryId="info" size={16} />
         <AlertDescription className="text-xs font-medium">
           {KEY_MESSAGES.notOverpopulation.sv}
         </AlertDescription>
@@ -288,10 +299,10 @@ const PositiveFactorsPanel: React.FC<{ onFactorClick: (factor: CapacityFactor) =
 
 // Energy honesty panel
 const EnergyHonestyPanel: React.FC = () => (
-  <Card className="border-yellow-200 bg-yellow-50/30 dark:bg-yellow-950/20">
+  <Card className="border-primary/30 bg-primary/5">
     <CardHeader>
       <div className="flex items-center gap-2">
-        <Zap className="h-5 w-5 text-yellow-600" />
+        <ClickableIcon icon={Zap} registryId="zap" size={20} className="text-primary" />
         <CardTitle className="text-base">Energy Honesty Layer</CardTitle>
       </div>
     </CardHeader>
@@ -302,14 +313,14 @@ const EnergyHonestyPanel: React.FC = () => (
         </p>
       </div>
       
-      <div className="p-4 bg-background rounded-lg border-l-4 border-yellow-500">
+      <div className="p-4 bg-background rounded-lg border-l-4 border-primary">
         <p className="text-sm font-medium">
           {ENERGY_HONESTY.consequence.sv}
         </p>
       </div>
       
       <Alert>
-        <Info className="h-4 w-4" />
+        <ClickableIcon icon={Info} registryId="info" size={16} />
         <AlertDescription className="text-sm font-medium">
           {ENERGY_HONESTY.physics.sv}
         </AlertDescription>
