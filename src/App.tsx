@@ -74,6 +74,7 @@ import AIAdoption from "./pages/AIAdoption";
 import CQAIS from "./pages/CQAIS";
 import Lambda from "./pages/Lambda";
 import InfiniteDepthDemo from "./pages/InfiniteDepthDemo";
+import RelevanceWeightManager from "./pages/RelevanceWeightManager";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -151,6 +152,7 @@ const App = () => (
               <Route path="/cqais" element={<CQAIS />} />
               <Route path="/lambda" element={<Lambda />} />
               <Route path="/depth" element={<InfiniteDepthDemo />} />
+              <Route path="/relevance-weight-manager" element={<RelevanceWeightManager />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
