@@ -6,3 +6,4 @@
  */
 
 export * from './iconRegistry';
+export * from './factorEvidenceRegistry';
