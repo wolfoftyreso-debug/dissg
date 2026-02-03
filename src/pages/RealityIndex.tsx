@@ -31,7 +31,7 @@ import {
   Check,
   AlertCircle
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   Tooltip,
@@ -44,6 +44,72 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { motion } from 'framer-motion';
+
+// ============================================================================
+// GLOBAL COUNTRY DATABASE
+// ============================================================================
+
+interface Country {
+  code: string;
+  name: string;
+  nameLocal: string;
+  region: string;
+  population: number;
+  dataQuality: 'A' | 'B' | 'C' | 'D';
+}
+
+const COUNTRIES: Country[] = [
+  // Nordics
+  { code: 'SE', name: 'Sweden', nameLocal: 'Sverige', region: 'Norden', population: 10500000, dataQuality: 'A' },
+  { code: 'NO', name: 'Norway', nameLocal: 'Norge', region: 'Norden', population: 5400000, dataQuality: 'A' },
+  { code: 'DK', name: 'Denmark', nameLocal: 'Danmark', region: 'Norden', population: 5900000, dataQuality: 'A' },
+  { code: 'FI', name: 'Finland', nameLocal: 'Suomi', region: 'Norden', population: 5500000, dataQuality: 'A' },
+  { code: 'IS', name: 'Iceland', nameLocal: 'Ísland', region: 'Norden', population: 370000, dataQuality: 'A' },
+  // Western Europe
+  { code: 'DE', name: 'Germany', nameLocal: 'Deutschland', region: 'Västeuropa', population: 83200000, dataQuality: 'A' },
+  { code: 'FR', name: 'France', nameLocal: 'France', region: 'Västeuropa', population: 67400000, dataQuality: 'A' },
+  { code: 'GB', name: 'United Kingdom', nameLocal: 'UK', region: 'Västeuropa', population: 67200000, dataQuality: 'A' },
+  { code: 'NL', name: 'Netherlands', nameLocal: 'Nederland', region: 'Västeuropa', population: 17500000, dataQuality: 'A' },
+  { code: 'BE', name: 'Belgium', nameLocal: 'België', region: 'Västeuropa', population: 11600000, dataQuality: 'A' },
+  { code: 'CH', name: 'Switzerland', nameLocal: 'Schweiz', region: 'Västeuropa', population: 8700000, dataQuality: 'A' },
+  { code: 'AT', name: 'Austria', nameLocal: 'Österreich', region: 'Västeuropa', population: 9000000, dataQuality: 'A' },
+  // Southern Europe
+  { code: 'ES', name: 'Spain', nameLocal: 'España', region: 'Sydeuropa', population: 47400000, dataQuality: 'A' },
+  { code: 'IT', name: 'Italy', nameLocal: 'Italia', region: 'Sydeuropa', population: 59100000, dataQuality: 'A' },
+  { code: 'PT', name: 'Portugal', nameLocal: 'Portugal', region: 'Sydeuropa', population: 10300000, dataQuality: 'A' },
+  { code: 'GR', name: 'Greece', nameLocal: 'Ελλάδα', region: 'Sydeuropa', population: 10400000, dataQuality: 'B' },
+  // Eastern Europe
+  { code: 'PL', name: 'Poland', nameLocal: 'Polska', region: 'Östeuropa', population: 37700000, dataQuality: 'A' },
+  { code: 'CZ', name: 'Czechia', nameLocal: 'Česko', region: 'Östeuropa', population: 10700000, dataQuality: 'A' },
+  { code: 'RO', name: 'Romania', nameLocal: 'România', region: 'Östeuropa', population: 19100000, dataQuality: 'B' },
+  { code: 'UA', name: 'Ukraine', nameLocal: 'Україна', region: 'Östeuropa', population: 41000000, dataQuality: 'C' },
+  // Americas
+  { code: 'US', name: 'United States', nameLocal: 'USA', region: 'Nordamerika', population: 331900000, dataQuality: 'A' },
+  { code: 'CA', name: 'Canada', nameLocal: 'Canada', region: 'Nordamerika', population: 38200000, dataQuality: 'A' },
+  { code: 'MX', name: 'Mexico', nameLocal: 'México', region: 'Centralamerika', population: 128900000, dataQuality: 'B' },
+  { code: 'BR', name: 'Brazil', nameLocal: 'Brasil', region: 'Sydamerika', population: 214300000, dataQuality: 'B' },
+  { code: 'AR', name: 'Argentina', nameLocal: 'Argentina', region: 'Sydamerika', population: 45800000, dataQuality: 'B' },
+  // Asia
+  { code: 'JP', name: 'Japan', nameLocal: '日本', region: 'Östasien', population: 125800000, dataQuality: 'A' },
+  { code: 'KR', name: 'South Korea', nameLocal: '한국', region: 'Östasien', population: 51800000, dataQuality: 'A' },
+  { code: 'CN', name: 'China', nameLocal: '中国', region: 'Östasien', population: 1412000000, dataQuality: 'B' },
+  { code: 'IN', name: 'India', nameLocal: 'भारत', region: 'Sydasien', population: 1408000000, dataQuality: 'B' },
+  { code: 'SG', name: 'Singapore', nameLocal: 'Singapore', region: 'Sydostasien', population: 5900000, dataQuality: 'A' },
+  { code: 'TH', name: 'Thailand', nameLocal: 'ประเทศไทย', region: 'Sydostasien', population: 69900000, dataQuality: 'B' },
+  // Oceania
+  { code: 'AU', name: 'Australia', nameLocal: 'Australia', region: 'Oceanien', population: 25700000, dataQuality: 'A' },
+  { code: 'NZ', name: 'New Zealand', nameLocal: 'New Zealand', region: 'Oceanien', population: 5100000, dataQuality: 'A' },
+  // Middle East
+  { code: 'IL', name: 'Israel', nameLocal: 'ישראל', region: 'Mellanöstern', population: 9400000, dataQuality: 'A' },
+  { code: 'AE', name: 'UAE', nameLocal: 'الإمارات', region: 'Mellanöstern', population: 9900000, dataQuality: 'B' },
+  // Africa
+  { code: 'ZA', name: 'South Africa', nameLocal: 'South Africa', region: 'Afrika', population: 60000000, dataQuality: 'B' },
+  { code: 'EG', name: 'Egypt', nameLocal: 'مصر', region: 'Afrika', population: 104000000, dataQuality: 'C' },
+  { code: 'NG', name: 'Nigeria', nameLocal: 'Nigeria', region: 'Afrika', population: 218000000, dataQuality: 'C' },
+  { code: 'KE', name: 'Kenya', nameLocal: 'Kenya', region: 'Afrika', population: 54000000, dataQuality: 'C' },
+  // Global/World aggregate
+  { code: 'WORLD', name: 'World', nameLocal: 'Världen', region: 'Global', population: 8000000000, dataQuality: 'B' },
+];
 
 // ============================================================================
 // REALITY INDEX 1.0 - THE FIVE UNAVOIDABLE DOMAINS
@@ -538,19 +604,130 @@ function CitationBlock({ score, timestamp }: { score: number; timestamp: string 
 }
 
 // ============================================================================
+// COUNTRY SELECTOR COMPONENT
+// ============================================================================
+
+function CountrySelector({
+  selectedCountry,
+  onSelect,
+}: {
+  selectedCountry: Country;
+  onSelect: (country: Country) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  // Group countries by region
+  const groupedCountries = useMemo(() => {
+    const groups: Record<string, Country[]> = {};
+    COUNTRIES.forEach(country => {
+      if (!groups[country.region]) {
+        groups[country.region] = [];
+      }
+      groups[country.region].push(country);
+    });
+    return groups;
+  }, []);
+
+  const regions = Object.keys(groupedCountries).sort();
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border bg-background hover:bg-muted/50 transition-colors"
+      >
+        <Globe className="h-4 w-4 text-muted-foreground" />
+        <span className="font-medium text-sm">{selectedCountry.nameLocal}</span>
+        <ChevronDown className={cn(
+          "h-4 w-4 text-muted-foreground transition-transform",
+          isOpen && "rotate-180"
+        )} />
+      </button>
+
+      {isOpen && (
+        <>
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setIsOpen(false)} 
+          />
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-full right-0 mt-2 w-80 max-h-96 overflow-auto bg-popover border rounded-lg shadow-lg z-50"
+          >
+            <div className="p-2 border-b bg-muted/30">
+              <p className="text-xs text-muted-foreground text-center">
+                Välj land för att se Reality Index
+              </p>
+            </div>
+            
+            {regions.map(region => (
+              <div key={region}>
+                <div className="px-3 py-2 text-xs font-semibold text-muted-foreground bg-muted/20 sticky top-0">
+                  {region}
+                </div>
+                {groupedCountries[region].map(country => (
+                  <button
+                    key={country.code}
+                    onClick={() => {
+                      onSelect(country);
+                      setIsOpen(false);
+                    }}
+                    className={cn(
+                      "w-full px-3 py-2 text-left flex items-center justify-between hover:bg-muted/50 transition-colors",
+                      selectedCountry.code === country.code && "bg-primary/10"
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{country.nameLocal}</span>
+                      <span className="text-xs text-muted-foreground">({country.name})</span>
+                    </div>
+                    <Badge variant="outline" className={cn(
+                      "text-[10px]",
+                      country.dataQuality === 'A' && "border-emerald-500 text-emerald-600",
+                      country.dataQuality === 'B' && "border-blue-500 text-blue-600",
+                      country.dataQuality === 'C' && "border-amber-500 text-amber-600",
+                      country.dataQuality === 'D' && "border-rose-500 text-rose-600",
+                    )}>
+                      {country.dataQuality}
+                    </Badge>
+                  </button>
+                ))}
+              </div>
+            ))}
+          </motion.div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
 export default function RealityIndex() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const countryCode = searchParams.get('country') || 'SE';
+  
+  const [selectedCountry, setSelectedCountry] = useState<Country>(
+    COUNTRIES.find(c => c.code === countryCode) || COUNTRIES[0]
+  );
   const [viewMode, setViewMode] = useState<ViewMode>('overview');
   const [expandedDomain, setExpandedDomain] = useState<string | null>(null);
-  const [geographyLevel] = useState<GeographyLevel>('country');
 
-  // Generate domain scores (would come from real data in production)
+  const handleCountryChange = (country: Country) => {
+    setSelectedCountry(country);
+    setSearchParams({ country: country.code });
+  };
+
+  // Generate domain scores based on selected country
   const domainScores = useMemo(() => {
-    const seed = Date.now() / 1000000;
+    // Use country code as seed for consistent but different scores per country
+    const seed = selectedCountry.code.charCodeAt(0) + selectedCountry.code.charCodeAt(1);
     return REALITY_DOMAINS.map(domain => generateDomainScore(domain, seed));
-  }, []);
+  }, [selectedCountry]);
 
   // Calculate composite index (equal weights as per spec)
   const compositeScore = Math.round(
@@ -579,9 +756,10 @@ export default function RealityIndex() {
             <span className="font-semibold">Reality Index 1.0</span>
           </div>
           <div className="flex items-center gap-3">
-            <Badge variant="outline" className="text-xs hidden sm:flex">
-              Sverige
-            </Badge>
+            <CountrySelector
+              selectedCountry={selectedCountry}
+              onSelect={handleCountryChange}
+            />
             <Link 
               to="/public"
               className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
