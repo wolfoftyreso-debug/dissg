@@ -6,6 +6,15 @@ export { KnowledgeWrapper, ClickableNumber, ClickableLabel } from './KnowledgeWr
 export { ClarityMap, ClarityMapDemo } from './ClarityMap';
 export { QuestionNavigation, QuestionNavigationDemo } from './QuestionNavigation';
 
+// Absolute Clarity Standard Components
+export { ClarityAnalysisView } from './ClarityAnalysisView';
+export { 
+  ForbiddenTermScanner, 
+  HighlightedText, 
+  ForbiddenTermsReference,
+  useTextValidation,
+} from './ForbiddenTermScanner';
+
 // Re-export configuration
 export {
   DEPTH_LEVELS,
@@ -24,3 +33,22 @@ export {
   type DepthLevel,
   type BreadcrumbLevel,
 } from '@/config/extremeClaritySystem';
+
+// Absolute Clarity Standard exports
+export {
+  CLARITY_DESIGN_RULES,
+  FORBIDDEN_TERMS,
+  NEUTRAL_REPLACEMENTS,
+  STANDARD_DISCLAIMERS,
+  TOPIC_TEMPLATES,
+  BENCHMARK_RESPONSE,
+  COMPREHENSION_TARGET,
+  validateAnalysisCompleteness,
+  scanForForbiddenTerms,
+  getNeutralReplacement,
+  type ClarityAnalysis,
+  type ObservationBlock,
+  type CoMovementBlock,
+  type LimitationsBlock,
+  type MisinterpretationRiskBlock,
+} from '@/config/absoluteClarityConfig';
