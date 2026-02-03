@@ -1176,6 +1176,90 @@ export type Database = {
           },
         ]
       }
+      canonical_questions: {
+        Row: {
+          answer_template_id: string | null
+          block_reason:
+            | Database["public"]["Enums"]["question_block_reason"]
+            | null
+          block_redirect: string | null
+          canonical_text: string
+          canonical_text_local: Json | null
+          comparison_baseline: string | null
+          created_at: string | null
+          default_time_window: string | null
+          excluded_indicator_ids: string[] | null
+          id: string
+          intent_class: Database["public"]["Enums"]["question_intent_class"]
+          is_active: boolean | null
+          is_blocked: boolean | null
+          metadata: Json | null
+          primary_indicator_ids: string[] | null
+          priority_rank: number | null
+          question_id: string
+          related_indicator_ids: string[] | null
+          scope_level: string
+          search_variants: string[] | null
+          search_volume_estimate: number | null
+          secondary_indicator_ids: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          answer_template_id?: string | null
+          block_reason?:
+            | Database["public"]["Enums"]["question_block_reason"]
+            | null
+          block_redirect?: string | null
+          canonical_text: string
+          canonical_text_local?: Json | null
+          comparison_baseline?: string | null
+          created_at?: string | null
+          default_time_window?: string | null
+          excluded_indicator_ids?: string[] | null
+          id?: string
+          intent_class: Database["public"]["Enums"]["question_intent_class"]
+          is_active?: boolean | null
+          is_blocked?: boolean | null
+          metadata?: Json | null
+          primary_indicator_ids?: string[] | null
+          priority_rank?: number | null
+          question_id: string
+          related_indicator_ids?: string[] | null
+          scope_level?: string
+          search_variants?: string[] | null
+          search_volume_estimate?: number | null
+          secondary_indicator_ids?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          answer_template_id?: string | null
+          block_reason?:
+            | Database["public"]["Enums"]["question_block_reason"]
+            | null
+          block_redirect?: string | null
+          canonical_text?: string
+          canonical_text_local?: Json | null
+          comparison_baseline?: string | null
+          created_at?: string | null
+          default_time_window?: string | null
+          excluded_indicator_ids?: string[] | null
+          id?: string
+          intent_class?: Database["public"]["Enums"]["question_intent_class"]
+          is_active?: boolean | null
+          is_blocked?: boolean | null
+          metadata?: Json | null
+          primary_indicator_ids?: string[] | null
+          priority_rank?: number | null
+          question_id?: string
+          related_indicator_ids?: string[] | null
+          scope_level?: string
+          search_variants?: string[] | null
+          search_volume_estimate?: number | null
+          secondary_indicator_ids?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       causal_chains: {
         Row: {
           alternative_explanations: Json | null
@@ -8045,6 +8129,119 @@ export type Database = {
         }
         Relationships: []
       }
+      question_answer_templates: {
+        Row: {
+          blocked_response_template: string | null
+          comparison_template: string | null
+          created_at: string | null
+          deep_links_template: string | null
+          id: string
+          intent_class: Database["public"]["Enums"]["question_intent_class"]
+          is_active: boolean | null
+          mechanism_template: string | null
+          short_answer_template: string
+          template_code: string
+          template_name: string
+          timeline_template: string | null
+          translations: Json | null
+          uncertainty_template: string | null
+        }
+        Insert: {
+          blocked_response_template?: string | null
+          comparison_template?: string | null
+          created_at?: string | null
+          deep_links_template?: string | null
+          id?: string
+          intent_class: Database["public"]["Enums"]["question_intent_class"]
+          is_active?: boolean | null
+          mechanism_template?: string | null
+          short_answer_template: string
+          template_code: string
+          template_name: string
+          timeline_template?: string | null
+          translations?: Json | null
+          uncertainty_template?: string | null
+        }
+        Update: {
+          blocked_response_template?: string | null
+          comparison_template?: string | null
+          created_at?: string | null
+          deep_links_template?: string | null
+          id?: string
+          intent_class?: Database["public"]["Enums"]["question_intent_class"]
+          is_active?: boolean | null
+          mechanism_template?: string | null
+          short_answer_template?: string
+          template_code?: string
+          template_name?: string
+          timeline_template?: string | null
+          translations?: Json | null
+          uncertainty_template?: string | null
+        }
+        Relationships: []
+      }
+      question_search_log: {
+        Row: {
+          block_reason:
+            | Database["public"]["Enums"]["question_block_reason"]
+            | null
+          created_at: string | null
+          detected_intent:
+            | Database["public"]["Enums"]["question_intent_class"]
+            | null
+          geo_context: string | null
+          id: string
+          language_code: string | null
+          matched_question_id: string | null
+          normalized_query: string | null
+          raw_query: string
+          source_type: string | null
+          was_blocked: boolean | null
+        }
+        Insert: {
+          block_reason?:
+            | Database["public"]["Enums"]["question_block_reason"]
+            | null
+          created_at?: string | null
+          detected_intent?:
+            | Database["public"]["Enums"]["question_intent_class"]
+            | null
+          geo_context?: string | null
+          id?: string
+          language_code?: string | null
+          matched_question_id?: string | null
+          normalized_query?: string | null
+          raw_query: string
+          source_type?: string | null
+          was_blocked?: boolean | null
+        }
+        Update: {
+          block_reason?:
+            | Database["public"]["Enums"]["question_block_reason"]
+            | null
+          created_at?: string | null
+          detected_intent?:
+            | Database["public"]["Enums"]["question_intent_class"]
+            | null
+          geo_context?: string | null
+          id?: string
+          language_code?: string | null
+          matched_question_id?: string | null
+          normalized_query?: string | null
+          raw_query?: string
+          source_type?: string | null
+          was_blocked?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_search_log_matched_question_id_fkey"
+            columns: ["matched_question_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       raw_data_ingest: {
         Row: {
           checksum: string
@@ -8901,6 +9098,65 @@ export type Database = {
         }
         Relationships: []
       }
+      suggested_questions: {
+        Row: {
+          created_at: string | null
+          detected_intent:
+            | Database["public"]["Enums"]["question_intent_class"]
+            | null
+          first_seen_at: string | null
+          id: string
+          last_seen_at: string | null
+          promoted_to_question_id: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          search_frequency: number | null
+          status: string | null
+          suggested_text: string
+        }
+        Insert: {
+          created_at?: string | null
+          detected_intent?:
+            | Database["public"]["Enums"]["question_intent_class"]
+            | null
+          first_seen_at?: string | null
+          id?: string
+          last_seen_at?: string | null
+          promoted_to_question_id?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          search_frequency?: number | null
+          status?: string | null
+          suggested_text: string
+        }
+        Update: {
+          created_at?: string | null
+          detected_intent?:
+            | Database["public"]["Enums"]["question_intent_class"]
+            | null
+          first_seen_at?: string | null
+          id?: string
+          last_seen_at?: string | null
+          promoted_to_question_id?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          search_frequency?: number | null
+          status?: string | null
+          suggested_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggested_questions_promoted_to_question_id_fkey"
+            columns: ["promoted_to_question_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       surfaced_insights: {
         Row: {
           created_at: string | null
@@ -9546,6 +9802,12 @@ export type Database = {
         | "lag_signal"
         | "anomaly"
       priority_level: "critical" | "high" | "medium" | "low" | "monitor"
+      question_block_reason:
+        | "normative"
+        | "political_directive"
+        | "speculative"
+        | "insufficient_data"
+        | "out_of_scope"
       question_category:
         | "demography_work"
         | "economic_capacity"
@@ -9553,6 +9815,13 @@ export type Database = {
         | "energy_resources"
         | "food_supply"
         | "institutional_resilience"
+      question_intent_class:
+        | "status"
+        | "trend"
+        | "cause"
+        | "comparison"
+        | "consequence"
+        | "forecast"
       responsibility_area:
         | "halsa"
         | "arbete"
@@ -9776,6 +10045,13 @@ export const Constants = {
         "anomaly",
       ],
       priority_level: ["critical", "high", "medium", "low", "monitor"],
+      question_block_reason: [
+        "normative",
+        "political_directive",
+        "speculative",
+        "insufficient_data",
+        "out_of_scope",
+      ],
       question_category: [
         "demography_work",
         "economic_capacity",
@@ -9783,6 +10059,14 @@ export const Constants = {
         "energy_resources",
         "food_supply",
         "institutional_resilience",
+      ],
+      question_intent_class: [
+        "status",
+        "trend",
+        "cause",
+        "comparison",
+        "consequence",
+        "forecast",
       ],
       responsibility_area: [
         "halsa",
