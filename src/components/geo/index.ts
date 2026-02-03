@@ -4,4 +4,6 @@
  */
 
 export * from '@/lib/geo/geoHierarchy';
+export * from '@/lib/geo/globalGeoRegistry';
 export * from './GeoNavigation';
+export { GeoExplorer } from './GeoExplorer';
