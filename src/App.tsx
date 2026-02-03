@@ -76,6 +76,7 @@ import Lambda from "./pages/Lambda";
 import InfiniteDepthDemo from "./pages/InfiniteDepthDemo";
 import RelevanceWeightManager from "./pages/RelevanceWeightManager";
 import OscilloscopeViewPage from "./pages/OscilloscopeViewPage";
+import GmiWeightEditor from "./pages/GmiWeightEditor";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -155,6 +156,7 @@ const App = () => (
               <Route path="/depth" element={<InfiniteDepthDemo />} />
               <Route path="/relevance-weight-manager" element={<RelevanceWeightManager />} />
               <Route path="/oscilloscope-view" element={<OscilloscopeViewPage />} />
+              <Route path="/gmi-weight-editor" element={<GmiWeightEditor />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
