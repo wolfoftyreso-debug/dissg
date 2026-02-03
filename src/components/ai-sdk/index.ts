@@ -21,3 +21,23 @@ export {
   type SdkResponse,
   type Citation,
 } from '@/config/aiAgentSdkConfig';
+
+// Re-export AI Citation Standard
+export {
+  ALLOWED_CITATION_TEMPLATES,
+  FORBIDDEN_FORMULATIONS,
+  CITATION_BLOCK_TEMPLATE,
+  AI_FALLBACK_RESPONSES,
+  AI_REFERENCE_DECLARATION,
+  AI_SDK_DONE_CRITERIA as CITATION_DONE_CRITERIA,
+  generateCitationBlock,
+  generateGroundingMetadata,
+  validateAICitation,
+  generateAIReferencePage,
+  EXAMPLE_CORRECT_RESPONSES,
+  type CitationBlock,
+  type AIGroundingMetadata,
+  type CitationValidationResult,
+  type CitationTemplateCode,
+  type FallbackResponseCode,
+} from '@/config/aiCitationStandard';
