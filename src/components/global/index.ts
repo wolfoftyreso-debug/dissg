@@ -54,3 +54,9 @@ export { LambdaSetpointDisplay, LambdaBadge, LambdaSensorBreakdown } from './Lam
 export { LambdaPedagogicalView } from './LambdaPedagogicalView';
 export { LambdaFormalDefinition } from './LambdaFormalDefinition';
 export { LambdaPublicExplainer } from './LambdaPublicExplainer';
+
+// LAMBDA Visualization (Strict Rules)
+export { LambdaGauge } from './LambdaGauge';
+export { LambdaSensorBreakdownBars } from './LambdaSensorBreakdownBars';
+export { LambdaChangeExplanation } from './LambdaChangeExplanation';
+export { LambdaComparisonWarning } from './LambdaComparisonWarning';
