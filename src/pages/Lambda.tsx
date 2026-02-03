@@ -16,19 +16,14 @@ import {
   Globe, 
   BookOpen,
   CheckCircle2,
-  XCircle,
-  ArrowRight,
   Layers,
   Cpu,
-  Scale,
   GraduationCap
 } from 'lucide-react';
 import {
-  LAMBDA_DEFINITION,
   LAMBDA_LEVELS,
   LAMBDA_SENSORS,
   SYSTEM_STRESS_INDICATORS,
-  SYSTEM_SAYS,
 } from '@/config/lambdaSetpointConfig';
 import { 
   LambdaSetpointDisplay, 
@@ -36,6 +31,7 @@ import {
   LambdaSensorBreakdown 
 } from '@/components/global/LambdaSetpointDisplay';
 import { LambdaPedagogicalView } from '@/components/global/LambdaPedagogicalView';
+import { LambdaFormalDefinition } from '@/components/global/LambdaFormalDefinition';
 
 const LambdaPage: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState<string>('national');
@@ -145,117 +141,9 @@ const LambdaPage: React.FC = () => {
             </Card>
           </TabsContent>
 
-          {/* Definition Tab */}
+          {/* Definition Tab - FORMAL SPECIFICATION */}
           <TabsContent value="definition" className="space-y-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Scale className="h-5 w-5" />
-                  Formal Definition
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="p-6 bg-muted/50 rounded-lg border">
-                  <p className="text-lg leading-relaxed">
-                    {LAMBDA_DEFINITION.formalDefinition.en}
-                  </p>
-                  <div className="mt-4 font-mono text-sm text-muted-foreground">
-                    Formula: {LAMBDA_DEFINITION.formula}
-                  </div>
-                </div>
-                
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-semibold flex items-center gap-2 text-emerald-600 mb-4">
-                      <CheckCircle2 className="h-5 w-5" />
-                      What Lambda 1.0 IS
-                    </h3>
-                    <ul className="space-y-2">
-                      {LAMBDA_DEFINITION.whatLambdaIs.map((item) => (
-                        <li key={item} className="flex items-start gap-2 text-sm">
-                          <ArrowRight className="h-4 w-4 mt-0.5 text-emerald-500" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold flex items-center gap-2 text-red-600 mb-4">
-                      <XCircle className="h-5 w-5" />
-                      What Lambda 1.0 is NOT
-                    </h3>
-                    <ul className="space-y-2">
-                      {LAMBDA_DEFINITION.whatLambdaIsNot.map((item) => (
-                        <li key={item} className="flex items-start gap-2 text-sm">
-                          <XCircle className="h-4 w-4 mt-0.5 text-red-500" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* What the System Says */}
-            <Card>
-              <CardHeader>
-                <CardTitle>What the System Says (and Doesn't Say)</CardTitle>
-                <CardDescription>
-                  Lambda provides measurements, not judgments
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="text-sm font-medium text-emerald-600 mb-3">The system SAYS:</h4>
-                    <ul className="space-y-2">
-                      {SYSTEM_SAYS.examples.map((example) => (
-                        <li key={example} className="text-sm p-2 bg-emerald-500/10 rounded border border-emerald-500/20 font-mono">
-                          "{example}"
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-red-600 mb-3">The system NEVER says:</h4>
-                    <ul className="space-y-2">
-                      {SYSTEM_SAYS.neverSays.map((example) => (
-                        <li key={example} className="text-sm p-2 bg-red-500/10 rounded border border-red-500/20 font-mono line-through opacity-60">
-                          "{example}"
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* The Decisive Point */}
-            <Card className="border-2 border-primary/20 bg-primary/5">
-              <CardContent className="pt-6">
-                <div className="text-center space-y-4">
-                  <h3 className="text-xl font-bold">The Decisive Point</h3>
-                  <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    When someone says:
-                  </p>
-                  <blockquote className="text-xl italic py-4">
-                    "We do this to improve society"
-                  </blockquote>
-                  <p className="text-lg text-muted-foreground">
-                    You can now answer:
-                  </p>
-                  <div className="text-2xl font-bold text-primary py-4">
-                    "Show how it affects Lambda."
-                  </div>
-                  <Separator className="my-4" />
-                  <p className="text-sm text-muted-foreground">
-                    If they cannot → it's not serious. It's rhetoric. It's feeling.<br/>
-                    <strong>Lambda is the final measuring stick.</strong>
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <LambdaFormalDefinition language="sv" />
           </TabsContent>
 
           {/* Live Demo Tab */}
