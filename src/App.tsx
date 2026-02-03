@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SpotlessProvider } from "@/context/SpotlessContext";
+import { InfiniteDepthProvider, DepthExplorer } from "@/components/data";
 import Index from "./pages/Index";
 import PublicDashboard from "./pages/PublicDashboard";
 import GlobalCompact from "./pages/GlobalCompact";
@@ -71,6 +72,7 @@ import HistoricalReplay from "./pages/HistoricalReplay";
 import AIAdoption from "./pages/AIAdoption";
 import CQAIS from "./pages/CQAIS";
 import Lambda from "./pages/Lambda";
+import InfiniteDepthDemo from "./pages/InfiniteDepthDemo";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -78,10 +80,12 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AuthProvider>
         <SpotlessProvider>
-          <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+          <InfiniteDepthProvider>
+            <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <DepthExplorer />
+            <BrowserRouter>
             <Routes>
               {/* Publika routes */}
               <Route path="/login" element={<Login />} />
@@ -144,6 +148,7 @@ const App = () => (
               <Route path="/ai-adoption" element={<AIAdoption />} />
               <Route path="/cqais" element={<CQAIS />} />
               <Route path="/lambda" element={<Lambda />} />
+              <Route path="/depth" element={<InfiniteDepthDemo />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
@@ -167,7 +172,8 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
-          </TooltipProvider>
+            </TooltipProvider>
+          </InfiniteDepthProvider>
         </SpotlessProvider>
       </AuthProvider>
     </ThemeProvider>
