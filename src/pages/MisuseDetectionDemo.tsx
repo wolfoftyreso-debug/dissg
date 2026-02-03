@@ -259,8 +259,8 @@ export default function MisuseDetectionDemo() {
       <div className="container mx-auto px-4 py-6 space-y-6">
         <SystemBreadcrumbs
           items={[
-            { label: 'System', labelSv: 'System', level: 'world', href: '/' },
-            { label: 'Governance', labelSv: 'Governance', level: 'indicator' },
+            { id: 'system', label: 'System', labelSv: 'System', level: 'world', href: '/' },
+            { id: 'governance', label: 'Governance', labelSv: 'Governance', level: 'indicator' },
           ]}
         />
 
