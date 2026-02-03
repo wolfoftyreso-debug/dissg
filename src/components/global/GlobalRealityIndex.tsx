@@ -472,7 +472,12 @@ export const GlobalRealityIndex: React.FC = () => {
                 GRI korsat med CPM ger: <strong>Sen mognad / tidig omställning</strong>
               </p>
             </div>
-            <Button variant="outline" size="sm" className="text-xs">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="text-xs"
+              onClick={() => window.location.href = '/civilization'}
+            >
               Öppna CPM →
             </Button>
           </div>
