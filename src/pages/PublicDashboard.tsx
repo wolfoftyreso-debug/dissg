@@ -73,23 +73,23 @@ function NationalStatusBadge({ status, summary }: {
   summary: string;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center py-8 px-4 animate-fade-in">
+    <div className="flex flex-col items-center justify-center py-6 sm:py-8 px-4 animate-fade-in">
       <div className={cn(
-        "w-28 h-28 rounded-full flex items-center justify-center mb-4 transition-all duration-500",
+        "w-20 h-20 sm:w-28 sm:h-28 rounded-full flex items-center justify-center mb-3 sm:mb-4 transition-all duration-500",
         "ring-4 ring-offset-4 ring-offset-background",
         status === 'positive' && "ring-status-positive/30 bg-status-positive/10",
         status === 'warning' && "ring-status-warning/30 bg-status-warning/10",
         status === 'critical' && "ring-status-critical/30 bg-status-critical/10"
       )}>
         <div className={cn(
-          "w-16 h-16 rounded-full transition-colors",
+          "w-12 h-12 sm:w-16 sm:h-16 rounded-full transition-colors",
           status === 'positive' && "bg-status-positive",
           status === 'warning' && "bg-status-warning",
           status === 'critical' && "bg-status-critical"
         )} />
       </div>
       <h2 className={cn(
-        "text-xl font-bold uppercase tracking-wide",
+        "text-lg sm:text-xl font-bold uppercase tracking-wide text-center",
         status === 'positive' && "text-status-positive",
         status === 'warning' && "text-status-warning",
         status === 'critical' && "text-status-critical"
@@ -98,10 +98,10 @@ function NationalStatusBadge({ status, summary }: {
         {status === 'warning' && 'Stabilt men med risker'}
         {status === 'critical' && 'Sverige försämras'}
       </h2>
-      <p className="text-muted-foreground text-center mt-3 max-w-md text-sm">
+      <p className="text-muted-foreground text-center mt-2 sm:mt-3 max-w-md text-sm px-2">
         {summary}
       </p>
-      <p className="text-xs text-muted-foreground mt-4">
+      <p className="text-xs text-muted-foreground mt-3 sm:mt-4">
         Uppdaterad: {new Date().toLocaleDateString('sv-SE')}
       </p>
     </div>
@@ -563,41 +563,62 @@ export default function PublicDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Header - Mobile optimized */}
       <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-primary" />
-            <span className="font-semibold text-sm">Nationellt Läge</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link 
-              to="/decisions"
-              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-            >
-              <Calendar className="h-3 w-3" />
-              Beslutstidslinje
-            </Link>
-            <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
-              <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
-                  <HelpCircle className="h-3.5 w-3.5" />
-                  Hur fungerar det?
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="p-0 border-0 bg-transparent shadow-none max-w-md">
-                <PublicOnboarding 
-                  onComplete={() => setShowOnboarding(false)} 
-                  onSkip={() => setShowOnboarding(false)} 
-                />
-              </DialogContent>
-            </Dialog>
-            <Link 
-              to="/"
-              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
-            >
-              Intern vy <ExternalLink className="h-3 w-3" />
-            </Link>
+        <div className="max-w-2xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
+          {/* Top row: Logo and main nav */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary shrink-0" />
+              <span className="font-semibold text-sm">Nationellt Läge</span>
+            </div>
+            
+            {/* Desktop nav */}
+            <div className="hidden sm:flex items-center gap-3">
+              <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-1.5 text-xs h-8">
+                    <HelpCircle className="h-3.5 w-3.5" />
+                    Hur fungerar det?
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="p-0 border-0 bg-transparent shadow-none max-w-md mx-4">
+                  <PublicOnboarding 
+                    onComplete={() => setShowOnboarding(false)} 
+                    onSkip={() => setShowOnboarding(false)} 
+                  />
+                </DialogContent>
+              </Dialog>
+              <Link 
+                to="/"
+                className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+              >
+                Intern vy <ExternalLink className="h-3 w-3" />
+              </Link>
+            </div>
+
+            {/* Mobile nav */}
+            <div className="flex sm:hidden items-center gap-1">
+              <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <HelpCircle className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="p-0 border-0 bg-transparent shadow-none max-w-[calc(100vw-2rem)] mx-4">
+                  <PublicOnboarding 
+                    onComplete={() => setShowOnboarding(false)} 
+                    onSkip={() => setShowOnboarding(false)} 
+                  />
+                </DialogContent>
+              </Dialog>
+              <Link 
+                to="/"
+                className="p-2 text-muted-foreground hover:text-foreground"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -618,63 +639,64 @@ export default function PublicDashboard() {
 
             <NationalStatusBadge status={nationalStatus} summary={summary} />
 
-            {/* Quick Links */}
-            <div className="flex flex-wrap justify-center gap-2 mt-4">
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/reality-index" className="gap-2">
-                  📊 Reality Index
+            {/* Quick Links - better mobile grid */}
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-center gap-2 mt-4">
+              <Button variant="outline" size="sm" className="h-9 text-xs px-3" asChild>
+                <Link to="/reality-index" className="gap-1.5">
+                  <span>📊</span>
+                  <span className="truncate">Reality Index</span>
                 </Link>
               </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/regional" className="gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Jämför län
+              <Button variant="outline" size="sm" className="h-9 text-xs px-3" asChild>
+                <Link to="/regional" className="gap-1.5">
+                  <BarChart3 className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">Jämför län</span>
                 </Link>
               </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/cities" className="gap-2">
-                  🏙️ Städer
+              <Button variant="outline" size="sm" className="h-9 text-xs px-3" asChild>
+                <Link to="/cities" className="gap-1.5">
+                  <span>🏙️</span>
+                  <span className="truncate">Städer</span>
                 </Link>
               </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/decisions" className="gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Beslutstidslinje
+              <Button variant="outline" size="sm" className="h-9 text-xs px-3" asChild>
+                <Link to="/decisions" className="gap-1.5">
+                  <Calendar className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">Tidslinje</span>
                 </Link>
               </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/replay" className="gap-2">
-                  📜 Historisk replay
+              <Button variant="outline" size="sm" className="h-9 text-xs px-3" asChild>
+                <Link to="/replay" className="gap-1.5">
+                  <span>📜</span>
+                  <span className="truncate">Historik</span>
                 </Link>
               </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/eu" className="gap-2">
-                  🇪🇺 EU Dashboard
+              <Button variant="outline" size="sm" className="h-9 text-xs px-3" asChild>
+                <Link to="/eu" className="gap-1.5">
+                  <span>🇪🇺</span>
+                  <span className="truncate">EU</span>
                 </Link>
               </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/gmi" className="gap-2">
-                  🌍 Global Master Index
+              <Button variant="outline" size="sm" className="h-9 text-xs px-3" asChild>
+                <Link to="/gmi" className="gap-1.5">
+                  <span>🌍</span>
+                  <span className="truncate">GMI</span>
                 </Link>
               </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/cite" className="gap-2">
-                  🤖 AI Citation API
-                </Link>
-              </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/api-policy" className="gap-2">
-                  📜 API & Licenser
+              <Button variant="outline" size="sm" className="h-9 text-xs px-3" asChild>
+                <Link to="/cite" className="gap-1.5">
+                  <span>🤖</span>
+                  <span className="truncate">API</span>
                 </Link>
               </Button>
             </div>
 
             {/* Area Grid */}
-            <div className="mt-8">
-              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
+            <div className="mt-6 sm:mt-8">
+              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3 sm:mb-4">
                 Välj ett område
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3">
                 {areaData.map((area) => (
                   <AreaCard 
                     key={area.group.id}
