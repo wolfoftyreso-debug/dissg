@@ -31,18 +31,12 @@ import {
   Globe, 
   ChevronRight,
   ExternalLink,
-  BarChart3,
   History,
-  AlertTriangle,
-  Database,
   FileText,
   Link2,
-  Microscope,
   Scale,
-  Zap,
   CheckCircle2,
   XCircle,
-  HelpCircle,
   Download,
   Share2,
   Bookmark
@@ -174,10 +168,7 @@ const CaseStudyDetail: React.FC<{
           {/* Methodology */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Microscope className="h-4 w-4" />
-                Metodologi
-              </CardTitle>
+              <CardTitle className="text-sm">Metod & tillvägagångssätt</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">{caseStudy.methodology}</p>
@@ -214,12 +205,13 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
   const evidence = getFactorEvidence(factor.id);
   if (!evidence) return null;
   
+  // Levels use text descriptions instead of abstract icons
   const levels = [
-    { id: 'L1', label: 'Observation', icon: BarChart3, description: 'Vad ser vi?' },
-    { id: 'L2', label: 'Mekanism', icon: Zap, description: 'Hur fungerar det?' },
-    { id: 'L3', label: 'Metod', icon: Microscope, description: 'Hur vet vi?' },
-    { id: 'L4', label: 'Begränsningar', icon: AlertTriangle, description: 'Vad visar detta INTE?' },
-    { id: 'L5', label: 'Rådata', icon: Database, description: 'Underliggande siffror' }
+    { id: 'L1', label: 'Observation', description: 'Vad ser vi i datan?' },
+    { id: 'L2', label: 'Mekanism', description: 'Hur fungerar sambandet?' },
+    { id: 'L3', label: 'Metod', description: 'Hur vet vi detta?' },
+    { id: 'L4', label: 'Begränsningar', description: 'Vad visar detta INTE?' },
+    { id: 'L5', label: 'Rådata', description: 'Underliggande siffror' }
   ];
   
   return (
@@ -227,11 +219,10 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-5xl max-h-[90vh] p-0">
           <div className="flex h-full">
-            {/* Level navigation sidebar */}
+            {/* Level navigation sidebar - text-based, no icons */}
             <div className="w-48 border-r bg-muted/30 p-4 flex-shrink-0">
               <div className="space-y-1">
                 {levels.map((level) => {
-                  const Icon = level.icon;
                   const isActive = activeLevel === level.id;
                   return (
                     <button
@@ -244,7 +235,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4" />
+                        <span className="text-xs font-mono opacity-60">{level.id}</span>
                         <span className="text-sm font-medium">{level.label}</span>
                       </div>
                       <p className={`text-xs mt-1 ${isActive ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
@@ -498,7 +489,6 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                 {activeLevel === 'L3' && (
                   <div className="space-y-6">
                     <Alert>
-                      <Microscope className="h-4 w-4" />
                       <AlertTitle>Metodtransparens</AlertTitle>
                       <AlertDescription>
                         Alla analyser ska kunna granskas och ifrågasättas. Här visar vi exakt hur slutsatserna är framtagna.
@@ -585,11 +575,8 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                     {/* Alternative interpretations */}
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-sm flex items-center gap-2">
-                          <HelpCircle className="h-4 w-4" />
-                          Alternativa tolkningar
-                        </CardTitle>
-                        <CardDescription>Andra sätt att förklara samma data</CardDescription>
+                        <CardTitle className="text-sm">Alternativa tolkningar</CardTitle>
+                        <CardDescription>Andra sätt att förklara samma data — vetenskaplig ödmjukhet</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <Accordion type="single" collapsible>
@@ -613,8 +600,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                 {activeLevel === 'L4' && (
                   <div className="space-y-6">
                     <Alert variant="destructive" className="bg-destructive/10 border-destructive/30">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertTitle>Obligatorisk begränsningsvy</AlertTitle>
+                      <AlertTitle>⚠ Obligatorisk begränsningsvy</AlertTitle>
                       <AlertDescription>
                         Ingen analys är komplett utan att förstå dess begränsningar. Läs detta innan du drar slutsatser.
                       </AlertDescription>
@@ -649,7 +635,9 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                         <ul className="space-y-2">
                           {evidence.limitations.methodologicalWeaknesses.map((w, idx) => (
                             <li key={idx} className="text-sm flex items-start gap-2">
-                              <AlertTriangle className={`h-4 w-4 mt-0.5 shrink-0 ${w.severity === 'high' ? 'text-destructive' : w.severity === 'medium' ? 'text-yellow-600' : 'text-muted-foreground'}`} />
+                              <span className={`text-sm shrink-0 ${w.severity === 'high' ? 'text-destructive' : w.severity === 'medium' ? 'text-amber-600' : 'text-muted-foreground'}`}>
+                                {w.severity === 'high' ? '●' : w.severity === 'medium' ? '◐' : '○'}
+                              </span>
                               <div>
                                 <span>{w.weaknessSv || w.weakness}</span>
                                 {w.mitigation && <p className="text-xs text-muted-foreground mt-1">Åtgärd: {w.mitigation}</p>}
