@@ -173,8 +173,25 @@ const PillarBar: React.FC<{
   );
 };
 
-// Regional map (simplified grid representation)
+// Region code to geo path mapping
+const REGION_TO_GEO_PATH: Record<string, string> = {
+  'EUR': '/geo/europe',
+  'NAM': '/geo/north-america',
+  'EAS': '/geo/east-asia',
+  'SAS': '/geo/south-asia',
+  'AFR': '/geo/africa',
+  'LAM': '/geo/latin-america',
+  'MNA': '/geo/mena',
+  'OCE': '/geo/oceania',
+};
+
+// Regional map (clickable grid representation with drill-down)
 const RegionalMap: React.FC = () => {
+  const handleRegionClick = (regionCode: string) => {
+    const path = REGION_TO_GEO_PATH[regionCode] || `/geo?region=${regionCode}`;
+    window.location.href = path;
+  };
+
   return (
     <Card className="bg-muted/20">
       <CardHeader className="pb-2">
@@ -191,20 +208,25 @@ const RegionalMap: React.FC = () => {
           {SAMPLE_REGIONAL_DATA.map(region => {
             const status = getStatusConfig(region.overallStatus);
             return (
-              <div 
+              <button 
                 key={region.regionCode}
-                className="p-2 rounded text-center text-xs hover:opacity-80 cursor-pointer transition-opacity"
+                onClick={() => handleRegionClick(region.regionCode)}
+                className="p-2 rounded text-center text-xs hover:opacity-80 hover:scale-105 cursor-pointer transition-all group border border-transparent hover:border-primary/30"
                 style={{ backgroundColor: `${status?.color}20` }}
+                title={`Klicka för att utforska ${region.regionNameSv}`}
               >
                 <div 
-                  className="w-3 h-3 rounded-full mx-auto mb-1"
+                  className="w-3 h-3 rounded-full mx-auto mb-1 group-hover:ring-2 group-hover:ring-offset-1 group-hover:ring-primary/40 transition-all"
                   style={{ backgroundColor: status?.color }}
                 />
-                <span className="font-medium">{region.regionNameSv}</span>
-              </div>
+                <span className="font-medium group-hover:underline">{region.regionNameSv}</span>
+              </button>
             );
           })}
         </div>
+        <p className="text-xs text-muted-foreground mt-3 text-center">
+          Klicka på en region för att se detaljerad data →
+        </p>
       </CardContent>
     </Card>
   );
