@@ -885,24 +885,39 @@ export default function CityNode() {
               <h3 className="font-semibold mb-4">Jämför med andra städer</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Jämförelse via distributionskurvor och percentiler – aldrig "bäst/sämst"-listor.
+                <span className="text-primary ml-1">Klicka på en stad för att se dess fullständiga data.</span>
               </p>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {CITIES.filter(c => c.id !== cityData.city.id).slice(0, 4).map(city => {
                   const otherData = generateCityData(city);
+                  const diffFromCurrent = otherData.compositeScore - cityData.compositeScore;
                   return (
-                    <button
+                    <motion.button
                       key={city.id}
                       onClick={() => handleCitySelect(city)}
-                      className="p-4 rounded-lg border hover:bg-muted/50 transition-colors text-left"
+                      className="group relative p-4 rounded-lg border bg-card hover:bg-muted/50 hover:border-primary/50 transition-all duration-200 text-left cursor-pointer"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      <div className="font-medium">{city.name}</div>
+                      {/* Arrow indicator */}
+                      <ChevronRight className="absolute top-3 right-3 h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      
+                      <div className="font-medium group-hover:text-primary transition-colors">{city.name}</div>
                       <div className="text-xs text-muted-foreground">{city.country}</div>
                       <div className="text-2xl font-bold mt-2">{otherData.compositeScore}</div>
                       <div className="text-xs text-muted-foreground">
                         P{otherData.percentileGlobal} globalt
                       </div>
-                    </button>
+                      
+                      {/* Difference indicator */}
+                      <div className={cn(
+                        "text-xs mt-2 font-medium",
+                        diffFromCurrent > 0 ? "text-emerald-500" : diffFromCurrent < 0 ? "text-rose-500" : "text-muted-foreground"
+                      )}>
+                        {diffFromCurrent > 0 ? '+' : ''}{diffFromCurrent} vs {cityData.city.name}
+                      </div>
+                    </motion.button>
                   );
                 })}
               </div>
