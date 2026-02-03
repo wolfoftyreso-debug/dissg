@@ -48,3 +48,6 @@ export { CoreIndicatorGrid } from './CoreIndicatorGrid';
 
 // WAVE 12: Truth Oracle Doctrine
 export * from '../doctrine';
+
+// LAMBDA 1.0: Global Reality Setpoint
+export { LambdaSetpointDisplay, LambdaBadge, LambdaSensorBreakdown } from './LambdaSetpointDisplay';
