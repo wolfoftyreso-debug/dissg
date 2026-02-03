@@ -86,3 +86,6 @@ export { LambdaGovernancePanel } from './LambdaGovernancePanel';
 export { LambdaLaunchProtocol } from './LambdaLaunchProtocol';
 export { LambdaAIGroundingPanel } from './LambdaAIGroundingPanel';
 export { LambdaFirstGlobalIndex } from './LambdaFirstGlobalIndex';
+
+// Universal Responsibility Map (Jurisdiction-Neutral)
+export { default as UniversalResponsibilityMap } from './UniversalResponsibilityMap';

@@ -14,7 +14,7 @@ import { RoleBasedDashboard } from '@/components/dashboard/RoleBasedDashboard';
 import { GovRoleDashboard } from '@/components/dashboard/GovRoleDashboard';
 import { AlertNotificationPanel } from '@/components/dashboard/AlertNotificationPanel';
 import { PrioritizedDashboard } from '@/components/relevance/PrioritizedDashboard';
-import { SwedenResponsibilityMap } from '@/components/responsibility/SwedenResponsibilityMap';
+import UniversalResponsibilityMap from '@/components/global/UniversalResponsibilityMap';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { useGovRole } from '@/hooks/useGovRole';
 import { getRoleConfig } from '@/config/roleViewConfig';
@@ -117,7 +117,7 @@ const Index = () => {
             )}
             
             {activeNav === 'responsibility' && (
-              <SwedenResponsibilityMap />
+              <UniversalResponsibilityMap />
             )}
             
             {activeNav === 'analysis' && (
