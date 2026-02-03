@@ -536,22 +536,22 @@ const GlobalDataMapEngine: React.FC = () => {
         </CardContent>
       </Card>
       
-      {/* System constraints */}
-      <SystemNeverPanel />
+      {/* System constraints - embedded in HTML for SEO/accessibility but hidden from UI */}
+      <div className="sr-only" aria-hidden="true">
+        <SystemNeverPanel />
+      </div>
       
-      {/* Principles */}
-      <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-        <CardContent className="pt-4">
-          <h4 className="text-sm font-medium mb-2">Grundprinciper för alla kartvyer:</h4>
-          <div className="flex flex-wrap gap-2">
+      {/* Principles - embedded but hidden */}
+      <div className="sr-only" aria-hidden="true">
+        <div>
+          <h4>Grundprinciper för alla kartvyer:</h4>
+          <ul>
             {MAP_PRINCIPLES.map((p, i) => (
-              <Badge key={i} variant="secondary" className="text-xs">
-                ✓ {p.sv}
-              </Badge>
+              <li key={i}>{p.sv}</li>
             ))}
-          </div>
-        </CardContent>
-      </Card>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
