@@ -6,13 +6,10 @@
  */
 
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { 
   Building2, 
   Search, 
@@ -25,7 +22,6 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
 
 // Swedish major cities with population data
 const SWEDISH_CITIES = [
@@ -92,57 +88,59 @@ function CityCard({ city }: { city: typeof SWEDISH_CITIES[0] }) {
                         downTrends > upTrends + 1 ? 'declining' : 'stable';
   
   return (
-    <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer group">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Building2 className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h3 className="font-semibold">{city.name}</h3>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <MapPin className="h-3 w-3" />
-              {city.region}
+    <Link to={`/city?city=${city.code}`}>
+      <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer group">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Building2 className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold">{city.name}</h3>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <MapPin className="h-3 w-3" />
+                {city.region}
+              </div>
             </div>
           </div>
+          <Badge 
+            variant={overallStatus === 'improving' ? 'default' : overallStatus === 'declining' ? 'destructive' : 'secondary'}
+            className="text-xs"
+          >
+            {overallStatus === 'improving' ? 'Förbättras' : overallStatus === 'declining' ? 'Försämras' : 'Stabilt'}
+          </Badge>
         </div>
-        <Badge 
-          variant={overallStatus === 'improving' ? 'default' : overallStatus === 'declining' ? 'destructive' : 'secondary'}
-          className="text-xs"
-        >
-          {overallStatus === 'improving' ? 'Förbättras' : overallStatus === 'declining' ? 'Försämras' : 'Stabilt'}
-        </Badge>
-      </div>
-      
-      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
-        <Users className="h-3 w-3" />
-        {city.population.toLocaleString('sv-SE')} invånare
-      </div>
-      
-      {/* Key indicators preview */}
-      <div className="grid grid-cols-3 gap-2 mb-4">
-        {indicators.slice(0, 3).map(ind => (
-          <div key={ind.code} className="text-center p-2 rounded bg-muted/50">
-            <div className="text-xs text-muted-foreground mb-1">{ind.name}</div>
-            <div className="flex items-center justify-center gap-1">
-              {ind.trend === 'up' && <TrendingUp className="h-3 w-3 text-emerald-500" />}
-              {ind.trend === 'down' && <TrendingDown className="h-3 w-3 text-rose-500" />}
-              {ind.trend === 'stable' && <Minus className="h-3 w-3 text-muted-foreground" />}
-              <span className="text-sm font-medium">
-                {ind.code === 'income' || ind.code === 'housing' 
-                  ? `${(ind.value / 1000).toFixed(0)}k`
-                  : ind.value.toFixed(ind.code === 'health' ? 1 : 0)}
-              </span>
+        
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
+          <Users className="h-3 w-3" />
+          {city.population.toLocaleString('sv-SE')} invånare
+        </div>
+        
+        {/* Key indicators preview */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {indicators.slice(0, 3).map(ind => (
+            <div key={ind.code} className="text-center p-2 rounded bg-muted/50">
+              <div className="text-xs text-muted-foreground mb-1">{ind.name}</div>
+              <div className="flex items-center justify-center gap-1">
+                {ind.trend === 'up' && <TrendingUp className="h-3 w-3 text-emerald-500" />}
+                {ind.trend === 'down' && <TrendingDown className="h-3 w-3 text-rose-500" />}
+                {ind.trend === 'stable' && <Minus className="h-3 w-3 text-muted-foreground" />}
+                <span className="text-sm font-medium">
+                  {ind.code === 'income' || ind.code === 'housing' 
+                    ? `${(ind.value / 1000).toFixed(0)}k`
+                    : ind.value.toFixed(ind.code === 'health' ? 1 : 0)}
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-      
-      <div className="flex items-center justify-end text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-        <span>Visa detaljer</span>
-        <ArrowRight className="h-3 w-3 ml-1" />
-      </div>
-    </Card>
+          ))}
+        </div>
+        
+        <div className="flex items-center justify-end text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+          <span>Visa detaljer</span>
+          <ArrowRight className="h-3 w-3 ml-1" />
+        </div>
+      </Card>
+    </Link>
   );
 }
 

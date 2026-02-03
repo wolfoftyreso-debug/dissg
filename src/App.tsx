@@ -64,6 +64,7 @@ import SpotlessPage from "./pages/SpotlessPage";
 import PrioritizedPage from "./pages/PrioritizedPage";
 import RealityIndex from "./pages/RealityIndex";
 import CityNodes from "./pages/CityNodes";
+import CityNode from "./pages/CityNode";
 import CitationAPI from "./pages/CitationAPI";
 import HistoricalReplay from "./pages/HistoricalReplay";
 const queryClient = new QueryClient();
@@ -132,6 +133,7 @@ const App = () => (
               <Route path="/prioritized" element={<PrioritizedPage />} />
               <Route path="/reality-index" element={<RealityIndex />} />
               <Route path="/cities" element={<CityNodes />} />
+              <Route path="/city" element={<CityNode />} />
               <Route path="/cite" element={<CitationAPI />} />
               <Route path="/replay" element={<HistoricalReplay />} />
               <Route path="/" element={
