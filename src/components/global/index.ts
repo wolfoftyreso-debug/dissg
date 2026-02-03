@@ -78,3 +78,6 @@ export { LambdaAITextGenerator, LambdaValueJudgmentResponse } from './LambdaAITe
 
 // LAMBDA Self-Calibration & Model Evolution
 export { LambdaSelfCalibration } from './LambdaSelfCalibration';
+
+// LAMBDA Governance, Immunity & Protection
+export { LambdaGovernancePanel } from './LambdaGovernancePanel';
