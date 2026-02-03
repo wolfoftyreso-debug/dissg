@@ -13,6 +13,7 @@ import { AnalysisPanel } from '@/components/dashboard/AnalysisPanel';
 import { RoleBasedDashboard } from '@/components/dashboard/RoleBasedDashboard';
 import { GovRoleDashboard } from '@/components/dashboard/GovRoleDashboard';
 import { AlertNotificationPanel } from '@/components/dashboard/AlertNotificationPanel';
+import { PrioritizedDashboard } from '@/components/relevance/PrioritizedDashboard';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { useGovRole } from '@/hooks/useGovRole';
 import { getRoleConfig } from '@/config/roleViewConfig';
@@ -21,7 +22,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Index = () => {
   const [selectedKPI, setSelectedKPI] = useState<KPI | null>(null);
-  const [activeNav, setActiveNav] = useState<NavItem>('overview');
+  const [activeNav, setActiveNav] = useState<NavItem>('priority');
   const [comparisonPeriod, setComparisonPeriod] = useState<'week' | 'month3' | 'month12'>('week');
   const [viewMode, setViewMode] = useState<'standard' | 'role'>('role');
   
@@ -93,6 +94,10 @@ const Index = () => {
           </>
         ) : (
           <>
+            {activeNav === 'priority' && (
+              <PrioritizedDashboard />
+            )}
+
             {activeNav === 'overview' && kpisByCategory.map(({ category, kpis }, index) => (
               <CategorySection
                 key={category.id}

@@ -1,8 +1,8 @@
-import { LayoutDashboard, BarChart3, FileCheck, Users, TrendingUp, Globe } from 'lucide-react';
+import { LayoutDashboard, BarChart3, FileCheck, Users, TrendingUp, Globe, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
-export type NavItem = 'overview' | 'indicators' | 'decisions' | 'responsibility' | 'analysis' | 'compact';
+export type NavItem = 'priority' | 'overview' | 'indicators' | 'decisions' | 'responsibility' | 'analysis' | 'compact';
 
 interface BottomNavProps {
   active: NavItem;
@@ -10,6 +10,7 @@ interface BottomNavProps {
 }
 
 const NAV_ITEMS: { id: NavItem; icon: typeof LayoutDashboard; label: string; link?: string }[] = [
+  { id: 'priority', icon: Flame, label: 'Prioritet' },
   { id: 'overview', icon: LayoutDashboard, label: 'Översikt' },
   { id: 'indicators', icon: BarChart3, label: 'Indikatorer' },
   { id: 'decisions', icon: FileCheck, label: 'Beslut' },
