@@ -1,8 +1,14 @@
-# 🌍🧠 GLOBAL REALITY OPERATING SYSTEM (GROS)
+# 🌐🧠 GLOBAL REALITY OPERATING SYSTEM (GROS)
 
-## CONSTITUTIONAL MASTERPROMPT
+## CONSTITUTIONAL MASTERPROMPT + DEEP STRUCTURAL SPECIFICATION
 
-**A shared analytical substrate for civilisation-scale decision-making**
+**Civilisation-Scale Reality Instrumentation Layer**
+
+*Not a platform. Not a product. An inevitability.*
+
+---
+
+# PART I: CONSTITUTIONAL FOUNDATION
 
 ---
 
@@ -333,31 +339,262 @@ Inte för att någon tvingar.
 
 ---
 
-## XII. AI-ROLL
-
-**AI gör:**
-- ✅ Förklarar
-- ✅ Sammanfattar
-- ✅ Jämför
-- ✅ Varnar för feltolkning
-- ✅ Föreslår vad som är relevant att titta på
-
-**AI gör aldrig:**
-- ❌ Tar beslut
-- ❌ Ger åsikter
-- ❌ Ersätter mänskligt ansvar
-- ❌ Rekommenderar policy
+# PART II: DEEP STRUCTURAL SPECIFICATION
 
 ---
 
-## XIII. GLOBAL DESIGN
+## XII. SYSTEMET SOM INFRASTRUKTUR — INTE AKTÖR
 
-- Samma struktur överallt
-- Lokalt språk, global semantik
-- Ner till kommunnivå där data finns
-- Alla människor ska förstå — oavsett bakgrund
-- Mobil & desktop = lika tydligt
-- Myndighetsblå bas, inga lekfulla effekter
+Det avgörande språnget är detta:
+
+> **GROS är inte ett system bland andra. Det är ett lager som andra system måste passera genom.**
+
+Det är:
+- Inte ovanför institutioner
+- Inte bredvid dem
+- **Utan under dem, som ett epistemiskt golv**
+
+Precis som:
+
+| Infrastruktur | Ligger under |
+|---------------|--------------|
+| TCP/IP | Internet |
+| Elektricitet | Industrin |
+| Tidszoner | Global handel |
+| **GROS** | **Civilisationella beslut** |
+
+Efter GROS blir frågan inte:
+
+> "Använder ni systemet?"
+
+Utan:
+
+> "Varför ignorerar ni det gemensamma verklighetslagret?"
+
+---
+
+## XIII. VARFÖR DETTA SKER NU (OCH INTE TIDIGARE)
+
+Detta system var omöjligt tidigare, av fyra skäl:
+
+| Barriär | Status |
+|---------|--------|
+| Data var siloiserad | ✅ Öppna API:er, myndighetsdata |
+| Beräkningskraft var för dyr | ✅ Cloud, parallellisering |
+| Integration krävde manuellt arbete | ✅ AI-driven fusion |
+| Förklaring av komplexitet krävde elitkompetens | ✅ LLM:er som förklaringsmotorer |
+
+**Alla fyra barriärer är nu borta.**
+
+Detta betyder något mycket obehagligt för institutioner:
+
+> **Att fortsätta som tidigare är inte längre tradition — det är försummelse.**
+
+---
+
+## XIV. SYSTEMETS TYSTA MAKTPOSITION
+
+GROS utövar ingen direkt makt.
+
+**Det gör något långt farligare:**
+
+- Det förändrar referensramen
+- Det flyttar vad som uppfattas som rimligt
+- Det definierar vad som räknas som seriöst
+
+### Makt utövas inte genom tvång — utan genom:
+
+| Mekanism | Effekt |
+|----------|--------|
+| Vad som kräver förklaring | Avvikelse från GROS kräver motivering |
+| Vad som kräver försvar | Beslut utan datagrund blir defensiva |
+| Vad som inte längre kan sägas oemotsagt | Narrativ utan verifiering tappar kraft |
+
+> **Efter GROS är det inte systemet som ifrågasätts. Det är avvikelser från det.**
+
+---
+
+## XV. SYSTEMET SOM ANTI-KORRUPTIONSMEKANISM
+
+Korruption kräver minst ett av följande:
+
+| Förutsättning | GROS-effekt |
+|---------------|-------------|
+| Komplexitet utan insyn | ✅ Full transparens till rådata |
+| Fragmenterade beslutsvägar | ✅ Alla beslut tidsstämplas |
+| Tidsförskjutning mellan beslut och konsekvens | ✅ Realtidskoppling |
+| Selektiv redovisning | ✅ Alla aggregeringar reversibla |
+
+**GROS eliminerar alla fyra genom design.**
+
+Inte genom kontroll.
+**Utan genom samtidig synlighet.**
+
+> **När alla ser samma sak i realtid, blir manipulation energimässigt omöjlig.**
+
+---
+
+## XVI. VARFÖR SYSTEMET ÄR FARLIGT FÖR SYMBOLMAKT
+
+Symbolmakt fungerar när:
+
+- Symboler inte testas mot utfall
+- Narrativ inte binds till konsekvens
+- Ansvar löses upp över tid
+
+### GROS gör tre saker:
+
+```
+1. Binder symbol → beslut
+2. Binder beslut → utfall
+3. Binder utfall → tidslinje
+```
+
+### Detta gör att:
+
+- **Symboler utan effekt tappar kraft**
+- **Retorik utan konsekvens avslöjas**
+- **Performativ politik dör av sig själv**
+
+---
+
+## XVII. SYSTEMET SOM CIVILISATIONELL SENSORFUSION
+
+GROS fungerar exakt som ett modernt tekniskt styrsystem:
+
+| Komponent | Funktion |
+|-----------|----------|
+| Hundratals sensorer | Dataflöden från alla domäner |
+| Realtidsfusion | Korrelation och samvariation |
+| Redundans | Multipla källor per KPI |
+| Felupptäckt | Avvikelsedetektion |
+| Avvikelsedetektion | Statistiskt signifikanta förändringar |
+
+**Det är:**
+- Ett oscilloskop
+- Ett diagnostikverktyg
+- Ett felindikationssystem
+
+**Men för:**
+- Samhällen
+- Ekonomier
+- Hälsa
+- Miljö
+- Institutioner
+
+> **Det är inte en karta. Det är instrumentpanelen.**
+
+---
+
+## XVIII. LAMBDA SOM UNIVERSAL METRIK
+
+Lambda används inte som mål.
+**Lambda används som referenspunkt.**
+
+### Lambda = 1.0 betyder:
+
+- Inget läckage
+- Inga överstyrningar
+- Inga systemiska spänningar
+
+### Avvikelse från Lambda betyder:
+
+| Riktning | Betydelse |
+|----------|-----------|
+| λ < 1.0 | Energi går förlorad, överbelastning |
+| λ > 1.0 | Resurser binds utan effekt, stress |
+
+### Gäller för:
+
+- Ekonomi
+- Utbildning
+- Urbanisering
+- Hälsa
+- Arbete
+- Energi
+- Social stabilitet
+
+> **Lambda är inte moral. Lambda är funktion.**
+
+---
+
+## XIX. VARFÖR DAVOS INTE KAN MOTSTÅ DETTA
+
+Davos existerar för att:
+
+- Samordna narrativ
+- Utbyta perspektiv
+- Kalibrera makt
+
+**Men Davos saknar idag:**
+
+> **Ett gemensamt analytiskt golv**
+
+### GROS blir:
+
+| Roll | Funktion |
+|------|----------|
+| Den tysta ryggraden | Bakom alla diskussioner |
+| Den interaktiva bakgrunden | Realtidsdata i alla paneler |
+| Det lager alla paneler förutsätts relatera till | Referenspunkt för trovärdighet |
+
+**Inte genom avtal. Utan genom relevans.**
+
+---
+
+## XX. VARFÖR DETTA BLIR HUVUDSPONSOR — INTE PARTNER
+
+Företag, stater och institutioner kommer vilja:
+
+- Associeras med verklighetsförankring
+- Visa att de inte agerar i mörker
+- Visa att deras beslut är testbara
+
+### GROS blir därför:
+
+> **Inte en sponsorlogga — utan det som sponsrar Davos med verklighet.**
+
+---
+
+## XXI. SYSTEMETS SJÄLVBEGRÄNSNING (DET SOM GÖR DET SÄKERT)
+
+GROS:
+
+- ❌ Ger inga order
+- ❌ Föreslår inga värderingar
+- ❌ Gör inga normativa påståenden
+
+**Det gör bara detta:**
+
+> **Det tar bort möjligheten att låtsas.**
+
+Det är därför det är säkert.
+**Och därför det är farligt.**
+
+---
+
+## XXII. SLUTSATS — DEN SOM INGEN KAN SÄGA EMOT
+
+Detta system kommer inte dominera världen.
+
+**Det kommer göra något mycket enklare:**
+
+> **Det kommer göra verkligheten gemensam igen.**
+
+När det händer:
+
+- Blir konflikter tydligare
+- Blir prioriteringar smalare
+- Blir beslut svårare att undvika
+- Blir ansvar återigen meningsfullt
+
+---
+
+## DEN SLUTLIGA SATSEN
+
+### Obruten. Oåterkallelig.
+
+> **När civilisationen får en instrumentpanel blir det omöjligt att köra i blindo och kalla det ledarskap.**
 
 ---
 
@@ -369,17 +606,13 @@ Inte för att någon tvingar.
 
 ---
 
-## SLUTSATS
-
-### Fast. Torr. Oåterkallelig.
-
-> **När verkligheten blir mätbar, blir ignorans ett val.**
+*Global Reality Operating System (GROS) v1.0*
+*Constitutional Masterprompt + Deep Structural Specification*
+*Lambda System — An oscilloscope for civilization*
 
 ---
 
-*Global Reality Operating System (GROS) v1.0*
-*Constitutional Masterprompt*
-*Lambda System — An oscilloscope for civilization*
+# APPENDIX
 
 ---
 
@@ -407,28 +640,43 @@ Inte för att någon tvingar.
 
 ---
 
-## APPENDIX B: ANTI-SYMBOLPOLITIK
+## APPENDIX B: INFRASTRUKTURELL POSITION
 
-Systemet identifierar och markerar automatiskt:
+| Lager | Exempel | GROS-analog |
+|-------|---------|-------------|
+| Fysiskt | Elektricitet, vatten | — |
+| Protokoll | TCP/IP, HTTP | G-DSP (Global Data Standard Protocol) |
+| Semantik | Schema.org, Dublin Core | GROS Ontology |
+| Applikation | Webbplatser, appar | Dashboards, API:er |
 
-| Mönster | Indikator |
-|---------|-----------|
-| Hög uppmärksamhet, låg effekt | Mediaexponering ÷ KPI-förändring |
-| Hög kostnad, låg påverkan | Budget ÷ utfallsförändring |
-| Narrativ utan empiriskt stöd | Påstående utan verifierbar datapunkt |
-
-> **Inte med åsikt — utan med effektmått.**
+> **GROS opererar på protokoll- och semantiknivå — inte applikationsnivå.**
 
 ---
 
-## APPENDIX C: VERIFIERBARHET
+## APPENDIX C: ANTI-KORRUPTIONSDESIGN
 
-Varje visualisering, sammanställning och påstående i systemet:
+| Korruptionsvektor | GROS-motåtgärd |
+|-------------------|----------------|
+| Komplexitet utan insyn | Alla aggregat reversibla till rådata |
+| Fragmenterade beslutsvägar | Alla beslut tidsstämplade och kopplade |
+| Tidsförskjutning | Realtidskoppling beslut → utfall |
+| Selektiv redovisning | Obligatorisk fullständighet |
+| Narrativ utan konsekvens | Symbol → beslut → utfall-koppling |
 
-1. **Har en unik hash** — SHA-256 för innehållsintegritet
-2. **Har en QR-kod** — För snabb verifiering
-3. **Kan reproduceras** — Samma input → samma output
-4. **Visar källkedja** — Från aggregat till rådata
-5. **Är versionerad** — Alla ändringar spåras
+---
 
-> **Systemet äger presentationen, inte sanningen.**
+## APPENDIX D: AI-ROLL
+
+**AI gör:**
+- ✅ Förklarar
+- ✅ Sammanfattar
+- ✅ Jämför
+- ✅ Varnar för feltolkning
+- ✅ Föreslår vad som är relevant att titta på
+
+**AI gör aldrig:**
+- ❌ Tar beslut
+- ❌ Ger åsikter
+- ❌ Ersätter mänskligt ansvar
+- ❌ Rekommenderar policy
+- ❌ Prioriterar mellan värden
