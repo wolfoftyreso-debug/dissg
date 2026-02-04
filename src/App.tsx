@@ -79,6 +79,7 @@ import OscilloscopeViewPage from "./pages/OscilloscopeViewPage";
 import GmiWeightEditor from "./pages/GmiWeightEditor";
 import SystemAuditPage from "./pages/SystemAudit";
 import FaultCodesPage from "./pages/FaultCodes";
+import DiagnosticsPage from "./pages/Diagnostics";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -161,6 +162,7 @@ const App = () => (
               <Route path="/gmi-weight-editor" element={<GmiWeightEditor />} />
               <Route path="/system-audit" element={<SystemAuditPage />} />
               <Route path="/fault-codes" element={<FaultCodesPage />} />
+              <Route path="/diagnostics" element={<DiagnosticsPage />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
