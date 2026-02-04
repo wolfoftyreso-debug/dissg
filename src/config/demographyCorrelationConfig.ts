@@ -207,6 +207,52 @@ export const GEO_LEVELS: GeoLevelOption[] = [
   }
 ];
 
+// === 4B. JURISDICTION SELECTION ===
+
+export interface JurisdictionOption {
+  id: string;
+  label: string;
+  labelSv: string;
+  type: 'country' | 'region' | 'municipality';
+  parentId?: string;
+  dataTier: 'A' | 'B' | 'C' | 'D';
+}
+
+// Countries with demographic data
+export const COUNTRIES: JurisdictionOption[] = [
+  { id: 'se', label: 'Sweden', labelSv: 'Sverige', type: 'country', dataTier: 'A' },
+  { id: 'no', label: 'Norway', labelSv: 'Norge', type: 'country', dataTier: 'A' },
+  { id: 'dk', label: 'Denmark', labelSv: 'Danmark', type: 'country', dataTier: 'A' },
+  { id: 'fi', label: 'Finland', labelSv: 'Finland', type: 'country', dataTier: 'A' },
+  { id: 'de', label: 'Germany', labelSv: 'Tyskland', type: 'country', dataTier: 'A' },
+  { id: 'nl', label: 'Netherlands', labelSv: 'Nederländerna', type: 'country', dataTier: 'A' },
+  { id: 'gb', label: 'United Kingdom', labelSv: 'Storbritannien', type: 'country', dataTier: 'A' },
+  { id: 'fr', label: 'France', labelSv: 'Frankrike', type: 'country', dataTier: 'A' },
+  { id: 'us', label: 'United States', labelSv: 'USA', type: 'country', dataTier: 'B' },
+  { id: 'ca', label: 'Canada', labelSv: 'Kanada', type: 'country', dataTier: 'B' },
+  { id: 'au', label: 'Australia', labelSv: 'Australien', type: 'country', dataTier: 'B' },
+];
+
+// Swedish regions (example - would be dynamic in production)
+export const SWEDISH_REGIONS: JurisdictionOption[] = [
+  { id: 'se-ab', label: 'Stockholm', labelSv: 'Stockholm', type: 'region', parentId: 'se', dataTier: 'A' },
+  { id: 'se-o', label: 'Västra Götaland', labelSv: 'Västra Götaland', type: 'region', parentId: 'se', dataTier: 'A' },
+  { id: 'se-m', label: 'Skåne', labelSv: 'Skåne', type: 'region', parentId: 'se', dataTier: 'A' },
+  { id: 'se-e', label: 'Östergötland', labelSv: 'Östergötland', type: 'region', parentId: 'se', dataTier: 'A' },
+  { id: 'se-d', label: 'Södermanland', labelSv: 'Södermanland', type: 'region', parentId: 'se', dataTier: 'A' },
+  { id: 'se-c', label: 'Uppsala', labelSv: 'Uppsala', type: 'region', parentId: 'se', dataTier: 'A' },
+  { id: 'se-z', label: 'Jämtland', labelSv: 'Jämtland', type: 'region', parentId: 'se', dataTier: 'B' },
+  { id: 'se-ac', label: 'Västerbotten', labelSv: 'Västerbotten', type: 'region', parentId: 'se', dataTier: 'B' },
+  { id: 'se-bd', label: 'Norrbotten', labelSv: 'Norrbotten', type: 'region', parentId: 'se', dataTier: 'B' },
+];
+
+// Helper to get regions for a country
+export const getRegionsForCountry = (countryId: string): JurisdictionOption[] => {
+  if (countryId === 'se') return SWEDISH_REGIONS;
+  // Other countries would have their own regions
+  return [];
+};
+
 // === 5. MANDATORY DISCLAIMERS ===
 
 export const CORRELATION_DISCLAIMER = {
