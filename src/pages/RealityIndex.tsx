@@ -724,7 +724,7 @@ function CitationBlock({ score, timestamp }: { score: number; timestamp: string 
 // RANKING VIEW - AGGREGATED LEADERBOARD
 // ============================================================================
 
-function RankingView({ selectedCountry }: { selectedCountry: Country }) {
+const RankingView = ({ selectedCountry }: { selectedCountry: Country }) => {
   // Generate rankings for all countries
   const rankings = useMemo(() => {
     return COUNTRIES
