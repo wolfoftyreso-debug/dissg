@@ -100,3 +100,6 @@ export * from './probable-cause-engine';
 
 // Setpoint & Tolerance System
 export * from './setpoint-tolerance';
+
+// Lambda 1.0 (Global Optimal Balance Index)
+export * from './lambda-1.0';
