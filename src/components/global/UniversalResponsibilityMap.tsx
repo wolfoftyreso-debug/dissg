@@ -336,19 +336,32 @@ const IndicatorBadge: React.FC<{ indicator: UniversalIndicator }> = ({ indicator
 const GovernanceLevelSection: React.FC<{ 
   level: GovernanceLevel;
   responsibilities: string[];
-}> = ({ level, responsibilities }) => {
+  isHighlighted?: boolean;
+}> = ({ level, responsibilities, isHighlighted = false }) => {
   if (responsibilities.length === 0) return null;
 
   return (
-    <div className="space-y-2 font-mono">
+    <div className={cn(
+      "space-y-2 font-mono p-3 rounded-lg border transition-all",
+      isHighlighted 
+        ? "bg-primary/10 border-primary/40 ring-2 ring-primary/30" 
+        : "bg-muted/30 border-border/50"
+    )}>
       <div className="flex items-center gap-2 text-sm font-medium">
-        <span className="text-xs text-muted-foreground">{level.marker}</span>
+        <Badge variant={isHighlighted ? "default" : "outline"} className="text-xs font-mono">
+          {level.marker}
+        </Badge>
         <span>{level.name}</span>
+        {isHighlighted && (
+          <Badge className="ml-auto text-xs bg-primary text-primary-foreground font-mono">
+            [VALD NIVÅ]
+          </Badge>
+        )}
       </div>
-      <div className="ml-6 space-y-1">
+      <div className="ml-2 space-y-1">
         {responsibilities.map((resp, idx) => (
           <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>[→]</span>
+            <span className="text-primary">[→]</span>
             <span>{resp}</span>
           </div>
         ))}
@@ -358,7 +371,7 @@ const GovernanceLevelSection: React.FC<{
 };
 
 // Domain card
-const DomainCard: React.FC<{ domain: HumanNeedDomain }> = ({ domain }) => {
+const DomainCard: React.FC<{ domain: HumanNeedDomain; selectedLevel: string }> = ({ domain, selectedLevel }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   
   const totalIndicators = domain.universalIndicators.length;
@@ -422,13 +435,22 @@ const DomainCard: React.FC<{ domain: HumanNeedDomain }> = ({ domain }) => {
                   <div>
                     <h4 className="font-semibold text-sm mb-3 flex items-center gap-2 font-mono">
                       [NIVÅ] Styrningsnivåer & typiskt mandat
+                      {selectedLevel !== 'all' && (
+                        <Badge variant="outline" className="ml-2 font-mono text-xs">
+                          Filtrerar: {GOVERNANCE_LEVELS.find(l => l.id === selectedLevel)?.marker}
+                        </Badge>
+                      )}
                     </h4>
-                    <div className="space-y-4">
-                      {GOVERNANCE_LEVELS.map((level) => (
+                    <div className="space-y-3">
+                      {(selectedLevel === 'all' 
+                        ? GOVERNANCE_LEVELS 
+                        : GOVERNANCE_LEVELS.filter(l => l.id === selectedLevel)
+                      ).map((level) => (
                         <GovernanceLevelSection
                           key={level.id}
                           level={level}
                           responsibilities={domain.governanceLevels[level.id as keyof typeof domain.governanceLevels] || []}
+                          isHighlighted={selectedLevel === level.id}
                         />
                       ))}
                     </div>
@@ -525,7 +547,7 @@ const UniversalResponsibilityMap: React.FC = () => {
       {/* Domain cards */}
       <div className="grid gap-4">
         {HUMAN_NEEDS_DOMAINS.map((domain) => (
-          <DomainCard key={domain.id} domain={domain} />
+          <DomainCard key={domain.id} domain={domain} selectedLevel={selectedLevel} />
         ))}
       </div>
 
