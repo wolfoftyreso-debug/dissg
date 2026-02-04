@@ -257,6 +257,61 @@ const SOURCE_REGISTRY: Record<string, AggregatedSource> = {
       }
     ],
     qualityAssurance: 'Officiella FN-data med dokumenterade osäkerhetsintervall för prognoser.'
+  },
+  
+  'national-statistics-nordic': {
+    categoryName: 'Nordiska statistikbyråer',
+    description: 'Officiell statistik från nationella statistikbyråer i Norden.',
+    methodology: 'Totalundersökningar och registerbaserad statistik enligt europeiska standarder (ESS).',
+    updateFrequency: 'Månadsvis till årligt beroende på indikator',
+    primarySources: [
+      {
+        name: 'Statistiska centralbyrån (SCB)',
+        url: 'https://www.scb.se/',
+        type: 'primary',
+        description: 'Sveriges officiella statistikmyndighet',
+        lastAccessed: '2024-01'
+      },
+      {
+        name: 'Brottsförebyggande rådet (BRÅ)',
+        url: 'https://bra.se/statistik.html',
+        type: 'primary',
+        description: 'Officiell svensk brottsstatistik'
+      },
+      {
+        name: 'Eurostat',
+        url: 'https://ec.europa.eu/eurostat',
+        type: 'primary',
+        description: 'EU:s statistikkontor med harmoniserade data'
+      },
+      {
+        name: 'Statistics Denmark',
+        url: 'https://www.dst.dk/',
+        type: 'primary',
+        description: 'Danmarks statistik'
+      },
+      {
+        name: 'Statistics Norway (SSB)',
+        url: 'https://www.ssb.no/',
+        type: 'primary',
+        description: 'Statistisk sentralbyrå'
+      },
+      {
+        name: 'Statistics Finland',
+        url: 'https://www.stat.fi/',
+        type: 'primary',
+        description: 'Tilastokeskus'
+      }
+    ],
+    secondarySources: [
+      {
+        name: 'Nordic Statistics',
+        url: 'https://www.nordicstatistics.org/',
+        type: 'secondary',
+        description: 'Jämförbar nordisk statistik'
+      }
+    ],
+    qualityAssurance: 'Officiell statistik enligt europeiska kvalitetsstandarder. Registerbaserade data med hög täckningsgrad.'
   }
 };
 
