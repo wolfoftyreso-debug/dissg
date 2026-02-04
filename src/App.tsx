@@ -11,6 +11,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SpotlessProvider } from "@/context/SpotlessContext";
 import { InfiniteDepthProvider, DepthExplorer } from "@/components/data";
 import { TruthLayerProvider } from "@/components/truth";
+import { AppLayout } from "@/components/layout/AppLayout";
 import Index from "./pages/Index";
 import PublicDashboard from "./pages/PublicDashboard";
 import GlobalCompact from "./pages/GlobalCompact";
@@ -115,105 +116,113 @@ const App = () => (
                     <DepthExplorer />
                     <BrowserRouter>
             <Routes>
-              {/* Publika routes */}
+              {/* Auth routes - utan layout */}
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/public" element={<PublicDashboard />} />
-              <Route path="/regional" element={<RegionalView />} />
-              <Route path="/decisions" element={<DecisionTimeline />} />
-              <Route path="/compact" element={<GlobalCompact />} />
-              <Route path="/api-policy" element={<ApiLicensingPage />} />
-              <Route path="/gmi" element={<GlobalMasterIndex />} />
-              <Route path="/profiles" element={<PublicProfiles />} />
-              <Route path="/profile-demo" element={<ProfileDemo />} />
-              <Route path="/wrapped" element={<WrappedDemo />} />
-              <Route path="/eu" element={<EuDashboardPage />} />
-              <Route path="/om" element={<AboutSystem />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/demo" element={<ConceptDemo />} />
-              <Route path="/canvas" element={<CanvasDemo />} />
-              <Route path="/learn" element={<LearningPaths />} />
-              <Route path="/stories" element={<StoriesDemo />} />
-              <Route path="/resilience" element={<ResilienceDemo />} />
-              <Route path="/insights" element={<InsightBuilderDemo />} />
-              <Route path="/collective-learning" element={<CollectiveLearningDemo />} />
-              <Route path="/misuse-detection" element={<MisuseDetectionDemo />} />
-              <Route path="/system-memory" element={<SystemMemoryDemo />} />
-              <Route path="/cognitive-bias" element={<CognitiveBiasDemo />} />
-              <Route path="/viability" element={<HumanViabilityDemo />} />
-              <Route path="/perspective" element={<PerspectiveDemo />} />
-              <Route path="/clarity" element={<ClarityDemo />} />
-              <Route path="/demography" element={<DemographyDemo />} />
-              <Route path="/sweden" element={<SwedenDashboard />} />
-              <Route path="/scenario" element={<ScenarioDemo />} />
-              <Route path="/capacity" element={<CapacityDemo />} />
-              <Route path="/fairness" element={<FairnessDemo />} />
-              <Route path="/civilization" element={<CivilizationDemo />} />
-              <Route path="/map" element={<GlobalMapDemo />} />
-              <Route path="/explain" element={<ExplainDemo />} />
-              <Route path="/reality" element={<GlobalRealityDemo />} />
-              <Route path="/indices" element={<IndexEngineDemo />} />
-              <Route path="/index" element={<IndexPage />} />
-              <Route path="/correlation" element={<CorrelationDemo />} />
-              <Route path="/smoke-test" element={<SmokeTestPage />} />
-              <Route path="/trust-log" element={<TrustLogPage />} />
-              <Route path="/charter" element={<CharterPage />} />
-              <Route path="/governance" element={<GovernancePage />} />
-              <Route path="/evidence" element={<EvidenceRequirementPage />} />
-              <Route path="/mechanism" element={<EvidenceMechanismPage />} />
-              <Route path="/big-questions" element={<BigQuestionsPage />} />
-              <Route path="/big-questions/:code" element={<BigQuestionDetailPage />} />
-              <Route path="/ai/grounding" element={<AIGroundingPage />} />
-              <Route path="/reality-check" element={<RealityCheckDemo />} />
-              <Route path="/onboarding" element={<OnboardingPage />} />
-              <Route path="/spotless" element={<SpotlessPage />} />
-              <Route path="/prioritized" element={<PrioritizedPage />} />
-              <Route path="/reality-index" element={<RealityIndex />} />
-              <Route path="/cities" element={<CityNodes />} />
-              <Route path="/city" element={<CityNode />} />
-              <Route path="/cite" element={<CitationAPI />} />
-              <Route path="/ai-discovery" element={<AIDiscovery />} />
-              <Route path="/replay" element={<HistoricalReplay />} />
-              <Route path="/ai-adoption" element={<AIAdoption />} />
-              <Route path="/cqais" element={<CQAIS />} />
-              <Route path="/lambda" element={<Lambda />} />
-              <Route path="/depth" element={<InfiniteDepthDemo />} />
-              <Route path="/relevance-weight-manager" element={<RelevanceWeightManager />} />
-              <Route path="/oscilloscope-view" element={<OscilloscopeViewPage />} />
-              <Route path="/gmi-weight-editor" element={<GmiWeightEditor />} />
-              <Route path="/system-audit" element={<SystemAuditPage />} />
-              <Route path="/fault-codes" element={<FaultCodesPage />} />
-              <Route path="/diagnostics" element={<DiagnosticsPage />} />
-              <Route path="/ai-governance" element={<AIGovernancePage />} />
-              <Route path="/self-test" element={<SelfTestPage />} />
-              <Route path="/gedi" element={<GEDIPage />} />
-              <Route path="/lambda1" element={<Lambda1Page />} />
-              <Route path="/gdm" element={<GDMPage />} />
-              <Route path="/ggd" element={<GGDPage />} />
-              <Route path="/wages" element={<WagesPage />} />
-              <Route path="/country/:code" element={<CountryExplorer />} />
-              <Route path="/indicator/:code" element={<IndicatorExplorer />} />
-              <Route path="/log" element={<SystemLog />} />
-              <Route path="/data" element={<DataPage />} />
-              <Route path="/extras" element={<Extras />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/democratic-health" element={<DemocraticHealth />} />
-              <Route path="/budget" element={<BudgetPage />} />
-              {/* Huvudsidan är publik - läsning utan inloggning */}
-              <Route path="/" element={<Index />} />
-              {/* Skyddade routes - kräver inloggning */}
-              <Route path="/depth-demo" element={
-                <ProtectedRoute requiredRole="operativ">
-                  <DepthDemo />
-                </ProtectedRoute>
-              } />
               
-              {/* Admin - kräver Statsminister */}
-              <Route path="/admin" element={
-                <ProtectedRoute requiredRole="statsminister">
-                  <Admin />
-                </ProtectedRoute>
-              } />
+              {/* Fullskärmskartan - utan layout */}
+              <Route path="/gdm" element={<GDMPage />} />
+              
+              {/* Routes med global layout (sidebar + breadcrumbs) */}
+              <Route element={<AppLayout />}>
+                <Route path="/public" element={<PublicDashboard />} />
+                <Route path="/regional" element={<RegionalView />} />
+                <Route path="/decisions" element={<DecisionTimeline />} />
+                <Route path="/compact" element={<GlobalCompact />} />
+                <Route path="/api-policy" element={<ApiLicensingPage />} />
+                <Route path="/gmi" element={<GlobalMasterIndex />} />
+                <Route path="/profiles" element={<PublicProfiles />} />
+                <Route path="/profile-demo" element={<ProfileDemo />} />
+                <Route path="/wrapped" element={<WrappedDemo />} />
+                <Route path="/eu" element={<EuDashboardPage />} />
+                <Route path="/om" element={<AboutSystem />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/demo" element={<ConceptDemo />} />
+                <Route path="/canvas" element={<CanvasDemo />} />
+                <Route path="/learn" element={<LearningPaths />} />
+                <Route path="/stories" element={<StoriesDemo />} />
+                <Route path="/resilience" element={<ResilienceDemo />} />
+                <Route path="/insights" element={<InsightBuilderDemo />} />
+                <Route path="/collective-learning" element={<CollectiveLearningDemo />} />
+                <Route path="/misuse-detection" element={<MisuseDetectionDemo />} />
+                <Route path="/system-memory" element={<SystemMemoryDemo />} />
+                <Route path="/cognitive-bias" element={<CognitiveBiasDemo />} />
+                <Route path="/viability" element={<HumanViabilityDemo />} />
+                <Route path="/perspective" element={<PerspectiveDemo />} />
+                <Route path="/clarity" element={<ClarityDemo />} />
+                <Route path="/demography" element={<DemographyDemo />} />
+                <Route path="/sweden" element={<SwedenDashboard />} />
+                <Route path="/scenario" element={<ScenarioDemo />} />
+                <Route path="/capacity" element={<CapacityDemo />} />
+                <Route path="/fairness" element={<FairnessDemo />} />
+                <Route path="/civilization" element={<CivilizationDemo />} />
+                <Route path="/map" element={<GlobalMapDemo />} />
+                <Route path="/explain" element={<ExplainDemo />} />
+                <Route path="/reality" element={<GlobalRealityDemo />} />
+                <Route path="/indices" element={<IndexEngineDemo />} />
+                <Route path="/index" element={<IndexPage />} />
+                <Route path="/correlation" element={<CorrelationDemo />} />
+                <Route path="/smoke-test" element={<SmokeTestPage />} />
+                <Route path="/trust-log" element={<TrustLogPage />} />
+                <Route path="/charter" element={<CharterPage />} />
+                <Route path="/governance" element={<GovernancePage />} />
+                <Route path="/evidence" element={<EvidenceRequirementPage />} />
+                <Route path="/mechanism" element={<EvidenceMechanismPage />} />
+                <Route path="/big-questions" element={<BigQuestionsPage />} />
+                <Route path="/big-questions/:code" element={<BigQuestionDetailPage />} />
+                <Route path="/ai/grounding" element={<AIGroundingPage />} />
+                <Route path="/reality-check" element={<RealityCheckDemo />} />
+                <Route path="/onboarding" element={<OnboardingPage />} />
+                <Route path="/spotless" element={<SpotlessPage />} />
+                <Route path="/prioritized" element={<PrioritizedPage />} />
+                <Route path="/reality-index" element={<RealityIndex />} />
+                <Route path="/cities" element={<CityNodes />} />
+                <Route path="/city" element={<CityNode />} />
+                <Route path="/cite" element={<CitationAPI />} />
+                <Route path="/ai-discovery" element={<AIDiscovery />} />
+                <Route path="/replay" element={<HistoricalReplay />} />
+                <Route path="/ai-adoption" element={<AIAdoption />} />
+                <Route path="/cqais" element={<CQAIS />} />
+                <Route path="/lambda" element={<Lambda />} />
+                <Route path="/depth" element={<InfiniteDepthDemo />} />
+                <Route path="/relevance-weight-manager" element={<RelevanceWeightManager />} />
+                <Route path="/oscilloscope-view" element={<OscilloscopeViewPage />} />
+                <Route path="/gmi-weight-editor" element={<GmiWeightEditor />} />
+                <Route path="/system-audit" element={<SystemAuditPage />} />
+                <Route path="/fault-codes" element={<FaultCodesPage />} />
+                <Route path="/diagnostics" element={<DiagnosticsPage />} />
+                <Route path="/ai-governance" element={<AIGovernancePage />} />
+                <Route path="/self-test" element={<SelfTestPage />} />
+                <Route path="/gedi" element={<GEDIPage />} />
+                <Route path="/lambda1" element={<Lambda1Page />} />
+                <Route path="/ggd" element={<GGDPage />} />
+                <Route path="/wages" element={<WagesPage />} />
+                <Route path="/country/:code" element={<CountryExplorer />} />
+                <Route path="/indicator/:code" element={<IndicatorExplorer />} />
+                <Route path="/log" element={<SystemLog />} />
+                <Route path="/data" element={<DataPage />} />
+                <Route path="/extras" element={<Extras />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/democratic-health" element={<DemocraticHealth />} />
+                <Route path="/budget" element={<BudgetPage />} />
+                
+                {/* Huvudsidan */}
+                <Route path="/" element={<Index />} />
+                
+                {/* Skyddade routes - kräver inloggning */}
+                <Route path="/depth-demo" element={
+                  <ProtectedRoute requiredRole="operativ">
+                    <DepthDemo />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Admin - kräver Statsminister */}
+                <Route path="/admin" element={
+                  <ProtectedRoute requiredRole="statsminister">
+                    <Admin />
+                  </ProtectedRoute>
+                } />
+              </Route>
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

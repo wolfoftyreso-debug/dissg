@@ -19,7 +19,8 @@ export type EntityType =
   | 'indicator'
   | 'index'
   | 'observation'
-  | 'source';
+  | 'source'
+  | 'mode'; // Navigation/instrument modes
 
 export interface EntityLink {
   id: string;
@@ -56,6 +57,7 @@ export const ENTITY_PATH_PATTERNS: Record<EntityType, string> = {
   index: '/index/:code',
   observation: '/observation/:id',
   source: '/source/:code',
+  mode: '/:code', // Navigation modes
 };
 
 // Generate canonical path for an entity
@@ -230,6 +232,7 @@ export const ENTITY_LEVELS: Record<EntityType, number> = {
   index: 2,
   observation: 3,
   source: 1,
+  mode: 3, // Instrument modes
 };
 
 // Get parent entity type
