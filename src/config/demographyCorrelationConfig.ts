@@ -273,22 +273,235 @@ export const WHAT_THIS_DOES_NOT_SHOW = {
   ]
 };
 
-// === 6. CONTROL VARIABLES ===
+// === 6. CONTROL VARIABLES (Full Explanation Pyramid) ===
+
+export interface ControlVariableSource {
+  name: string;
+  url: string;
+  type: 'primary' | 'secondary';
+  coverage: string;
+}
 
 export interface ControlVariable {
   id: string;
   name: string;
   nameSv: string;
   description: string;
+  // Level 1: Observation (What?)
+  observation: {
+    sv: string;
+    en: string;
+  };
+  // Level 2: Mechanism (Why/Drivers?)
+  mechanism: {
+    sv: string;
+    en: string;
+  };
+  // Level 3: Method (How do we know?)
+  method: {
+    sv: string;
+    en: string;
+    dataFrequency: string;
+    latestUpdate: string;
+  };
+  // Level 4: Limitations (What doesn't this show?)
+  limitations: {
+    sv: string[];
+    en: string[];
+  };
+  // Level 5: Sources (Raw data)
+  sources: ControlVariableSource[];
+  // Trend data for sparkline
+  trendDirection: 'up' | 'down' | 'stable' | 'volatile';
+  changePercent?: number;
+  relevanceScore: number; // 0-100, how relevant to the analysis
 }
 
 export const CONTROL_VARIABLES: ControlVariable[] = [
-  { id: 'population_size', name: 'Population size', nameSv: 'Befolkningsstorlek', description: 'Total befolkning i området' },
-  { id: 'age_structure', name: 'Age structure', nameSv: 'Åldersstruktur', description: 'Fördelning av åldersgrupper' },
-  { id: 'urbanization', name: 'Urbanization', nameSv: 'Urbanisering', description: 'Andel boende i städer' },
-  { id: 'economic_cycles', name: 'Economic cycles', nameSv: 'Ekonomiska cykler', description: 'Konjunkturläge under perioden' },
-  { id: 'law_changes', name: 'Legislative changes', nameSv: 'Lagändringar', description: 'Relevanta lagändringar under perioden' },
-  { id: 'reporting_practices', name: 'Reporting practices', nameSv: 'Rapporteringspraxis', description: 'Förändringar i hur statistik samlas in' }
+  { 
+    id: 'population_size', 
+    name: 'Population size', 
+    nameSv: 'Befolkningsstorlek', 
+    description: 'Total befolkning i området',
+    observation: {
+      sv: 'Sveriges befolkning ökade från 8,9 till 10,5 miljoner under analysperioden.',
+      en: 'Sweden\'s population increased from 8.9 to 10.5 million during the analysis period.'
+    },
+    mechanism: {
+      sv: 'Befolkningsökning påverkar brottsnivåer genom ökad befolkningstäthet, förändrad åldersstruktur och urbanisering. Fler personer innebär fler potentiella händelser, men också fler rapportörer.',
+      en: 'Population growth affects crime levels through increased density, changed age structure and urbanization.'
+    },
+    method: {
+      sv: 'Folkbokföring via Skatteverket. Alla personer med uppehållstillstånd >12 månader registreras.',
+      en: 'Population registry via Swedish Tax Agency. All persons with residence >12 months are registered.',
+      dataFrequency: 'Månadsvis',
+      latestUpdate: '2024-01-15'
+    },
+    limitations: {
+      sv: ['Exkluderar papperslösa', 'Registreringsfördröjning ~2 månader', 'Regional fördelning kan avvika'],
+      en: ['Excludes undocumented persons', 'Registration delay ~2 months', 'Regional distribution may differ']
+    },
+    sources: [
+      { name: 'SCB Befolkningsstatistik', url: 'https://www.scb.se/be0101', type: 'primary', coverage: '1749-2024' },
+      { name: 'Eurostat Population', url: 'https://ec.europa.eu/eurostat', type: 'secondary', coverage: '1960-2024' }
+    ],
+    trendDirection: 'up',
+    changePercent: 18.4,
+    relevanceScore: 85
+  },
+  { 
+    id: 'age_structure', 
+    name: 'Age structure', 
+    nameSv: 'Åldersstruktur', 
+    description: 'Fördelning av åldersgrupper',
+    observation: {
+      sv: 'Andelen 15-24-åringar minskade från 12,8% till 11,2% under perioden. Medianåldern ökade från 39 till 41 år.',
+      en: 'The proportion of 15-24 year olds decreased from 12.8% to 11.2%. Median age increased from 39 to 41.'
+    },
+    mechanism: {
+      sv: 'Åldersstruktur påverkar brottsstatistik starkt då personer 15-30 år står för majoriteten av anmälda brott. En åldrande befolkning tenderar korrelera med lägre brottsnivåer, allt annat lika.',
+      en: 'Age structure strongly affects crime statistics as persons 15-30 account for the majority of reported crimes.'
+    },
+    method: {
+      sv: 'Åldersfördelning beräknas från folkbokföring. Kohorter definieras i 5-årsintervall.',
+      en: 'Age distribution calculated from population registry. Cohorts defined in 5-year intervals.',
+      dataFrequency: 'Årlig',
+      latestUpdate: '2024-01-10'
+    },
+    limitations: {
+      sv: ['Ålder vid brott kan skilja från ålder vid dom', 'Kriminalitetsbenägenhet varierar inom kohorter', 'Historiska data saknar finfördelning'],
+      en: ['Age at crime may differ from age at conviction', 'Criminal propensity varies within cohorts', 'Historical data lacks granularity']
+    },
+    sources: [
+      { name: 'SCB Befolkningsstatistik', url: 'https://www.scb.se/be0101', type: 'primary', coverage: '1860-2024' },
+      { name: 'BRÅ Kriminalstatistik', url: 'https://www.bra.se', type: 'secondary', coverage: '1950-2024' }
+    ],
+    trendDirection: 'up',
+    changePercent: 5.1,
+    relevanceScore: 92
+  },
+  { 
+    id: 'urbanization', 
+    name: 'Urbanization', 
+    nameSv: 'Urbanisering', 
+    description: 'Andel boende i städer',
+    observation: {
+      sv: 'Andelen boende i tätorter ökade från 83% till 88% under analysperioden.',
+      en: 'The proportion living in urban areas increased from 83% to 88% during the analysis period.'
+    },
+    mechanism: {
+      sv: 'Urbanisering ökar befolkningstäthet och anonymitet, vilket kan påverka både brottsbenägenhet och anmälningsbenägenhet. Städer har också fler polisresurser per capita.',
+      en: 'Urbanization increases population density and anonymity, affecting both crime propensity and reporting rates.'
+    },
+    method: {
+      sv: 'Tätortsdefinition: sammanhängande bebyggelse med >200 invånare och <200m mellan hus. Mäts via GIS-analys.',
+      en: 'Urban area definition: continuous settlement with >200 inhabitants and <200m between buildings.',
+      dataFrequency: 'Vart 5:e år',
+      latestUpdate: '2020-12-31'
+    },
+    limitations: {
+      sv: ['Definition ändrades 2015', 'Pendling ej inkluderad', 'Förorter klassificeras olika över tid'],
+      en: ['Definition changed 2015', 'Commuting not included', 'Suburbs classified differently over time']
+    },
+    sources: [
+      { name: 'SCB Tätorter', url: 'https://www.scb.se/mi0810', type: 'primary', coverage: '1960-2020' },
+      { name: 'UN World Urbanization', url: 'https://population.un.org/wup/', type: 'secondary', coverage: '1950-2050' }
+    ],
+    trendDirection: 'up',
+    changePercent: 6.0,
+    relevanceScore: 78
+  },
+  { 
+    id: 'economic_cycles', 
+    name: 'Economic cycles', 
+    nameSv: 'Ekonomiska cykler', 
+    description: 'Konjunkturläge under perioden',
+    observation: {
+      sv: 'Perioden inkluderade finanskrisen 2008-2009 (-5% BNP), återhämtning 2010-2019, och pandemikrisen 2020 (-2,8% BNP).',
+      en: 'The period included the 2008-2009 financial crisis (-5% GDP), recovery 2010-2019, and pandemic crisis 2020 (-2.8% GDP).'
+    },
+    mechanism: {
+      sv: 'Konjunkturnedgångar korrelerar historiskt med ökad egendomsbrottslighet men minskad våldsbrott (färre tillfällen). Arbetslöshet påverkar ungdomsbrottslighet med 1-2 års fördröjning.',
+      en: 'Economic downturns historically correlate with increased property crime but decreased violent crime.'
+    },
+    method: {
+      sv: 'BNP-förändring beräknas kvartalsvis. Konjunkturindikatorn är ett viktat index av produktion, sysselsättning och konsumtion.',
+      en: 'GDP change calculated quarterly. Business cycle indicator is weighted index of production, employment, and consumption.',
+      dataFrequency: 'Kvartalsvis',
+      latestUpdate: '2024-Q3'
+    },
+    limitations: {
+      sv: ['Regional variation stor', 'Branscheffekter ej separerade', 'Tidsfördröjning mellan ekonomi och brott oklar'],
+      en: ['Large regional variation', 'Sector effects not separated', 'Time lag between economy and crime unclear']
+    },
+    sources: [
+      { name: 'SCB Nationalräkenskaper', url: 'https://www.scb.se/nr0103', type: 'primary', coverage: '1950-2024' },
+      { name: 'Konjunkturinstitutet', url: 'https://www.konj.se', type: 'primary', coverage: '1996-2024' }
+    ],
+    trendDirection: 'volatile',
+    relevanceScore: 71
+  },
+  { 
+    id: 'law_changes', 
+    name: 'Legislative changes', 
+    nameSv: 'Lagändringar', 
+    description: 'Relevanta lagändringar under perioden',
+    observation: {
+      sv: 'Under perioden genomfördes 12 större straffrättsliga reformer, inklusive skärpta straff för våldsbrott (2010, 2017) och ny sexualbrottslagstiftning (2018).',
+      en: 'During the period, 12 major criminal law reforms were implemented.'
+    },
+    mechanism: {
+      sv: 'Lagändringar påverkar statistiken genom: (1) nya brottskategorier ökar anmälningar, (2) straffskärpningar kan ha avskräckande effekt, (3) definitionsändringar bryter tidsserier.',
+      en: 'Legislative changes affect statistics through: (1) new crime categories increase reports, (2) harsher penalties may deter, (3) definition changes break time series.'
+    },
+    method: {
+      sv: 'Riksdagsbeslut och SFS-publikationer. Ikraftträdandedatum registreras. Effektbedömningar görs av Brå.',
+      en: 'Parliamentary decisions and SFS publications. Entry into force dates recorded. Effect assessments by Brå.',
+      dataFrequency: 'Löpande',
+      latestUpdate: '2024-07-01'
+    },
+    limitations: {
+      sv: ['Effekt vs korrelation svår att särskilja', 'Internationella jämförelser problematiska', 'Praxis ändras utan lagändring'],
+      en: ['Effect vs correlation hard to distinguish', 'International comparisons problematic', 'Practice changes without legislation']
+    },
+    sources: [
+      { name: 'Riksdagen.se', url: 'https://www.riksdagen.se/sv/dokument-och-lagar/', type: 'primary', coverage: '1974-2024' },
+      { name: 'BRÅ Reformuppföljningar', url: 'https://www.bra.se/publikationer', type: 'primary', coverage: '2000-2024' }
+    ],
+    trendDirection: 'up',
+    relevanceScore: 88
+  },
+  { 
+    id: 'reporting_practices', 
+    name: 'Reporting practices', 
+    nameSv: 'Rapporteringspraxis', 
+    description: 'Förändringar i hur statistik samlas in',
+    observation: {
+      sv: 'Anmälningsbenägenheten för våldsbrott ökade från ~30% till ~45% under perioden. Digitala anmälningskanaler infördes 2015.',
+      en: 'Reporting propensity for violent crimes increased from ~30% to ~45% during the period.'
+    },
+    mechanism: {
+      sv: 'Ökad anmälningsbenägenhet ökar registrerad brottslighet utan att faktisk brottslighet ökar. Faktorer: attityder, tillgänglighet, förtroende för rättsväsendet.',
+      en: 'Increased reporting propensity increases registered crime without actual crime increasing.'
+    },
+    method: {
+      sv: 'Nationella trygghetsundersökningen (NTU) jämför självrapporterad utsatthet med polisanmälningar. Årlig enkät till 200 000 personer.',
+      en: 'National Crime Survey (NTU) compares self-reported victimization with police reports. Annual survey to 200,000 persons.',
+      dataFrequency: 'Årlig',
+      latestUpdate: '2024-01-25'
+    },
+    limitations: {
+      sv: ['Enkätbortfall ~40%', 'Minnesbias', 'Definitioner av utsatthet subjektiva', 'Vissa brott saknar "mörkertalsdata"'],
+      en: ['Survey non-response ~40%', 'Recall bias', 'Victimization definitions subjective', 'Some crimes lack "dark figure" data']
+    },
+    sources: [
+      { name: 'BRÅ NTU', url: 'https://www.bra.se/ntu', type: 'primary', coverage: '2006-2024' },
+      { name: 'Polisens anmälningsstatistik', url: 'https://polisen.se/statistik', type: 'primary', coverage: '1975-2024' }
+    ],
+    trendDirection: 'up',
+    changePercent: 50,
+    relevanceScore: 95
+  }
 ];
 
 export const CONTROL_VARIABLES_HEADER = {

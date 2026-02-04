@@ -35,6 +35,7 @@ import {
   type TimePeriod,
   type GeoLevel
 } from '@/config/demographyCorrelationConfig';
+import { ControlVariableCard } from './ControlVariableCard';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 // Seeded random for reproducible indicator-specific data
@@ -431,14 +432,18 @@ export const SocietalCorrelationEngine: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {CONTROL_VARIABLES.map(cv => (
-                  <div key={cv.id} className="p-3 border rounded-lg">
-                    <div className="font-medium text-sm">{cv.nameSv}</div>
-                    <div className="text-xs text-muted-foreground">{cv.description}</div>
-                  </div>
+                  <ControlVariableCard 
+                    key={cv.id} 
+                    variable={cv}
+                    language="sv"
+                  />
                 ))}
               </div>
+              <p className="text-xs text-muted-foreground mt-4 text-center">
+                Klicka på en faktor för att se observation, mekanism, metod, begränsningar och källor.
+              </p>
             </CardContent>
           </Card>
 
