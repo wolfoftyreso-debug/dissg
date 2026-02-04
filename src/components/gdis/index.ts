@@ -10,3 +10,4 @@ export { ODISTabs, type ODISTab } from './ODISTabs';
 export { ODISSidebar, type OperatingMode } from './ODISSidebar';
 export { ODISTreeView, type TreeNode } from './ODISTreeView';
 export { ODISFooter } from './ODISFooter';
+export { GeoScopeNavigator } from './GeoScopeNavigator';

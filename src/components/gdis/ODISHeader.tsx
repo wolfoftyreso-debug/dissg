@@ -3,10 +3,13 @@
  * 
  * Strukturmässigt lik VW ODIS diagnostiksystem.
  * Visar systeminfo i grid-layout med statusindikatorer.
+ * Integrerar GeoScopeNavigator för zoom in/out mellan nivåer.
  */
 
 import React from 'react';
 import { UserMenu } from '@/components/auth/UserMenu';
+import { GeoScopeNavigator } from './GeoScopeNavigator';
+import { useGeo } from '@/contexts/GeoContext';
 
 interface SystemInfo {
   label: string;
@@ -24,14 +27,10 @@ interface ODISHeaderProps {
 }
 
 export const ODISHeader: React.FC<ODISHeaderProps> = ({
-  systemName = 'Global Diagnostic Information System Service',
-  leftInfo = [
-    { label: 'Country', value: 'SE' },
-    { label: 'Region', value: 'NUTS-2' },
-    { label: 'Scope', value: 'National' },
-  ],
+  systemName = 'DISSG – Diagnostic Information System for Societal Governance',
+  leftInfo,
   rightInfo = [
-    { label: 'VER', value: 'GDIS 1.0' },
+    { label: 'VER', value: 'DISSG 1.0' },
     { label: 'Data', value: '2024-Q4 / 184 indicators' },
   ],
   statusIndicators = [
@@ -40,6 +39,8 @@ export const ODISHeader: React.FC<ODISHeaderProps> = ({
     { status: 'inactive', label: 'Simulation' },
   ],
 }) => {
+  const { scope } = useGeo();
+  
   const getStatusColor = (status: 'ok' | 'warning' | 'error' | 'inactive') => {
     switch (status) {
       case 'ok': return 'bg-emerald-500';
@@ -48,6 +49,12 @@ export const ODISHeader: React.FC<ODISHeaderProps> = ({
       case 'inactive': return 'bg-muted-foreground/30';
     }
   };
+
+  // Dynamic left info based on geo scope
+  const dynamicLeftInfo = leftInfo || [
+    { label: 'Scope', value: scope.level.toUpperCase() },
+    { label: scope.level === 'global' ? 'Coverage' : 'Focus', value: scope.name_local || scope.name },
+  ];
 
   return (
     <header className="border-b-2 border-border bg-muted/30">
@@ -63,24 +70,30 @@ export const ODISHeader: React.FC<ODISHeaderProps> = ({
 
       {/* Info grid */}
       <div className="px-3 py-2 flex items-start justify-between gap-4 flex-wrap">
-        {/* Left info columns */}
-        <div className="flex gap-6">
-          {leftInfo.map((info, i) => (
-            <div key={i} className="min-w-[80px]">
-              <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                {info.label}:
+        {/* Left: Geo Navigator + info */}
+        <div className="flex items-center gap-4">
+          {/* Geo Scope Navigator */}
+          <GeoScopeNavigator variant="full" />
+          
+          {/* Additional info */}
+          <div className="hidden md:flex gap-6 pl-4 border-l border-border">
+            {dynamicLeftInfo.map((info, i) => (
+              <div key={i} className="min-w-[80px]">
+                <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                  {info.label}:
+                </div>
+                <div className="font-mono text-sm font-medium">
+                  {info.value}
+                </div>
               </div>
-              <div className="font-mono text-sm font-medium">
-                {info.value}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Right info + status */}
         <div className="flex items-start gap-6">
           {rightInfo.map((info, i) => (
-            <div key={i} className="min-w-[100px]">
+            <div key={i} className="min-w-[100px] hidden lg:block">
               <div className="text-[10px] text-muted-foreground uppercase tracking-wider">
                 {info.label}:
               </div>
