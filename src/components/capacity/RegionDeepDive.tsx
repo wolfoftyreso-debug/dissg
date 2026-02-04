@@ -48,6 +48,7 @@ import {
 } from 'lucide-react';
 import type { PressZone } from '@/config/carryingCapacityConfig';
 import { cn } from '@/lib/utils';
+import { ClickableCountryName } from '@/components/ui/ClickableCountryName';
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES & INTERFACES
@@ -960,7 +961,12 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                   <CardContent>
                     <div className="flex flex-wrap gap-2">
                       {evidence.overview.countries.map((country) => (
-                        <Badge key={country} variant="secondary">{country}</Badge>
+                        <ClickableCountryName
+                          key={country}
+                          countryCode={country.substring(0, 2).toUpperCase()}
+                          countryName={country}
+                          variant="badge"
+                        />
                       ))}
                     </div>
                   </CardContent>

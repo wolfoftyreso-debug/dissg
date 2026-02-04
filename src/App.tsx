@@ -87,6 +87,7 @@ import Lambda1Page from "./pages/Lambda1";
 import GDMPage from "./pages/GDM";
 import GGDPage from "./pages/GGD";
 import WagesPage from "./pages/WagesPage";
+import CountryExplorer from "./pages/CountryExplorer";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -177,6 +178,7 @@ const App = () => (
               <Route path="/gdm" element={<GDMPage />} />
               <Route path="/ggd" element={<GGDPage />} />
               <Route path="/wages" element={<WagesPage />} />
+              <Route path="/country/:code" element={<CountryExplorer />} />
               {/* Huvudsidan är publik - läsning utan inloggning */}
               <Route path="/" element={<Index />} />
               {/* Skyddade routes - kräver inloggning */}

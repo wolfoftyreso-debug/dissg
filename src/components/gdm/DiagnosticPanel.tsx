@@ -23,6 +23,7 @@ import {
 } from 'recharts';
 import { getDiagnosticPanelData, getLambdaColor, getSystemStatus } from './mockData';
 import type { GEDICodeSummary, ProbableCause, Lever } from './types';
+import { ClickableCountryName } from '@/components/ui/ClickableCountryName';
 
 interface DiagnosticPanelProps {
   countryCode: string;
@@ -192,7 +193,12 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
       <div className="p-4 border-b flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-2xl">{geo.name.sv}</span>
+            <ClickableCountryName
+              countryCode={geo.code}
+              countryName={geo.name.sv}
+              variant="default"
+              className="text-2xl"
+            />
             <Badge variant="outline" className="font-mono">{geo.code}</Badge>
           </div>
           <div className="text-xs text-muted-foreground mt-1">
