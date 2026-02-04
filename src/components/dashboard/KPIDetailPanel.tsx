@@ -65,9 +65,10 @@ const DEPARTMENT_MAP: Record<string, { primary: string; secondary: string; opera
 export function KPIDetailPanel({ kpi, onClose }: KPIDetailPanelProps) {
   const dept = DEPARTMENT_MAP[kpi.category] || DEPARTMENT_MAP.systemrisk_styrning;
   
-  // Beräkna veckor med negativ trend (mock)
-  const weeksNegative = Math.floor(Math.random() * 8) + 4;
-  const hasRegisteredActions = Math.random() > 0.6;
+  // Real data only - no simulation
+  // These values will come from verified database sources
+  const weeksNegative: number | null = null; // Will be populated from kpi_values
+  const hasRegisteredActions: boolean | null = null; // Will be populated from policy_actions
 
   return (
     <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[28rem] lg:w-[32rem] xl:w-[36rem] overflow-y-auto border-l border-border bg-background shadow-xl animate-in slide-in-from-right-full duration-300">

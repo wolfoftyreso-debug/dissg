@@ -7,16 +7,12 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
-  Download,
-  ZoomIn,
-  ZoomOut,
   ChevronDown,
   Info,
   GitCompare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
-  LineChart, 
   Line, 
   XAxis, 
   YAxis, 
@@ -28,7 +24,7 @@ import {
   ComposedChart,
   Brush
 } from 'recharts';
-import { format, subMonths, subYears, parseISO } from 'date-fns';
+import { format, subMonths, parseISO } from 'date-fns';
 import { sv } from 'date-fns/locale';
 import { KPICompareSelector } from './KPICompareSelector';
 import { KPICompareChart } from './KPICompareChart';
@@ -47,51 +43,8 @@ interface HistoricalDataPoint {
   isProvisional?: boolean;
 }
 
-// Generate mock historical data for demonstration
-function generateMockHistoricalData(kpi: KPI, months: number): HistoricalDataPoint[] {
-  const data: HistoricalDataPoint[] = [];
-  const now = new Date();
-  const baseValue = kpi.value;
-  const volatility = baseValue * 0.05; // 5% volatility
-  
-  let currentValue = baseValue;
-  
-  // Generate data backwards from current date
-  for (let i = months; i >= 0; i--) {
-    const date = subMonths(now, i);
-    
-    // Random walk with slight trend based on current KPI status
-    const trendFactor = kpi.status === 'positive' ? 0.002 : 
-                        kpi.status === 'critical' ? -0.003 : 0;
-    const randomChange = (Math.random() - 0.5) * volatility;
-    
-    if (i < months) {
-      currentValue = currentValue * (1 + trendFactor) + randomChange;
-    }
-    
-    // Ensure value stays positive and reasonable
-    currentValue = Math.max(currentValue * 0.5, Math.min(currentValue * 1.5, currentValue));
-    
-    const prevValue = data.length > 0 ? data[data.length - 1].value : currentValue;
-    const trend = currentValue > prevValue * 1.01 ? 'up' : 
-                  currentValue < prevValue * 0.99 ? 'down' : 'stable';
-    
-    data.push({
-      date: format(date, 'yyyy-MM-dd'),
-      value: Math.round(currentValue * 100) / 100,
-      formattedDate: format(date, 'MMM yyyy', { locale: sv }),
-      trend,
-      isProvisional: i <= 1 // Last 2 months are provisional
-    });
-  }
-  
-  // Ensure the last value matches the current KPI value
-  if (data.length > 0) {
-    data[data.length - 1].value = kpi.value;
-  }
-  
-  return data;
-}
+// NO MOCK DATA GENERATION - System principle: "Silence over speculation"
+// Historical data comes ONLY from verified kpi_values table
 
 const TIME_RANGES: { value: TimeRange; label: string; months: number }[] = [
   { value: '6m', label: '6 mån', months: 6 },
@@ -153,7 +106,7 @@ export function HistoryPanel({ kpi }: HistoryPanelProps) {
     },
   });
   
-  // Use real data if available, otherwise generate mock data
+  // Use ONLY real verified data - no mock/simulated data
   const historicalData = useMemo(() => {
     if (dbData && dbData.length > 0) {
       return dbData.map((row, idx, arr) => {
@@ -172,9 +125,12 @@ export function HistoryPanel({ kpi }: HistoryPanelProps) {
       });
     }
     
-    // Generate mock data for demonstration
-    return generateMockHistoricalData(kpi, months);
-  }, [dbData, kpi, months]);
+    // NO MOCK DATA - return empty array when real data unavailable
+    return [];
+  }, [dbData]);
+  
+  // Flag for when we have no verified data
+  const hasVerifiedData = historicalData.length > 0;
   
   // Calculate statistics
   const stats = useMemo(() => {
