@@ -12,27 +12,24 @@ import React, { useState } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import {
-  Info,
-  ChevronDown,
-  BookOpen,
-  FileText,
-  ExternalLink,
-  Database,
-  CheckCircle2,
-  AlertTriangle,
-  Atom,
-  Clock,
-  Scale,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+// Text-based type labels instead of icons (per design doctrine)
+const SOURCE_TYPE_LABELS: Record<string, string> = {
+  study: 'STUDIE',
+  report: 'RAPPORT',
+  law: 'LAG',
+  data: 'DATA',
+  book: 'BOK',
+  physics: 'FYSIK'
+};
 
 // ═══════════════════════════════════════════════════════════════
 // EVIDENCE REGISTRY - All expandable statements with documentation
@@ -216,15 +213,8 @@ const EVIDENCE_REGISTRY: Record<string, StatementEvidence> = {
 // UTILITY FUNCTIONS
 // ═══════════════════════════════════════════════════════════════
 
-const getSourceIcon = (type: EvidenceSource['type']) => {
-  switch (type) {
-    case 'study': return <Atom className="h-3.5 w-3.5 text-purple-500" />;
-    case 'report': return <FileText className="h-3.5 w-3.5 text-blue-500" />;
-    case 'law': return <Scale className="h-3.5 w-3.5 text-amber-500" />;
-    case 'data': return <Database className="h-3.5 w-3.5 text-green-500" />;
-    case 'book': return <BookOpen className="h-3.5 w-3.5 text-orange-500" />;
-    case 'physics': return <Atom className="h-3.5 w-3.5 text-cyan-500" />;
-  }
+const getSourceTypeLabel = (type: EvidenceSource['type']) => {
+  return SOURCE_TYPE_LABELS[type] || 'KÄLLA';
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -240,8 +230,6 @@ export interface ExpandableInfoAlertProps {
   label?: string;
   /** Visual variant */
   variant?: 'default' | 'primary' | 'muted' | 'warning';
-  /** Optional icon override */
-  icon?: React.ReactNode;
   /** Additional className */
   className?: string;
   /** If no evidence in registry, still show basic expansion */
@@ -253,7 +241,6 @@ export const ExpandableInfoAlert: React.FC<ExpandableInfoAlertProps> = ({
   statement,
   label,
   variant = 'default',
-  icon,
   className,
   fallbackEvidence,
 }) => {
@@ -283,7 +270,6 @@ export const ExpandableInfoAlert: React.FC<ExpandableInfoAlertProps> = ({
           isOpen && "border-primary ring-1 ring-primary/20",
           className
         )}>
-          {icon || <Info className="h-4 w-4" />}
           <AlertDescription className="text-sm">
             <div className="flex items-center justify-between gap-2">
               <span>
@@ -294,10 +280,12 @@ export const ExpandableInfoAlert: React.FC<ExpandableInfoAlertProps> = ({
                 <Badge variant="outline" className="text-xs opacity-60 group-hover:opacity-100">
                   {evidence.sources.length} käll{evidence.sources.length !== 1 ? 'or' : 'a'}
                 </Badge>
-                <ChevronDown className={cn(
-                  "h-4 w-4 transition-transform text-muted-foreground",
+                <span className={cn(
+                  "text-xs font-mono transition-transform text-muted-foreground",
                   isOpen && "rotate-180"
-                )} />
+                )}>
+                  {isOpen ? '−' : '+'}
+                </span>
               </div>
             </div>
           </AlertDescription>
@@ -308,9 +296,8 @@ export const ExpandableInfoAlert: React.FC<ExpandableInfoAlertProps> = ({
         {/* Scientific Basis */}
         <Card className="bg-muted/30">
           <CardHeader className="pb-2 pt-3">
-            <CardTitle className="text-xs flex items-center gap-2">
-              <Atom className="h-3.5 w-3.5 text-purple-500" />
-              Vetenskaplig grund
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              VETENSKAPLIG GRUND
             </CardTitle>
           </CardHeader>
           <CardContent className="pb-3">
@@ -318,33 +305,34 @@ export const ExpandableInfoAlert: React.FC<ExpandableInfoAlertProps> = ({
           </CardContent>
         </Card>
         
-        {/* Sources */}
+        {/* Sources - FULLY CLICKABLE */}
         {evidence.sources.length > 0 && (
           <Card>
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs flex items-center gap-2">
-                <FileText className="h-3.5 w-3.5 text-blue-500" />
-                Källor ({evidence.sources.length})
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                KÄLLOR ({evidence.sources.length})
               </CardTitle>
             </CardHeader>
             <CardContent className="pb-3 space-y-2">
               {evidence.sources.map((source, idx) => (
-                <div key={idx} className="flex items-start gap-2 p-2 rounded bg-muted/30">
-                  {getSourceIcon(source.type)}
+                <a 
+                  key={idx} 
+                  href={source.url || `https://scholar.google.com/scholar?q=${encodeURIComponent(source.title + ' ' + source.source)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-2 p-2 rounded bg-muted/30 hover:bg-primary/10 hover:border-primary/50 border border-transparent transition-colors cursor-pointer group"
+                >
+                  <span className="text-xs font-mono uppercase text-muted-foreground shrink-0">
+                    [{getSourceTypeLabel(source.type)}]
+                  </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate">{source.title}</p>
+                    <p className="text-xs font-medium truncate group-hover:text-primary">{source.title}</p>
                     <p className="text-xs text-muted-foreground">
                       {source.source}{source.year && ` (${source.year})`}
                     </p>
                   </div>
-                  {source.url && (
-                    <Button variant="ghost" size="sm" className="h-6 px-2" asChild>
-                      <a href={source.url} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </Button>
-                  )}
-                </div>
+                  <span className="text-xs opacity-50 group-hover:opacity-100">→</span>
+                </a>
               ))}
             </CardContent>
           </Card>
@@ -354,9 +342,8 @@ export const ExpandableInfoAlert: React.FC<ExpandableInfoAlertProps> = ({
         {evidence.historicalContext && (
           <Card className="bg-amber-50/30 dark:bg-amber-950/10 border-amber-200/50">
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                <Clock className="h-3.5 w-3.5" />
-                Historisk kontext
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                HISTORISK KONTEXT
               </CardTitle>
             </CardHeader>
             <CardContent className="pb-3">
@@ -370,9 +357,8 @@ export const ExpandableInfoAlert: React.FC<ExpandableInfoAlertProps> = ({
           {evidence.whatThisProves.length > 0 && (
             <Card className="bg-green-50/30 dark:bg-green-950/10 border-green-200/50">
               <CardHeader className="pb-1 pt-2">
-                <CardTitle className="text-xs flex items-center gap-2 text-green-700 dark:text-green-400">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  Detta visar
+                <CardTitle className="text-xs font-mono uppercase tracking-wider text-green-700 dark:text-green-400">
+                  DETTA VISAR
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-2">
@@ -391,9 +377,8 @@ export const ExpandableInfoAlert: React.FC<ExpandableInfoAlertProps> = ({
           {evidence.limitations.length > 0 && (
             <Card className="bg-amber-50/30 dark:bg-amber-950/10 border-amber-200/50">
               <CardHeader className="pb-1 pt-2">
-                <CardTitle className="text-xs flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                  <AlertTriangle className="h-3.5 w-3.5" />
-                  Begränsningar
+                <CardTitle className="text-xs font-mono uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                  BEGRÄNSNINGAR
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-2">
@@ -410,10 +395,10 @@ export const ExpandableInfoAlert: React.FC<ExpandableInfoAlertProps> = ({
           )}
         </div>
         
-        {/* Data source footer */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
-          <Database className="h-3 w-3" />
-          <span>Verifierad evidens från peer-reviewed källor och officiell statistik</span>
+        {/* Data source footer - text only */}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1 font-mono uppercase tracking-wider">
+          <span>[VERIFIERAD]</span>
+          <span>Peer-reviewed källor och officiell statistik</span>
         </div>
       </CollapsibleContent>
     </Collapsible>
@@ -428,7 +413,6 @@ export const PopulationResultAlert: React.FC<{ className?: string }> = ({ classN
   <ExpandableInfoAlert
     evidenceKey="population-result"
     statement="Befolkning är resultat, inte primärvariabel."
-    icon={<span className="text-sm">📌</span>}
     variant="muted"
     className={className}
   />
@@ -487,7 +471,6 @@ export const DecisionCorrelationAlert: React.FC<{ statement: string; className?:
   <ExpandableInfoAlert
     evidenceKey="decision-correlation"
     statement={statement}
-    icon={<span className="text-sm">📌</span>}
     variant="muted"
     className={className}
   />
@@ -497,7 +480,6 @@ export const TransitionOutcomesAlert: React.FC<{ statement: string; className?: 
   <ExpandableInfoAlert
     evidenceKey="transition-outcomes"
     statement={statement}
-    icon={<span className="text-sm">📌</span>}
     variant="primary"
     className={className}
   />

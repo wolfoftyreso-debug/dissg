@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChevronRight, Clock } from 'lucide-react';
+// No lucide icons - using text-based indicators per design doctrine
 import { cn } from '@/lib/utils';
 import { ExpandableBadge } from '@/components/ui/ExpandableBadge';
 import { EnergyBaselineCard, EnergyConsequenceCard } from '@/components/ui/ExpandableStatementCard';
@@ -277,7 +277,7 @@ const PressZonesPanel: React.FC<{ onZoneClick: (zone: PressZone) => void }> = ({
                 )}
               </div>
             </div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors mt-1 shrink-0" />
+            <span className="text-sm text-muted-foreground group-hover:text-primary transition-colors mt-1 shrink-0">→</span>
           </div>
         </button>
       ))}
@@ -314,7 +314,7 @@ const PositiveFactorsPanel: React.FC<{ onFactorClick: (factor: CapacityFactor) =
           {factor.historicalEvidence && (
             <Badge variant="secondary" className="text-xs shrink-0">✓ Historisk evidens</Badge>
           )}
-          <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors mt-1" />
+          <span className="text-sm text-muted-foreground group-hover:text-primary transition-colors mt-1">→</span>
         </button>
       ))}
     </CardContent>
@@ -418,7 +418,6 @@ const RegionalCapacityPanel: React.FC = () => {
         <ExpandableInfoAlert
           evidenceKey="imbalance-problem"
           statement="Avslöjar sårbarhet utan moralism."
-          icon={<span className="text-sm">📌</span>}
           variant="muted"
           className="mt-4"
           fallbackEvidence={{
@@ -661,7 +660,7 @@ const HistoricalTimelinePanel: React.FC = () => (
   <Card>
     <CardHeader>
       <div className="flex items-center gap-2">
-        <Clock className="h-4 w-4" />
+        <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">[TIDSAXEL]</span>
         <CardTitle className="text-base">Tidsperspektiv: 200 år</CardTitle>
       </div>
       <CardDescription>Hur bärkraft byggts upp – och hur snabbt den kan falla</CardDescription>
@@ -703,8 +702,8 @@ const HistoricalTimelinePanel: React.FC = () => (
       </div>
       
       <Alert className="mt-4">
-        <Clock className="h-4 w-4" />
         <AlertDescription className="text-sm">
+          <span className="font-mono text-xs mr-2">[ASYMMETRI]</span>
           {KEY_MESSAGES.timeAsymmetry.sv}
         </AlertDescription>
       </Alert>
@@ -743,7 +742,7 @@ const SystemConnectionsPanel: React.FC = () => {
               className="justify-start h-auto py-3 hover:bg-primary/10 hover:border-primary/50 transition-all group"
               onClick={() => navigate(CONNECTION_ROUTES[conn.id] || '/')}
             >
-              <ChevronRight className="h-4 w-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="text-sm mr-2 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
               <span className="text-sm">{conn.labelSv}</span>
             </Button>
           ))}
@@ -792,9 +791,9 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
       {/* Core definition - EXPANDABLE with simple language */}
       <Card className="border-primary/30 bg-primary/5">
         <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <div className="text-2xl">🌍</div>
-            <div className="flex-1 space-y-2">
+        <div className="flex items-start gap-3">
+          <span className="text-xs font-mono uppercase tracking-wider text-primary">[GRUND]</span>
+          <div className="flex-1 space-y-2">
               <p className="font-medium">Grundfrågan:</p>
               <p className="text-sm text-muted-foreground">
                 {GCCE_CORE_DEFINITION.sv}

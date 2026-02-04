@@ -16,15 +16,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  ChevronRight,
-  BookOpen,
-  FileText,
-  Database,
-  Atom,
-  Scale,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+// Text-based type labels instead of icons (per design doctrine)
+const SOURCE_TYPE_LABELS: Record<string, string> = {
+  study: 'STUDIE',
+  report: 'RAPPORT',
+  law: 'LAG',
+  data: 'DATA',
+  book: 'BOK'
+};
 
 // ═══════════════════════════════════════════════════════════════
 // BADGE EVIDENCE REGISTRY
@@ -200,15 +201,8 @@ const BADGE_EVIDENCE_REGISTRY: Record<string, BadgeEvidence> = {
 // UTILITY FUNCTIONS
 // ═══════════════════════════════════════════════════════════════
 
-const getSourceIcon = (type: string) => {
-  switch (type) {
-    case 'study': return <Atom className="h-3.5 w-3.5 text-purple-500" />;
-    case 'report': return <FileText className="h-3.5 w-3.5 text-blue-500" />;
-    case 'law': return <Scale className="h-3.5 w-3.5 text-amber-500" />;
-    case 'data': return <Database className="h-3.5 w-3.5 text-green-500" />;
-    case 'book': return <BookOpen className="h-3.5 w-3.5 text-orange-500" />;
-    default: return <FileText className="h-3.5 w-3.5" />;
-  }
+const getSourceTypeLabel = (type: string): string => {
+  return SOURCE_TYPE_LABELS[type] || 'KÄLLA';
 };
 
 const normalizeKey = (text: string): string => {
@@ -270,14 +264,14 @@ export const ExpandableBadge: React.FC<ExpandableBadgeProps> = ({
           )}
         >
           {text}
-          <ChevronRight className="h-3 w-3 ml-1 opacity-50 group-hover:opacity-100 transition-opacity" />
+          <span className="text-xs ml-1 opacity-50 group-hover:opacity-100 transition-opacity">→</span>
         </Badge>
       </DialogTrigger>
       
       <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Database className="h-4 w-4 text-primary" />
+            <span className="text-xs font-mono uppercase tracking-wider text-primary">[EVIDENS]</span>
             {evidence.title}
           </DialogTitle>
         </DialogHeader>
@@ -286,9 +280,8 @@ export const ExpandableBadge: React.FC<ExpandableBadgeProps> = ({
           {/* Scientific Basis */}
           <Card className="bg-muted/30">
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs flex items-center gap-2">
-                <Atom className="h-3.5 w-3.5 text-purple-500" />
-                Vetenskaplig grund
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                VETENSKAPLIG GRUND
               </CardTitle>
             </CardHeader>
             <CardContent className="pb-3">
@@ -395,7 +388,9 @@ const ClickableSource: React.FC<ClickableSourceProps> = ({ source }) => {
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full flex items-start gap-2 p-2 hover:bg-muted/50 transition-colors text-left"
       >
-        {getSourceIcon(source.type)}
+        <span className="text-xs font-mono uppercase text-muted-foreground shrink-0">
+          [{getSourceTypeLabel(source.type)}]
+        </span>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-medium">{source.title}</p>
           <p className="text-xs text-muted-foreground">
