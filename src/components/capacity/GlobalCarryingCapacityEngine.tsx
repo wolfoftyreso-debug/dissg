@@ -155,8 +155,8 @@ const GlobalStatusPanel: React.FC = () => {
   );
 };
 
-// Three axes visualization
-const ThreeAxesPanel: React.FC = () => {
+// Three axes visualization - FULLY CLICKABLE
+const ThreeAxesPanel: React.FC<{ onAxisClick: (axisId: string) => void }> = ({ onAxisClick }) => {
   const radarData = CAPACITY_AXES.map(axis => ({
     axis: axis.labelSv,
     value: axis.id === 'energy' ? 72 : axis.id === 'technology' ? 67 : 54,
@@ -167,7 +167,7 @@ const ThreeAxesPanel: React.FC = () => {
     <Card>
       <CardHeader>
         <CardTitle className="text-base">De tre obrytbara axlarna</CardTitle>
-        <CardDescription>All bärkraft är funktion av dessa</CardDescription>
+        <CardDescription>All bärkraft är funktion av dessa – klicka för fördjupning</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4 lg:grid-cols-2">
@@ -190,18 +190,38 @@ const ThreeAxesPanel: React.FC = () => {
           
           <div className="space-y-3">
             {CAPACITY_AXES.map(axis => (
-              <div key={axis.id} className="p-3 border rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">{axis.icon}</span>
-                  <span className="font-medium text-sm">{axis.labelSv}</span>
+              <button
+                key={axis.id}
+                onClick={() => onAxisClick(axis.id)}
+                className="w-full text-left p-3 border rounded-lg hover:bg-muted/30 hover:border-primary/50 transition-all cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-sm group-hover:text-primary transition-colors">{axis.labelSv}</span>
+                  <Badge variant="outline" className="text-xs">
+                    {axis.id === 'energy' ? '72' : axis.id === 'technology' ? '67' : '54'} index
+                  </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground mb-2">{axis.descriptionSv}</p>
                 <div className="flex flex-wrap gap-1">
                   {axis.components.map(c => (
-                    <Badge key={c.id} variant="outline" className="text-xs">{c.labelSv}</Badge>
+                    <ExpandableBadge
+                      key={c.id}
+                      text={c.labelSv}
+                      fallbackEvidence={{
+                        scientificBasis: `Del av ${axis.labelSv}: ${axis.descriptionSv}`,
+                        whatThisProves: [`Bidrar till ${axis.labelSv.toLowerCase()}`],
+                        limitations: ['Komponentdata aggregeras på axelnivå']
+                      }}
+                    />
                   ))}
                 </div>
-              </div>
+                <div className="mt-2 flex justify-end">
+                  <Badge variant="secondary" className="text-xs">
+                    {axis.components.length} källor
+                    <span className="ml-1 opacity-60">+</span>
+                  </Badge>
+                </div>
+              </button>
             ))}
           </div>
         </div>
@@ -531,7 +551,19 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
 
         <TabsContent value="overview" className="mt-4 space-y-6">
           <GlobalStatusPanel />
-          <ThreeAxesPanel />
+          <ThreeAxesPanel onAxisClick={(axisId) => {
+            // Map axis to factor for deep dive
+            const axisToFactor: Record<string, string> = {
+              'energy': 'stable-energy',
+              'technology': 'technical-efficiency',
+              'institutions': 'institutional-capacity'
+            };
+            const factorId = axisToFactor[axisId];
+            if (factorId) {
+              const factor = POSITIVE_FACTORS.find(f => f.id === factorId);
+              if (factor) setSelectedFactor(factor);
+            }
+          }} />
           <PressZonesPanel onZoneClick={(zone) => setSelectedZone(zone)} />
         </TabsContent>
 
