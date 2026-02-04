@@ -1,0 +1,77 @@
+{
+  "app": {
+    "name": "DISSG",
+    "tagline": "Diagnostic Information System for Societal Governance",
+    "description": "A civilizational diagnostic system treating the world as a fleet, countries as vehicles, and indicators as sensors."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "indicators": "Indicators",
+    "regions": "Regions",
+    "timeline": "Timeline",
+    "analysis": "Analysis",
+    "settings": "Settings",
+    "documentation": "Documentation"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "tiers": {
+    "guest": "Guest",
+    "observer": "Observer",
+    "analyst": "Analyst",
+    "institutional": "Institutional",
+    "guestDesc": "Limited access to public data",
+    "observerDesc": "Full transparency, basic features",
+    "analystDesc": "Scenario lab, exports, API access",
+    "institutionalDesc": "Enterprise features, team accounts"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "export": "Export",
+    "import": "Import",
+    "filter": "Filter",
+    "search": "Search",
+    "refresh": "Refresh"
+  },
+  "status": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "noData": "No data available",
+    "updating": "Updating..."
+  },
+  "regions": {
+    "global": "Global",
+    "europe": "Europe",
+    "northAmerica": "North America",
+    "asia": "Asia",
+    "africa": "Africa",
+    "southAmerica": "South America",
+    "oceania": "Oceania"
+  },
+  "governance": {
+    "observation": "Observation",
+    "mechanism": "Mechanism",
+    "method": "Method",
+    "limitations": "Limitations",
+    "rawData": "Raw Data"
+  },
+  "disclaimers": {
+    "noAdvice": "This platform does not provide policy advice.",
+    "observational": "All content is observational decision-support infrastructure.",
+    "userResponsibility": "Interpretation and decisions rest entirely with the user."
+  }
+}
