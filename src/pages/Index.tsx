@@ -19,6 +19,7 @@ import { KPIDetailPanel } from '@/components/dashboard/KPIDetailPanel';
 import { PrioritizedDashboard } from '@/components/relevance/PrioritizedDashboard';
 import { SubscriptionDashboard } from '@/components/dashboard/SubscriptionDashboard';
 import { AlertNotificationPanel } from '@/components/dashboard/AlertNotificationPanel';
+import { IndexExplorer } from '@/components/indices';
 import UniversalResponsibilityMap from '@/components/global/UniversalResponsibilityMap';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { SYSTEM } from '@/config/system';
@@ -170,41 +171,83 @@ const Index = () => {
 
       {/* Main content area with sidebar */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Main content */}
+        {/* Main content - switches based on activeMode from sidebar */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          {activeTab === 'diagnosis' && (
-            <div className="flex-1 flex flex-col p-3 gap-3 overflow-hidden">
-              {/* Alert panel */}
-              <AlertNotificationPanel />
-              
-              {/* Priority dashboard collapsed into tree view */}
-              <div className="flex-1 overflow-hidden">
-                <ODISTreeView
-                  title="Tests in current diagnostic plan"
-                  subtitle="Indicators (sorted according to priority/status)"
-                  nodes={treeNodes}
-                  onNodeClick={handleNodeClick}
-                  selectedNodeId={selectedNodeId}
-                />
-              </div>
+          {/* DIAGNOSIS MODE */}
+          {activeMode === 'diagnosis' && (
+            <>
+              {activeTab === 'diagnosis' && (
+                <div className="flex-1 flex flex-col p-3 gap-3 overflow-hidden">
+                  <AlertNotificationPanel />
+                  <div className="flex-1 overflow-hidden">
+                    <ODISTreeView
+                      title="Tests in current diagnostic plan"
+                      subtitle="Indicators (sorted according to priority/status)"
+                      nodes={treeNodes}
+                      onNodeClick={handleNodeClick}
+                      selectedNodeId={selectedNodeId}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'modules' && (
+                <div className="flex-1 p-3 overflow-auto">
+                  <SubscriptionDashboard />
+                </div>
+              )}
+
+              {activeTab === 'timeline' && (
+                <div className="flex-1 p-3 overflow-auto">
+                  <PrioritizedDashboard />
+                </div>
+              )}
+
+              {activeTab === 'operation' && (
+                <div className="flex-1 p-3 overflow-auto">
+                  <UniversalResponsibilityMap />
+                </div>
+              )}
+            </>
+          )}
+
+          {/* INDEX MODE - Full Index Explorer */}
+          {activeMode === 'index' && (
+            <div className="flex-1 overflow-hidden">
+              <IndexExplorer />
             </div>
           )}
 
-          {activeTab === 'modules' && (
-            <div className="flex-1 p-3 overflow-auto">
-              <SubscriptionDashboard />
-            </div>
-          )}
-
-          {activeTab === 'timeline' && (
+          {/* MEASUREMENT MODE */}
+          {activeMode === 'measurement' && (
             <div className="flex-1 p-3 overflow-auto">
               <PrioritizedDashboard />
             </div>
           )}
 
-          {activeTab === 'operation' && (
+          {/* INFO MODE */}
+          {activeMode === 'info' && (
+            <div className="flex-1 p-3 overflow-auto flex items-center justify-center">
+              <div className="text-center font-mono space-y-4 max-w-lg">
+                <div className="text-4xl">[INFO]</div>
+                <h2 className="text-xl font-bold">{SYSTEM.name} v{SYSTEM.version}</h2>
+                <p className="text-muted-foreground text-sm">
+                  Diagnostic Information System for Societal Governance. 
+                  Klinisk diagnostik för samhällsstyrning.
+                </p>
+                <div className="text-xs text-muted-foreground border-t pt-4 mt-4">
+                  <div>[DATA] {kpis.length} indikatorer</div>
+                  <div>[GEO] {scope.level}: {scope.code}</div>
+                  <div>[STATUS] {criticalCount} kritiska, {warningCount} varningar</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ADMIN MODE */}
+          {activeMode === 'admin' && (
             <div className="flex-1 p-3 overflow-auto">
-              <UniversalResponsibilityMap />
+              <SubscriptionDashboard />
             </div>
           )}
         </main>
