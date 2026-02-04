@@ -3,18 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  AlertTriangle, 
-  AlertCircle, 
-  Bell, 
-  BellOff,
-  RefreshCw,
-  ChevronRight,
-  X,
-  TrendingUp,
-  TrendingDown,
-  CheckCircle2
-} from 'lucide-react';
 import { useKPIAlerts, type KPIAlert } from '@/hooks/useKPIAlerts';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -40,20 +28,16 @@ function AlertCard({
       alert.acknowledged && "opacity-60"
     )}>
       <div className="flex items-start gap-3">
-        <div className={cn(
-          "p-2 rounded-full shrink-0",
-          isCritical ? "bg-destructive/20" : "bg-warning/20"
+        <span className={cn(
+          "font-mono text-sm font-bold shrink-0 mt-0.5",
+          isCritical ? "text-destructive" : "text-warning"
         )}>
-          {isCritical ? (
-            <AlertCircle className="h-4 w-4 text-destructive" />
-          ) : (
-            <AlertTriangle className="h-4 w-4 text-warning" />
-          )}
-        </div>
+          {isCritical ? '[!!]' : '[!]'}
+        </span>
         
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <Badge variant={isCritical ? "destructive" : "secondary"} className="text-xs">
+            <Badge variant={isCritical ? "destructive" : "secondary"} className="text-xs font-mono">
               {isCritical ? 'KRITISK' : 'VARNING'}
             </Badge>
             {alert.priorityIndex !== undefined && (
@@ -61,8 +45,8 @@ function AlertCard({
                 P:{alert.priorityIndex}
               </Badge>
             )}
-            <span className="text-xs text-muted-foreground">
-              {alert.triggeredAt && format(new Date(alert.triggeredAt), 'HH:mm', { locale: sv })}
+            <span className="text-xs text-muted-foreground font-mono">
+              [{alert.triggeredAt && format(new Date(alert.triggeredAt), 'HH:mm', { locale: sv })}]
             </span>
           </div>
           
@@ -74,25 +58,21 @@ function AlertCard({
             {alert.description}
           </p>
           
-          <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-4 text-xs font-mono">
             <div className="flex items-center gap-1">
-              <span className="text-muted-foreground">Värde:</span>
-              <span className="font-mono font-medium">{alert.currentValue}</span>
+              <span className="text-muted-foreground">[VÄRDE]</span>
+              <span className="font-medium">{alert.currentValue}</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-muted-foreground">Tröskel:</span>
-              <span className="font-mono">{alert.threshold}</span>
+              <span className="text-muted-foreground">[TRÖSKEL]</span>
+              <span>{alert.threshold}</span>
             </div>
             <div className="flex items-center gap-1">
-              {alert.trendPercent >= 0 ? (
-                <TrendingUp className="h-3 w-3 text-destructive" />
-              ) : (
-                <TrendingDown className="h-3 w-3 text-destructive" />
-              )}
               <span className={cn(
-                "font-mono",
+                "font-bold",
                 alert.trendPercent >= 0 ? "text-destructive" : "text-destructive"
               )}>
+                {alert.trendPercent >= 0 ? '[↑]' : '[↓]'}
                 {alert.trendPercent >= 0 ? '+' : ''}{alert.trendPercent.toFixed(1)}%
               </span>
             </div>
@@ -103,20 +83,20 @@ function AlertCard({
           {!alert.acknowledged && (
             <Button 
               variant="ghost" 
-              size="icon" 
-              className="h-7 w-7"
+              size="sm" 
+              className="h-7 font-mono text-xs"
               onClick={onAcknowledge}
             >
-              <CheckCircle2 className="h-4 w-4" />
+              [OK]
             </Button>
           )}
           <Button 
             variant="ghost" 
-            size="icon" 
-            className="h-7 w-7 text-muted-foreground"
+            size="sm" 
+            className="h-7 text-muted-foreground font-mono text-xs"
             onClick={onDismiss}
           >
-            <X className="h-4 w-4" />
+            [X]
           </Button>
         </div>
       </div>
@@ -149,8 +129,8 @@ export function AlertNotificationPanel() {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <Bell className="h-5 w-5" />
+            <div className="relative font-mono text-sm font-bold">
+              [ALERTMOTOR]
               {(criticalCount + warningCount) > 0 && (
                 <span className={cn(
                   "absolute -top-1 -right-1 h-4 w-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white",
@@ -161,10 +141,10 @@ export function AlertNotificationPanel() {
               )}
             </div>
             <div>
-              <CardTitle className="text-base">Varningssystem</CardTitle>
+              <CardTitle className="text-base font-mono">Varningssystem</CardTitle>
               {lastChecked && (
-                <p className="text-xs text-muted-foreground">
-                  Senast kontrollerad: {format(lastChecked, 'HH:mm:ss', { locale: sv })}
+                <p className="text-xs text-muted-foreground font-mono">
+                  [SENAST: {format(lastChecked, 'HH:mm:ss', { locale: sv })}]
                 </p>
               )}
             </div>
@@ -176,37 +156,32 @@ export function AlertNotificationPanel() {
               size="sm"
               onClick={analyzeAlerts}
               disabled={isLoading}
+              className="font-mono text-xs"
             >
-              <RefreshCw className={cn("h-4 w-4 mr-1", isLoading && "animate-spin")} />
-              Analysera
+              {isLoading ? '[...]' : '[↻ ANALYSERA]'}
             </Button>
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
+              className="font-mono text-xs"
             >
-              <ChevronRight className={cn(
-                "h-4 w-4 transition-transform",
-                isExpanded && "rotate-90"
-              )} />
+              {isExpanded ? '[−]' : '[+]'}
             </Button>
           </div>
         </div>
         
         {/* Status badges */}
         <div className="flex gap-2 mt-2">
-          <Badge variant="destructive" className="gap-1">
-            <AlertCircle className="h-3 w-3" />
-            {criticalCount} kritiska
+          <Badge variant="destructive" className="gap-1 font-mono">
+            [!!] {criticalCount} kritiska
           </Badge>
-          <Badge variant="secondary" className="gap-1 bg-warning/20 text-warning-foreground">
-            <AlertTriangle className="h-3 w-3" />
-            {warningCount} varningar
+          <Badge variant="secondary" className="gap-1 bg-warning/20 text-warning-foreground font-mono">
+            [!] {warningCount} varningar
           </Badge>
           {acknowledgedAlerts.length > 0 && (
-            <Badge variant="outline" className="gap-1">
-              <BellOff className="h-3 w-3" />
-              {acknowledgedAlerts.length} kvitterade
+            <Badge variant="outline" className="gap-1 font-mono">
+              [OK] {acknowledgedAlerts.length} kvitterade
             </Badge>
           )}
         </div>
@@ -216,7 +191,7 @@ export function AlertNotificationPanel() {
         <CardContent>
           {activeAlerts.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <CheckCircle2 className="h-8 w-8 mx-auto mb-2 text-positive" />
+              <p className="font-mono text-2xl mb-2 text-positive">[OK]</p>
               <p className="text-sm">Inga aktiva varningar</p>
               <p className="text-xs">Alla KPI:er är inom normala tröskelvärden</p>
             </div>
