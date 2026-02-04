@@ -55,6 +55,13 @@ const MAIN_NAVIGATION: NavItem[] = [
     marker: '[D]',
     description: 'Datautforskare',
   },
+  {
+    path: '/portfolio',
+    label: 'Portfölj',
+    shortLabel: 'PORT',
+    marker: '[P]',
+    description: 'Landsportföljer (Premium)',
+  },
 ];
 
 const SECONDARY_NAVIGATION: NavItem[] = [

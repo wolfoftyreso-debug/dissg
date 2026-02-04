@@ -1497,6 +1497,75 @@ export type Database = {
           },
         ]
       }
+      country_portfolio_items: {
+        Row: {
+          added_at: string
+          country_code: string
+          id: string
+          notes: string | null
+          portfolio_id: string
+        }
+        Insert: {
+          added_at?: string
+          country_code: string
+          id?: string
+          notes?: string | null
+          portfolio_id: string
+        }
+        Update: {
+          added_at?: string
+          country_code?: string
+          id?: string
+          notes?: string | null
+          portfolio_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "country_portfolio_items_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "country_portfolio_items_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "country_portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      country_portfolios: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       covid_comparison_validity: {
         Row: {
           assessed_at: string
