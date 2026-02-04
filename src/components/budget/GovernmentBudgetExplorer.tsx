@@ -434,24 +434,35 @@ export const GovernmentBudgetExplorer: React.FC = () => {
                 {selectedGov2.leaderName}
               </h3>
               <div className="space-y-4">
-                {BUDGET_CATEGORIES.map(cat => {
+              {BUDGET_CATEGORIES.map(cat => {
                   const diff = budget1.categories[cat.id] - budget2.categories[cat.id];
                   return (
-                    <div key={cat.id} className="relative">
-                      <PercentBar
-                        percent={budget2.categories[cat.id]}
-                        color={cat.color}
-                        label={`${cat.icon} ${cat.name}`}
+                    <div key={cat.id}>
+                      <button
                         onClick={() => handleCategoryClick(cat, 'gov2')}
-                      />
-                      {Math.abs(diff) >= 1 && (
-                        <span className={cn(
-                          'absolute right-0 top-0 text-xs font-mono',
-                          diff > 0 ? 'text-red-600' : 'text-emerald-600'
-                        )}>
-                          {diff > 0 ? '−' : '+'}{Math.abs(diff)}%
-                        </span>
-                      )}
+                        className="w-full group text-left"
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm">{cat.icon} {cat.name}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-mono font-medium">{budget2.categories[cat.id]}%</span>
+                            {Math.abs(diff) >= 1 && (
+                              <span className={cn(
+                                'text-xs font-mono px-1.5 py-0.5 rounded',
+                                diff > 0 ? 'text-red-600 bg-red-100' : 'text-emerald-600 bg-emerald-100'
+                              )}>
+                                {diff > 0 ? '−' : '+'}{Math.abs(diff)}%
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="h-6 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className={cn(cat.color, 'h-full rounded-full transition-all group-hover:opacity-80')}
+                            style={{ width: `${budget2.categories[cat.id]}%` }}
+                          />
+                        </div>
+                      </button>
                     </div>
                   );
                 })}
