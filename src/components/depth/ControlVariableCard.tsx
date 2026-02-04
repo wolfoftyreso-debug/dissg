@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
+import { ExpandableBadge } from '@/components/ui/ExpandableBadge';
 import type { ControlVariable } from '@/config/demographyCorrelationConfig';
 
 interface ControlVariableCardProps {
@@ -80,10 +81,15 @@ export const ControlVariableCard: React.FC<ControlVariableCardProps> = ({
       {/* Explanation Pyramid Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+          <DialogHeader className="pr-16">
             <DialogTitle className="flex items-center justify-between gap-4 flex-wrap">
               <span>{variable.nameSv}</span>
-              <Badge variant={relevance.variant}>{relevance.label}</Badge>
+              <ExpandableBadge 
+                text={relevance.label} 
+                evidenceKey="relevans-motor"
+                variant={relevance.variant}
+                className="text-xs"
+              />
             </DialogTitle>
             <p className="text-sm text-muted-foreground">{variable.description}</p>
           </DialogHeader>

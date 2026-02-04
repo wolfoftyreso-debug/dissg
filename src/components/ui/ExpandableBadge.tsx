@@ -312,6 +312,75 @@ const BADGE_EVIDENCE_REGISTRY: Record<string, BadgeEvidence> = {
       'Att utesluta helt är inte möjligt'
     ],
     context: 'Systemet visar utfall av policyer utan att attribuera till ideologisk "sida".'
+  },
+
+  // ═══ RELEVANCE ENGINE ═══
+  'relevans-motor': {
+    title: 'Systemisk Relevansberäkning',
+    scientificBasis: 'Relevans beräknas automatiskt genom att väga fem faktorer: Samhällspåverkan (30%), Förändringstakt (20%), Geografisk spridning (15%), Varaktighet (15%) och Ansvarsmandat (10%). Ingen redaktionell inblandning sker.',
+    sources: [
+      { title: 'Civilization Relevance Model v1.0', type: 'data', source: 'GROS Systemkonfiguration', year: 2024 },
+      { title: 'Information Overload and Decision Quality', type: 'study', source: 'Journal of Information Science', year: 2021 },
+      { title: 'Attention Allocation in Complex Systems', type: 'study', source: 'Decision Sciences', year: 2019 },
+    ],
+    whatThisProves: [
+      'Prioritering sker på matematiska grunder, ej redaktionella val',
+      'Akuta förändringar lyfts automatiskt upp i hierarkin',
+      'Ansvar och mandat vägs in för att möjliggöra handling',
+      'Modellen är transparent och kan granskas av alla'
+    ],
+    limitations: [
+      'Relevans är en matematisk modell, ej en absolut sanning',
+      'Viktningen kan diskuteras – modellen exponerar sina antaganden',
+      'Lokala prioriteringar kan avvika från nationella'
+    ],
+    context: 'Relevansmotorn ersätter redaktionella val med beräkningsbar, reproducerbar och granskningsbar prioritering. Användare kan alltid se varför något rankas högt eller lågt.'
+  },
+  'mest-relevans': {
+    title: 'Mest Relevans (≥90)',
+    scientificBasis: 'Denna variabel har bedömts ha högsta relevans baserat på kombination av samhällspåverkan, förändringstakt och geografisk spridning.',
+    sources: [
+      { title: 'Relevance Scoring Algorithm', type: 'data', source: 'GROS', year: 2024 },
+    ],
+    whatThisProves: [
+      'Stark samhällspåverkan bekräftad i data',
+      'Hög förändringstakt eller acceleration detekterad',
+      'Bred geografisk spridning av effekter'
+    ],
+    limitations: [
+      'Hög relevans betyder inte "viktigast" i normativ mening',
+      'Andra faktorer kan vara viktiga för specifika beslut'
+    ]
+  },
+  'medel-relevans': {
+    title: 'Medel Relevans (70-89)',
+    scientificBasis: 'Variabeln har signifikant påverkan men rankas under de mest akuta signalerna.',
+    sources: [
+      { title: 'Relevance Scoring Algorithm', type: 'data', source: 'GROS', year: 2024 },
+    ],
+    whatThisProves: [
+      'Mätbar samhällspåverkan finns',
+      'Förändring pågår men är inte akut accelererande'
+    ],
+    limitations: [
+      'Kan vara viktigare i specifika geografier eller sektorer',
+      'Tröskelvärden är konfigurerbara'
+    ]
+  },
+  'lag-relevans': {
+    title: 'Låg Relevans (<70)',
+    scientificBasis: 'Variabeln har begränsad påverkan på systemnivå enligt nuvarande mätningar.',
+    sources: [
+      { title: 'Relevance Scoring Algorithm', type: 'data', source: 'GROS', year: 2024 },
+    ],
+    whatThisProves: [
+      'Begränsad samhällspåverkan i nuvarande data',
+      'Stabilitet snarare än förändring'
+    ],
+    limitations: [
+      'Låg relevans idag kan ändras snabbt',
+      'Kan vara kritisk för specifika subgrupper'
+    ]
   }
 };
 
