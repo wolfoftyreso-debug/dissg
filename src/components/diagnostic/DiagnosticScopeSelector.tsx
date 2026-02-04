@@ -8,12 +8,11 @@
  * - City/Municipality
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
-import { Globe, Map, Flag, Building2, Search, ChevronRight, Zap, TrendingUp, Database } from 'lucide-react';
 
 // =============================================================================
 // TYPES
@@ -32,7 +31,7 @@ export interface DiagnosticScope {
 
 interface ScopeLevelOption {
   level: DiagnosticScopeLevel;
-  icon: React.ReactNode;
+  marker: string;
   title: string;
   subtitle: string;
   description: string;
@@ -121,7 +120,7 @@ function ScopeLevelSelector({ selectedLevel, onSelectLevel }: ScopeLevelSelector
   const levels: ScopeLevelOption[] = [
     {
       level: 'global',
-      icon: <Globe className="w-6 h-6" />,
+      marker: '[◉]',
       title: 'GLOBAL',
       subtitle: 'Fullständig civilisationsdiagnos',
       description: '195 nationer • 184 indikatorer • 7 världsdelar',
@@ -129,7 +128,7 @@ function ScopeLevelSelector({ selectedLevel, onSelectLevel }: ScopeLevelSelector
     },
     {
       level: 'continent',
-      icon: <Map className="w-6 h-6" />,
+      marker: '[▣]',
       title: 'VÄRLDSDEL',
       subtitle: 'Regional systemdiagnos',
       description: 'Europa, Asien, Afrika, Amerika, Oceanien',
@@ -137,7 +136,7 @@ function ScopeLevelSelector({ selectedLevel, onSelectLevel }: ScopeLevelSelector
     },
     {
       level: 'country',
-      icon: <Flag className="w-6 h-6" />,
+      marker: '[▢]',
       title: 'NATION',
       subtitle: 'Nationell systemdiagnos',
       description: 'Individuell nation med full indikatoruppsättning',
@@ -145,7 +144,7 @@ function ScopeLevelSelector({ selectedLevel, onSelectLevel }: ScopeLevelSelector
     },
     {
       level: 'city',
-      icon: <Building2 className="w-6 h-6" />,
+      marker: '[•]',
       title: 'STAD / KOMMUN',
       subtitle: 'Lokal systemdiagnos',
       description: 'Metropolitanområden med tillgänglig data',
@@ -179,10 +178,10 @@ function ScopeLevelSelector({ selectedLevel, onSelectLevel }: ScopeLevelSelector
           >
             <div className="flex items-start gap-4">
               <div className={`
-                p-3 rounded-lg
-                ${selectedLevel === option.level ? 'bg-primary text-primary-foreground' : 'bg-muted'}
+                font-mono text-2xl
+                ${selectedLevel === option.level ? 'text-primary' : 'text-muted-foreground'}
               `}>
-                {option.icon}
+                {option.marker}
               </div>
               <div className="flex-1">
                 <div className="font-mono font-bold text-sm">{option.title}</div>
@@ -190,7 +189,7 @@ function ScopeLevelSelector({ selectedLevel, onSelectLevel }: ScopeLevelSelector
                 <div className="text-xs text-muted-foreground mt-2">{option.description}</div>
               </div>
               {selectedLevel === option.level && (
-                <ChevronRight className="w-5 h-5 text-primary" />
+                <span className="font-mono text-primary">[→]</span>
               )}
             </div>
           </button>
@@ -234,8 +233,8 @@ function EntitySelector({ level, onSelectEntity, onBack }: EntitySelectorProps) 
 
         <div className="p-6 rounded-lg border bg-card">
           <div className="flex items-center gap-4 mb-6">
-            <div className="p-4 rounded-lg bg-primary text-primary-foreground">
-              <Globe className="w-8 h-8" />
+            <div className="font-mono text-4xl text-primary">
+              [◉]
             </div>
             <div>
               <div className="text-2xl font-mono font-bold">GLOBAL CIVILISATION</div>
@@ -260,16 +259,13 @@ function EntitySelector({ level, onSelectEntity, onBack }: EntitySelectorProps) 
 
           <div className="flex gap-3 text-xs text-muted-foreground mb-6">
             <Badge variant="outline" className="font-mono">
-              <Zap className="w-3 h-3 mr-1" />
-              LAMBDA: 0.78
+              [λ] 0.78
             </Badge>
             <Badge variant="outline" className="font-mono">
-              <TrendingUp className="w-3 h-3 mr-1" />
-              1990–2025
+              [↗] 1990–2025
             </Badge>
             <Badge variant="outline" className="font-mono">
-              <Database className="w-3 h-3 mr-1" />
-              47 DATAKÄLLOR
+              [DB] 47 DATAKÄLLOR
             </Badge>
           </div>
 
@@ -307,12 +303,12 @@ function EntitySelector({ level, onSelectEntity, onBack }: EntitySelectorProps) 
         </div>
 
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-muted-foreground text-sm">[SÖK]</span>
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Sök världsdel..."
-            className="pl-10 font-mono"
+            className="pl-16 font-mono"
           />
         </div>
 
@@ -386,12 +382,12 @@ function EntitySelector({ level, onSelectEntity, onBack }: EntitySelectorProps) 
         </div>
 
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-muted-foreground text-sm">[SÖK]</span>
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Sök nation..."
-            className="pl-10 font-mono"
+            className="pl-16 font-mono"
           />
         </div>
 
@@ -444,12 +440,12 @@ function EntitySelector({ level, onSelectEntity, onBack }: EntitySelectorProps) 
         </div>
 
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-muted-foreground text-sm">[SÖK]</span>
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Sök stad..."
-            className="pl-10 font-mono"
+            className="pl-16 font-mono"
           />
         </div>
 
@@ -509,7 +505,7 @@ export function DiagnosticScopeSelector({ onSelectScope }: DiagnosticScopeSelect
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+            <span className="font-mono text-xs text-primary">[●]</span>
             <span className="font-mono text-xs text-muted-foreground">DIAGNOSTISK SESSION</span>
           </div>
           <h1 className="text-3xl font-mono font-bold mb-2">SYSTEMDIAGNOS</h1>
