@@ -2,7 +2,7 @@
  * HERO SECTION
  * 
  * Avanza-inspirerad hero med headline, beskrivning och CTA.
- * Anpassad för DISSG - samhällsdiagnostik.
+ * GLOBALT PERSPEKTIV - jurisdiktionsneutral.
  */
 
 import React from 'react';
@@ -21,14 +21,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onStartDiagnosis }) =>
           {/* Left: Text content */}
           <div className="space-y-6">
             <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
-              Förstå samhället<br />
+              Förstå civilisationen<br />
               genom data
             </h1>
             
             <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
-              Vill du också få insyn i hur samhället utvecklas? Med DISSG kan du följa 
-              184 nyckeltal för Sverige, Europa och världen. Kanske är det därför 
-              vi kallas "samhällets kontrollpanel".
+              Få insyn i hur samhällen utvecklas världen över. Med DISSG kan du följa 
+              184 nyckeltal för 195 länder – från globalt till lokalt. Kanske är det 
+              därför vi kallas "civilisationens kontrollpanel".
             </p>
 
             <div className="flex flex-wrap gap-4 pt-4">
@@ -51,7 +51,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onStartDiagnosis }) =>
             </p>
           </div>
 
-          {/* Right: Visual element (simplified device mockup) */}
+          {/* Right: Visual element (global device mockup) */}
           <div className="hidden lg:flex justify-center">
             <div className="relative">
               {/* Phone mockup */}
@@ -61,39 +61,40 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onStartDiagnosis }) =>
                   <div className="w-20 h-1 bg-border rounded-full" />
                 </div>
                 
-                {/* Phone content */}
+                {/* Phone content - GLOBAL perspective */}
                 <div className="p-4 space-y-4">
                   <div className="text-xs text-muted-foreground font-mono">[DISSG Mobile]</div>
                   
                   <div className="space-y-3">
                     <div className="p-3 bg-muted rounded-sm">
-                      <div className="text-[10px] text-muted-foreground mb-1">LAMBDA</div>
-                      <div className="text-2xl font-bold font-mono">0.98</div>
-                      <div className="text-xs text-emerald-600">↑ Stabil trend</div>
+                      <div className="text-[10px] text-muted-foreground mb-1">GLOBAL LAMBDA</div>
+                      <div className="text-2xl font-bold font-mono">0.76</div>
+                      <div className="text-xs text-emerald-600">↑ Förbättring sedan 1990</div>
                     </div>
                     
+                    {/* Global domains - not country-specific */}
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Hälsa</span>
-                        <span className="font-mono text-emerald-600">+2.1%</span>
+                        <span className="text-muted-foreground">[VIT] Liv & Hälsa</span>
+                        <span className="font-mono text-emerald-600">+18%</span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Ekonomi</span>
-                        <span className="font-mono text-emerald-600">+1.4%</span>
+                        <span className="text-muted-foreground">[FÖR] Försörjning</span>
+                        <span className="font-mono text-emerald-600">+24%</span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Utbildning</span>
-                        <span className="font-mono text-amber-600">-0.3%</span>
+                        <span className="text-muted-foreground">[KAP] Kapacitet</span>
+                        <span className="font-mono text-emerald-600">+31%</span>
                       </div>
                       <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Miljö</span>
-                        <span className="font-mono text-emerald-600">+0.8%</span>
+                        <span className="text-muted-foreground">[HÅL] Hållbarhet</span>
+                        <span className="font-mono text-amber-600">-12%</span>
                       </div>
                     </div>
                   </div>
                   
                   <div className="h-24 bg-muted rounded-sm flex items-center justify-center">
-                    <span className="text-xs text-muted-foreground">[Trend Graph]</span>
+                    <span className="text-xs text-muted-foreground">[195 länder]</span>
                   </div>
                 </div>
               </div>
