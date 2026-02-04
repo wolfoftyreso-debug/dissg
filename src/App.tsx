@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
+import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { GeoProvider } from "@/contexts/GeoContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -96,16 +97,17 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AuthProvider>
-        <GeoProvider>
-          <SpotlessProvider>
-            <InfiniteDepthProvider>
-              <TruthLayerProvider>
-              <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <DepthExplorer />
-              <BrowserRouter>
+      <HelmetProvider>
+        <AuthProvider>
+          <GeoProvider>
+            <SpotlessProvider>
+              <InfiniteDepthProvider>
+                <TruthLayerProvider>
+                  <TooltipProvider>
+                    <Toaster />
+                    <Sonner />
+                    <DepthExplorer />
+                    <BrowserRouter>
             <Routes>
               {/* Publika routes */}
               <Route path="/login" element={<Login />} />
@@ -204,13 +206,14 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-            </BrowserRouter>
-              </TooltipProvider>
-            </TruthLayerProvider>
-          </InfiniteDepthProvider>
-        </SpotlessProvider>
-      </GeoProvider>
-    </AuthProvider>
+                    </BrowserRouter>
+                  </TooltipProvider>
+                </TruthLayerProvider>
+              </InfiniteDepthProvider>
+            </SpotlessProvider>
+          </GeoProvider>
+        </AuthProvider>
+      </HelmetProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
