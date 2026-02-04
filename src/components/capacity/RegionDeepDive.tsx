@@ -566,12 +566,14 @@ interface RegionDeepDiveProps {
 }
 
 import { MetricDeepDive, type MetricType } from './MetricDeepDive';
+import { DetailDeepDive, type DetailType } from './DetailDeepDive';
 
 export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOpenChange }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [_selectedIndicator, setSelectedIndicator] = useState<RegionIndicator | null>(null);
   const [_selectedSubstance, setSelectedSubstance] = useState<SubstanceData | null>(null);
   const [selectedMetric, setSelectedMetric] = useState<MetricType | null>(null);
+  const [selectedDetail, setSelectedDetail] = useState<DetailType | null>(null);
   
   if (!zone) return null;
   
@@ -606,6 +608,22 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
         population={evidence.overview.population}
         countries={evidence.overview.countries}
         lifeExpectancy={evidence.health.lifeExpectancy}
+      />
+      
+      {/* Detail Deep Dive */}
+      <DetailDeepDive
+        open={selectedDetail !== null}
+        onOpenChange={(open) => !open && setSelectedDetail(null)}
+        type={selectedDetail || 'challenges'}
+        regionName={zone.regionSv}
+        items={
+          selectedDetail === 'challenges' ? evidence.overview.mainChallenges :
+          selectedDetail === 'signals' ? evidence.overview.positiveSignals :
+          selectedDetail === 'shows' ? evidence.thisShows :
+          selectedDetail === 'notShows' ? evidence.thisDoesNotShow :
+          []
+        }
+        historicalContext={evidence.historicalContext}
       />
       
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -721,95 +739,114 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                   </CardContent>
                 </Card>
 
-                {/* Challenges & signals */}
+                {/* Challenges & signals - CLICKABLE */}
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-red-500" />
-                        Huvudutmaningar
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-1">
-                        {evidence.overview.mainChallenges.map((challenge, i) => (
-                          <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
-                            <span className="text-red-500 mt-0.5">•</span>
-                            {challenge}
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
+                  <button onClick={() => setSelectedDetail('challenges')} className="text-left">
+                    <Card className="h-full hover:bg-red-50/50 dark:hover:bg-red-950/20 hover:border-red-300 transition-all cursor-pointer group">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <AlertTriangle className="h-4 w-4 text-red-500" />
+                          Huvudutmaningar
+                          <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-red-500 transition-colors" />
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="space-y-1">
+                          {evidence.overview.mainChallenges.map((challenge, i) => (
+                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-red-500 mt-0.5">•</span>
+                              {challenge}
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </button>
                   
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-green-500" />
-                        Positiva signaler
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-1">
-                        {evidence.overview.positiveSignals.map((signal, i) => (
-                          <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
-                            <span className="text-green-500 mt-0.5">•</span>
-                            {signal}
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
+                  <button onClick={() => setSelectedDetail('signals')} className="text-left">
+                    <Card className="h-full hover:bg-green-50/50 dark:hover:bg-green-950/20 hover:border-green-300 transition-all cursor-pointer group">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <TrendingUp className="h-4 w-4 text-green-500" />
+                          Positiva signaler
+                          <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-green-500 transition-colors" />
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="space-y-1">
+                          {evidence.overview.positiveSignals.map((signal, i) => (
+                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
+                              <span className="text-green-500 mt-0.5">•</span>
+                              {signal}
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </button>
                 </div>
 
-                {/* Historical context */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      Historisk kontext
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {evidence.historicalContext.map((event, i) => (
-                        <div key={i} className="flex gap-3 text-xs">
-                          <Badge variant="outline" className="shrink-0 h-5">{event.period}</Badge>
-                          <div>
-                            <p className="font-medium">{event.event}</p>
-                            <p className="text-muted-foreground">{event.impact}</p>
+                {/* Historical context - CLICKABLE */}
+                <button onClick={() => setSelectedDetail('history')} className="w-full text-left">
+                  <Card className="hover:bg-blue-50/50 dark:hover:bg-blue-950/20 hover:border-blue-300 transition-all cursor-pointer group">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-blue-500" />
+                        Historisk kontext
+                        <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-blue-500 transition-colors" />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {evidence.historicalContext.map((event, i) => (
+                          <div key={i} className="flex gap-3 text-xs">
+                            <Badge variant="outline" className="shrink-0 h-5">{event.period}</Badge>
+                            <div>
+                              <p className="font-medium">{event.event}</p>
+                              <p className="text-muted-foreground">{event.impact}</p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </button>
 
-                {/* This shows / doesn't show */}
+                {/* This shows / doesn't show - CLICKABLE */}
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Alert className="bg-green-50/50 dark:bg-green-950/20 border-green-200">
-                    <BookOpen className="h-4 w-4 text-green-600" />
-                    <AlertDescription>
-                      <p className="font-medium text-green-700 dark:text-green-400 text-xs mb-1">Detta visar:</p>
-                      <ul className="text-xs space-y-0.5">
-                        {evidence.thisShows.map((item, i) => (
-                          <li key={i}>• {item}</li>
-                        ))}
-                      </ul>
-                    </AlertDescription>
-                  </Alert>
+                  <button onClick={() => setSelectedDetail('shows')} className="text-left">
+                    <Alert className="h-full bg-green-50/50 dark:bg-green-950/20 border-green-200 hover:border-green-400 transition-all cursor-pointer group">
+                      <BookOpen className="h-4 w-4 text-green-600" />
+                      <AlertDescription>
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="font-medium text-green-700 dark:text-green-400 text-xs">Detta visar:</p>
+                          <ChevronRight className="h-3 w-3 text-green-500 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <ul className="text-xs space-y-0.5">
+                          {evidence.thisShows.map((item, i) => (
+                            <li key={i}>• {item}</li>
+                          ))}
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+                  </button>
                   
-                  <Alert className="bg-red-50/50 dark:bg-red-950/20 border-red-200">
-                    <Scale className="h-4 w-4 text-red-600" />
-                    <AlertDescription>
-                      <p className="font-medium text-red-700 dark:text-red-400 text-xs mb-1">Detta visar INTE:</p>
-                      <ul className="text-xs space-y-0.5">
-                        {evidence.thisDoesNotShow.map((item, i) => (
-                          <li key={i}>• {item}</li>
-                        ))}
-                      </ul>
-                    </AlertDescription>
-                  </Alert>
+                  <button onClick={() => setSelectedDetail('notShows')} className="text-left">
+                    <Alert className="h-full bg-red-50/50 dark:bg-red-950/20 border-red-200 hover:border-red-400 transition-all cursor-pointer group">
+                      <Scale className="h-4 w-4 text-red-600" />
+                      <AlertDescription>
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="font-medium text-red-700 dark:text-red-400 text-xs">Detta visar INTE:</p>
+                          <ChevronRight className="h-3 w-3 text-red-500 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <ul className="text-xs space-y-0.5">
+                          {evidence.thisDoesNotShow.map((item, i) => (
+                            <li key={i}>• {item}</li>
+                          ))}
+                        </ul>
+                      </AlertDescription>
+                    </Alert>
+                  </button>
                 </div>
               </TabsContent>
 

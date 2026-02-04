@@ -2,3 +2,4 @@ export { default as GlobalCarryingCapacityEngine } from './GlobalCarryingCapacit
 export { RegionDeepDive } from './RegionDeepDive';
 export { FactorDeepDive } from './FactorDeepDive';
 export { MetricDeepDive } from './MetricDeepDive';
+export { DetailDeepDive } from './DetailDeepDive';
