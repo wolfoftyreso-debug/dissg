@@ -8,11 +8,18 @@
  * - City/Municipality
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
+import { 
+  CONTINENTS, 
+  COUNTRIES, 
+  getCountriesByContinent, 
+  searchCountries,
+  getTotalCountryCount 
+} from '@/lib/geo/countries';
 
 // =============================================================================
 // TYPES
@@ -39,56 +46,8 @@ interface ScopeLevelOption {
 }
 
 // =============================================================================
-// MOCK DATA - Global Hierarchy
+// CITIES DATA (subset - metropolitan areas with available data)
 // =============================================================================
-
-const CONTINENTS = [
-  { code: 'EU', name: 'Europa', countries: 44, dataCoverage: 94, indicatorCount: 184 },
-  { code: 'AS', name: 'Asien', countries: 48, dataCoverage: 78, indicatorCount: 156 },
-  { code: 'AF', name: 'Afrika', countries: 54, dataCoverage: 62, indicatorCount: 128 },
-  { code: 'NA', name: 'Nordamerika', countries: 23, dataCoverage: 89, indicatorCount: 172 },
-  { code: 'SA', name: 'Sydamerika', countries: 12, dataCoverage: 81, indicatorCount: 164 },
-  { code: 'OC', name: 'Oceanien', countries: 14, dataCoverage: 76, indicatorCount: 148 },
-];
-
-const COUNTRIES = [
-  // Europa
-  { code: 'SE', name: 'Sverige', continent: 'EU', dataCoverage: 94, indicatorCount: 184 },
-  { code: 'NO', name: 'Norge', continent: 'EU', dataCoverage: 93, indicatorCount: 182 },
-  { code: 'DK', name: 'Danmark', continent: 'EU', dataCoverage: 92, indicatorCount: 180 },
-  { code: 'FI', name: 'Finland', continent: 'EU', dataCoverage: 91, indicatorCount: 179 },
-  { code: 'DE', name: 'Tyskland', continent: 'EU', dataCoverage: 95, indicatorCount: 184 },
-  { code: 'FR', name: 'Frankrike', continent: 'EU', dataCoverage: 94, indicatorCount: 183 },
-  { code: 'GB', name: 'Storbritannien', continent: 'EU', dataCoverage: 93, indicatorCount: 182 },
-  { code: 'IT', name: 'Italien', continent: 'EU', dataCoverage: 91, indicatorCount: 178 },
-  { code: 'ES', name: 'Spanien', continent: 'EU', dataCoverage: 90, indicatorCount: 176 },
-  { code: 'PL', name: 'Polen', continent: 'EU', dataCoverage: 88, indicatorCount: 172 },
-  { code: 'NL', name: 'Nederländerna', continent: 'EU', dataCoverage: 94, indicatorCount: 183 },
-  { code: 'BE', name: 'Belgien', continent: 'EU', dataCoverage: 92, indicatorCount: 180 },
-  { code: 'CH', name: 'Schweiz', continent: 'EU', dataCoverage: 93, indicatorCount: 181 },
-  { code: 'AT', name: 'Österrike', continent: 'EU', dataCoverage: 91, indicatorCount: 179 },
-  // Asien
-  { code: 'JP', name: 'Japan', continent: 'AS', dataCoverage: 92, indicatorCount: 180 },
-  { code: 'KR', name: 'Sydkorea', continent: 'AS', dataCoverage: 90, indicatorCount: 176 },
-  { code: 'CN', name: 'Kina', continent: 'AS', dataCoverage: 78, indicatorCount: 156 },
-  { code: 'IN', name: 'Indien', continent: 'AS', dataCoverage: 72, indicatorCount: 144 },
-  { code: 'SG', name: 'Singapore', continent: 'AS', dataCoverage: 91, indicatorCount: 178 },
-  // Nordamerika
-  { code: 'US', name: 'USA', continent: 'NA', dataCoverage: 94, indicatorCount: 184 },
-  { code: 'CA', name: 'Kanada', continent: 'NA', dataCoverage: 93, indicatorCount: 182 },
-  { code: 'MX', name: 'Mexiko', continent: 'NA', dataCoverage: 82, indicatorCount: 164 },
-  // Sydamerika
-  { code: 'BR', name: 'Brasilien', continent: 'SA', dataCoverage: 84, indicatorCount: 168 },
-  { code: 'AR', name: 'Argentina', continent: 'SA', dataCoverage: 81, indicatorCount: 162 },
-  { code: 'CL', name: 'Chile', continent: 'SA', dataCoverage: 86, indicatorCount: 172 },
-  // Afrika
-  { code: 'ZA', name: 'Sydafrika', continent: 'AF', dataCoverage: 78, indicatorCount: 156 },
-  { code: 'NG', name: 'Nigeria', continent: 'AF', dataCoverage: 64, indicatorCount: 128 },
-  { code: 'EG', name: 'Egypten', continent: 'AF', dataCoverage: 72, indicatorCount: 144 },
-  // Oceanien
-  { code: 'AU', name: 'Australien', continent: 'OC', dataCoverage: 92, indicatorCount: 180 },
-  { code: 'NZ', name: 'Nya Zeeland', continent: 'OC', dataCoverage: 90, indicatorCount: 176 },
-];
 
 const CITIES = [
   // Global cities
@@ -244,7 +203,7 @@ function EntitySelector({ level, onSelectEntity, onBack }: EntitySelectorProps) 
 
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="p-4 rounded border bg-muted/30 text-center">
-              <div className="font-mono text-2xl font-bold">195</div>
+              <div className="font-mono text-2xl font-bold">{getTotalCountryCount()}</div>
               <div className="text-xs text-muted-foreground">NATIONER</div>
             </div>
             <div className="p-4 rounded border bg-muted/30 text-center">
@@ -252,7 +211,7 @@ function EntitySelector({ level, onSelectEntity, onBack }: EntitySelectorProps) 
               <div className="text-xs text-muted-foreground">INDIKATORER</div>
             </div>
             <div className="p-4 rounded border bg-muted/30 text-center">
-              <div className="font-mono text-2xl font-bold">82%</div>
+              <div className="font-mono text-2xl font-bold">76%</div>
               <div className="text-xs text-muted-foreground">DATATÄCKNING</div>
             </div>
           </div>
