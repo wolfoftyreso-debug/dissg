@@ -1,21 +1,13 @@
 /**
- * INDEX CATEGORY PANEL
+ * INDEX CATEGORY PANEL - Avanza-inspired
  * 
  * Collapsible panel showing indices within a category.
- * Supports grid and list view modes.
+ * Clean, professional financial app aesthetic.
  * 
  * NO ICONS - text markers only per design doctrine.
  */
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import type { IndexDefinition, IndexCategory } from '@/lib/lambda';
 
@@ -34,7 +26,7 @@ interface IndexCategoryPanelProps {
   className?: string;
 }
 
-// Text markers for categories instead of icons
+// Text markers for categories
 const CATEGORY_MARKERS: Record<IndexCategory, string> = {
   living_basic: '[LEVNAD]',
   shadow_economy: '[SKUGGA]',
@@ -45,21 +37,22 @@ const CATEGORY_MARKERS: Record<IndexCategory, string> = {
   governance: '[STYRNING]',
 };
 
-// Direction markers without icons
+// Direction markers
 const DIRECTION_MARKERS = {
   higher_better: '[+]',
   lower_better: '[−]',
   neutral_optimal: '[~]',
 };
 
-const CATEGORY_COLORS: Record<IndexCategory, string> = {
-  living_basic: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20',
-  shadow_economy: 'bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/20',
-  health_function: 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/20',
-  social_cultural: 'bg-violet-500/10 text-violet-700 dark:text-violet-400 border-violet-500/20',
-  productivity_work: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
-  environmental: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20',
-  governance: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20',
+// Avanza-style category accent colors (left border + text)
+const CATEGORY_ACCENTS: Record<IndexCategory, { border: string; text: string; bg: string }> = {
+  living_basic: { border: 'border-l-amber-500', text: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50/50 dark:bg-amber-950/20' },
+  shadow_economy: { border: 'border-l-slate-500', text: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-50/50 dark:bg-slate-950/20' },
+  health_function: { border: 'border-l-rose-500', text: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50/50 dark:bg-rose-950/20' },
+  social_cultural: { border: 'border-l-violet-500', text: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50/50 dark:bg-violet-950/20' },
+  productivity_work: { border: 'border-l-blue-500', text: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50/50 dark:bg-blue-950/20' },
+  environmental: { border: 'border-l-emerald-500', text: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50/50 dark:bg-emerald-950/20' },
+  governance: { border: 'border-l-orange-500', text: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50/50 dark:bg-orange-950/20' },
 };
 
 export function IndexCategoryPanel({
@@ -71,112 +64,70 @@ export function IndexCategoryPanel({
   className,
 }: IndexCategoryPanelProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const accent = CATEGORY_ACCENTS[category.code];
 
   if (indices.length === 0) return null;
 
   return (
-    <Collapsible 
-      open={isOpen} 
-      onOpenChange={setIsOpen}
-      className={cn("space-y-3", className)}
-    >
-      <CollapsibleTrigger asChild>
-        <Button
-          variant="ghost"
-          className={cn(
-            "w-full justify-between p-4 h-auto rounded-lg border font-mono",
-            CATEGORY_COLORS[category.code]
-          )}
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium">{CATEGORY_MARKERS[category.code]}</span>
-            <div className="text-left">
-              <h3 className="font-semibold">{category.name_sv}</h3>
-              <p className="text-xs opacity-75">{category.name_en}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-background/50 font-mono">
-              {indices.length} index
-            </Badge>
-            <span className="text-sm">{isOpen ? '[−]' : '[+]'}</span>
-          </div>
-        </Button>
-      </CollapsibleTrigger>
-
-      <CollapsibleContent className="space-y-3">
-        {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {indices.map(index => (
-              <IndexMiniCard 
-                key={index.code} 
-                index={index} 
-                onClick={() => onSelectIndex(index)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {indices.map(index => (
-              <IndexListRow 
-                key={index.code} 
-                index={index} 
-                onClick={() => onSelectIndex(index)}
-              />
-            ))}
-          </div>
+    <div className={cn("space-y-0", className)}>
+      {/* Category Header - Avanza style with left accent border */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "w-full flex items-center justify-between px-4 py-3 rounded-t-lg border border-b-0",
+          "transition-colors hover:bg-muted/30",
+          accent.bg,
+          accent.border,
+          "border-l-4"
         )}
-      </CollapsibleContent>
-    </Collapsible>
-  );
-}
-
-// Mini card for grid view
-function IndexMiniCard({ 
-  index, 
-  onClick 
-}: { 
-  index: IndexDefinition; 
-  onClick: () => void;
-}) {
-  return (
-    <Card 
-      className="cursor-pointer hover:border-primary/50 hover:shadow-sm transition-all group"
-      onClick={onClick}
-    >
-      <CardContent className="p-4 space-y-2">
-        <div className="flex items-start justify-between font-mono">
-          <Badge variant="outline" className="text-xs font-mono">
-            {index.code}
-          </Badge>
-          <span className="text-xs text-muted-foreground">
-            {DIRECTION_MARKERS[index.direction]}
+      >
+        <div className="flex items-center gap-3">
+          <span className={cn("font-mono text-sm font-semibold", accent.text)}>
+            {CATEGORY_MARKERS[category.code]}
           </span>
-        </div>
-        
-        <h4 className="font-medium text-sm group-hover:text-primary transition-colors line-clamp-1">
-          {index.name_sv}
-        </h4>
-        
-        <p className="text-xs text-muted-foreground line-clamp-2">
-          {index.description}
-        </p>
-
-        <div className="flex items-center justify-between pt-2 border-t font-mono">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            [TID] {index.update_frequency === 'annual' ? 'Årlig' : 
-             index.update_frequency === 'quarterly' ? 'Kvartal' :
-             index.update_frequency === 'monthly' ? 'Månad' : 'Vecka'}
+          <div className="text-left">
+            <h3 className={cn("font-semibold", accent.text)}>{category.name_sv}</h3>
+            <p className="text-xs text-muted-foreground">{category.name_en}</p>
           </div>
-          <span className="text-muted-foreground group-hover:translate-x-1 transition-transform">[→]</span>
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex items-center gap-3 font-mono text-sm text-muted-foreground">
+          <span>{indices.length} index</span>
+          <span>{isOpen ? '[−]' : '[+]'}</span>
+        </div>
+      </button>
+
+      {/* Index Cards Container */}
+      {isOpen && (
+        <div className="border border-t-0 rounded-b-lg p-4 bg-card">
+          {viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {indices.map(index => (
+                <IndexCard 
+                  key={index.code} 
+                  index={index} 
+                  onClick={() => onSelectIndex(index)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {indices.map(index => (
+                <IndexRow 
+                  key={index.code} 
+                  index={index} 
+                  onClick={() => onSelectIndex(index)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
-// Row for list view
-function IndexListRow({ 
+// Avanza-style Index Card
+function IndexCard({ 
   index, 
   onClick 
 }: { 
@@ -185,13 +136,67 @@ function IndexListRow({
 }) {
   return (
     <div
-      className="flex items-center gap-4 p-3 rounded-lg border hover:border-primary/50 hover:bg-muted/50 cursor-pointer transition-colors group font-mono"
       onClick={onClick}
+      className={cn(
+        "group cursor-pointer rounded-lg border bg-background p-4",
+        "hover:border-primary/40 hover:shadow-sm transition-all"
+      )}
     >
-      <Badge variant="outline" className="font-mono shrink-0 min-w-[140px] justify-center text-xs">
+      {/* Header: Code + Direction */}
+      <div className="flex items-center justify-between mb-2">
+        <span className="inline-flex items-center px-2 py-0.5 rounded border text-xs font-mono bg-muted/50">
+          {index.code}
+        </span>
+        <span className="text-xs font-mono text-muted-foreground">
+          {DIRECTION_MARKERS[index.direction]}
+        </span>
+      </div>
+
+      {/* Title */}
+      <h4 className="font-semibold text-sm mb-1 group-hover:text-primary transition-colors line-clamp-1">
+        {index.name_sv}
+      </h4>
+
+      {/* Description */}
+      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+        {index.description}
+      </p>
+
+      {/* Footer: Frequency + Arrow */}
+      <div className="flex items-center justify-between pt-2 border-t text-xs font-mono text-muted-foreground">
+        <span>
+          [TID] {index.update_frequency === 'annual' ? 'Årlig' : 
+           index.update_frequency === 'quarterly' ? 'Kvartal' :
+           index.update_frequency === 'monthly' ? 'Månad' : 'Vecka'}
+        </span>
+        <span className="group-hover:translate-x-1 transition-transform">[→]</span>
+      </div>
+    </div>
+  );
+}
+
+// Avanza-style Index Row (list view)
+function IndexRow({ 
+  index, 
+  onClick 
+}: { 
+  index: IndexDefinition; 
+  onClick: () => void;
+}) {
+  return (
+    <div
+      onClick={onClick}
+      className={cn(
+        "group flex items-center gap-4 p-3 rounded-lg border bg-background cursor-pointer",
+        "hover:border-primary/40 hover:bg-muted/30 transition-all"
+      )}
+    >
+      {/* Code Badge */}
+      <span className="shrink-0 inline-flex items-center justify-center px-2 py-1 rounded border text-xs font-mono bg-muted/50 min-w-[160px]">
         {index.code}
-      </Badge>
-      
+      </span>
+
+      {/* Content */}
       <div className="flex-1 min-w-0">
         <h4 className="font-medium text-sm group-hover:text-primary transition-colors truncate">
           {index.name_sv}
@@ -201,15 +206,12 @@ function IndexListRow({
         </p>
       </div>
 
-      <div className="flex items-center gap-3 shrink-0 text-xs text-muted-foreground">
-        <div className="flex items-center gap-1">
-          [GEO] {index.geo_coverage.toUpperCase()}
-        </div>
-        <div className="flex items-center gap-1">
-          [TID] {index.update_frequency === 'annual' ? 'År' : 
-           index.update_frequency === 'quarterly' ? 'Kv' :
-           index.update_frequency === 'monthly' ? 'Mån' : 'V'}
-        </div>
+      {/* Meta */}
+      <div className="shrink-0 flex items-center gap-4 text-xs font-mono text-muted-foreground">
+        <span>[TID] {index.update_frequency === 'annual' ? 'År' : 
+         index.update_frequency === 'quarterly' ? 'Kv' :
+         index.update_frequency === 'monthly' ? 'Mån' : 'V'}</span>
+        <span>{DIRECTION_MARKERS[index.direction]}</span>
         <span className="group-hover:translate-x-1 transition-transform">[→]</span>
       </div>
     </div>
