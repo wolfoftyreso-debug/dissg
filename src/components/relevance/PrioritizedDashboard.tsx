@@ -7,18 +7,21 @@
  * - Topp 5 förbättringar
  * - Topp 5 försämringar
  * 
- * Med "Varför visas detta?" för varje post.
+ * Med klickbar fördjupning och "Varför visas detta?" för varje post.
+ * Följer NO ICONS-doktrinen: endast text-markörer.
  */
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RelevanceExplainer } from './RelevanceExplainer';
-import { TrendingUp, TrendingDown, AlertTriangle, ArrowUp, ArrowDown, Minus, RefreshCw } from 'lucide-react';
+import { IndexItemDetailDialog } from './IndexItemDetailDialog';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface RelevanceScore {
   id: string;
@@ -86,7 +89,21 @@ interface DailySnapshot {
   calculation_duration_ms: number;
 }
 
+interface SelectedItem {
+  id: string;
+  code: string;
+  name: string;
+  change: number;
+  score?: number;
+  primaryReason?: string;
+  category?: string;
+}
+
 export function PrioritizedDashboard() {
+  const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
+  const [detailType, setDetailType] = useState<'improvement' | 'decline' | 'attention'>('attention');
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   // Hämta dagens snapshot
   const { data: snapshot, isLoading: snapshotLoading } = useQuery({
     queryKey: ['daily-priority-snapshot'],
@@ -101,7 +118,6 @@ export function PrioritizedDashboard() {
       if (error) throw error;
       if (!data) return null;
       
-      // Safely cast JSONB fields
       return {
         snapshot_date: data.snapshot_date,
         top_relevant: (data.top_relevant as unknown as TopRelevantItem[]) ?? [],
@@ -153,7 +169,6 @@ export function PrioritizedDashboard() {
       
       if (error) throw error;
       
-      // Deduplicate to get latest per KPI
       const latest = new Map<string, KPIValue>();
       for (const val of data) {
         if (!latest.has(val.kpi_id)) {
@@ -178,12 +193,20 @@ export function PrioritizedDashboard() {
         id: 'relevance-calc',
       });
       
-      // Refetch data
       window.location.reload();
     } catch (error) {
       toast.error('Kunde inte beräkna relevans', { id: 'relevance-calc' });
       console.error(error);
     }
+  };
+
+  const handleItemClick = (
+    item: { id: string; code: string; name: string; change: number; score?: number; primaryReason?: string },
+    type: 'improvement' | 'decline' | 'attention'
+  ) => {
+    setSelectedItem(item);
+    setDetailType(type);
+    setDialogOpen(true);
   };
 
   const isLoading = snapshotLoading || scoresLoading;
@@ -208,27 +231,25 @@ export function PrioritizedDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Prioriterad översikt</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-2xl font-bold font-mono">[PRIORITERAD ÖVERSIKT]</h2>
+          <p className="text-muted-foreground text-sm">
             Det som påverkar flest människor mest just nu
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={handleRefreshRelevance}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Beräkna relevans
+        <Button variant="outline" size="sm" onClick={handleRefreshRelevance} className="font-mono">
+          [↻] Beräkna relevans
         </Button>
       </div>
 
       {!hasData ? (
         <Card className="p-8 text-center">
-          <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <div className="text-4xl font-mono mb-4">[!]</div>
           <h3 className="font-medium mb-2">Ingen relevansdata tillgänglig</h3>
           <p className="text-muted-foreground mb-4">
             Klicka på "Beräkna relevans" för att generera prioriterad data.
           </p>
-          <Button onClick={handleRefreshRelevance}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Beräkna nu
+          <Button onClick={handleRefreshRelevance} className="font-mono">
+            [↻] Beräkna nu
           </Button>
         </Card>
       ) : (
@@ -236,8 +257,8 @@ export function PrioritizedDashboard() {
           {/* Topp 5 mest relevanta */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <AlertTriangle className="h-5 w-5 text-orange-500" />
+              <CardTitle className="flex items-center gap-2 text-lg font-mono">
+                <span className="text-amber-600">[!]</span>
                 Kräver uppmärksamhet
               </CardTitle>
             </CardHeader>
@@ -245,19 +266,28 @@ export function PrioritizedDashboard() {
               {scores?.slice(0, 5).map((score, index) => {
                 const kpiDef = kpiDefMap.get(score.object_id);
                 const kpiValue = kpiValues?.get(score.object_id);
+                const name = kpiDef?.name ?? score.object_code;
                 
                 return (
-                  <div 
-                    key={score.id} 
-                    className="flex items-start justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  <button
+                    key={score.id}
+                    onClick={() => handleItemClick({
+                      id: score.object_id,
+                      code: score.object_code,
+                      name,
+                      change: kpiValue?.trend_percent ?? 0,
+                      score: score.total_score,
+                      primaryReason: score.primary_reason,
+                    }, 'attention')}
+                    className="w-full text-left flex items-start justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer border border-transparent hover:border-border"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-xs font-mono">
                           #{index + 1}
                         </Badge>
                         <span className="font-medium truncate">
-                          {kpiDef?.name ?? score.object_code}
+                          {name}
                         </span>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-1">
@@ -266,19 +296,13 @@ export function PrioritizedDashboard() {
                       <div className="flex items-center gap-2 mt-1">
                         <Badge 
                           variant={score.total_score >= 75 ? 'destructive' : score.total_score >= 50 ? 'default' : 'secondary'}
-                          className="text-xs"
+                          className="text-xs font-mono"
                         >
                           {score.total_score.toFixed(0)}
                         </Badge>
                         {kpiValue && (
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            {kpiValue.trend === 'up' ? (
-                              <ArrowUp className="h-3 w-3 text-green-500" />
-                            ) : kpiValue.trend === 'down' ? (
-                              <ArrowDown className="h-3 w-3 text-red-500" />
-                            ) : (
-                              <Minus className="h-3 w-3" />
-                            )}
+                          <span className="text-xs text-muted-foreground font-mono">
+                            {kpiValue.trend === 'up' ? '↑' : kpiValue.trend === 'down' ? '↓' : '→'}
                             {kpiValue.trend_percent?.toFixed(1)}%
                           </span>
                         )}
@@ -306,7 +330,7 @@ export function PrioritizedDashboard() {
                       calculatedAt={score.calculated_at}
                       kpiName={kpiDef?.name}
                     />
-                  </div>
+                  </button>
                 );
               })}
             </CardContent>
@@ -315,8 +339,8 @@ export function PrioritizedDashboard() {
           {/* Topp 5 förbättringar */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <TrendingUp className="h-5 w-5 text-green-500" />
+              <CardTitle className="flex items-center gap-2 text-lg font-mono">
+                <span className="text-emerald-600">[↑]</span>
                 Förbättringar
               </CardTitle>
             </CardHeader>
@@ -324,31 +348,40 @@ export function PrioritizedDashboard() {
               {snapshot?.top_improvements && snapshot.top_improvements.length > 0 ? (
                 snapshot.top_improvements.map((item, index) => {
                   const kpiDef = kpiDefMap.get(item.id);
+                  const name = kpiDef?.name ?? item.name ?? item.code;
                   return (
-                    <div 
+                    <button
                       key={item.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-green-500/5 hover:bg-green-500/10 transition-colors"
+                      onClick={() => handleItemClick({
+                        id: item.id,
+                        code: item.code,
+                        name,
+                        change: item.change,
+                      }, 'improvement')}
+                      className={cn(
+                        "w-full text-left flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer",
+                        "bg-emerald-500/5 hover:bg-emerald-500/10 border border-transparent hover:border-emerald-200"
+                      )}
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs bg-green-500/10 text-green-700 border-green-200">
+                          <Badge variant="outline" className="text-xs font-mono bg-emerald-500/10 text-emerald-700 border-emerald-200">
                             #{index + 1}
                           </Badge>
                           <span className="font-medium truncate">
-                            {kpiDef?.name ?? item.name ?? item.code}
+                            {name}
                           </span>
                         </div>
                       </div>
-                      <Badge className="bg-green-500 text-white">
-                        <ArrowUp className="h-3 w-3 mr-1" />
-                        {Math.abs(item.change).toFixed(1)}%
+                      <Badge className="bg-emerald-500 text-white font-mono">
+                        ↑ {Math.abs(item.change).toFixed(1)}%
                       </Badge>
-                    </div>
+                    </button>
                   );
                 })
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  Inga signifikanta förbättringar
+                <p className="text-sm text-muted-foreground text-center py-8 font-mono">
+                  [—] Inga signifikanta förbättringar
                 </p>
               )}
             </CardContent>
@@ -357,8 +390,8 @@ export function PrioritizedDashboard() {
           {/* Topp 5 försämringar */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <TrendingDown className="h-5 w-5 text-red-500" />
+              <CardTitle className="flex items-center gap-2 text-lg font-mono">
+                <span className="text-red-600">[↓]</span>
                 Försämringar
               </CardTitle>
             </CardHeader>
@@ -366,31 +399,40 @@ export function PrioritizedDashboard() {
               {snapshot?.top_declines && snapshot.top_declines.length > 0 ? (
                 snapshot.top_declines.map((item, index) => {
                   const kpiDef = kpiDefMap.get(item.id);
+                  const name = kpiDef?.name ?? item.name ?? item.code;
                   return (
-                    <div 
+                    <button
                       key={item.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-red-500/5 hover:bg-red-500/10 transition-colors"
+                      onClick={() => handleItemClick({
+                        id: item.id,
+                        code: item.code,
+                        name,
+                        change: item.change,
+                      }, 'decline')}
+                      className={cn(
+                        "w-full text-left flex items-center justify-between p-3 rounded-lg transition-colors cursor-pointer",
+                        "bg-red-500/5 hover:bg-red-500/10 border border-transparent hover:border-red-200"
+                      )}
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs bg-red-500/10 text-red-700 border-red-200">
+                          <Badge variant="outline" className="text-xs font-mono bg-red-500/10 text-red-700 border-red-200">
                             #{index + 1}
                           </Badge>
                           <span className="font-medium truncate">
-                            {kpiDef?.name ?? item.name ?? item.code}
+                            {name}
                           </span>
                         </div>
                       </div>
-                      <Badge variant="destructive">
-                        <ArrowDown className="h-3 w-3 mr-1" />
-                        {Math.abs(item.change).toFixed(1)}%
+                      <Badge variant="destructive" className="font-mono">
+                        ↓ {Math.abs(item.change).toFixed(1)}%
                       </Badge>
-                    </div>
+                    </button>
                   );
                 })
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  Inga signifikanta försämringar
+                <p className="text-sm text-muted-foreground text-center py-8 font-mono">
+                  [—] Inga signifikanta försämringar
                 </p>
               )}
             </CardContent>
@@ -400,14 +442,22 @@ export function PrioritizedDashboard() {
 
       {/* Metadata */}
       {snapshot && (
-        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-          <span>Beräknad: {new Date(snapshot.snapshot_date).toLocaleDateString('sv-SE')}</span>
+        <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground font-mono">
+          <span>[DATUM] {new Date(snapshot.snapshot_date).toLocaleDateString('sv-SE')}</span>
           <span>•</span>
-          <span>{snapshot.total_objects_scored} indikatorer analyserade</span>
+          <span>[N] {snapshot.total_objects_scored} indikatorer</span>
           <span>•</span>
-          <span>{snapshot.calculation_duration_ms}ms</span>
+          <span>[TID] {snapshot.calculation_duration_ms}ms</span>
         </div>
       )}
+
+      {/* Detail Dialog */}
+      <IndexItemDetailDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        item={selectedItem}
+        type={detailType}
+      />
     </div>
   );
 }
