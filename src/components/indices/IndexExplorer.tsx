@@ -1,24 +1,23 @@
 /**
- * INDEX EXPLORER - Avanza-inspired Dashboard
+ * INDEX EXPLORER - Professional Avanza-inspired Dashboard
  * 
- * Full-width world map with regional indices + category panels below.
- * Professional financial app aesthetic. Click any index for drill-down.
+ * Clean, dense, professional. Better than Avanza.
  */
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { IndexWorldMap } from './IndexWorldMap';
 import { IndexPanel } from './IndexPanel';
 import { IndexDetailView } from './IndexDetailView';
+import { ChevronDown } from 'lucide-react';
 import type { IndexDefinition } from '@/lib/lambda';
 
 interface IndexExplorerProps {
   className?: string;
 }
 
-// Mock data for panels
+// Mock data - matching Avanza style with flags and professional naming
 const NORDIC_INDICES = [
   { code: 'SWE_RI', name: 'Sweden Reality Index', flag: '🇸🇪', change: 0.31, value: 72.45, time: '17:29' },
   { code: 'NOR_RI', name: 'Norway Reality Index', flag: '🇳🇴', change: 0.28, value: 74.12, time: '17:29' },
@@ -59,9 +58,11 @@ const SECTOR_INDICES = [
   { code: 'DEMO_IDX', name: 'Demografiindex', flag: '👶', change: -0.56, value: 63.45, time: '00:26' },
 ];
 
+type TabType = 'today' | 'watchlist' | 'notes' | 'alerts';
+
 export function IndexExplorer({ className }: IndexExplorerProps) {
   const [selectedIndex, setSelectedIndex] = useState<IndexDefinition | null>(null);
-  const [activeTab, setActiveTab] = useState<'today' | 'watchlist' | 'notes' | 'alerts'>('today');
+  const [activeTab, setActiveTab] = useState<TabType>('today');
 
   const handleBackToList = () => {
     setSelectedIndex(null);
@@ -78,79 +79,79 @@ export function IndexExplorer({ className }: IndexExplorerProps) {
     );
   }
 
+  const tabs: { id: TabType; label: string }[] = [
+    { id: 'today', label: 'Index idag' },
+    { id: 'watchlist', label: 'Mina bevakningar' },
+    { id: 'notes', label: 'Anteckningar' },
+    { id: 'alerts', label: 'Larm' },
+  ];
+
   return (
     <div className={cn("flex flex-col h-full bg-background overflow-hidden", className)}>
-      {/* Header with Tabs */}
+      {/* Header */}
       <div className="flex-shrink-0 border-b bg-card">
-        <div className="px-6 pt-4 pb-0">
-          <h1 className="text-xl font-semibold mb-1">Indexöversikt</h1>
+        <div className="px-6 pt-4">
+          <h1 className="text-xl font-semibold text-foreground mb-3">Indexöversikt</h1>
           
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
-            <div className="flex items-center justify-between">
-              <TabsList className="bg-transparent p-0 h-auto gap-1">
-                <TabsTrigger 
-                  value="today" 
-                  className="px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none text-sm"
+          {/* Tab Navigation */}
+          <div className="flex items-center justify-between">
+            <div className="flex gap-0">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "px-4 py-2 text-sm font-medium transition-colors relative",
+                    activeTab === tab.id 
+                      ? "text-foreground" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
                 >
-                  Index idag
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="watchlist" 
-                  className="px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none text-sm"
-                >
-                  Mina bevakningar
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="notes" 
-                  className="px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none text-sm"
-                >
-                  Anteckningar
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="alerts" 
-                  className="px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none text-sm"
-                >
-                  Larm
-                </TabsTrigger>
-              </TabsList>
-
-              <div className="flex items-center gap-2 pb-2">
-                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
-                  Index idag
-                  <span className="text-muted-foreground">▼</span>
-                </Button>
-                <Button variant="outline" size="sm" className="h-8 text-xs">
-                  + Lägg till
-                </Button>
-                <Button variant="outline" size="sm" className="h-8 text-xs">
-                  ↕ Sortera
-                </Button>
-                <span className="text-xs text-muted-foreground">Drag and drop</span>
-                <Button variant="secondary" size="sm" className="h-8 text-xs">
-                  Auto
-                </Button>
-              </div>
+                  {tab.label}
+                  {activeTab === tab.id && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+                  )}
+                </button>
+              ))}
             </div>
-          </Tabs>
+
+            {/* Toolbar */}
+            <div className="flex items-center gap-2 pb-2">
+              <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5 font-normal">
+                Index idag
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+              <Button variant="outline" size="sm" className="h-8 text-xs font-normal">
+                + Lägg till
+              </Button>
+              <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5 font-normal">
+                ↕ Sortera
+              </Button>
+              <span className="text-xs text-muted-foreground px-2">Drag and drop</span>
+              <Button variant="secondary" size="sm" className="h-8 text-xs font-medium">
+                Auto
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Disclaimer Banner */}
-      <div className="flex-shrink-0 bg-status-warning/10 border-b border-status-warning/30 px-6 py-2">
+      <div className="flex-shrink-0 bg-status-warning/10 border-b border-status-warning/20 px-6 py-2">
         <p className="text-xs text-status-warning">
-          <span className="font-semibold">Index innebär osäkerhet.</span> Att jämföra länder och regioner över tid är komplext. 
-          Index visar trender och relativa positioner, men ger inte fullständig bild. Klicka på valfritt index för fullständig metodbeskrivning.
+          <span className="font-semibold">Index innebär osäkerhet.</span>{' '}
+          Att jämföra länder och regioner över tid är komplext. Index visar trender och relativa positioner, men ger inte fullständig bild. Klicka på valfritt index för fullständig metodbeskrivning.
         </p>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        <div className="p-6 space-y-6">
+        <div className="p-4 space-y-4">
           {/* World Map Section */}
           <IndexWorldMap />
 
-          {/* Index Panels Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {/* Index Panels Grid - 5 columns on xl */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
             <IndexPanel title="Nordiska index" items={NORDIC_INDICES} />
             <IndexPanel title="Världsindex" items={WORLD_INDICES} />
             <IndexPanel title="Europeiska index" items={EUROPEAN_INDICES} />
