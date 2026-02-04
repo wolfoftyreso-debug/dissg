@@ -36,6 +36,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { ExpandableSourceDocument } from '@/components/ui/ExpandableSourceDocument';
+import { ExpandableHistoricalEvent } from '@/components/ui/ExpandableHistoricalEvent';
 
 // ═══════════════════════════════════════════════════════════════
 // PRINCIPLE EVIDENCE DATA
@@ -373,12 +374,12 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
           </CardContent>
         </Card>
         
-        {/* Historical Context */}
+        {/* Historical Context - Now Expandable */}
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Clock className="h-4 w-4 text-amber-500" />
-              Historisk kontext
+              Historisk kontext ({evidence.historicalContext.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -386,14 +387,14 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
               <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-border" />
               <div className="space-y-4">
                 {evidence.historicalContext.map((milestone, idx) => (
-                  <div key={idx} className="relative pl-8">
-                    <div className="absolute left-1.5 top-1.5 w-3 h-3 rounded-full bg-primary" />
-                    <div>
-                      <Badge variant="outline" className="mb-1">{milestone.year}</Badge>
-                      <p className="text-sm font-medium">{milestone.event}</p>
-                      <p className="text-xs text-muted-foreground">{milestone.significance}</p>
-                    </div>
-                  </div>
+                  <ExpandableHistoricalEvent
+                    key={idx}
+                    event={{
+                      year: milestone.year,
+                      event: milestone.event,
+                      significance: milestone.significance,
+                    }}
+                  />
                 ))}
               </div>
             </div>
