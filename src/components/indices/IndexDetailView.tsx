@@ -4,6 +4,8 @@
  * Complete drill-down view for a single index.
  * Shows methodology, components, sources, historical data, and correlations.
  * Follows infinite-clickability requirement.
+ * 
+ * NO ICONS - text markers only per design doctrine.
  */
 
 import React, { useState } from 'react';
@@ -14,30 +16,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import {
-  ArrowLeft,
-  Info,
-  Calculator,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  ExternalLink,
-  Database,
-  Clock,
-  Globe2,
-  LineChart,
-  AlertTriangle,
-  CheckCircle2,
-  XCircle,
-  FileText,
-  Link2,
-  ChevronDown,
-  ChevronUp,
-  Scale,
-  Layers,
-  History,
-  BarChart3,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { IndexDefinition } from '@/lib/lambda';
 import {
@@ -51,6 +29,13 @@ interface IndexDetailViewProps {
   onBack: () => void;
   className?: string;
 }
+
+// Direction markers
+const DIRECTION_INFO = {
+  higher_better: { text: 'Högre är bättre', marker: '[+]', color: 'text-trend-up' },
+  lower_better: { text: 'Lägre är bättre', marker: '[−]', color: 'text-trend-down' },
+  neutral_optimal: { text: 'Optimalt intervall', marker: '[~]', color: 'text-trend-stable' },
+};
 
 export function IndexDetailView({ index, onBack, className }: IndexDetailViewProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'methodology' | 'data' | 'history'>('overview');
@@ -66,31 +51,23 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
     setExpandedSections(next);
   };
 
-  const directionLabel = {
-    higher_better: { text: 'Högre är bättre', icon: TrendingUp, color: 'text-trend-up' },
-    lower_better: { text: 'Lägre är bättre', icon: TrendingDown, color: 'text-trend-down' },
-    neutral_optimal: { text: 'Optimalt intervall', icon: Minus, color: 'text-trend-stable' },
-  };
-
-  const direction = directionLabel[index.direction];
-  const DirectionIcon = direction.icon;
+  const direction = DIRECTION_INFO[index.direction];
 
   return (
-    <div className={cn("flex flex-col h-full", className)}>
+    <div className={cn("flex flex-col h-full font-mono", className)}>
       {/* Header with back button */}
       <div className="flex-shrink-0 p-4 border-b bg-card">
         <div className="flex items-center gap-3 mb-4">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <ArrowLeft className="h-5 w-5" />
+          <Button variant="ghost" size="sm" onClick={onBack} className="font-mono">
+            [←] Tillbaka
           </Button>
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <Badge variant="outline" className="font-mono">
                 {index.code}
               </Badge>
-              <Badge variant="secondary" className={cn("gap-1", direction.color)}>
-                <DirectionIcon className="h-3 w-3" />
-                {direction.text}
+              <Badge variant="secondary" className={cn("gap-1 font-mono", direction.color)}>
+                {direction.marker} {direction.text}
               </Badge>
             </div>
             <h1 className="text-2xl font-bold">{index.name_sv}</h1>
@@ -101,12 +78,12 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
         {/* Quick stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <QuickStat 
-            icon={Globe2} 
+            marker="[GEO]" 
             label="Täckning" 
             value={index.geo_coverage === 'global' ? 'Global' : index.geo_coverage.toUpperCase()} 
           />
           <QuickStat 
-            icon={Clock} 
+            marker="[TID]" 
             label="Uppdatering" 
             value={
               index.update_frequency === 'annual' ? 'Årlig' : 
@@ -115,12 +92,12 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
             } 
           />
           <QuickStat 
-            icon={Database} 
+            marker="[DATA]" 
             label="Data från" 
             value={`${index.coverage_start_year}`} 
           />
           <QuickStat 
-            icon={Layers} 
+            marker="[KOM]" 
             label="Indikatorer" 
             value={`${index.input_indicators.length}`} 
           />
@@ -130,21 +107,17 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex-1 flex flex-col">
         <TabsList className="w-full justify-start px-4 pt-2 rounded-none border-b bg-transparent">
-          <TabsTrigger value="overview" className="gap-2">
-            <Info className="h-4 w-4" />
-            Översikt
+          <TabsTrigger value="overview" className="gap-2 font-mono">
+            [INFO] Översikt
           </TabsTrigger>
-          <TabsTrigger value="methodology" className="gap-2">
-            <Calculator className="h-4 w-4" />
-            Metodik
+          <TabsTrigger value="methodology" className="gap-2 font-mono">
+            [METOD] Metodik
           </TabsTrigger>
-          <TabsTrigger value="data" className="gap-2">
-            <Database className="h-4 w-4" />
-            Data & Källor
+          <TabsTrigger value="data" className="gap-2 font-mono">
+            [KÄLLA] Data & Källor
           </TabsTrigger>
-          <TabsTrigger value="history" className="gap-2">
-            <History className="h-4 w-4" />
-            Historik
+          <TabsTrigger value="history" className="gap-2 font-mono">
+            [HIST] Historik
           </TabsTrigger>
         </TabsList>
 
@@ -154,9 +127,8 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
             {/* Description */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Info className="h-4 w-4" />
-                  Beskrivning
+                <CardTitle className="text-base flex items-center gap-2 font-mono">
+                  [INFO] Beskrivning
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -167,9 +139,8 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
             {/* Optimal Range */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Scale className="h-4 w-4" />
-                  Optimalt intervall
+                <CardTitle className="text-base flex items-center gap-2 font-mono">
+                  [SKALA] Optimalt intervall
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -192,9 +163,8 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
             {/* Input indicators */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Layers className="h-4 w-4" />
-                  Ingående indikatorer
+                <CardTitle className="text-base flex items-center gap-2 font-mono">
+                  [KOM] Ingående indikatorer
                 </CardTitle>
                 <CardDescription>
                   Klicka för att utforska varje indikator
@@ -206,7 +176,7 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
                     <Badge 
                       key={i} 
                       variant="outline" 
-                      className="cursor-pointer hover:bg-primary/10 transition-colors"
+                      className="cursor-pointer hover:bg-primary/10 transition-colors font-mono"
                     >
                       {indicator.replace(/_/g, ' ')}
                     </Badge>
@@ -218,18 +188,17 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
             {/* Primary sources */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  Primära källor
+                <CardTitle className="text-base flex items-center gap-2 font-mono">
+                  [KÄLLA] Primära källor
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
                   {index.primary_sources.map((source, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm">
-                      <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+                      <span className="text-primary shrink-0">[OK]</span>
                       <span>{source}</span>
-                      <ExternalLink className="h-3 w-3 text-muted-foreground ml-auto cursor-pointer hover:text-primary" />
+                      <span className="text-muted-foreground ml-auto cursor-pointer hover:text-primary">[LÄNK]</span>
                     </li>
                   ))}
                 </ul>
@@ -242,7 +211,7 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
             {/* Formula */}
             <CollapsibleSection
               title="Beräkningsformel"
-              icon={Calculator}
+              marker="[FORMEL]"
               isOpen={expandedSections.has('formula')}
               onToggle={() => toggleSection('formula')}
             >
@@ -254,12 +223,12 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
             {/* Normalization */}
             <CollapsibleSection
               title="Normaliseringsmetod"
-              icon={Scale}
+              marker="[NORM]"
               isOpen={expandedSections.has('normalization')}
               onToggle={() => toggleSection('normalization')}
             >
               <div className="space-y-2">
-                <Badge variant="secondary" className="text-sm">
+                <Badge variant="secondary" className="text-sm font-mono">
                   {index.normalization_method}
                 </Badge>
                 <p className="text-sm text-muted-foreground">
@@ -278,13 +247,13 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
             {/* Direction */}
             <CollapsibleSection
               title="Tolkning"
-              icon={TrendingUp}
+              marker="[TOLKNING]"
               isOpen={expandedSections.has('direction')}
               onToggle={() => toggleSection('direction')}
             >
               <div className="space-y-3">
                 <div className={cn("flex items-center gap-2", direction.color)}>
-                  <DirectionIcon className="h-5 w-5" />
+                  <span className="font-mono">{direction.marker}</span>
                   <span className="font-medium">{direction.text}</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -301,12 +270,12 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
             {/* Update frequency */}
             <CollapsibleSection
               title="Uppdateringsfrekvens"
-              icon={Clock}
+              marker="[TID]"
               isOpen={expandedSections.has('frequency')}
               onToggle={() => toggleSection('frequency')}
             >
               <div className="space-y-2">
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="font-mono">
                   {index.update_frequency === 'annual' ? 'Årlig uppdatering' : 
                    index.update_frequency === 'quarterly' ? 'Kvartalsvis uppdatering' :
                    index.update_frequency === 'monthly' ? 'Månatlig uppdatering' : 
@@ -323,9 +292,8 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
           <TabsContent value="data" className="p-4 space-y-4 m-0">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Database className="h-4 w-4" />
-                  Datakällor
+                <CardTitle className="text-base flex items-center gap-2 font-mono">
+                  [KÄLLA] Datakällor
                 </CardTitle>
                 <CardDescription>
                   Alla primära och sekundära källor för detta index
@@ -334,8 +302,8 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
               <CardContent className="space-y-4">
                 {index.primary_sources.map((source, i) => (
                   <div key={i} className="flex items-start gap-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
-                    <div className="p-2 bg-primary/10 rounded-lg shrink-0">
-                      <Database className="h-4 w-4 text-primary" />
+                    <div className="p-2 bg-primary/10 rounded-lg shrink-0 font-mono text-xs text-primary">
+                      [DATA]
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-sm">{source}</h4>
@@ -343,7 +311,7 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
                         Primär källa • Verifierad • Regelbundet uppdaterad
                       </p>
                     </div>
-                    <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="text-xs text-muted-foreground shrink-0">[LÄNK]</span>
                   </div>
                 ))}
               </CardContent>
@@ -351,16 +319,15 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Globe2 className="h-4 w-4" />
-                  Geografisk täckning
+                <CardTitle className="text-base flex items-center gap-2 font-mono">
+                  [GEO] Geografisk täckning
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span>Täckningsnivå</span>
-                    <Badge variant="secondary">
+                    <Badge variant="secondary" className="font-mono">
                       {index.geo_coverage === 'global' ? 'Global (190+ länder)' :
                        index.geo_coverage === 'oecd' ? 'OECD (38 länder)' :
                        index.geo_coverage === 'eu' ? 'EU (27 länder)' : 'Regional'}
@@ -375,23 +342,22 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-status-warning" />
-                  Kvalitetsvarningar
+                <CardTitle className="text-base flex items-center gap-2 font-mono">
+                  [!] Kvalitetsvarningar
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
-                    <AlertTriangle className="h-4 w-4 text-status-warning shrink-0 mt-0.5" />
+                    <span className="text-status-warning shrink-0">[!]</span>
                     <span>Eftersläpning i data varierar mellan 1-24 månader beroende på källa</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <AlertTriangle className="h-4 w-4 text-status-warning shrink-0 mt-0.5" />
+                    <span className="text-status-warning shrink-0">[!]</span>
                     <span>Definitoner kan variera mellan länder</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground shrink-0">[i]</span>
                     <span>Se fullständig metoddokumentation för detaljer</span>
                   </li>
                 </ul>
@@ -403,30 +369,29 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
           <TabsContent value="history" className="p-4 space-y-4 m-0">
             <Card>
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <History className="h-4 w-4" />
-                  Datatillgänglighet
+                <CardTitle className="text-base flex items-center gap-2 font-mono">
+                  [HIST] Datatillgänglighet
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Startår</span>
-                  <Badge variant="secondary">{index.coverage_start_year}</Badge>
+                  <Badge variant="secondary" className="font-mono">{index.coverage_start_year}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Senaste data</span>
-                  <Badge variant="secondary">2024</Badge>
+                  <Badge variant="secondary" className="font-mono">2024</Badge>
                 </div>
                 <Separator />
                 <div className="text-center py-8">
-                  <LineChart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <span className="text-4xl font-mono text-muted-foreground block mb-4">[GRAF]</span>
                   <p className="text-sm text-muted-foreground">
                     Historisk tidsseriedata tillgänglig.
                     <br />
                     Välj geografisk enhet för att visa utveckling.
                   </p>
-                  <Button variant="outline" size="sm" className="mt-4">
-                    Visa historik →
+                  <Button variant="outline" size="sm" className="mt-4 font-mono">
+                    Visa historik [→]
                   </Button>
                 </div>
               </CardContent>
@@ -438,20 +403,20 @@ export function IndexDetailView({ index, onBack, className }: IndexDetailViewPro
   );
 }
 
-// Quick stat component
+// Quick stat component - text marker based
 function QuickStat({ 
-  icon: Icon, 
+  marker, 
   label, 
   value 
 }: { 
-  icon: React.ElementType; 
+  marker: string; 
   label: string; 
   value: string;
 }) {
   return (
-    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-      <div className="p-2 bg-background rounded-lg">
-        <Icon className="h-4 w-4 text-muted-foreground" />
+    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg font-mono">
+      <div className="p-2 bg-background rounded-lg text-xs text-muted-foreground">
+        {marker}
       </div>
       <div>
         <p className="text-xs text-muted-foreground">{label}</p>
@@ -461,16 +426,16 @@ function QuickStat({
   );
 }
 
-// Collapsible section component
+// Collapsible section component - text marker based
 function CollapsibleSection({ 
   title, 
-  icon: Icon, 
+  marker, 
   isOpen, 
   onToggle, 
   children 
 }: { 
   title: string; 
-  icon: React.ElementType; 
+  marker: string; 
   isOpen: boolean; 
   onToggle: () => void; 
   children: React.ReactNode;
@@ -478,12 +443,12 @@ function CollapsibleSection({
   return (
     <Collapsible open={isOpen} onOpenChange={onToggle}>
       <CollapsibleTrigger asChild>
-        <Button variant="ghost" className="w-full justify-between p-4 h-auto border rounded-lg">
+        <Button variant="ghost" className="w-full justify-between p-4 h-auto border rounded-lg font-mono">
           <div className="flex items-center gap-2">
-            <Icon className="h-4 w-4" />
+            <span className="text-xs text-muted-foreground">{marker}</span>
             <span className="font-medium">{title}</span>
           </div>
-          {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          <span>{isOpen ? '[−]' : '[+]'}</span>
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent className="px-4 py-3 border-x border-b rounded-b-lg -mt-px">

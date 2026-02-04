@@ -3,6 +3,8 @@
  * 
  * Collapsible panel showing indices within a category.
  * Supports grid and list view modes.
+ * 
+ * NO ICONS - text markers only per design doctrine.
  */
 
 import React, { useState } from 'react';
@@ -14,23 +16,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import {
-  ChevronDown,
-  ChevronUp,
-  ChevronRight,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  Activity,
-  Heart,
-  Users,
-  Briefcase,
-  DollarSign,
-  Building2,
-  Leaf,
-  Clock,
-  Globe2,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { IndexDefinition, IndexCategory } from '@/lib/lambda';
 
@@ -49,14 +34,22 @@ interface IndexCategoryPanelProps {
   className?: string;
 }
 
-const CATEGORY_ICONS: Record<IndexCategory, React.ReactNode> = {
-  living_basic: <DollarSign className="h-5 w-5" />,
-  shadow_economy: <Activity className="h-5 w-5" />,
-  health_function: <Heart className="h-5 w-5" />,
-  social_cultural: <Users className="h-5 w-5" />,
-  productivity_work: <Briefcase className="h-5 w-5" />,
-  environmental: <Leaf className="h-5 w-5" />,
-  governance: <Building2 className="h-5 w-5" />,
+// Text markers for categories instead of icons
+const CATEGORY_MARKERS: Record<IndexCategory, string> = {
+  living_basic: '[LEVNAD]',
+  shadow_economy: '[SKUGGA]',
+  health_function: '[HÄLSA]',
+  social_cultural: '[SOCIAL]',
+  productivity_work: '[ARBETE]',
+  environmental: '[MILJÖ]',
+  governance: '[STYRNING]',
+};
+
+// Direction markers without icons
+const DIRECTION_MARKERS = {
+  higher_better: '[+]',
+  lower_better: '[−]',
+  neutral_optimal: '[~]',
 };
 
 const CATEGORY_COLORS: Record<IndexCategory, string> = {
@@ -91,26 +84,22 @@ export function IndexCategoryPanel({
         <Button
           variant="ghost"
           className={cn(
-            "w-full justify-between p-4 h-auto rounded-lg border",
+            "w-full justify-between p-4 h-auto rounded-lg border font-mono",
             CATEGORY_COLORS[category.code]
           )}
         >
           <div className="flex items-center gap-3">
-            {CATEGORY_ICONS[category.code]}
+            <span className="text-sm font-medium">{CATEGORY_MARKERS[category.code]}</span>
             <div className="text-left">
               <h3 className="font-semibold">{category.name_sv}</h3>
               <p className="text-xs opacity-75">{category.name_en}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-background/50">
+            <Badge variant="secondary" className="bg-background/50 font-mono">
               {indices.length} index
             </Badge>
-            {isOpen ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
+            <span className="text-sm">{isOpen ? '[−]' : '[+]'}</span>
           </div>
         </Button>
       </CollapsibleTrigger>
@@ -150,23 +139,19 @@ function IndexMiniCard({
   index: IndexDefinition; 
   onClick: () => void;
 }) {
-  const directionIcon = {
-    higher_better: <TrendingUp className="h-3 w-3 text-trend-up" />,
-    lower_better: <TrendingDown className="h-3 w-3 text-trend-down" />,
-    neutral_optimal: <Minus className="h-3 w-3 text-trend-stable" />,
-  };
-
   return (
     <Card 
       className="cursor-pointer hover:border-primary/50 hover:shadow-sm transition-all group"
       onClick={onClick}
     >
       <CardContent className="p-4 space-y-2">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between font-mono">
           <Badge variant="outline" className="text-xs font-mono">
             {index.code}
           </Badge>
-          {directionIcon[index.direction]}
+          <span className="text-xs text-muted-foreground">
+            {DIRECTION_MARKERS[index.direction]}
+          </span>
         </div>
         
         <h4 className="font-medium text-sm group-hover:text-primary transition-colors line-clamp-1">
@@ -177,14 +162,13 @@ function IndexMiniCard({
           {index.description}
         </p>
 
-        <div className="flex items-center justify-between pt-2 border-t">
+        <div className="flex items-center justify-between pt-2 border-t font-mono">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            {index.update_frequency === 'annual' ? 'Årlig' : 
+            [TID] {index.update_frequency === 'annual' ? 'Årlig' : 
              index.update_frequency === 'quarterly' ? 'Kvartal' :
              index.update_frequency === 'monthly' ? 'Månad' : 'Vecka'}
           </div>
-          <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+          <span className="text-muted-foreground group-hover:translate-x-1 transition-transform">[→]</span>
         </div>
       </CardContent>
     </Card>
@@ -201,7 +185,7 @@ function IndexListRow({
 }) {
   return (
     <div
-      className="flex items-center gap-4 p-3 rounded-lg border hover:border-primary/50 hover:bg-muted/50 cursor-pointer transition-colors group"
+      className="flex items-center gap-4 p-3 rounded-lg border hover:border-primary/50 hover:bg-muted/50 cursor-pointer transition-colors group font-mono"
       onClick={onClick}
     >
       <Badge variant="outline" className="font-mono shrink-0 min-w-[140px] justify-center text-xs">
@@ -219,16 +203,14 @@ function IndexListRow({
 
       <div className="flex items-center gap-3 shrink-0 text-xs text-muted-foreground">
         <div className="flex items-center gap-1">
-          <Globe2 className="h-3 w-3" />
-          {index.geo_coverage.toUpperCase()}
+          [GEO] {index.geo_coverage.toUpperCase()}
         </div>
         <div className="flex items-center gap-1">
-          <Clock className="h-3 w-3" />
-          {index.update_frequency === 'annual' ? 'År' : 
+          [TID] {index.update_frequency === 'annual' ? 'År' : 
            index.update_frequency === 'quarterly' ? 'Kv' :
            index.update_frequency === 'monthly' ? 'Mån' : 'V'}
         </div>
-        <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+        <span className="group-hover:translate-x-1 transition-transform">[→]</span>
       </div>
     </div>
   );

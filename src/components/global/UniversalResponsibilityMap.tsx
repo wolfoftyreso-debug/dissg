@@ -9,6 +9,8 @@
  * 
  * Följer CRM (Civilization Relevance Model) och perspektivhierarkin:
  * Civilisation → Världsdel → Nation → Region → System → Indikator
+ * 
+ * NO ICONS - text markers only per design doctrine.
  */
 
 import React, { useState } from 'react';
@@ -17,14 +19,6 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  ChevronDown,
-  ChevronRight,
-  Info,
-  Layers,
-  Target,
-  AlertCircle
-} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -46,7 +40,7 @@ interface GovernanceLevel {
   name: string;
   nameLocal?: Record<string, string>;
   description: string;
-  icon: React.ReactNode;
+  marker: string;
   typicalActors: string[];
   jurisdictionExamples: string[];
 }
@@ -56,7 +50,7 @@ interface HumanNeedDomain {
   code: string;
   name: string;
   nameLocal?: Record<string, string>;
-  icon: React.ReactNode;
+  marker: string;
   color: string;
   description: string;
   universalIndicators: UniversalIndicator[];
@@ -70,13 +64,13 @@ interface HumanNeedDomain {
 }
 
 // Governance levels - universal across all jurisdictions
-// Using descriptive labels instead of abstract icons
+// Using text markers instead of icons
 const GOVERNANCE_LEVELS: GovernanceLevel[] = [
   {
     id: 'global',
     name: 'Global',
     description: 'International bodies, treaties, and cross-border coordination',
-    icon: <span className="text-xs font-medium">🌐</span>,
+    marker: '[GLOBAL]',
     typicalActors: ['UN agencies', 'WHO', 'ILO', 'World Bank', 'IMF', 'WTO'],
     jurisdictionExamples: ['Paris Agreement', 'SDGs', 'IHR', 'Basel Accords']
   },
@@ -84,7 +78,7 @@ const GOVERNANCE_LEVELS: GovernanceLevel[] = [
     id: 'continental',
     name: 'Kontinental / Block',
     description: 'Regional economic and political unions',
-    icon: <span className="text-xs font-medium">🗺️</span>,
+    marker: '[KONT]',
     typicalActors: ['EU', 'AU', 'ASEAN', 'Mercosur', 'NAFTA/USMCA'],
     jurisdictionExamples: ['EU Directives', 'AU Protocols', 'ASEAN Framework']
   },
@@ -92,7 +86,7 @@ const GOVERNANCE_LEVELS: GovernanceLevel[] = [
     id: 'national',
     name: 'Nationell',
     description: 'Sovereign state legislation and policy',
-    icon: <span className="text-xs font-medium">🏛️</span>,
+    marker: '[NAT]',
     typicalActors: ['Parliament', 'Federal agencies', 'National ministries'],
     jurisdictionExamples: ['National constitution', 'Federal law', 'National budget']
   },
@@ -100,7 +94,7 @@ const GOVERNANCE_LEVELS: GovernanceLevel[] = [
     id: 'regional',
     name: 'Regional / Provinsiell',
     description: 'Sub-national administrative units',
-    icon: <span className="text-xs font-medium">📍</span>,
+    marker: '[REG]',
     typicalActors: ['States', 'Provinces', 'Länder', 'Regions', 'Counties'],
     jurisdictionExamples: ['State law', 'Regional planning', 'Provincial services']
   },
@@ -108,19 +102,19 @@ const GOVERNANCE_LEVELS: GovernanceLevel[] = [
     id: 'local',
     name: 'Lokal / Kommunal',
     description: 'Cities, municipalities, and communities',
-    icon: <span className="text-xs font-medium">🏘️</span>,
+    marker: '[LOK]',
     typicalActors: ['City councils', 'Mayors', 'Municipal agencies'],
     jurisdictionExamples: ['Zoning', 'Local services', 'Community programs']
   }
 ];
 
-// Universal human needs domains - using descriptive labels
+// Universal human needs domains - using text markers
 const HUMAN_NEEDS_DOMAINS: HumanNeedDomain[] = [
   {
     id: 'life-health',
     code: 'LH',
     name: 'Liv & Hälsa',
-    icon: <span className="text-base">Hälsa</span>,
+    marker: 'Hälsa',
     color: 'bg-destructive/10 text-destructive border-destructive/30',
     description: 'Överlevnad, fysisk hälsa, psykiskt välbefinnande, sjukvårdstillgång',
     universalIndicators: [
@@ -143,7 +137,7 @@ const HUMAN_NEEDS_DOMAINS: HumanNeedDomain[] = [
     id: 'livelihood-work',
     code: 'LW',
     name: 'Försörjning & Arbete',
-    icon: <span className="text-base">Arbete</span>,
+    marker: 'Arbete',
     color: 'bg-amber-500/10 text-amber-500 border-amber-500/30',
     description: 'Sysselsättning, inkomst, ekonomiskt deltagande, arbetsrätt',
     universalIndicators: [
@@ -166,7 +160,7 @@ const HUMAN_NEEDS_DOMAINS: HumanNeedDomain[] = [
     id: 'knowledge-skills',
     code: 'KS',
     name: 'Kunskap & Kompetens',
-    icon: <span className="text-base">Utbildning</span>,
+    marker: 'Utbildning',
     color: 'bg-blue-500/10 text-blue-500 border-blue-500/30',
     description: 'Utbildning, läskunnighet, kompetensutveckling, livslångt lärande',
     universalIndicators: [
@@ -189,7 +183,7 @@ const HUMAN_NEEDS_DOMAINS: HumanNeedDomain[] = [
     id: 'safety-security',
     code: 'SS',
     name: 'Trygghet & Säkerhet',
-    icon: <span className="text-base">Säkerhet</span>,
+    marker: 'Säkerhet',
     color: 'bg-orange-500/10 text-orange-500 border-orange-500/30',
     description: 'Fysisk säkerhet, rättsstat, konflikter, krisberedskap',
     universalIndicators: [
@@ -212,7 +206,7 @@ const HUMAN_NEEDS_DOMAINS: HumanNeedDomain[] = [
     id: 'shelter-infrastructure',
     code: 'SI',
     name: 'Boende & Infrastruktur',
-    icon: <span className="text-base">Bostad</span>,
+    marker: 'Bostad',
     color: 'bg-teal-500/10 text-teal-500 border-teal-500/30',
     description: 'Bostäder, vatten, sanitet, transport, uppkoppling',
     universalIndicators: [
@@ -235,7 +229,7 @@ const HUMAN_NEEDS_DOMAINS: HumanNeedDomain[] = [
     id: 'environment-resources',
     code: 'ER',
     name: 'Miljö & Resurser',
-    icon: <span className="text-base">Miljö</span>,
+    marker: 'Miljö',
     color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30',
     description: 'Luftkvalitet, klimat, biologisk mångfald, resurshållbarhet',
     universalIndicators: [
@@ -258,7 +252,7 @@ const HUMAN_NEEDS_DOMAINS: HumanNeedDomain[] = [
     id: 'energy-food',
     code: 'EF',
     name: 'Energi & Mat',
-    icon: <span className="text-base">Energi</span>,
+    marker: 'Energi',
     color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30',
     description: 'Energitillgång, livsmedelssäkerhet, nutrition, jordbruk',
     universalIndicators: [
@@ -281,7 +275,7 @@ const HUMAN_NEEDS_DOMAINS: HumanNeedDomain[] = [
     id: 'governance-rights',
     code: 'GR',
     name: 'Styrning & Rättigheter',
-    icon: <span className="text-base">Demokrati</span>,
+    marker: 'Demokrati',
     color: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/30',
     description: 'Demokratiskt deltagande, mänskliga rättigheter, transparens, inkludering',
     universalIndicators: [
@@ -303,7 +297,7 @@ const HUMAN_NEEDS_DOMAINS: HumanNeedDomain[] = [
 ];
 
 // ═══════════════════════════════════════════════════════════════
-// COMPONENTS
+// COMPONENTS - NO ICONS
 // ═══════════════════════════════════════════════════════════════
 
 // Indicator badge with data availability
@@ -315,8 +309,15 @@ const IndicatorBadge: React.FC<{ indicator: UniversalIndicator }> = ({ indicator
     none: 'bg-muted text-muted-foreground'
   };
 
+  const availabilityMarkers = {
+    high: '[HÖG]',
+    medium: '[MED]',
+    low: '[LÅG]',
+    none: '[−]'
+  };
+
   return (
-    <div className="flex items-center gap-2 p-2 rounded-lg bg-card/50 border border-border/50">
+    <div className="flex items-center gap-2 p-2 rounded-lg bg-card/50 border border-border/50 font-mono">
       <Badge variant="outline" className="font-mono text-xs">
         {indicator.code}
       </Badge>
@@ -324,8 +325,8 @@ const IndicatorBadge: React.FC<{ indicator: UniversalIndicator }> = ({ indicator
         <p className="text-sm font-medium truncate">{indicator.name}</p>
         <p className="text-xs text-muted-foreground">{indicator.unit}</p>
       </div>
-      <Badge className={cn("text-xs", availabilityColors[indicator.dataAvailability])}>
-        {indicator.dataAvailability === 'high' ? '●' : indicator.dataAvailability === 'medium' ? '◐' : '○'}
+      <Badge className={cn("text-xs font-mono", availabilityColors[indicator.dataAvailability])}>
+        {availabilityMarkers[indicator.dataAvailability]}
       </Badge>
     </div>
   );
@@ -339,15 +340,15 @@ const GovernanceLevelSection: React.FC<{
   if (responsibilities.length === 0) return null;
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 font-mono">
       <div className="flex items-center gap-2 text-sm font-medium">
-        {level.icon}
+        <span className="text-xs text-muted-foreground">{level.marker}</span>
         <span>{level.name}</span>
       </div>
       <div className="ml-6 space-y-1">
         {responsibilities.map((resp, idx) => (
           <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
-            <ChevronRight className="h-3 w-3" />
+            <span>[→]</span>
             <span>{resp}</span>
           </div>
         ))}
@@ -369,23 +370,21 @@ const DomainCard: React.FC<{ domain: HumanNeedDomain }> = ({ domain }) => {
         <CollapsibleTrigger className="w-full">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <div className={cn("p-2 rounded-lg border", domain.color)}>
-                {domain.icon}
+              <div className={cn("p-2 rounded-lg border font-mono", domain.color)}>
+                {domain.marker}
               </div>
               <div className="flex-1 text-left">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <span className="font-mono text-muted-foreground text-sm">{domain.code}</span>
+                <CardTitle className="text-lg flex items-center gap-2 font-mono">
+                  <span className="text-muted-foreground text-sm">{domain.code}</span>
                   {domain.name}
-                  {isExpanded ? (
-                    <ChevronDown className="h-4 w-4 text-muted-foreground ml-auto" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto" />
-                  )}
+                  <span className="text-muted-foreground ml-auto text-sm">
+                    {isExpanded ? '[−]' : '[+]'}
+                  </span>
                 </CardTitle>
                 <CardDescription>{domain.description}</CardDescription>
               </div>
             </div>
-            <div className="flex gap-2 mt-3 flex-wrap">
+            <div className="flex gap-2 mt-3 flex-wrap font-mono">
               <Badge variant="secondary" className="text-xs">
                 {totalIndicators} indikatorer
               </Badge>
@@ -409,9 +408,8 @@ const DomainCard: React.FC<{ domain: HumanNeedDomain }> = ({ domain }) => {
                 <CardContent className="pt-0 space-y-6">
                   {/* Universal indicators */}
                   <div>
-                    <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                      <Target className="h-4 w-4 text-primary" />
-                      Universella indikatorer
+                    <h4 className="font-semibold text-sm mb-3 flex items-center gap-2 font-mono">
+                      [DATA] Universella indikatorer
                     </h4>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {domain.universalIndicators.map((indicator) => (
@@ -422,9 +420,8 @@ const DomainCard: React.FC<{ domain: HumanNeedDomain }> = ({ domain }) => {
 
                   {/* Governance levels */}
                   <div>
-                    <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                      <Layers className="h-4 w-4 text-primary" />
-                      Styrningsnivåer & typiskt mandat
+                    <h4 className="font-semibold text-sm mb-3 flex items-center gap-2 font-mono">
+                      [NIVÅ] Styrningsnivåer & typiskt mandat
                     </h4>
                     <div className="space-y-4">
                       {GOVERNANCE_LEVELS.map((level) => (
@@ -456,7 +453,7 @@ const StatsSummary: React.FC = () => {
   );
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono">
       <Card className="p-4 text-center">
         <div className="text-2xl font-bold text-primary">{HUMAN_NEEDS_DOMAINS.length}</div>
         <div className="text-xs text-muted-foreground">Behovsdomäner</div>
@@ -485,12 +482,12 @@ const UniversalResponsibilityMap: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState<string>('all');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-mono">
       {/* Header - descriptive text instead of icons */}
       <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
         <CardHeader>
           <div>
-            <CardTitle className="text-xl">Universell Ansvarsmatris</CardTitle>
+            <CardTitle className="text-xl">[ANSVAR] Universell Ansvarsmatris</CardTitle>
             <CardDescription className="mt-2">
               Globalt ramverk för mänskliga behov, indikatorer och styrningsnivåer — oberoende av jurisdiktion. 
               Varje behov kan spåras från individnivå upp till globala fördrag.
@@ -504,7 +501,7 @@ const UniversalResponsibilityMap: React.FC = () => {
 
       {/* Perspective reminder */}
       <Alert className="bg-muted/50">
-        <Info className="h-4 w-4" />
+        <span className="font-mono text-xs mr-2">[!]</span>
         <AlertDescription className="text-xs">
           <strong>Perspektivhierarki:</strong> Civilisation → Världsdel → Nation → Region → System → Indikator → Datapunkt. 
           Alla datapunkter existerar i sitt globala sammanhang.
@@ -513,14 +510,13 @@ const UniversalResponsibilityMap: React.FC = () => {
 
       {/* Level filter - text-based tabs */}
       <Tabs value={selectedLevel} onValueChange={setSelectedLevel}>
-        <TabsList className="flex-wrap h-auto">
+        <TabsList className="flex-wrap h-auto font-mono">
           <TabsTrigger value="all" className="gap-1.5">
             Alla nivåer
           </TabsTrigger>
           {GOVERNANCE_LEVELS.map((level) => (
             <TabsTrigger key={level.id} value={level.id} className="gap-1.5">
-              {level.icon}
-              {level.name}
+              {level.marker} {level.name}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -534,18 +530,18 @@ const UniversalResponsibilityMap: React.FC = () => {
       </div>
 
       {/* Data availability legend */}
-      <Card className="p-4">
+      <Card className="p-4 font-mono">
         <div className="flex flex-wrap items-center gap-6 text-xs">
           <div className="flex items-center gap-2">
-            <Badge className="bg-emerald-500/20 text-emerald-400">●</Badge>
+            <Badge className="bg-emerald-500/20 text-emerald-400">[HÖG]</Badge>
             <span>Hög datatillgång (SDG, WHO, WB)</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge className="bg-amber-500/20 text-amber-400">◐</Badge>
+            <Badge className="bg-amber-500/20 text-amber-400">[MED]</Badge>
             <span>Medium (nationella källor)</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge className="bg-red-500/20 text-red-400">○</Badge>
+            <Badge className="bg-red-500/20 text-red-400">[LÅG]</Badge>
             <span>Låg (begränsad/fragmenterad)</span>
           </div>
         </div>
@@ -553,7 +549,7 @@ const UniversalResponsibilityMap: React.FC = () => {
 
       {/* Principle */}
       <Alert>
-        <AlertCircle className="h-4 w-4" />
+        <span className="font-mono text-xs mr-2">[!]</span>
         <AlertDescription>
           <strong>Universell princip:</strong> Mänskliga behov är konstanta över jurisdiktioner. 
           Indikatorerna är desamma oavsett om du tittar på Sverige, Kenya eller Japan – 
