@@ -89,6 +89,7 @@ import GGDPage from "./pages/GGD";
 import WagesPage from "./pages/WagesPage";
 import CountryExplorer from "./pages/CountryExplorer";
 import IndicatorExplorer from "./pages/IndicatorExplorer";
+import IndexPage from "./pages/IndexPage";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -142,6 +143,7 @@ const App = () => (
               <Route path="/explain" element={<ExplainDemo />} />
               <Route path="/reality" element={<GlobalRealityDemo />} />
               <Route path="/indices" element={<IndexEngineDemo />} />
+              <Route path="/index" element={<IndexPage />} />
               <Route path="/correlation" element={<CorrelationDemo />} />
               <Route path="/smoke-test" element={<SmokeTestPage />} />
               <Route path="/trust-log" element={<TrustLogPage />} />
