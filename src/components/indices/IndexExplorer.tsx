@@ -3,6 +3,8 @@
  * 
  * Hierarchical navigation through all indices organized by category.
  * Follows ODIS diagnostic layout with tree navigation and detail panel.
+ * 
+ * NO ICONS - text markers only per design doctrine.
  */
 
 import React, { useState, useMemo } from 'react';
@@ -13,23 +15,6 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import {
-  Search,
-  Filter,
-  Grid3X3,
-  List,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  Activity,
-  ChevronRight,
-  Info,
-  ExternalLink,
-  Layers,
-  BarChart3,
-  Globe2,
-  Clock,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   INDEX_REGISTRY,
@@ -47,6 +32,13 @@ interface IndexExplorerProps {
   initialCategory?: IndexCategory;
   initialIndexCode?: string;
 }
+
+// Direction markers without icons
+const DIRECTION_MARKERS = {
+  higher_better: '[+]',
+  lower_better: '[−]',
+  neutral_optimal: '[~]',
+};
 
 export function IndexExplorer({ 
   className, 
@@ -116,11 +108,10 @@ export function IndexExplorer({
       <div className="flex-shrink-0 p-4 border-b bg-card">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Layers className="h-6 w-6 text-primary" />
-              Index Explorer
+            <h1 className="text-2xl font-bold font-mono flex items-center gap-2">
+              [INDEX] Index Explorer
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-1 font-mono">
               {totalIndices} index i {categoriesCount} kategorier • Klicka för att utforska
             </p>
           </div>
@@ -128,17 +119,19 @@ export function IndexExplorer({
           <div className="flex items-center gap-2">
             <Button
               variant={viewMode === 'grid' ? 'default' : 'outline'}
-              size="icon"
+              size="sm"
               onClick={() => setViewMode('grid')}
+              className="font-mono"
             >
-              <Grid3X3 className="h-4 w-4" />
+              [RUTNÄT]
             </Button>
             <Button
               variant={viewMode === 'list' ? 'default' : 'outline'}
-              size="icon"
+              size="sm"
               onClick={() => setViewMode('list')}
+              className="font-mono"
             >
-              <List className="h-4 w-4" />
+              [LISTA]
             </Button>
           </div>
         </div>
@@ -146,12 +139,12 @@ export function IndexExplorer({
         {/* Search & Filters */}
         <div className="flex items-center gap-3">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono">[SÖK]</span>
             <Input
               placeholder="Sök index..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-14 font-mono"
             />
           </div>
           
@@ -161,6 +154,7 @@ export function IndexExplorer({
               variant={selectedCategory === null ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedCategory(null)}
+              className="font-mono"
             >
               Alla
             </Button>
@@ -170,6 +164,7 @@ export function IndexExplorer({
                 variant={selectedCategory === cat.code ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSelectedCategory(cat.code)}
+                className="font-mono"
               >
                 {cat.name_sv}
               </Button>
@@ -181,17 +176,14 @@ export function IndexExplorer({
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex-1 flex flex-col">
         <TabsList className="w-full justify-start px-4 pt-2 rounded-none border-b bg-transparent">
-          <TabsTrigger value="browse" className="gap-2">
-            <Layers className="h-4 w-4" />
-            Utforska
+          <TabsTrigger value="browse" className="gap-2 font-mono">
+            [UTFORSKA] Utforska
           </TabsTrigger>
-          <TabsTrigger value="compare" className="gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Jämför
+          <TabsTrigger value="compare" className="gap-2 font-mono">
+            [JÄMFÖR] Jämför
           </TabsTrigger>
-          <TabsTrigger value="trends" className="gap-2">
-            <Activity className="h-4 w-4" />
-            Trender
+          <TabsTrigger value="trends" className="gap-2 font-mono">
+            [TREND] Trender
           </TabsTrigger>
         </TabsList>
 
@@ -214,13 +206,13 @@ export function IndexExplorer({
                 // Show filtered/category results
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">
+                    <h2 className="text-lg font-semibold font-mono">
                       {selectedCategory 
                         ? INDEX_CATEGORIES.find(c => c.code === selectedCategory)?.name_sv
                         : 'Sökresultat'
                       }
                     </h2>
-                    <Badge variant="secondary">
+                    <Badge variant="secondary" className="font-mono">
                       {filteredIndices.length} index
                     </Badge>
                   </div>
@@ -258,9 +250,9 @@ export function IndexExplorer({
 
         <TabsContent value="trends" className="flex-1 m-0 p-4">
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <Activity className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Trend-analys</h3>
-            <p className="text-sm text-muted-foreground max-w-md">
+            <span className="text-4xl font-mono text-muted-foreground mb-4">[TREND]</span>
+            <h3 className="text-lg font-semibold mb-2 font-mono">Trend-analys</h3>
+            <p className="text-sm text-muted-foreground max-w-md font-mono">
               Visualisera historisk utveckling och prognoser för index. 
               Välj ett index ovan för att se detaljerad trend-data.
             </p>
@@ -279,12 +271,6 @@ function IndexCard({
   index: IndexDefinition; 
   onClick: () => void;
 }) {
-  const directionIcon = {
-    higher_better: <TrendingUp className="h-3 w-3 text-trend-up" />,
-    lower_better: <TrendingDown className="h-3 w-3 text-trend-down" />,
-    neutral_optimal: <Minus className="h-3 w-3 text-trend-stable" />,
-  };
-
   return (
     <Card 
       className="cursor-pointer hover:border-primary/50 hover:shadow-md transition-all group"
@@ -295,9 +281,11 @@ function IndexCard({
           <Badge variant="outline" className="text-xs font-mono">
             {index.code}
           </Badge>
-          {directionIcon[index.direction]}
+          <span className="text-xs font-mono text-muted-foreground">
+            {DIRECTION_MARKERS[index.direction]}
+          </span>
         </div>
-        <CardTitle className="text-base group-hover:text-primary transition-colors">
+        <CardTitle className="text-base group-hover:text-primary transition-colors font-mono">
           {index.name_sv}
         </CardTitle>
       </CardHeader>
@@ -307,23 +295,21 @@ function IndexCard({
         </p>
         
         <div className="flex flex-wrap gap-1.5">
-          <Badge variant="secondary" className="text-xs">
-            <Clock className="h-3 w-3 mr-1" />
-            {index.update_frequency === 'annual' ? 'Årlig' : 
+          <Badge variant="secondary" className="text-xs font-mono">
+            [TID] {index.update_frequency === 'annual' ? 'Årlig' : 
              index.update_frequency === 'quarterly' ? 'Kvartalsvis' :
              index.update_frequency === 'monthly' ? 'Månatlig' : 'Veckovis'}
           </Badge>
-          <Badge variant="secondary" className="text-xs">
-            <Globe2 className="h-3 w-3 mr-1" />
-            {index.geo_coverage === 'global' ? 'Global' :
+          <Badge variant="secondary" className="text-xs font-mono">
+            [GEO] {index.geo_coverage === 'global' ? 'Global' :
              index.geo_coverage === 'oecd' ? 'OECD' :
              index.geo_coverage === 'eu' ? 'EU' : 'Regional'}
           </Badge>
         </div>
 
-        <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
+        <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t font-mono">
           <span>{index.primary_sources[0]}</span>
-          <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          <span className="group-hover:translate-x-1 transition-transform">[→]</span>
         </div>
       </CardContent>
     </Card>
@@ -340,7 +326,7 @@ function IndexListItem({
 }) {
   return (
     <div
-      className="flex items-center gap-4 p-3 rounded-lg border hover:border-primary/50 hover:bg-muted/50 cursor-pointer transition-colors group"
+      className="flex items-center gap-4 p-3 rounded-lg border hover:border-primary/50 hover:bg-muted/50 cursor-pointer transition-colors group font-mono"
       onClick={onClick}
     >
       <Badge variant="outline" className="font-mono shrink-0 w-32 justify-center">
@@ -357,12 +343,12 @@ function IndexListItem({
       </div>
       
       <div className="flex items-center gap-2 shrink-0">
-        <Badge variant="secondary" className="text-xs">
+        <Badge variant="secondary" className="text-xs font-mono">
           {index.update_frequency === 'annual' ? 'Årlig' : 
            index.update_frequency === 'quarterly' ? 'Kvartalsvis' :
            index.update_frequency === 'monthly' ? 'Månatlig' : 'Veckovis'}
         </Badge>
-        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+        <span className="text-muted-foreground group-hover:translate-x-1 transition-transform">[→]</span>
       </div>
     </div>
   );

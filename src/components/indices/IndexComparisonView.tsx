@@ -3,6 +3,8 @@
  * 
  * Compare multiple indices side by side.
  * Supports cross-country and cross-index comparisons.
+ * 
+ * NO ICONS - text markers only per design doctrine.
  */
 
 import React, { useState, useMemo } from 'react';
@@ -27,19 +29,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  BarChart3,
-  Plus,
-  X,
-  ArrowUpDown,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-  Globe2,
-  Filter,
-  Download,
-  RefreshCw,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { IndexDefinition, IndexCategory } from '@/lib/lambda';
 import { INDEX_CATEGORIES } from '@/lib/lambda';
@@ -48,6 +37,13 @@ interface IndexComparisonViewProps {
   indices: IndexDefinition[];
   className?: string;
 }
+
+// Direction markers
+const DIRECTION_MARKERS = {
+  higher_better: '[+]',
+  lower_better: '[−]',
+  neutral_optimal: '[~]',
+};
 
 // Mock country data for demonstration
 const DEMO_COUNTRIES = [
@@ -75,7 +71,6 @@ export function IndexComparisonView({ indices, className }: IndexComparisonViewP
   const [selectedIndices, setSelectedIndices] = useState<string[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>(['SE', 'NO', 'DK']);
   const [categoryFilter, setCategoryFilter] = useState<IndexCategory | 'all'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'category'>('category');
 
   // Filter indices by category
   const filteredIndices = useMemo(() => {
@@ -117,7 +112,7 @@ export function IndexComparisonView({ indices, className }: IndexComparisonViewP
   );
 
   return (
-    <div className={cn("flex h-full", className)}>
+    <div className={cn("flex h-full font-mono", className)}>
       {/* Selection Panel */}
       <div className="w-80 border-r bg-muted/30 flex flex-col shrink-0">
         <div className="p-4 border-b">
@@ -125,10 +120,10 @@ export function IndexComparisonView({ indices, className }: IndexComparisonViewP
           
           {/* Category filter */}
           <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v as any)}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full font-mono">
               <SelectValue placeholder="Filtrera kategori" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-popover font-mono">
               <SelectItem value="all">Alla kategorier</SelectItem>
               {INDEX_CATEGORIES.map(cat => (
                 <SelectItem key={cat.code} value={cat.code}>
@@ -193,12 +188,12 @@ export function IndexComparisonView({ indices, className }: IndexComparisonViewP
             <Badge
               key={country.code}
               variant={selectedCountries.includes(country.code) ? 'default' : 'outline'}
-              className="cursor-pointer"
+              className="cursor-pointer font-mono"
               onClick={() => toggleCountry(country.code)}
             >
               {country.name}
               {selectedCountries.includes(country.code) && (
-                <X className="h-3 w-3 ml-1" />
+                <span className="ml-1">[X]</span>
               )}
             </Badge>
           ))}
@@ -207,7 +202,7 @@ export function IndexComparisonView({ indices, className }: IndexComparisonViewP
         {/* Comparison table or empty state */}
         {selectedIndices.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8">
-            <BarChart3 className="h-16 w-16 text-muted-foreground mb-4" />
+            <span className="text-4xl font-mono text-muted-foreground mb-4">[JÄMFÖR]</span>
             <h3 className="text-lg font-semibold mb-2">Välj index att jämföra</h3>
             <p className="text-sm text-muted-foreground text-center max-w-md">
               Markera index i panelen till vänster för att se en jämförelse
@@ -257,16 +252,8 @@ export function IndexComparisonView({ indices, className }: IndexComparisonViewP
                           </TableCell>
                         );
                       })}
-                      <TableCell className="text-center">
-                        {idx.direction === 'higher_better' && (
-                          <TrendingUp className="h-4 w-4 text-trend-up mx-auto" />
-                        )}
-                        {idx.direction === 'lower_better' && (
-                          <TrendingDown className="h-4 w-4 text-trend-down mx-auto" />
-                        )}
-                        {idx.direction === 'neutral_optimal' && (
-                          <Minus className="h-4 w-4 text-trend-stable mx-auto" />
-                        )}
+                      <TableCell className="text-center font-mono">
+                        {DIRECTION_MARKERS[idx.direction]}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -278,15 +265,15 @@ export function IndexComparisonView({ indices, className }: IndexComparisonViewP
                 <h4 className="text-sm font-medium mb-2">Tolkningsguide</h4>
                 <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3 text-trend-up" />
+                    <span className="text-trend-up">[+]</span>
                     <span>Högre är bättre</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <TrendingDown className="h-3 w-3 text-trend-down" />
+                    <span className="text-trend-down">[−]</span>
                     <span>Lägre är bättre</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Minus className="h-3 w-3 text-trend-stable" />
+                    <span className="text-trend-stable">[~]</span>
                     <span>Optimalt intervall</span>
                   </div>
                 </div>
@@ -301,13 +288,11 @@ export function IndexComparisonView({ indices, className }: IndexComparisonViewP
         {/* Actions */}
         {selectedIndices.length > 0 && (
           <div className="p-4 border-t flex items-center justify-between bg-card">
-            <Button variant="outline" size="sm" onClick={() => setSelectedIndices([])}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Rensa urval
+            <Button variant="outline" size="sm" onClick={() => setSelectedIndices([])} className="font-mono">
+              [↺] Rensa urval
             </Button>
-            <Button size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Exportera
+            <Button size="sm" className="font-mono">
+              [↓] Exportera
             </Button>
           </div>
         )}
