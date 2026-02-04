@@ -560,12 +560,13 @@ interface RegionDeepDiveProps {
   zone: PressZone | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSelectRegion?: (regionId: string) => void;
 }
 
 import { MetricDeepDive, type MetricType } from './MetricDeepDive';
 import { DetailDeepDive, type DetailType } from './DetailDeepDive';
 
-export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOpenChange }) => {
+export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOpenChange, onSelectRegion }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [_selectedIndicator, setSelectedIndicator] = useState<RegionIndicator | null>(null);
   const [_selectedSubstance, setSelectedSubstance] = useState<SubstanceData | null>(null);
@@ -994,7 +995,19 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                   <CardContent>
                     <div className="flex flex-wrap gap-2">
                       {evidence.relatedRegions.map((region) => (
-                        <Badge key={region} variant="outline">{region}</Badge>
+                        <button
+                          key={region}
+                          onClick={() => {
+                            if (onSelectRegion) {
+                              onSelectRegion(region);
+                            }
+                          }}
+                          disabled={!onSelectRegion}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 border rounded-full text-sm hover:bg-muted/50 hover:border-primary/50 transition-all cursor-pointer group disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <span className="group-hover:text-primary transition-colors">{region.replace(/_/g, ' ')}</span>
+                          <span className="font-mono text-[10px] text-muted-foreground group-hover:text-primary transition-colors">[→]</span>
+                        </button>
                       ))}
                     </div>
                   </CardContent>
