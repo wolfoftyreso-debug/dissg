@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { KPI } from '@/types/kpi';
 import { supabase } from '@/integrations/supabase/client';
+import { useLiveForecast, LiveDataPoint } from '@/hooks/useLiveForecast';
+import { LiveForecastChart } from './LiveForecastChart';
 import { 
   TrendingUp, 
-  TrendingDown, 
   AlertTriangle, 
   Clock, 
   Target,
@@ -13,10 +14,11 @@ import {
   Lightbulb,
   AlertCircle,
   CheckCircle,
-  XCircle
+  XCircle,
+  Radio,
+  RefreshCw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, ReferenceLine, Area, ComposedChart } from 'recharts';
 
 interface ForecastPanelProps {
   kpi: KPI;
@@ -69,6 +71,14 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>('consequences');
+  const [isLiveMode, setIsLiveMode] = useState(false);
+  
+  // Use live forecast hook for real-time data
+  const liveForecast = useLiveForecast(isLiveMode ? kpi : null, {
+    autoRefresh: isLiveMode,
+    refreshInterval: 60000, // Refresh every minute
+    horizon: '12_months',
+  });
 
   const generateForecast = async () => {
     setIsLoading(true);
@@ -97,6 +107,8 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
 
       if (data?.analysis) {
         setForecast(data.analysis);
+        // Start live mode after initial forecast
+        setIsLiveMode(true);
       } else {
         throw new Error('Ingen analysdata mottagen');
       }
@@ -108,8 +120,13 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
     }
   };
 
-  // Generate chart data for forecast visualization
-  const generateChartData = () => {
+  // Generate chart data for forecast visualization - use live data if available
+  const generateChartData = (): LiveDataPoint[] => {
+    // Use live data if available
+    if (liveForecast.animatedData.length > 0) {
+      return liveForecast.animatedData;
+    }
+    
     if (!forecast?.forecast) return [];
     
     const now = kpi.value;
@@ -117,12 +134,47 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
     const optimistic = forecast.forecast.scenario_optimistic;
     const pessimistic = forecast.forecast.scenario_pessimistic;
 
-    return [
-      { month: 'Nu', baseline: now, optimistic: now, pessimistic: now },
-      { month: '3m', baseline: baseline.value_3m, optimistic: baseline.value_3m * 1.05, pessimistic: baseline.value_3m * 0.95 },
-      { month: '6m', baseline: baseline.value_6m, optimistic: baseline.value_6m * 1.08, pessimistic: baseline.value_6m * 0.92 },
-      { month: '12m', baseline: baseline.value_12m, optimistic: optimistic.value_12m, pessimistic: pessimistic.value_12m },
-    ];
+    // Convert to LiveDataPoint format with interpolated monthly values
+    const dataPoints: LiveDataPoint[] = [];
+    const months = 12;
+    
+    for (let i = 0; i <= months; i++) {
+      let baselineValue: number;
+      let optimisticValue: number;
+      let pessimisticValue: number;
+      
+      if (i === 0) {
+        baselineValue = now;
+        optimisticValue = now;
+        pessimisticValue = now;
+      } else if (i <= 3) {
+        const t = i / 3;
+        baselineValue = now + (baseline.value_3m - now) * t;
+        optimisticValue = baselineValue * (1 + 0.02 * t);
+        pessimisticValue = baselineValue * (1 - 0.02 * t);
+      } else if (i <= 6) {
+        const t = (i - 3) / 3;
+        baselineValue = baseline.value_3m + (baseline.value_6m - baseline.value_3m) * t;
+        optimisticValue = baselineValue * 1.05;
+        pessimisticValue = baselineValue * 0.95;
+      } else {
+        const t = (i - 6) / 6;
+        baselineValue = baseline.value_6m + (baseline.value_12m - baseline.value_6m) * t;
+        optimisticValue = baseline.value_6m + (optimistic.value_12m - baseline.value_6m) * t;
+        pessimisticValue = baseline.value_6m + (pessimistic.value_12m - baseline.value_6m) * t;
+      }
+      
+      dataPoints.push({
+        month: i,
+        baseline: Math.round(baselineValue * 100) / 100,
+        optimistic: Math.round(optimisticValue * 100) / 100,
+        pessimistic: Math.round(pessimisticValue * 100) / 100,
+        lower_bound: Math.round(pessimisticValue * 0.95 * 100) / 100,
+        upper_bound: Math.round(optimisticValue * 1.05 * 100) / 100,
+      });
+    }
+    
+    return dataPoints;
   };
 
   const toggleSection = (section: string) => {
@@ -269,76 +321,37 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
         </div>
       </div>
 
-      {/* Forecast Chart */}
+      {/* Live Forecast Chart */}
       {chartData.length > 0 && (
         <div className="rounded-lg border border-border bg-card p-4">
-          <p className="mb-2 text-xs font-medium text-muted-foreground">PROGNOS 12 MÅNADER</p>
-          <div className="h-32">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 0 }}>
-                <XAxis 
-                  dataKey="month" 
-                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                  axisLine={{ stroke: 'hsl(var(--border))' }}
-                  tickLine={false}
-                />
-                <YAxis 
-                  tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={35}
-                />
-                {/* Pessimistic area */}
-                <Area
-                  type="monotone"
-                  dataKey="pessimistic"
-                  fill="hsl(var(--status-critical) / 0.1)"
-                  stroke="none"
-                />
-                {/* Optimistic line */}
-                <Line
-                  type="monotone"
-                  dataKey="optimistic"
-                  stroke="hsl(var(--status-positive))"
-                  strokeWidth={1.5}
-                  strokeDasharray="4 4"
-                  dot={false}
-                />
-                {/* Baseline (main forecast) */}
-                <Line
-                  type="monotone"
-                  dataKey="baseline"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2}
-                  dot={{ r: 3, fill: 'hsl(var(--primary))' }}
-                />
-                {/* Pessimistic line */}
-                <Line
-                  type="monotone"
-                  dataKey="pessimistic"
-                  stroke="hsl(var(--status-critical))"
-                  strokeWidth={1.5}
-                  strokeDasharray="4 4"
-                  dot={false}
-                />
-                <ReferenceLine x="Nu" stroke="hsl(var(--border))" />
-              </ComposedChart>
-            </ResponsiveContainer>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <p className="text-xs font-mono text-muted-foreground">[PROGNOS 12 MÅNADER]</p>
+              {isLiveMode && (
+                <span className="flex items-center gap-1 text-[10px] font-mono text-status-positive">
+                  <Radio className="h-3 w-3 animate-pulse" />
+                  LIVE
+                </span>
+              )}
+            </div>
+            {isLiveMode && (
+              <button
+                onClick={() => liveForecast.refresh()}
+                disabled={liveForecast.isLoading}
+                className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <RefreshCw className={cn("h-3 w-3", liveForecast.isLoading && "animate-spin")} />
+                {liveForecast.lastUpdated ? `${Math.round((Date.now() - liveForecast.lastUpdated.getTime()) / 1000)}s` : '—'}
+              </button>
+            )}
           </div>
-          <div className="mt-2 flex items-center justify-center gap-4 text-[10px]">
-            <div className="flex items-center gap-1">
-              <div className="h-0.5 w-3 bg-primary" />
-              <span className="text-muted-foreground">Basscenario</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="h-0.5 w-3 bg-status-positive" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 2px, hsl(var(--status-positive)) 2px, hsl(var(--status-positive)) 4px)' }} />
-              <span className="text-muted-foreground">Optimistiskt</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="h-0.5 w-3 bg-status-critical" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 2px, hsl(var(--status-critical)) 2px, hsl(var(--status-critical)) 4px)' }} />
-              <span className="text-muted-foreground">Pessimistiskt</span>
-            </div>
-          </div>
+          <LiveForecastChart 
+            data={chartData}
+            unit={kpi.unit}
+            isLoading={liveForecast.isLoading}
+            showConfidenceInterval={true}
+            height={140}
+          />
         </div>
       )}
 
