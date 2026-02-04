@@ -36,6 +36,7 @@ import {
 } from '@/config/demographyCorrelationConfig';
 import { ControlVariableCard } from './ControlVariableCard';
 import { TransparencyPrinciplesDeep } from './TransparencyPrinciplesDeep';
+import { ClickableSourceCitation } from '@/components/ui/ClickableSourceCitation';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 // Seeded random for reproducible indicator-specific data
@@ -401,8 +402,8 @@ export const SocietalCorrelationEngine: React.FC = () => {
                     Data före 1850 är rekonstruerade estimat
                   </div>
                 )}
-                <div>Källa: SCB, BRÅ, Eurostat (demonstrationsdata)</div>
-                <div>Senast uppdaterad: 2024-01-15</div>
+                <ClickableSourceCitation sourceKey="national-statistics-nordic" />
+                <div className="text-xs text-muted-foreground">Senast uppdaterad: 2024-01-15</div>
               </div>
             </CardContent>
           </Card>

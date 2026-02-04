@@ -30,7 +30,8 @@ import {
   LineChart,
   Line
 } from 'recharts';
-import { Users, Globe, Activity, TrendingUp, Calendar, MapPin, Database, AlertCircle } from 'lucide-react';
+// NO ICONS - Text markers only per design doctrine
+import { ClickableSourceCitation } from '@/components/ui/ClickableSourceCitation';
 import {
   useRegionalDemographics,
   usePopulationHistory,
@@ -63,7 +64,7 @@ interface MetricDeepDiveProps {
 const LoadingState: React.FC<{ message?: string }> = ({ message = 'Laddar data från databasen...' }) => (
   <div className="space-y-4">
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <Database className="h-4 w-4 animate-pulse" />
+      <span className="font-mono text-[10px]">[DB]</span>
       <span>{message}</span>
     </div>
     <Skeleton className="h-32 w-full" />
@@ -74,9 +75,9 @@ const LoadingState: React.FC<{ message?: string }> = ({ message = 'Laddar data f
 
 const EmptyState: React.FC<{ title: string; description: string }> = ({ title, description }) => (
   <Alert>
-    <AlertCircle className="h-4 w-4" />
     <AlertDescription>
-      <p className="font-medium">{title}</p>
+      <span className="font-mono text-[10px] mr-1">[!]</span>
+      <span className="font-medium">{title}</span>
       <p className="text-sm text-muted-foreground mt-1">{description}</p>
     </AlertDescription>
   </Alert>
@@ -135,17 +136,14 @@ const PopulationView: React.FC<{ regionName: string }> = ({ regionName }) => {
         </Card>
       </div>
       
-      {/* Data source indicator */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Database className="h-3 w-3" />
-        <span>Källa: {demographics[0]?.data_source || 'Databas'} • År: {stats?.dataYear}</span>
-      </div>
+      {/* Data source indicator - CLICKABLE */}
+      <ClickableSourceCitation sourceKey="demographic-data" />
       
       {/* Population pyramid from database */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Users className="h-4 w-4" />
+            <span className="font-mono text-[10px]">[POP]</span>
             Befolkningspyramid (ålder × kön)
           </CardTitle>
         </CardHeader>
@@ -190,7 +188,7 @@ const PopulationView: React.FC<{ regionName: string }> = ({ regionName }) => {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
+              <span className="font-mono text-[10px]">[TID]</span>
               Befolkningstillväxt {historyData[0]?.year}–{historyData[historyData.length - 1]?.year}
             </CardTitle>
           </CardHeader>
@@ -264,16 +262,13 @@ const CountriesView: React.FC<{ regionName: string }> = ({ regionName }) => {
     <div className="space-y-6">
       {/* Countries count */}
       <Card className="p-4 text-center bg-primary/5">
-        <Globe className="h-8 w-8 mx-auto text-primary mb-2" />
+        <span className="font-mono text-2xl text-primary block mb-2">[GEO]</span>
         <p className="text-3xl font-bold text-primary">{countries.length}</p>
         <p className="text-sm text-muted-foreground">Länder i regionen</p>
       </Card>
       
-      {/* Data source */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Database className="h-3 w-3" />
-        <span>Källa: {countries[0]?.data_source || 'Databas'} • År: {countries[0]?.year}</span>
-      </div>
+      {/* Data source - CLICKABLE */}
+      <ClickableSourceCitation sourceKey="undp-worldbank-who" />
       
       {/* Population distribution */}
       <Card>
@@ -315,7 +310,7 @@ const CountriesView: React.FC<{ regionName: string }> = ({ regionName }) => {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
+            <span className="font-mono text-[10px]">[LOK]</span>
             Länder (sorterade efter befolkning)
           </CardTitle>
         </CardHeader>
@@ -429,17 +424,14 @@ const LifeExpectancyView: React.FC<{ regionName: string }> = ({ regionName }) =>
         </Card>
       </div>
       
-      {/* Data source */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Database className="h-3 w-3" />
-        <span>Källa: {history[0]?.data_source || 'Databas'} • År: {stats?.dataYear}</span>
-      </div>
+      {/* Data source - CLICKABLE */}
+      <ClickableSourceCitation sourceKey="demographic-data" />
       
       {/* By gender from database */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Users className="h-4 w-4" />
+            <span className="font-mono text-[10px]">[KÖN]</span>
             Medellivslängd per kön
           </CardTitle>
         </CardHeader>
@@ -472,7 +464,7 @@ const LifeExpectancyView: React.FC<{ regionName: string }> = ({ regionName }) =>
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
+            <span className="font-mono text-[10px]">[↑]</span>
             Historisk utveckling {historyData[0]?.year}–{historyData[historyData.length - 1]?.year}
           </CardTitle>
         </CardHeader>
@@ -507,7 +499,7 @@ const LifeExpectancyView: React.FC<{ regionName: string }> = ({ regionName }) =>
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
-            <Globe className="h-4 w-4" />
+            <span className="font-mono text-[10px]">[GEO]</span>
             Jämförelse med andra regioner
           </CardTitle>
         </CardHeader>
@@ -549,21 +541,22 @@ export const MetricDeepDive: React.FC<MetricDeepDiveProps> = ({
   metricType,
   regionName,
 }) => {
-  const titles: Record<MetricType, { title: string; description: string; icon: React.ReactNode }> = {
+  // Text markers only - NO ICONS
+  const titles: Record<MetricType, { title: string; description: string; marker: string }> = {
     population: {
       title: 'Befolkning',
       description: 'Demografisk struktur och utveckling',
-      icon: <Users className="h-5 w-5" />
+      marker: '[POP]'
     },
     countries: {
       title: 'Länder',
       description: 'Länder i regionen och deras nyckeltal',
-      icon: <Globe className="h-5 w-5" />
+      marker: '[GEO]'
     },
     lifeExpectancy: {
       title: 'Medellivslängd',
       description: 'Förväntad livslängd och hälsomått',
-      icon: <Activity className="h-5 w-5" />
+      marker: '[LIV]'
     }
   };
   
@@ -576,9 +569,9 @@ export const MetricDeepDive: React.FC<MetricDeepDiveProps> = ({
           <div className="p-6 space-y-6">
             <SheetHeader>
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  {config.icon}
-                </div>
+                <span className="font-mono text-sm text-primary bg-primary/10 px-2 py-1 rounded">
+                  {config.marker}
+                </span>
                 <div>
                   <SheetTitle>{config.title}</SheetTitle>
                   <SheetDescription>{regionName}</SheetDescription>
