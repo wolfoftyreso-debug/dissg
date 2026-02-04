@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { IndexCategoryTables } from './SortableIndexTable';
 
 // Mini sparkline component
 export const MiniSparkline: React.FC<{ 
@@ -450,6 +451,22 @@ export const DataOverview: React.FC<{ className?: string }> = ({ className }) =>
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Sortable Index Tables Section */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Index & Mätdata</h2>
+          <div className="flex items-center gap-2">
+            <button className="text-sm px-3 py-1.5 border rounded hover:bg-muted transition-colors">
+              + Lägg till
+            </button>
+            <button className="text-sm px-3 py-1.5 border rounded hover:bg-muted transition-colors">
+              ↑↓ Sortera
+            </button>
+          </div>
+        </div>
+        <IndexCategoryTables />
       </div>
     </div>
   );
