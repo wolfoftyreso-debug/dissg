@@ -20,22 +20,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Minus,
-  Info,
-  ExternalLink,
-  ChevronRight,
-  ChevronDown,
-  Globe,
-  Clock,
-  BarChart3,
-  Copy,
-  Check,
-  AlertCircle,
-  MapPin
-} from 'lucide-react';
+// NO ICONS - Text markers only per design doctrine
 import { ClickableCountryName } from '@/components/ui/ClickableCountryName';
 import { Link, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -293,11 +278,11 @@ function CompositeScoreDisplay({
   velocity: number;
   confidence: number;
 }) {
-  const getTrendIcon = () => {
+  const getTrendMarker = () => {
     switch (trend) {
-      case 'improving': return <TrendingUp className="h-5 w-5 text-emerald-500" />;
-      case 'declining': return <TrendingDown className="h-5 w-5 text-rose-500" />;
-      default: return <Minus className="h-5 w-5 text-muted-foreground" />;
+      case 'improving': return <span className="font-mono text-emerald-500 font-bold">[↑]</span>;
+      case 'declining': return <span className="font-mono text-rose-500 font-bold">[↓]</span>;
+      default: return <span className="font-mono text-muted-foreground font-bold">[—]</span>;
     }
   };
 
@@ -330,13 +315,13 @@ function CompositeScoreDisplay({
       <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm">
         {/* Direction */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50">
-          {getTrendIcon()}
+          {getTrendMarker()}
           <span className="font-medium">{getTrendLabel()}</span>
         </div>
         
         {/* Speed */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50">
-          <Clock className="h-4 w-4 text-muted-foreground" />
+          <span className="font-mono text-xs text-muted-foreground">[TID]</span>
           <span>
             {velocity > 0 ? '+' : ''}{velocity} poäng/år
           </span>
@@ -346,7 +331,7 @@ function CompositeScoreDisplay({
         <Tooltip>
           <TooltipTrigger asChild>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 cursor-help">
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+              <span className="font-mono text-xs text-muted-foreground">[DAT]</span>
               <span>{Math.round(confidence * 100)}% täckning</span>
             </div>
           </TooltipTrigger>
@@ -370,16 +355,16 @@ function DomainBreakdown({
   isExpanded: boolean;
   onToggle: () => void;
 }) {
-  const getTrendIcon = (trend: string) => {
+  const getTrendMarker = (trend: string) => {
     switch (trend) {
       case 'improving':
       case 'up':
-        return <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />;
+        return <span className="font-mono text-xs text-emerald-500 font-bold">[↑]</span>;
       case 'declining':
       case 'down':
-        return <TrendingDown className="h-3.5 w-3.5 text-rose-500" />;
+        return <span className="font-mono text-xs text-rose-500 font-bold">[↓]</span>;
       default:
-        return <Minus className="h-3.5 w-3.5 text-muted-foreground" />;
+        return <span className="font-mono text-xs text-muted-foreground font-bold">[—]</span>;
     }
   };
 
@@ -399,14 +384,12 @@ function DomainBreakdown({
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                {getTrendIcon(domainScore.trend)}
+                {getTrendMarker(domainScore.trend)}
                 <span className="text-2xl font-bold">{domainScore.score}</span>
               </div>
-              {isExpanded ? (
-                <ChevronDown className="h-5 w-5 text-muted-foreground" />
-              ) : (
-                <ChevronRight className="h-5 w-5 text-muted-foreground" />
-              )}
+              <span className="font-mono text-muted-foreground text-sm">
+                {isExpanded ? '[−]' : '[+]'}
+              </span>
             </div>
           </button>
         </CollapsibleTrigger>
@@ -421,7 +404,7 @@ function DomainBreakdown({
                   className="flex items-center justify-between py-3 px-3 -mx-3 rounded-lg border-b border-border/50 last:border-0 hover:bg-primary/5 transition-colors cursor-pointer group"
                 >
                   <div className="flex items-center gap-2">
-                    {getTrendIcon(indicator.trend)}
+                    {getTrendMarker(indicator.trend)}
                     <div>
                       <div className="text-sm group-hover:text-primary transition-colors flex items-center gap-2">
                         {indicator.name}
@@ -495,7 +478,7 @@ function TimelineView({ domainScores }: { domainScores: DomainScore[] }) {
 
       <div className="p-4 rounded-lg bg-muted/30 border border-dashed">
         <div className="flex gap-3">
-          <Info className="h-5 w-5 text-muted-foreground shrink-0" />
+          <span className="font-mono text-sm text-muted-foreground shrink-0">[INFO]</span>
           <div className="text-sm text-muted-foreground">
             <p><strong>Tre frågor besvaras:</strong></p>
             <ol className="list-decimal ml-4 mt-1 space-y-0.5">
@@ -636,7 +619,7 @@ function DistributionView({ domainScores, countryName }: { domainScores: DomainS
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.5 }}
                         >
-                          <MapPin className="h-3 w-3 text-primary" />
+                          <span className="font-mono text-[10px] text-primary font-bold">[◆]</span>
                           <span className="text-xs font-semibold text-primary">{countryName}</span>
                         </motion.div>
                       )}
@@ -657,7 +640,7 @@ function DistributionView({ domainScores, countryName }: { domainScores: DomainS
       {/* Plain language summary */}
       <Card className="p-4 bg-muted/30">
         <div className="flex gap-3">
-          <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+          <span className="font-mono text-sm text-primary shrink-0 mt-0.5">[?]</span>
           <div className="space-y-2">
             <p className="text-sm font-medium">
               Vad betyder detta?
@@ -686,7 +669,7 @@ function DistributionView({ domainScores, countryName }: { domainScores: DomainS
       {/* Why no ranking disclaimer */}
       <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
         <div className="flex gap-3">
-          <AlertCircle className="h-5 w-5 text-amber-600 shrink-0" />
+          <span className="font-mono text-sm text-amber-600 shrink-0">[!]</span>
           <div className="text-sm">
             <p className="font-medium text-foreground">Varför visar vi inte exakt ranking?</p>
             <p className="mt-1 text-muted-foreground">
@@ -725,8 +708,8 @@ function CitationBlock({ score, timestamp }: { score: number; timestamp: string 
             ID: {citationId} · <a href="/cite" className="underline hover:text-foreground">Metodik & API →</a>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={handleCopy}>
-          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+        <Button variant="outline" size="sm" onClick={handleCopy} className="font-mono text-xs">
+          {copied ? '[✓]' : '[KOPIERA]'}
         </Button>
       </div>
     </Card>
@@ -907,12 +890,12 @@ function CountrySelector({
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-1.5 rounded-lg border bg-background hover:bg-muted/50 transition-colors"
       >
-        <Globe className="h-4 w-4 text-muted-foreground" />
+        <span className="font-mono text-xs text-muted-foreground">[GEO]</span>
         <span className="font-medium text-sm">{selectedCountry.nameLocal}</span>
-        <ChevronDown className={cn(
-          "h-4 w-4 text-muted-foreground transition-transform",
+        <span className={cn(
+          "font-mono text-xs text-muted-foreground transition-transform",
           isOpen && "rotate-180"
-        )} />
+        )}>{isOpen ? '▲' : '▼'}</span>
       </button>
 
       {isOpen && (
@@ -1035,7 +1018,7 @@ export default function RealityIndex() {
               to="/public"
               className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
             >
-              Dashboard <ExternalLink className="h-3 w-3" />
+              Dashboard <span className="font-mono">[→]</span>
             </Link>
           </div>
         </div>
@@ -1134,7 +1117,7 @@ export default function RealityIndex() {
         {/* Methodology Notice */}
         <Card className="p-4 sm:p-6 bg-muted/30 border-dashed">
           <div className="flex gap-3">
-            <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+            <span className="font-mono text-sm text-muted-foreground shrink-0 mt-0.5">[METOD]</span>
             <div className="text-sm text-muted-foreground space-y-3">
               <div>
                 <strong className="text-foreground">Methodology Overview:</strong>
@@ -1165,7 +1148,7 @@ export default function RealityIndex() {
         {/* Epistemic boundaries */}
         <Card className="p-4 bg-rose-500/5 border-rose-500/20">
           <div className="flex gap-3">
-            <AlertCircle className="h-5 w-5 text-rose-500 shrink-0" />
+            <span className="font-mono text-sm text-rose-500 shrink-0">[GRÄNS]</span>
             <div className="text-sm">
               <strong className="text-foreground">Platform Epistemic Boundaries:</strong>
               <ul className="mt-1 text-muted-foreground space-y-0.5">
