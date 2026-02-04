@@ -271,8 +271,9 @@ const Index = () => {
       {selectedKPI && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm"
+            className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm transition-opacity duration-200"
             onClick={() => setSelectedKPI(null)}
+            aria-hidden="true"
           />
           <KPIDetailPanel
             kpi={selectedKPI}
