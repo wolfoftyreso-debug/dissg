@@ -547,6 +547,23 @@ const ScopeView: React.FC<{
   regionName: string;
 }> = ({ items, type, regionName }) => {
   const isShows = type === 'shows';
+  const [expandedIndex, setExpandedIndex] = React.useState<number | null>(null);
+
+  const getDeepDiveText = (item: string) => {
+    // Neutral, non-normative, auditor-style text.
+    if (isShows) {
+      return (
+        `Fördjupning: Denna punkt är formulerad som en observation. Den beskriver ett mönster som återfinns i den aggregerade datan ` +
+        `för ${regionName}. Den specificerar inte individer, orsaker eller framtida utveckling. ` +
+        `För att verifiera exakt vilka indikatorer som stödjer påståendet krävs spårning till källnivå och tidsfönster.`
+      );
+    }
+    return (
+      `Fördjupning: Detta är en begränsning—inte en negation. Punkten markerar att den tillgängliga datan ` +
+      `inte räcker för att uttala sig om "${item}" för ${regionName} med spårbarhet. ` +
+      `Vanliga orsaker: otillräcklig upplösning (geo/tid), saknade variabler, eller att sambandet skulle kräva kausal identifikation.`
+    );
+  };
   
   return (
     <div className="space-y-6">
@@ -590,42 +607,64 @@ const ScopeView: React.FC<{
       
       {/* Items */}
       <div className="space-y-3">
-        {items.map((item, idx) => (
-          <Card 
-            key={idx} 
-            className={cn(
-              "p-4 transition-all cursor-pointer hover:bg-muted/50",
-              isShows ? "hover:border-green-300" : "hover:border-red-300"
-            )}
-          >
-            <div className="flex items-start gap-3">
-              <div className={cn(
-                "p-1 rounded",
-                isShows ? "bg-green-100 dark:bg-green-900/30" : "bg-red-100 dark:bg-red-900/30"
-              )}>
-                {isShows ? (
-                  <TrendingUp className="h-4 w-4 text-green-600" />
-                ) : (
-                  <TrendingDown className="h-4 w-4 text-red-600" />
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="text-sm">{item}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge 
-                    variant="outline" 
-                    className={cn(
-                      "text-xs",
-                      isShows ? "border-green-300 text-green-600" : "border-red-300 text-red-600"
+        {items.map((item, idx) => {
+          const isExpanded = expandedIndex === idx;
+          return (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => setExpandedIndex(isExpanded ? null : idx)}
+              aria-expanded={isExpanded}
+              className={cn(
+                'w-full text-left rounded-lg border transition-all hover:bg-muted/50',
+                isShows ? 'hover:border-green-300' : 'hover:border-red-300'
+              )}
+            >
+              <div className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className={cn(
+                    "p-1 rounded",
+                    isShows ? "bg-green-100 dark:bg-green-900/30" : "bg-red-100 dark:bg-red-900/30"
+                  )}>
+                    {isShows ? (
+                      <TrendingUp className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <TrendingDown className="h-4 w-4 text-red-600" />
                     )}
-                  >
-                    {isShows ? 'Verifierad' : 'Begränsning'}
-                  </Badge>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm">{item}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge 
+                        variant="outline" 
+                        className={cn(
+                          "text-xs",
+                          isShows ? "border-green-300 text-green-600" : "border-red-300 text-red-600"
+                        )}
+                      >
+                        {isShows ? 'Verifierad' : 'Begränsning'}
+                      </Badge>
+                      <span className="text-[10px] font-mono text-muted-foreground">
+                        {isExpanded ? '[−] FÖRDJUPNING' : '[+] FÖRDJUPNING'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
-        ))}
+
+              {isExpanded && (
+                <div className="px-4 pb-4">
+                  <div className="border-t pt-3 text-xs text-muted-foreground leading-relaxed">
+                    {getDeepDiveText(item)}
+                  </div>
+                  <div className="mt-2 text-[10px] font-mono text-muted-foreground">
+                    REF: SCOPE::{isShows ? 'SHOWS' : 'NOT_SHOWS'}::{regionName}::{idx + 1}
+                  </div>
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
       
       {/* Methodology note */}
