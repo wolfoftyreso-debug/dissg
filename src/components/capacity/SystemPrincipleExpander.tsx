@@ -13,7 +13,6 @@ import React, { useState } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -24,9 +23,7 @@ import {
 import {
   Info,
   ChevronDown,
-  BookOpen,
   FileText,
-  ExternalLink,
   Database,
   Scale,
   TrendingUp,
@@ -38,6 +35,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { ExpandableSourceDocument } from '@/components/ui/ExpandableSourceDocument';
 
 // ═══════════════════════════════════════════════════════════════
 // PRINCIPLE EVIDENCE DATA
@@ -249,29 +247,7 @@ function useDataConstitutionArticles(principleId: string) {
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-// DOCUMENT TYPE ICONS
-// ═══════════════════════════════════════════════════════════════
-
-const getDocumentIcon = (type: EvidenceDocument['type']) => {
-  switch (type) {
-    case 'study': return <Atom className="h-4 w-4 text-purple-500" />;
-    case 'report': return <FileText className="h-4 w-4 text-blue-500" />;
-    case 'law': return <Scale className="h-4 w-4 text-amber-500" />;
-    case 'data': return <Database className="h-4 w-4 text-green-500" />;
-    case 'book': return <BookOpen className="h-4 w-4 text-orange-500" />;
-  }
-};
-
-const getDocumentTypeName = (type: EvidenceDocument['type']) => {
-  switch (type) {
-    case 'study': return 'Vetenskaplig studie';
-    case 'report': return 'Officiell rapport';
-    case 'law': return 'Lag/Förordning';
-    case 'data': return 'Datakälla';
-    case 'book': return 'Akademisk bok';
-  }
-};
+// Document icon and type helpers moved to ExpandableSourceDocument component
 
 // ═══════════════════════════════════════════════════════════════
 // EXPANDABLE PRINCIPLE COMPONENT
@@ -367,7 +343,7 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
           </CardContent>
         </Card>
         
-        {/* Source Documents */}
+        {/* Source Documents - Now Expandable */}
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
@@ -377,42 +353,22 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
           </CardHeader>
           <CardContent className="space-y-3">
             {evidence.documents.map((doc) => (
-              <div 
-                key={doc.id} 
-                className={cn(
-                  "p-3 rounded-lg border transition-all",
-                  doc.relevance === 'primary' 
-                    ? "bg-primary/5 border-primary/20" 
-                    : "bg-muted/30"
-                )}
-              >
-                <div className="flex items-start gap-3">
-                  {getDocumentIcon(doc.type)}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-sm font-medium">{doc.title}</p>
-                      {doc.relevance === 'primary' && (
-                        <Badge className="text-xs h-5">Primär</Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {doc.source} ({doc.year})
-                    </p>
-                    <p className="text-xs mt-2">{doc.summary}</p>
-                    {doc.url && (
-                      <Button variant="link" size="sm" className="h-auto p-0 mt-2" asChild>
-                        <a href={doc.url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          Läs originalkälla
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                  <Badge variant="outline" className="text-xs shrink-0">
-                    {getDocumentTypeName(doc.type)}
-                  </Badge>
-                </div>
-              </div>
+              <ExpandableSourceDocument
+                key={doc.id}
+                document={{
+                  id: doc.id,
+                  title: doc.title,
+                  type: doc.type,
+                  source: doc.source,
+                  year: doc.year,
+                  url: doc.url,
+                  relevance: doc.relevance,
+                  ourSummary: doc.summary,
+                  keyFindings: [],
+                  howWeUseIt: 'Används som evidensbas för systemprinciper och bärkraftsberäkningar.',
+                }}
+                variant={doc.relevance}
+              />
             ))}
           </CardContent>
         </Card>
