@@ -779,23 +779,54 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
         onOpenChange={(open) => !open && setSelectedZone(null)} 
       />
       
-      {/* Header - descriptive text, no abstract icons */}
+      {/* Header - SIMPLE language for 15-year-olds */}
       <div className="text-center space-y-3">
-        <h1 className="text-2xl font-bold">Global Carrying Capacity Engine</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Hur många människor kan leva bra — givet energi, teknik och resurser? 
-          Detta är systemets kärnmodul som kvantifierar de fysiska begränsningarna för mänskligt välbefinnande.
+        <h1 className="text-2xl font-bold">Hur många kan leva bra?</h1>
+        <p className="text-muted-foreground max-w-2xl mx-auto text-base">
+          Tänk dig jorden som ett hus. Hur många personer kan bo där och ha det bra – 
+          inte bara överleva, utan faktiskt trivas? Det beror på hur mycket energi vi har, 
+          hur smart vår teknik är, och hur bra vi är på att organisera oss.
         </p>
       </div>
 
-      {/* Core definition - EXPANDABLE */}
-      <GCCEDefinitionAlert statement={GCCE_CORE_DEFINITION.sv} />
+      {/* Core definition - EXPANDABLE with simple language */}
+      <Card className="border-primary/30 bg-primary/5">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <div className="text-2xl">🌍</div>
+            <div className="flex-1 space-y-2">
+              <p className="font-medium">Grundfrågan:</p>
+              <p className="text-sm text-muted-foreground">
+                {GCCE_CORE_DEFINITION.sv}
+              </p>
+              <GCCEDefinitionAlert 
+                statement="Klicka för att se källorna bakom detta påstående" 
+                className="mt-2"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Not definitions - EXPANDABLE */}
-      <div className="flex flex-wrap justify-center gap-2">
-        {GCCE_NOT_DEFINITIONS.map((def, i) => (
-          <ExpandableBadge key={i} text={def.sv} className="text-xs" />
-        ))}
+      {/* Not definitions - with explanations for 15-year-olds */}
+      <div className="space-y-2">
+        <p className="text-xs text-center text-muted-foreground font-mono uppercase tracking-wider">
+          VAD VI INTE RÄKNAR
+        </p>
+        <div className="flex flex-wrap justify-center gap-2">
+          {GCCE_NOT_DEFINITIONS.map((def, i) => (
+            <ExpandableBadge 
+              key={i} 
+              text={def.sv} 
+              className="text-xs"
+              fallbackEvidence={{
+                scientificBasis: def.explanation,
+                whatThisProves: [],
+                limitations: []
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Tabs */}

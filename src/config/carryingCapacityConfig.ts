@@ -10,14 +10,27 @@
 // === 1. GRUNDDEFINITION ===
 
 export const GCCE_CORE_DEFINITION = {
-  sv: 'Global bärkraft = hur många människor som kan upprätthålla en god levnadsförmåga över tid, utan att urholka framtida handlingsutrymme.',
-  en: 'Global carrying capacity = how many people can maintain good living ability over time, without eroding future capacity.'
+  sv: 'Hur många människor kan leva ett bra liv på jorden? Det beror på tre saker: hur mycket energi vi har, hur smart vår teknik är, och hur bra vi är på att samarbeta.',
+  en: 'How many people can live well on Earth? It depends on three things: how much energy we have, how smart our technology is, and how well we cooperate.'
 };
 
+// Simplified "what this is NOT" for 15-year-olds
 export const GCCE_NOT_DEFINITIONS = [
-  { sv: 'Inte maximal överlevnad', en: 'Not maximum survival' },
-  { sv: 'Inte BNP-maximering', en: 'Not GDP maximization' },
-  { sv: 'Levbarhet över generationer', en: 'Livability across generations' }
+  { 
+    sv: 'Inte "flest möjliga människor"', 
+    en: 'Not "maximum number of people"',
+    explanation: 'Vi räknar inte hur många som kan överleva på existensminimum – vi räknar hur många som kan leva bra.'
+  },
+  { 
+    sv: 'Inte "mest pengar"', 
+    en: 'Not "most money"',
+    explanation: 'BNP mäter ekonomisk aktivitet, inte om människor faktiskt mår bra. Vi fokuserar på livskvalitet.'
+  },
+  { 
+    sv: 'Tänker på framtiden', 
+    en: 'Thinking about the future',
+    explanation: 'Vi får inte förstöra för nästa generation. Deras chanser räknas lika mycket som våra.'
+  }
 ];
 
 // === 2. DE TRE OBRYTBARA AXLARNA ===
