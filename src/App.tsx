@@ -82,6 +82,7 @@ import FaultCodesPage from "./pages/FaultCodes";
 import DiagnosticsPage from "./pages/Diagnostics";
 import AIGovernancePage from "./pages/AIGovernance";
 import SelfTestPage from "./pages/SelfTest";
+import GEDIPage from "./pages/GEDI";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -167,6 +168,7 @@ const App = () => (
               <Route path="/diagnostics" element={<DiagnosticsPage />} />
               <Route path="/ai-governance" element={<AIGovernancePage />} />
               <Route path="/self-test" element={<SelfTestPage />} />
+              <Route path="/gedi" element={<GEDIPage />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
