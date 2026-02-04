@@ -435,7 +435,201 @@ const RegionalCapacityPanel: React.FC = () => {
   );
 };
 
-// Clickable metric bar with expandable explanation
+// Clickable data source with deep-dive capability
+const ClickableDataSource: React.FC<{ sourceName: string }> = ({ sourceName }) => {
+  const [expanded, setExpanded] = useState(false);
+  
+  // Data source metadata registry
+  const getSourceMetadata = (name: string) => {
+    const sources: Record<string, {
+      fullName: string;
+      organization: string;
+      url: string;
+      dataType: string;
+      updateFrequency: string;
+      coverage: string;
+      reliability: number;
+      methodology: string;
+      limitations: string[];
+      lastAccessed: string;
+    }> = {
+      'IEA World Energy Outlook': {
+        fullName: 'International Energy Agency - World Energy Outlook',
+        organization: 'OECD/IEA',
+        url: 'https://www.iea.org/reports/world-energy-outlook-2023',
+        dataType: 'Energiproduktion, konsumtion, prognoser',
+        updateFrequency: 'Årlig (november)',
+        coverage: 'Global, 150+ länder',
+        reliability: 92,
+        methodology: 'Bottom-up modellering baserad på nationell statistik, IEA Energy Balances',
+        limitations: [
+          'Prognoser innehåller politiska antaganden',
+          'Historisk data kan revideras retroaktivt',
+          'Vissa länder rapporterar ofullständigt'
+        ],
+        lastAccessed: '2024-01'
+      },
+      'Eurostat Energy Statistics': {
+        fullName: 'Eurostat Energy Statistics Database',
+        organization: 'European Commission',
+        url: 'https://ec.europa.eu/eurostat/web/energy/data/database',
+        dataType: 'Energibalanser, produktion, handel',
+        updateFrequency: 'Månatlig/Kvartalsvis',
+        coverage: 'EU27 + EFTA + kandidatländer',
+        reliability: 95,
+        methodology: 'Obligatorisk rapportering från nationella statistikbyråer enligt EU-förordningar',
+        limitations: [
+          'Begränsat till europeiska länder',
+          'Preliminär data kan justeras',
+          'Definitionsskillnader mellan länder före harmonisering'
+        ],
+        lastAccessed: '2024-01'
+      },
+      'World Risk Report': {
+        fullName: 'World Risk Report - Bündnis Entwicklung Hilft',
+        organization: 'Bündnis Entwicklung Hilft / Ruhr University Bochum',
+        url: 'https://weltrisikobericht.de/en/',
+        dataType: 'Riskindex, sårbarhet, exponering',
+        updateFrequency: 'Årlig',
+        coverage: 'Global, 193 länder',
+        reliability: 85,
+        methodology: 'Sammansatt index: Exponering × Sårbarhet × Bristande anpassningsförmåga',
+        limitations: [
+          'Aggregerade index döljer regional variation',
+          'Vikter mellan komponenter är normativt valda',
+          'Naturkatastrofer dominerar, konfliktrisker underrepresenterade'
+        ],
+        lastAccessed: '2023-09'
+      },
+      'UNDP Human Development Index': {
+        fullName: 'UNDP Human Development Report - HDI',
+        organization: 'United Nations Development Programme',
+        url: 'https://hdr.undp.org/',
+        dataType: 'Hälsa, utbildning, inkomst',
+        updateFrequency: 'Årlig',
+        coverage: 'Global, 191 länder',
+        reliability: 90,
+        methodology: 'Geometriskt medelvärde av: Förväntad livslängd, utbildningsår, BNI per capita (PPP)',
+        limitations: [
+          'Mäter inte ojämlikhet (se IHDI för detta)',
+          'Nationella genomsnitt döljer intern variation',
+          'Inkomstkomponenten har logaritmisk dämpning'
+        ],
+        lastAccessed: '2024-01'
+      }
+    };
+    
+    return sources[name] || {
+      fullName: name,
+      organization: 'Okänd organisation',
+      url: '#',
+      dataType: 'Ej klassificerad',
+      updateFrequency: 'Okänd',
+      coverage: 'Okänd',
+      reliability: 50,
+      methodology: 'Metodologi ej dokumenterad i systemet',
+      limitations: ['Datakälla saknar fullständig metadata'],
+      lastAccessed: 'N/A'
+    };
+  };
+  
+  const metadata = getSourceMetadata(sourceName);
+  
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="group"
+      >
+        <Badge 
+          variant="outline" 
+          className="text-xs cursor-pointer hover:border-primary hover:bg-muted/30 transition-all"
+        >
+          {sourceName}
+          <span className="ml-1 font-mono text-[10px] opacity-60 group-hover:opacity-100">
+            {expanded ? '[−]' : '[→]'}
+          </span>
+        </Badge>
+      </button>
+      
+      {expanded && (
+        <div className="absolute z-50 mt-2 left-0 w-80 p-4 bg-popover border rounded-lg shadow-lg text-left">
+          <div className="flex justify-between items-start mb-3">
+            <span className="font-semibold text-sm">{metadata.fullName}</span>
+            <button 
+              onClick={() => setExpanded(false)}
+              className="text-muted-foreground hover:text-foreground text-xs font-mono"
+            >[×]</button>
+          </div>
+          
+          <div className="space-y-3 text-sm">
+            <div>
+              <span className="font-mono text-[10px] text-muted-foreground block">ORGANISATION</span>
+              <span>{metadata.organization}</span>
+            </div>
+            
+            <div>
+              <span className="font-mono text-[10px] text-muted-foreground block">DATATYP</span>
+              <span>{metadata.dataType}</span>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <span className="font-mono text-[10px] text-muted-foreground block">UPPDATERING</span>
+                <span className="text-xs">{metadata.updateFrequency}</span>
+              </div>
+              <div>
+                <span className="font-mono text-[10px] text-muted-foreground block">TÄCKNING</span>
+                <span className="text-xs">{metadata.coverage}</span>
+              </div>
+            </div>
+            
+            <div>
+              <span className="font-mono text-[10px] text-muted-foreground block">TILLFÖRLITLIGHET</span>
+              <div className="flex items-center gap-2 mt-1">
+                <Progress value={metadata.reliability} className="h-2 flex-1" />
+                <span className="text-xs font-mono">{metadata.reliability}%</span>
+              </div>
+            </div>
+            
+            <div>
+              <span className="font-mono text-[10px] text-muted-foreground block">METODOLOGI</span>
+              <p className="text-xs text-muted-foreground">{metadata.methodology}</p>
+            </div>
+            
+            <div>
+              <span className="font-mono text-[10px] text-muted-foreground block">BEGRÄNSNINGAR</span>
+              <ul className="space-y-1 mt-1">
+                {metadata.limitations.map((lim, idx) => (
+                  <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1">
+                    <span className="font-mono">•</span>
+                    {lim}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div className="pt-2 border-t flex justify-between items-center">
+              <span className="text-[10px] text-muted-foreground">
+                Senast hämtad: {metadata.lastAccessed}
+              </span>
+              <a 
+                href={metadata.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-primary hover:underline font-mono"
+              >
+                [ÖPPNA KÄLLA]
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 interface ClickableMetricBarProps {
   label: string;
   value: number;
@@ -542,9 +736,7 @@ const ClickableMetricBar: React.FC<ClickableMetricBarProps> = ({
             <p className="font-mono uppercase tracking-wider text-muted-foreground mb-1">DATAKÄLLOR</p>
             <div className="flex flex-wrap gap-1">
               {explanation.sources.map((src, i) => (
-                <Badge key={i} variant="outline" className="text-xs">
-                  {src}
-                </Badge>
+                <ClickableDataSource key={i} sourceName={src} />
               ))}
             </div>
           </div>
