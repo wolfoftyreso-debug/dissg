@@ -17,11 +17,10 @@ import { CATEGORIES, KPI } from '@/types/kpi';
 import { ODISHeader, ODISTabs, ODISSidebar, ODISTreeView, ODISFooter, type ODISTab, type OperatingMode, type TreeNode } from '@/components/gdis';
 import { KPIDetailPanel } from '@/components/dashboard/KPIDetailPanel';
 import { PrioritizedDashboard } from '@/components/relevance/PrioritizedDashboard';
-import { GovRoleDashboard } from '@/components/dashboard/GovRoleDashboard';
+import { SubscriptionDashboard } from '@/components/dashboard/SubscriptionDashboard';
 import { AlertNotificationPanel } from '@/components/dashboard/AlertNotificationPanel';
 import UniversalResponsibilityMap from '@/components/global/UniversalResponsibilityMap';
 import { useKPIOverview } from '@/hooks/useKPIData';
-import { useGovRole } from '@/hooks/useGovRole';
 import { SYSTEM } from '@/config/system';
 import { UniversalBreadcrumb } from '@/components/navigation';
 import { MachineReadableHead } from '@/components/seo';
@@ -53,8 +52,6 @@ const Index = () => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
   
   const { scope } = useGeo();
-  const { data: govRole } = useGovRole();
-  const currentRole = govRole?.role || 'public';
   
   // Try to fetch from database first
   const { data: dbKPIs, isLoading } = useKPIOverview();
@@ -195,7 +192,7 @@ const Index = () => {
 
           {activeTab === 'modules' && (
             <div className="flex-1 p-3 overflow-auto">
-              <GovRoleDashboard />
+              <SubscriptionDashboard />
             </div>
           )}
 
