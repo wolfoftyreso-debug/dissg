@@ -37,6 +37,13 @@ export { DepthExplorer } from './DepthExplorer';
 export { DataDashboard } from './DataDashboard';
 export { DataOverview, MiniSparkline } from './DataOverview';
 export { DataAccessPage } from './DataAccessPage';
+export { SortableIndexTable, IndexCategoryTables } from './SortableIndexTable';
+export { 
+  SourcesDrilldown, 
+  CountriesDrilldown, 
+  IndicatorsDrilldown, 
+  TablesDrilldown 
+} from './StatDrilldown';
 
 // Utility: Create a simple data point with basic depth
 export function createDataPoint(params: {
