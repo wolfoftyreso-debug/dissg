@@ -234,19 +234,19 @@ export const DataOverview: React.FC<{ className?: string }> = ({ className }) =>
     }));
   }, [kpiData]);
 
-  // Best and worst performers
+  // Best and worst performers - with indicator codes for navigation
   const topPerformers = [
-    { name: 'Sysselsättningsgrad', value: '78.2%', change: 2.3, isPositive: true },
-    { name: 'Medellivslängd', value: '83.1 år', change: 0.4, isPositive: true },
-    { name: 'BNP-tillväxt', value: '2.1%', change: 0.8, isPositive: true },
-    { name: 'Energieffektivitet', value: '127 index', change: 3.2, isPositive: true },
+    { name: 'Sysselsättningsgrad', code: 'employment_rate', value: '78.2%', change: 2.3, isPositive: true },
+    { name: 'Medellivslängd', code: 'life_expectancy', value: '83.1 år', change: 0.4, isPositive: true },
+    { name: 'BNP-tillväxt', code: 'gdp_growth', value: '2.1%', change: 0.8, isPositive: true },
+    { name: 'Energieffektivitet', code: 'energy_efficiency', value: '127 index', change: 3.2, isPositive: true },
   ];
 
   const worstPerformers = [
-    { name: 'Vårdkötid', value: '127 dagar', change: 15.2, isPositive: false },
-    { name: 'Skjutningar', value: '4.2/100k', change: 8.7, isPositive: false },
-    { name: 'Boendesegregation', value: '42 index', change: 2.1, isPositive: false },
-    { name: 'Lärarbrist', value: '18.3%', change: 4.6, isPositive: false },
+    { name: 'Vårdkötid', code: 'healthcare_wait_time', value: '127 dagar', change: 15.2, isPositive: false },
+    { name: 'Skjutningar', code: 'shootings', value: '4.2/100k', change: 8.7, isPositive: false },
+    { name: 'Boendesegregation', code: 'housing_segregation', value: '42 index', change: 2.1, isPositive: false },
+    { name: 'Lärarbrist', code: 'teacher_shortage', value: '18.3%', change: 4.6, isPositive: false },
   ];
 
   // Recent updates
@@ -342,11 +342,14 @@ export const DataOverview: React.FC<{ className?: string }> = ({ className }) =>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                {topPerformers.map((item, i) => (
+                {topPerformers.map((item) => (
                   <IndicatorRow
-                    key={i}
-                    {...item}
-                    onClick={() => navigate('/index')}
+                    key={item.code}
+                    name={item.name}
+                    value={item.value}
+                    change={item.change}
+                    isPositive={item.isPositive}
+                    onClick={() => navigate(`/indicator/${item.code}`)}
                   />
                 ))}
               </CardContent>
@@ -359,11 +362,14 @@ export const DataOverview: React.FC<{ className?: string }> = ({ className }) =>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                {worstPerformers.map((item, i) => (
+                {worstPerformers.map((item) => (
                   <IndicatorRow
-                    key={i}
-                    {...item}
-                    onClick={() => navigate('/index')}
+                    key={item.code}
+                    name={item.name}
+                    value={item.value}
+                    change={item.change}
+                    isPositive={item.isPositive}
+                    onClick={() => navigate(`/indicator/${item.code}`)}
                   />
                 ))}
               </CardContent>
