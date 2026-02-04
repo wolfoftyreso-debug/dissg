@@ -2,19 +2,20 @@
  * Sortable Index Table
  * 
  * Avanza-inspired sortable data tables for indices and indicators
+ * Every row is clickable for infinite depth exploration
  */
 
 import React, { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
 import { MiniSparkline } from './DataOverview';
+import { IndexDrilldown } from './IndexDrilldown';
 import { Settings } from 'lucide-react';
 
 type SortDirection = 'asc' | 'desc' | null;
 type SortField = 'name' | 'change' | 'value' | 'time';
 
-interface IndexItem {
+export interface IndexItem {
   id: string;
   code: string;
   name: string;
@@ -108,9 +109,10 @@ export const SortableIndexTable: React.FC<{
   onItemClick?: (item: IndexItem) => void;
   className?: string;
 }> = ({ title, items, showSparkline = false, onItemClick, className }) => {
-  const navigate = useNavigate();
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  const [selectedItem, setSelectedItem] = useState<IndexItem | null>(null);
+  const [drilldownOpen, setDrilldownOpen] = useState(false);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -121,6 +123,15 @@ export const SortableIndexTable: React.FC<{
     } else {
       setSortField(field);
       setSortDirection('desc');
+    }
+  };
+
+  const handleRowClick = (item: IndexItem) => {
+    if (onItemClick) {
+      onItemClick(item);
+    } else {
+      setSelectedItem(item);
+      setDrilldownOpen(true);
     }
   };
 
@@ -150,67 +161,71 @@ export const SortableIndexTable: React.FC<{
   }, [items, sortField, sortDirection]);
 
   return (
-    <Card className={className}>
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-base font-medium">{title}</CardTitle>
-        <button className="p-1 hover:bg-muted rounded transition-colors">
-          <Settings className="w-4 h-4 text-muted-foreground" />
-        </button>
-      </CardHeader>
-      <CardContent className="p-0">
-        <table className="w-full">
-          <thead className="bg-muted/30 border-b border-border">
-            <tr>
-              <SortHeader 
-                label="Index" 
-                field="name" 
-                currentField={sortField} 
-                direction={sortDirection}
-                onSort={handleSort}
-              />
-              <SortHeader 
-                label="+/−%" 
-                field="change" 
-                currentField={sortField} 
-                direction={sortDirection}
-                onSort={handleSort}
-                align="right"
-              />
-              {showSparkline && <th className="px-2 py-2 w-16"></th>}
-              <SortHeader 
-                label="Senast" 
-                field="value" 
-                currentField={sortField} 
-                direction={sortDirection}
-                onSort={handleSort}
-                align="right"
-              />
-              <SortHeader 
-                label="Tid" 
-                field="time" 
-                currentField={sortField} 
-                direction={sortDirection}
-                onSort={handleSort}
-                align="right"
-              />
-            </tr>
-          </thead>
-          <tbody>
-            {sortedItems.map((item) => (
-              <IndexRow
-                key={item.id}
-                item={item}
-                onClick={() => {
-                  if (onItemClick) onItemClick(item);
-                  else navigate(`/index?code=${item.code}`);
-                }}
-                showSparkline={showSparkline}
-              />
-            ))}
-          </tbody>
-        </table>
-      </CardContent>
-    </Card>
+    <>
+      <IndexDrilldown 
+        open={drilldownOpen} 
+        onOpenChange={setDrilldownOpen} 
+        item={selectedItem}
+      />
+      <Card className={className}>
+        <CardHeader className="pb-2 flex flex-row items-center justify-between">
+          <CardTitle className="text-base font-medium">{title}</CardTitle>
+          <button className="p-1 hover:bg-muted rounded transition-colors">
+            <Settings className="w-4 h-4 text-muted-foreground" />
+          </button>
+        </CardHeader>
+        <CardContent className="p-0">
+          <table className="w-full">
+            <thead className="bg-muted/30 border-b border-border">
+              <tr>
+                <SortHeader 
+                  label="Index" 
+                  field="name" 
+                  currentField={sortField} 
+                  direction={sortDirection}
+                  onSort={handleSort}
+                />
+                <SortHeader 
+                  label="+/−%" 
+                  field="change" 
+                  currentField={sortField} 
+                  direction={sortDirection}
+                  onSort={handleSort}
+                  align="right"
+                />
+                {showSparkline && <th className="px-2 py-2 w-16"></th>}
+                <SortHeader 
+                  label="Senast" 
+                  field="value" 
+                  currentField={sortField} 
+                  direction={sortDirection}
+                  onSort={handleSort}
+                  align="right"
+                />
+                <SortHeader 
+                  label="Tid" 
+                  field="time" 
+                  currentField={sortField} 
+                  direction={sortDirection}
+                  onSort={handleSort}
+                  align="right"
+                />
+              </tr>
+            </thead>
+            <tbody>
+              {sortedItems.map((item) => (
+                <IndexRow
+                  key={item.id}
+                  item={item}
+                  onClick={() => handleRowClick(item)}
+                  showSparkline={showSparkline}
+                />
+              ))}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 
