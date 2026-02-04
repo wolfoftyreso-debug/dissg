@@ -21,6 +21,19 @@ export interface GEDIStatusResult {
 }
 
 // =============================================================================
+// GEDI CATEGORY (Legacy support)
+// =============================================================================
+
+export type GEDICategory = 
+  | 'PERFORMANCE'
+  | 'SUSTAINABILITY'
+  | 'EQUALITY'
+  | 'HEALTH'
+  | 'CLIMATE'
+  | 'DEMOCRACY'
+  | 'INTEGRITY';
+
+// =============================================================================
 // GEDI CODE DEFINITION
 // =============================================================================
 
@@ -36,15 +49,6 @@ export interface GEDICodeDefinition {
   affectedSystems: string[];
   guidedAnalysisSteps: GuidedStep[];
 }
-
-export type GEDICategory = 
-  | 'PERFORMANCE'
-  | 'SUSTAINABILITY'
-  | 'EQUALITY'
-  | 'HEALTH'
-  | 'CLIMATE'
-  | 'DEMOCRACY'
-  | 'INTEGRITY';
 
 export interface GuidedStep {
   order: number;
