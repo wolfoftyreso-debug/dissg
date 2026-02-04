@@ -32,6 +32,7 @@ import {
 } from 'recharts';
 // NO ICONS - Text markers only per design doctrine
 import { ClickableSourceCitation } from '@/components/ui/ClickableSourceCitation';
+import { ClickableCountryName } from '@/components/ui/ClickableCountryName';
 import {
   useRegionalDemographics,
   usePopulationHistory,
@@ -325,7 +326,12 @@ const CountriesView: React.FC<{ regionName: string }> = ({ regionName }) => {
                   <Badge variant="outline" className="w-6 h-6 p-0 flex items-center justify-center text-xs">
                     {idx + 1}
                   </Badge>
-                  <span className="font-medium text-sm">{country.country_name}</span>
+                  <ClickableCountryName
+                    countryCode={country.country_code}
+                    countryName={country.country_name}
+                    variant="default"
+                    showCode
+                  />
                 </div>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <span>{country.population_millions.toFixed(1)}M</span>
