@@ -184,6 +184,7 @@ export function GuidedDiagnostics({
               ? 1 + (diagnosticCase.lambdaDeviation / 100)
               : 1 - (Math.abs(diagnosticCase.lambdaDeviation) / 100)
             }
+            caseId={diagnosticCase.caseId}
             isPro={isPro}
             onConfirm={() => goToNextStep()}
             onSkip={goToNextStep}
