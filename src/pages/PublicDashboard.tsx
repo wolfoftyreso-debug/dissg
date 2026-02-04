@@ -13,7 +13,7 @@ import { ODISHeader, ODISTabs, ODISSidebar, ODISTreeView, ODISFooter, type ODIST
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PublicOnboarding } from '@/components/onboarding';
 import { SystemFooter } from '@/components/transparency/SystemFooter';
 
@@ -142,6 +142,7 @@ const PublicDashboard = () => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
   const [selectedKPI, setSelectedKPI] = useState<KPI | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const navigate = useNavigate();
   
   const { data: dbKPIs, isLoading } = useKPIOverview();
   
@@ -365,7 +366,26 @@ const PublicDashboard = () => {
           <ODISSidebar
             modes={OPERATING_MODES}
             activeMode={activeMode}
-            onModeChange={setActiveMode}
+            onModeChange={(modeId) => {
+              setActiveMode(modeId);
+              // Navigate based on mode
+              switch (modeId) {
+                case 'index':
+                  navigate('/index');
+                  break;
+                case 'regional':
+                  navigate('/gdm');
+                  break;
+                case 'info':
+                  navigate('/gedi');
+                  break;
+                case 'diagnosis':
+                default:
+                  // Stay on current page, just switch tab
+                  setActiveTab('diagnosis');
+                  break;
+              }
+            }}
           />
         </div>
       </div>
