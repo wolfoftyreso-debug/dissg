@@ -50,13 +50,65 @@ interface FactorDeepDiveProps {
 // Evidence is now imported from factorEvidenceRegistry - no local definitions needed
 
 // Sub-components
+// Clickable confidence badge with explanation for 15-year-olds
 const ConfidenceBadge: React.FC<{ level: 'high' | 'medium' | 'low' }> = ({ level }) => {
+  const [showExplanation, setShowExplanation] = useState(false);
+  
   const config = {
-    high: { label: 'Hög konfidens', variant: 'default' as const },
-    medium: { label: 'Medel konfidens', variant: 'secondary' as const },
-    low: { label: 'Låg konfidens', variant: 'destructive' as const }
+    high: { 
+      label: 'Hög konfidens', 
+      variant: 'default' as const,
+      explanation: 'Många oberoende forskare har kommit fram till samma sak. Datan är tydlig och metoderna är väl beprövade.',
+      meaning: 'Vi är ganska säkra på detta'
+    },
+    medium: { 
+      label: 'Medel konfidens', 
+      variant: 'secondary' as const,
+      explanation: 'Flera studier pekar åt samma håll, men det finns viss osäkerhet. Antingen saknas data, eller så är forskarna inte helt överens.',
+      meaning: 'Troligt men inte säkert'
+    },
+    low: { 
+      label: 'Låg konfidens', 
+      variant: 'destructive' as const,
+      explanation: 'Det finns få studier, motstridiga resultat, eller metodproblem. Ta denna slutsats med en stor nypa salt.',
+      meaning: 'Osäkert – behöver mer forskning'
+    }
   };
-  return <Badge variant={config[level].variant}>{config[level].label}</Badge>;
+  
+  return (
+    <div className="relative inline-block">
+      <button
+        type="button"
+        onClick={() => setShowExplanation(!showExplanation)}
+        className="group"
+      >
+        <Badge 
+          variant={config[level].variant}
+          className="cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all"
+        >
+          {config[level].label}
+          <span className="ml-1 font-mono text-[10px] opacity-60 group-hover:opacity-100">[?]</span>
+        </Badge>
+      </button>
+      {showExplanation && (
+        <div className="absolute z-50 mt-2 left-0 w-72 p-4 bg-popover border rounded-lg shadow-lg">
+          <div className="flex justify-between items-start mb-2">
+            <span className="font-semibold text-sm">{config[level].meaning}</span>
+            <button 
+              onClick={() => setShowExplanation(false)}
+              className="text-muted-foreground hover:text-foreground text-xs"
+            >[×]</button>
+          </div>
+          <p className="text-sm text-muted-foreground">{config[level].explanation}</p>
+          <div className="mt-3 pt-3 border-t">
+            <p className="text-xs text-muted-foreground">
+              Konfidens = Hur säkra forskarna är på slutsatsen. Det handlar om datakvalitet och samstämmighet mellan studier.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 const ImpactBadge: React.FC<{ impact: 'critical' | 'moderate' | 'minor' }> = ({ impact }) => {
@@ -74,6 +126,166 @@ const SourceReliabilityBar: React.FC<{ reliability: number }> = ({ reliability }
     <span className="text-xs text-muted-foreground">{reliability}%</span>
   </div>
 );
+
+// Clickable driver component - makes each driver expandable with clear visual affordance
+const ClickableDriver: React.FC<{ 
+  driver: { name: string; contribution: number; description: string } 
+}> = ({ driver }) => {
+  const [expanded, setExpanded] = useState(false);
+  
+  // Generate pedagogical explanation based on driver name
+  const getDriverExplanation = (name: string) => {
+    const explanations: Record<string, { meaning: string; example: string; whyMatters: string }> = {
+      'Capacity Factor': {
+        meaning: 'Hur stor del av tiden som en kraftkälla faktiskt producerar el jämfört med vad den teoretiskt kunde.',
+        example: 'Om ett vindkraftverk kan producera 100 MW men i snitt levererar 35 MW, är kapacitetsfaktorn 35%.',
+        whyMatters: 'Högre kapacitetsfaktor = mer pålitlig och billigare el per investerad krona.'
+      },
+      'Predictability': {
+        meaning: 'Hur väl vi kan förutse produktionen 24-48 timmar i förväg.',
+        example: 'Kärnkraft är mycket förutsägbar (nästan 100%). Solenergi är halvdålig (molnigt väder). Vind varierar.',
+        whyMatters: 'Bättre förutsägbarhet = enklare att balansera elnätet och undvika strömavbrott.'
+      },
+      'System Cost': {
+        meaning: 'Totalkostnad för att leverera el, inklusive backup, lagring och förstärkning av elnätet.',
+        example: 'Solceller kan vara billiga, men om du behöver batterier för natten ökar totalkostnaden.',
+        whyMatters: 'Systemkostnad visar den verkliga prislappen, inte bara kostnaden för ett enskilt kraftverk.'
+      },
+      'Dispatchability': {
+        meaning: 'Förmågan att snabbt öka eller minska produktionen efter behov.',
+        example: 'Gasturbiner kan startas på minuter. Kärnkraft tar timmar. Sol och vind kan inte styras alls.',
+        whyMatters: 'Hög styrbarhet = kan snabbt möta plötsliga förändringar i efterfrågan.'
+      }
+    };
+    return explanations[name] || {
+      meaning: driver.description,
+      example: 'Se primärdata för mer detaljer.',
+      whyMatters: 'Denna faktor påverkar systemets övergripande stabilitet.'
+    };
+  };
+  
+  const explanation = getDriverExplanation(driver.name);
+  
+  return (
+    <button
+      type="button"
+      onClick={() => setExpanded(!expanded)}
+      className="w-full text-left p-3 rounded-lg border hover:border-primary/50 hover:bg-muted/30 transition-all group"
+    >
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-sm font-medium group-hover:text-primary">{driver.name}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-mono">{driver.contribution}%</span>
+          <span className="font-mono text-xs text-muted-foreground group-hover:text-primary">
+            {expanded ? '[−]' : '[+]'}
+          </span>
+        </div>
+      </div>
+      <Progress value={driver.contribution} className="h-2 mb-2" />
+      <p className="text-xs text-muted-foreground">{driver.description}</p>
+      
+      {expanded && (
+        <div className="mt-4 pt-4 border-t space-y-3 text-left">
+          <div>
+            <span className="text-xs font-medium text-muted-foreground block mb-1">VAD BETYDER DETTA?</span>
+            <p className="text-sm">{explanation.meaning}</p>
+          </div>
+          <div>
+            <span className="text-xs font-medium text-muted-foreground block mb-1">EXEMPEL</span>
+            <p className="text-sm">{explanation.example}</p>
+          </div>
+          <div>
+            <span className="text-xs font-medium text-muted-foreground block mb-1">VARFÖR SPELAR DET ROLL?</span>
+            <p className="text-sm">{explanation.whyMatters}</p>
+          </div>
+        </div>
+      )}
+    </button>
+  );
+};
+
+// Clickable timelag component - explains why things take time
+const ClickableTimelag: React.FC<{ 
+  timelag: { min: number; max: number; unit: string; explanation: string } 
+}> = ({ timelag }) => {
+  const [expanded, setExpanded] = useState(false);
+  
+  const getTimelagContext = () => {
+    if (timelag.unit === 'år' || timelag.unit === 'years') {
+      if (timelag.max >= 10) {
+        return {
+          scale: 'decennier',
+          why: 'Stora infrastrukturförändringar tar lång tid. Kraftverk byggs i 5-10 år, och effekterna på ekonomi och samhälle syns gradvis.',
+          comparison: 'När du börjar gymnasiet nu, kanske du ser resultaten som vuxen.',
+          factors: ['Byggnadstid för kraftverk', 'Politiska beslutsprocesser', 'Anpassning av industrin', 'Utbildning av personal']
+        };
+      }
+      return {
+        scale: 'år',
+        why: 'Energisystemet anpassar sig stegvis. Investeringar måste planeras, godkännas och genomföras.',
+        comparison: 'Ungefär som att byta gymnasium – det tar ett läsår att se resultatet.',
+        factors: ['Investeringscykler', 'Regleringsprocesser', 'Marknadsanpassning']
+      };
+    }
+    return {
+      scale: 'månader',
+      why: 'Kortsiktiga anpassningar kan ske relativt snabbt.',
+      comparison: 'Som att byta sportaktivitet – du märker skillnad efter några månader.',
+      factors: ['Operativa justeringar', 'Prisförändringar']
+    };
+  };
+  
+  const context = getTimelagContext();
+  
+  return (
+    <button
+      type="button"
+      onClick={() => setExpanded(!expanded)}
+      className="w-full text-left"
+    >
+      <div className="flex items-center gap-4 mb-4">
+        <Badge 
+          variant="outline" 
+          className="text-lg px-4 py-2 cursor-pointer hover:border-primary hover:bg-muted/30 transition-all group"
+        >
+          {timelag.min}–{timelag.max} {timelag.unit}
+          <span className="ml-2 font-mono text-xs opacity-60 group-hover:opacity-100">[?]</span>
+        </Badge>
+        <span className="text-sm text-muted-foreground">← Klicka för att förstå varför</span>
+      </div>
+      
+      <p className="text-sm text-muted-foreground">{timelag.explanation}</p>
+      
+      {expanded && (
+        <div className="mt-4 p-4 border rounded-lg bg-muted/20 space-y-4">
+          <div>
+            <span className="text-xs font-medium text-muted-foreground block mb-1">TIDSSKALA</span>
+            <p className="text-sm font-medium">{context.scale}</p>
+          </div>
+          <div>
+            <span className="text-xs font-medium text-muted-foreground block mb-1">VARFÖR TAR DET SÅ LÅNG TID?</span>
+            <p className="text-sm">{context.why}</p>
+          </div>
+          <div>
+            <span className="text-xs font-medium text-muted-foreground block mb-1">JÄMFÖRELSE</span>
+            <p className="text-sm italic">{context.comparison}</p>
+          </div>
+          <div>
+            <span className="text-xs font-medium text-muted-foreground block mb-1">FAKTORER SOM PÅVERKAR</span>
+            <ul className="space-y-1">
+              {context.factors.map((factor, idx) => (
+                <li key={idx} className="text-sm flex items-start gap-2">
+                  <span className="font-mono text-xs text-muted-foreground">•</span>
+                  {factor}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+    </button>
+  );
+};
 
 // Case study detail sheet
 const CaseStudyDetail: React.FC<{
@@ -451,22 +663,15 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                       </CardContent>
                     </Card>
                     
-                    {/* Primary drivers */}
+                    {/* Primary drivers - CLICKABLE */}
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-sm">Primära drivkrafter</CardTitle>
-                        <CardDescription>Relativ betydelse enligt modellen</CardDescription>
+                        <CardDescription>Klicka på varje drivkraft för att förstå vad den betyder</CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-4">
+                      <CardContent className="space-y-3">
                         {evidence.mechanism.primaryDrivers.map((driver, idx) => (
-                          <div key={idx}>
-                            <div className="flex justify-between mb-1">
-                              <span className="text-sm font-medium">{driver.name}</span>
-                              <span className="text-sm text-muted-foreground">{driver.contribution}%</span>
-                            </div>
-                            <Progress value={driver.contribution} className="h-2" />
-                            <p className="text-xs text-muted-foreground mt-1">{driver.description}</p>
-                          </div>
+                          <ClickableDriver key={idx} driver={driver} />
                         ))}
                       </CardContent>
                     </Card>
@@ -492,21 +697,17 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                       </CardContent>
                     </Card>
                     
-                    {/* Time lag */}
+                    {/* Time lag - CLICKABLE */}
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-sm flex items-center gap-2">
                           <span className="font-mono text-xs">[TID]</span>
                           Tidsfördröjning
                         </CardTitle>
+                        <CardDescription>Klicka på tidsspannet för att förstå varför det tar tid</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="flex items-center gap-4 mb-4">
-                          <Badge variant="outline" className="text-lg px-4 py-2">
-                            {evidence.mechanism.timelag.min}–{evidence.mechanism.timelag.max} {evidence.mechanism.timelag.unit}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{evidence.mechanism.timelag.explanation}</p>
+                        <ClickableTimelag timelag={evidence.mechanism.timelag} />
                       </CardContent>
                     </Card>
                   </div>
