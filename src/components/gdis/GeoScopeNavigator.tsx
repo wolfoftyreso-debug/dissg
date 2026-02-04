@@ -3,6 +3,7 @@
  * 
  * Shows current geographic scope with zoom in/out controls.
  * Displays breadcrumbs: Global → Region → Country
+ * NO ICONS - text markers only per design doctrine.
  */
 
 import React from 'react';
@@ -15,15 +16,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
-import {
-  Globe2,
-  MapPin,
-  ChevronUp,
-  ChevronDown,
-  ChevronRight,
-  Map,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   useGeo, 
@@ -38,20 +35,12 @@ interface GeoScopeNavigatorProps {
   className?: string;
 }
 
-const LEVEL_ICONS: Record<GeoLevel, React.ElementType> = {
-  global: Globe2,
-  region: Map,
-  country: MapPin,
-  province: MapPin,
-  municipal: MapPin,
-};
-
-const LEVEL_LABELS: Record<GeoLevel, string> = {
-  global: 'Global',
-  region: 'Region',
-  country: 'Land',
-  province: 'Provins',
-  municipal: 'Kommun',
+const LEVEL_MARKERS: Record<GeoLevel, string> = {
+  global: '[GLOBAL]',
+  region: '[REGION]',
+  country: '[LAND]',
+  province: '[PROVINS]',
+  municipal: '[KOMMUN]',
 };
 
 export function GeoScopeNavigator({ 
@@ -67,14 +56,10 @@ export function GeoScopeNavigator({
     detectedCountry,
   } = useGeo();
 
-  const Icon = LEVEL_ICONS[scope.level];
-
-  // Navigate to specific scope
   const navigateTo = (newScope: GeoScope) => {
     setScope(newScope);
   };
 
-  // Get available countries for current region
   const getRegionCountries = (regionCode: string) => {
     const region = GEO_REGIONS[regionCode];
     if (!region) return [];
@@ -86,12 +71,19 @@ export function GeoScopeNavigator({
       }));
   };
 
+  // Get all countries sorted alphabetically
+  const getAllCountries = () => {
+    return Object.entries(COUNTRIES)
+      .map(([code, data]) => ({ code, ...data }))
+      .sort((a, b) => a.name_local.localeCompare(b.name_local));
+  };
+
   if (variant === 'breadcrumb') {
     return (
-      <div className={cn("flex items-center gap-1 text-xs", className)}>
+      <div className={cn("flex items-center gap-1 text-xs font-mono", className)}>
         {breadcrumbs.map((crumb, i) => (
           <React.Fragment key={crumb.code}>
-            {i > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground" />}
+            {i > 0 && <span className="text-muted-foreground">›</span>}
             <button
               onClick={() => navigateTo(crumb)}
               className={cn(
@@ -111,59 +103,86 @@ export function GeoScopeNavigator({
 
   if (variant === 'full') {
     return (
-      <div className={cn("flex items-center gap-2", className)}>
+      <div className={cn("flex items-center gap-2 font-mono", className)}>
         {/* Zoom out button */}
         <Button
           variant="ghost"
-          size="icon"
-          className="h-8 w-8"
+          size="sm"
+          className="font-mono"
           onClick={zoomOut}
           disabled={!canZoomOut}
           title="Zooma ut"
         >
-          <ChevronUp className="h-4 w-4" />
+          [−]
         </Button>
 
         {/* Current scope dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2 min-w-[140px] justify-start">
-              <Icon className="h-4 w-4 shrink-0" />
+            <Button variant="outline" className="gap-2 min-w-[140px] justify-start font-mono">
+              <span className="text-xs text-muted-foreground">{LEVEL_MARKERS[scope.level]}</span>
               <span className="truncate">{scope.name_local || scope.name}</span>
-              <ChevronDown className="h-3 w-3 ml-auto opacity-50" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56 bg-popover">
-            <DropdownMenuLabel className="text-xs">Byt geografiskt fokus</DropdownMenuLabel>
+          <DropdownMenuContent align="start" className="w-64 bg-popover font-mono">
+            <DropdownMenuLabel className="text-xs font-mono">BYT GEOGRAFISKT FOKUS</DropdownMenuLabel>
             <DropdownMenuSeparator />
             
             {/* Global option */}
-            <DropdownMenuItem onClick={() => navigateTo({ level: 'global', code: 'GLOBAL', name: 'Global' })}>
-              <Globe2 className="h-4 w-4 mr-2" />
-              Global översikt
-              {scope.level === 'global' && <Badge variant="secondary" className="ml-auto text-xs">Aktiv</Badge>}
+            <DropdownMenuItem 
+              onClick={() => navigateTo({ level: 'global', code: 'GLOBAL', name: 'Global' })}
+              className="font-mono"
+            >
+              [GLOBAL] Global översikt
+              {scope.level === 'global' && <Badge variant="secondary" className="ml-auto text-xs font-mono">[AKTIV]</Badge>}
             </DropdownMenuItem>
             
             <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs">Regioner</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xs font-mono">REGIONER</DropdownMenuLabel>
             
             {Object.entries(GEO_REGIONS).map(([code, region]) => (
-              <DropdownMenuItem 
-                key={code}
-                onClick={() => navigateTo({ level: 'region', code, name: region.name })}
-              >
-                <Map className="h-4 w-4 mr-2" />
-                {region.name}
-                {scope.level === 'region' && scope.code === code && (
-                  <Badge variant="secondary" className="ml-auto text-xs">Aktiv</Badge>
-                )}
-              </DropdownMenuItem>
+              <DropdownMenuSub key={code}>
+                <DropdownMenuSubTrigger className="font-mono">
+                  [REGION] {region.name}
+                  {scope.level === 'region' && scope.code === code && (
+                    <Badge variant="secondary" className="ml-auto text-xs font-mono">[AKTIV]</Badge>
+                  )}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent className="bg-popover font-mono max-h-80 overflow-y-auto">
+                    <DropdownMenuItem 
+                      onClick={() => navigateTo({ level: 'region', code, name: region.name })}
+                      className="font-mono"
+                    >
+                      [REGION] Hela {region.name}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel className="text-xs font-mono">LÄNDER</DropdownMenuLabel>
+                    {getRegionCountries(code).map(country => (
+                      <DropdownMenuItem 
+                        key={country.code}
+                        onClick={() => navigateTo({ 
+                          level: 'country', 
+                          code: country.code, 
+                          name: country.name,
+                          name_local: country.name_local,
+                        })}
+                        className="font-mono"
+                      >
+                        [{country.code}] {country.name_local}
+                        {scope.level === 'country' && scope.code === country.code && (
+                          <Badge variant="secondary" className="ml-auto text-xs font-mono">[AKTIV]</Badge>
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
             ))}
             
             <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs">Snabbval</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xs font-mono">SNABBVAL</DropdownMenuLabel>
             
-            {/* Quick access to detected country */}
             {COUNTRIES[detectedCountry] && (
               <DropdownMenuItem 
                 onClick={() => navigateTo({ 
@@ -172,30 +191,24 @@ export function GeoScopeNavigator({
                   name: COUNTRIES[detectedCountry].name,
                   name_local: COUNTRIES[detectedCountry].name_local,
                 })}
+                className="font-mono"
               >
-                <MapPin className="h-4 w-4 mr-2" />
-                {COUNTRIES[detectedCountry].name_local} (detekterat)
+                [{detectedCountry}] {COUNTRIES[detectedCountry].name_local} [DETEKTERAT]
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Breadcrumbs */}
-        <div className="hidden md:flex items-center gap-1 text-xs text-muted-foreground">
-          {breadcrumbs.map((crumb, i) => (
-            <React.Fragment key={crumb.code}>
-              {i > 0 && <span>›</span>}
-              <button
-                onClick={() => navigateTo(crumb)}
-                className={cn(
-                  "hover:text-primary transition-colors px-1",
-                  crumb.code === scope.code && "text-foreground font-medium"
-                )}
-              >
-                {crumb.name_local || crumb.name}
-              </button>
-            </React.Fragment>
-          ))}
+        {/* Scope info */}
+        <div className="hidden md:flex items-center gap-4 text-xs">
+          <div>
+            <span className="text-muted-foreground">SCOPE:</span>{' '}
+            <span className="font-medium uppercase">{scope.level}</span>
+          </div>
+          <div>
+            <span className="text-muted-foreground">FOCUS:</span>{' '}
+            <span className="font-medium">{scope.name_local || scope.name}</span>
+          </div>
         </div>
       </div>
     );
@@ -210,22 +223,20 @@ export function GeoScopeNavigator({
           size="sm" 
           className={cn("gap-1.5 font-mono", className)}
         >
-          <Icon className="h-3.5 w-3.5" />
+          <span className="text-xs text-muted-foreground">{LEVEL_MARKERS[scope.level]}</span>
           <span className="text-xs">{scope.code}</span>
-          <ChevronDown className="h-3 w-3 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-48 bg-popover">
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-          {LEVEL_LABELS[scope.level]}: {scope.name_local || scope.name}
+      <DropdownMenuContent align="start" className="w-56 bg-popover font-mono">
+        <DropdownMenuLabel className="text-xs font-mono">
+          {scope.level.toUpperCase()}: {scope.name_local || scope.name}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
         {/* Zoom out option */}
         {canZoomOut && (
-          <DropdownMenuItem onClick={zoomOut}>
-            <ChevronUp className="h-4 w-4 mr-2" />
-            Zooma ut till {scope.level === 'country' ? 'region' : 'global'}
+          <DropdownMenuItem onClick={zoomOut} className="font-mono">
+            [−] Zooma ut till {scope.level === 'country' ? 'region' : 'global'}
           </DropdownMenuItem>
         )}
         
@@ -233,8 +244,8 @@ export function GeoScopeNavigator({
         {scope.level === 'region' && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs">Länder i {scope.name}</DropdownMenuLabel>
-            {getRegionCountries(scope.code).slice(0, 8).map(country => (
+            <DropdownMenuLabel className="text-xs font-mono">LÄNDER I {scope.name.toUpperCase()}</DropdownMenuLabel>
+            {getRegionCountries(scope.code).map(country => (
               <DropdownMenuItem 
                 key={country.code}
                 onClick={() => navigateTo({ 
@@ -243,10 +254,43 @@ export function GeoScopeNavigator({
                   name: country.name,
                   name_local: country.name_local,
                 })}
+                className="font-mono"
               >
-                <MapPin className="h-4 w-4 mr-2" />
-                {country.name_local}
+                [{country.code}] {country.name_local}
               </DropdownMenuItem>
+            ))}
+          </>
+        )}
+
+        {/* All countries submenu if at global level */}
+        {scope.level === 'global' && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs font-mono">VÄLJ LAND</DropdownMenuLabel>
+            {Object.entries(GEO_REGIONS).map(([code, region]) => (
+              <DropdownMenuSub key={code}>
+                <DropdownMenuSubTrigger className="font-mono">
+                  {region.name}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent className="bg-popover font-mono">
+                    {getRegionCountries(code).map(country => (
+                      <DropdownMenuItem 
+                        key={country.code}
+                        onClick={() => navigateTo({ 
+                          level: 'country', 
+                          code: country.code, 
+                          name: country.name,
+                          name_local: country.name_local,
+                        })}
+                        className="font-mono"
+                      >
+                        [{country.code}] {country.name_local}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
             ))}
           </>
         )}
@@ -255,9 +299,11 @@ export function GeoScopeNavigator({
         {scope.level !== 'global' && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigateTo({ level: 'global', code: 'GLOBAL', name: 'Global' })}>
-              <Globe2 className="h-4 w-4 mr-2" />
-              Global översikt
+            <DropdownMenuItem 
+              onClick={() => navigateTo({ level: 'global', code: 'GLOBAL', name: 'Global' })}
+              className="font-mono"
+            >
+              [GLOBAL] Global översikt
             </DropdownMenuItem>
           </>
         )}
