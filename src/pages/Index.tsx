@@ -1,38 +1,52 @@
+/**
+ * GDIS MAIN DASHBOARD
+ * 
+ * Global Diagnostic Information System - Main Entry Point
+ * Strukturmässigt lik VW ODIS / Volvo VIDA diagnostiksystem.
+ */
+
 import { useState, useMemo } from 'react';
 import { mockKPIs } from '@/data/mockKPIs';
 import { CATEGORIES, KPI } from '@/types/kpi';
-import { AppHeader } from '@/components/dashboard/AppHeader';
-import { BottomNav, NavItem } from '@/components/dashboard/BottomNav';
-import { OverviewHeader } from '@/components/dashboard/OverviewHeader';
-import { CategorySection } from '@/components/dashboard/CategorySection';
+import { ODISHeader, ODISTabs, ODISSidebar, ODISTreeView, ODISFooter, type ODISTab, type OperatingMode, type TreeNode } from '@/components/gdis';
 import { KPIDetailPanel } from '@/components/dashboard/KPIDetailPanel';
-import { IndicatorsPanel } from '@/components/dashboard/IndicatorsPanel';
-import { DecisionsTimelinePanel } from '@/components/dashboard/DecisionsTimelinePanel';
-
-import { AnalysisPanel } from '@/components/dashboard/AnalysisPanel';
-import { RoleBasedDashboard } from '@/components/dashboard/RoleBasedDashboard';
+import { PrioritizedDashboard } from '@/components/relevance/PrioritizedDashboard';
 import { GovRoleDashboard } from '@/components/dashboard/GovRoleDashboard';
 import { AlertNotificationPanel } from '@/components/dashboard/AlertNotificationPanel';
-import { PrioritizedDashboard } from '@/components/relevance/PrioritizedDashboard';
 import UniversalResponsibilityMap from '@/components/global/UniversalResponsibilityMap';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { useGovRole } from '@/hooks/useGovRole';
-import { getRoleConfig } from '@/config/roleViewConfig';
-import { Loader2 } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+// Tab configuration
+const MAIN_TABS: ODISTab[] = [
+  { id: 'diagnosis', label: 'Diagnosis', shortLabel: 'Diag' },
+  { id: 'modules', label: 'Control modules', shortLabel: 'Modules' },
+  { id: 'timeline', label: 'Timeline', shortLabel: 'Time' },
+  { id: 'operation', label: 'Operation', shortLabel: 'Oper' },
+  { id: 'special', label: 'Special Functions', shortLabel: 'Special', disabled: true },
+];
+
+// Operating modes configuration
+const OPERATING_MODES: OperatingMode[] = [
+  { id: 'diagnosis', label: 'Diagnosis', shortLabel: 'Diag' },
+  { id: 'index', label: 'Index View', shortLabel: 'Index' },
+  { id: 'simulation', label: 'Simulation', shortLabel: 'Sim', disabled: true },
+  { id: 'measurement', label: 'Measurement', shortLabel: 'Meas' },
+  { id: 'info', label: 'Info', shortLabel: 'Info' },
+  { id: 'admin', label: 'Admin', shortLabel: 'Admin' },
+];
 
 const Index = () => {
   const [selectedKPI, setSelectedKPI] = useState<KPI | null>(null);
-  const [activeNav, setActiveNav] = useState<NavItem>('overview');
-  const [comparisonPeriod, setComparisonPeriod] = useState<'week' | 'month3' | 'month12'>('week');
-  const [viewMode, setViewMode] = useState<'standard' | 'role'>('role');
+  const [activeTab, setActiveTab] = useState('diagnosis');
+  const [activeMode, setActiveMode] = useState('diagnosis');
+  const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
   
   const { data: govRole } = useGovRole();
   const currentRole = govRole?.role || 'public';
-  const roleConfig = getRoleConfig(currentRole);
   
   // Try to fetch from database first
-  const { data: dbKPIs, isLoading, error } = useKPIOverview();
+  const { data: dbKPIs, isLoading } = useKPIOverview();
   
   // Use database KPIs if available and have values, otherwise fall back to mock
   const kpis = useMemo(() => {
@@ -45,102 +59,172 @@ const Index = () => {
     return mockKPIs;
   }, [dbKPIs]);
 
-  const kpisByCategory = useMemo(() => {
-    return CATEGORIES.map(category => ({
-      category,
-      kpis: kpis.filter(kpi => kpi.category === category.id),
-    })).filter(group => group.kpis.length > 0);
+  // Convert KPIs to tree nodes for ODIS tree view
+  const treeNodes: TreeNode[] = useMemo(() => {
+    const categoryNodes: TreeNode[] = CATEGORIES.map(category => {
+      const categoryKPIs = kpis.filter(kpi => kpi.category === category.id);
+      const hasErrors = categoryKPIs.some(k => k.status === 'critical');
+      const hasWarnings = categoryKPIs.some(k => k.status === 'warning');
+      
+      const nodeStatus: TreeNode['status'] = hasErrors ? 'error' : hasWarnings ? 'warning' : 'ok';
+      
+      const children: TreeNode[] = categoryKPIs.map(kpi => {
+        const childStatus: TreeNode['status'] = 
+          kpi.status === 'critical' ? 'error' : 
+          kpi.status === 'warning' ? 'warning' : 
+          kpi.status === 'positive' ? 'ok' : 'info';
+        
+        return {
+          id: kpi.id,
+          label: kpi.name,
+          code: `KPI-${kpi.index}`,
+          status: childStatus,
+          details: `${kpi.value}${kpi.unit} | ${kpi.trendPercent >= 0 ? '+' : ''}${kpi.trendPercent}%`,
+        };
+      });
+      
+      return {
+        id: category.id,
+        label: category.name,
+        code: category.code,
+        status: nodeStatus,
+        details: `${categoryKPIs.length} indicators monitored`,
+        children,
+      };
+    }).filter(cat => cat.children && cat.children.length > 0);
+
+    return categoryNodes;
   }, [kpis]);
 
+  const handleNodeClick = (node: TreeNode) => {
+    setSelectedNodeId(node.id);
+    // Find matching KPI
+    const matchingKPI = kpis.find(k => k.id === node.id);
+    if (matchingKPI) {
+      setSelectedKPI(matchingKPI);
+    }
+  };
+
+  // System info for header
+  const criticalCount = kpis.filter(k => k.status === 'critical').length;
+  const warningCount = kpis.filter(k => k.status === 'warning').length;
+
+  const leftInfo = [
+    { label: 'Country', value: 'SE' },
+    { label: 'Scope', value: currentRole === 'public' ? 'PUBLIC' : currentRole.toUpperCase() },
+    { label: 'Level', value: 'NATIONAL' },
+  ];
+
+  const rightInfo = [
+    { label: 'VER', value: 'GDIS 1.0.4' },
+    { label: 'Coverage', value: `${kpis.length} indicators` },
+  ];
+
+  const statusIndicators: Array<{ status: 'ok' | 'warning' | 'error' | 'inactive'; label?: string }> = [
+    { 
+      status: isLoading ? 'inactive' : 'ok', 
+      label: 'Data sync' 
+    },
+    { 
+      status: criticalCount > 0 ? 'error' : warningCount > 0 ? 'warning' : 'ok', 
+      label: `${criticalCount} critical, ${warningCount} warnings` 
+    },
+    { 
+      status: 'inactive', 
+      label: 'Simulation (PRO)' 
+    },
+  ];
+
+  const footerActions = [
+    { id: 'run', label: 'Run test...', onClick: () => {}, variant: 'default' as const },
+    { id: 'documents', label: 'Documents', onClick: () => {} },
+    { id: 'export', label: 'Export', onClick: () => {} },
+  ];
+
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* App Header - Discrete */}
-      <AppHeader kpis={kpis} role={roleConfig.displayName} />
-
-      {/* View Mode Tabs */}
-      <div className="px-4 py-2 border-b">
-        <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'standard' | 'role')}>
-          <TabsList className="grid w-full grid-cols-2 max-w-xs">
-            <TabsTrigger value="role">Rollbaserad vy</TabsTrigger>
-            <TabsTrigger value="standard">Standardvy</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-          <span className="ml-2 text-sm text-muted-foreground">Laddar data...</span>
-        </div>
-      )}
-
-      {/* Overview Header with period selection */}
-      <OverviewHeader 
-        kpis={kpis}
-        selectedPeriod={comparisonPeriod}
-        onPeriodChange={setComparisonPeriod}
-        onKPIClick={setSelectedKPI}
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* ODIS Header */}
+      <ODISHeader
+        leftInfo={leftInfo}
+        rightInfo={rightInfo}
+        statusIndicators={statusIndicators}
       />
 
-      {/* Main Content */}
-      <main className="space-y-6 pb-6 px-4">
-        {/* Alert Notification Panel */}
-        <AlertNotificationPanel />
+      {/* ODIS Tabs */}
+      <ODISTabs
+        tabs={MAIN_TABS}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
-        {/* Prioriterad vy - alltid överst */}
-        <PrioritizedDashboard />
+      {/* Main content area with sidebar */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Main content */}
+        <main className="flex-1 flex flex-col overflow-hidden">
+          {activeTab === 'diagnosis' && (
+            <div className="flex-1 flex flex-col p-3 gap-3 overflow-hidden">
+              {/* Alert panel */}
+              <AlertNotificationPanel />
+              
+              {/* Priority dashboard collapsed into tree view */}
+              <div className="flex-1 overflow-hidden">
+                <ODISTreeView
+                  title="Tests in current diagnostic plan"
+                  subtitle="Indicators (sorted according to priority/status)"
+                  nodes={treeNodes}
+                  onNodeClick={handleNodeClick}
+                  selectedNodeId={selectedNodeId}
+                />
+              </div>
+            </div>
+          )}
 
-        {viewMode === 'role' ? (
-          <>
-            <GovRoleDashboard />
-            <RoleBasedDashboard kpis={kpis} onKPIClick={setSelectedKPI} />
-          </>
-        ) : (
-          <>
-            {activeNav === 'overview' && kpisByCategory.map(({ category, kpis }, index) => (
-              <CategorySection
-                key={category.id}
-                category={category}
-                kpis={kpis}
-                onKPIClick={setSelectedKPI}
-                defaultExpanded={index < 2}
-              />
-            ))}
-            
-            {activeNav === 'decisions' && (
-              <DecisionsTimelinePanel />
-            )}
-            
-            {activeNav === 'indicators' && (
-              <IndicatorsPanel kpis={kpis} onKPIClick={setSelectedKPI} />
-            )}
-            
-            {activeNav === 'responsibility' && (
+          {activeTab === 'modules' && (
+            <div className="flex-1 p-3 overflow-auto">
+              <GovRoleDashboard />
+            </div>
+          )}
+
+          {activeTab === 'timeline' && (
+            <div className="flex-1 p-3 overflow-auto">
+              <PrioritizedDashboard />
+            </div>
+          )}
+
+          {activeTab === 'operation' && (
+            <div className="flex-1 p-3 overflow-auto">
               <UniversalResponsibilityMap />
-            )}
-            
-            {activeNav === 'analysis' && (
-              <AnalysisPanel kpis={kpis} />
-            )}
-          </>
-        )}
-      </main>
+            </div>
+          )}
+        </main>
 
-      {/* Bottom Navigation - only show in standard mode */}
-      {viewMode === 'standard' && (
-        <BottomNav active={activeNav} onNavigate={setActiveNav} />
-      )}
+        {/* Right sidebar - hidden on mobile */}
+        <div className="hidden md:flex">
+          <ODISSidebar
+            modes={OPERATING_MODES}
+            activeMode={activeMode}
+            onModeChange={setActiveMode}
+          />
+        </div>
+      </div>
+
+      {/* ODIS Footer */}
+      <ODISFooter
+        actions={footerActions}
+        rightContent={
+          <span className="font-mono text-[10px] text-muted-foreground">
+            GDIS_SE_NATIONAL_1.0@2024
+          </span>
+        }
+      />
 
       {/* Detail Panel */}
       {selectedKPI && (
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm"
             onClick={() => setSelectedKPI(null)}
           />
-          {/* Panel */}
           <KPIDetailPanel
             kpi={selectedKPI}
             onClose={() => setSelectedKPI(null)}
