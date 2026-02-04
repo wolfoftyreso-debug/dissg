@@ -1,9 +1,14 @@
 /**
- * 📊 INDICATOR EXPLORER
+ * ============================================================================
+ * DISSG INDICATOR EXPLORER
+ * Diagnostic Information System for Societal Governance
+ * ============================================================================
+ * 
+ * Hierarchy Level: INDIKATOR (Level 5 of 7)
  * 
  * Deep-dive into any single indicator with:
  * - Historical trend (up to 2000 years where data exists)
- * - Geographic scale switching (City/Nation/Global)
+ * - Geographic scale switching (Civilisation/Nation/Region)
  * - Correlation with secondary indicators
  * - Full provenance and methodology
  */

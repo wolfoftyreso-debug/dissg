@@ -1,5 +1,8 @@
 /**
- * 🌍 REALITY INDEX 1.0 – GLOBAL BASELINE REFERENCE
+ * ============================================================================
+ * DISSG BASELINE INDEX
+ * Diagnostic Information System for Societal Governance
+ * ============================================================================
  * 
  * "How the world is doing, measured without opinion"
  * 
@@ -8,6 +11,8 @@
  * - Is comparable over time and geography
  * - Never hides its components
  * - Never used for judgment, only orientation
+ * 
+ * Core Principle: "Oscilloscope for Civilization"
  */
 
 import { useState, useMemo } from 'react';
@@ -45,6 +50,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { motion } from 'framer-motion';
+import { SYSTEM } from '@/config/system';
 
 // ============================================================================
 // GLOBAL COUNTRY DATABASE
@@ -113,15 +119,15 @@ const COUNTRIES: Country[] = [
 ];
 
 // ============================================================================
-// REALITY INDEX 1.0 - THE FIVE UNAVOIDABLE DOMAINS
+// DISSG DIAGNOSTIC DOMAINS - THE FIVE CORE SYSTEMS
 // ============================================================================
 
-interface RealityDomain {
+interface DiagnosticDomainDef {
   code: string;
   name: string;
   nameEn: string;
   weight: number;
-  icon: string;
+  marker: string; // Text marker, no icons
   description: string;
   descriptionEn: string;
   indicators: {
@@ -133,15 +139,15 @@ interface RealityDomain {
   }[];
 }
 
-const REALITY_DOMAINS: RealityDomain[] = [
+const DISSG_DOMAINS: DiagnosticDomainDef[] = [
   {
-    code: 'life_health',
-    name: 'Liv & Hälsa',
-    nameEn: 'Life & Health',
+    code: 'vitality',
+    name: 'Vitalitet',
+    nameEn: 'Vitality',
     weight: 0.20,
-    icon: '❤️',
-    description: 'Förväntad livslängd, dödlighet, sjukdomsbörda, tillgång till vård',
-    descriptionEn: 'Life expectancy, mortality, disease burden, access to care',
+    marker: '[VIT]',
+    description: 'Livslängd, dödlighet, sjukdomsbörda, vårdtillgång',
+    descriptionEn: 'Life expectancy, mortality, disease burden, healthcare access',
     indicators: [
       { code: 'life_expectancy', name: 'Förväntad livslängd', nameEn: 'Life expectancy', unit: 'år', higherIsBetter: true },
       { code: 'infant_mortality', name: 'Barnadödlighet', nameEn: 'Infant mortality', unit: 'per 1000', higherIsBetter: false },
@@ -150,13 +156,13 @@ const REALITY_DOMAINS: RealityDomain[] = [
     ]
   },
   {
-    code: 'livelihood_work',
-    name: 'Försörjning & Arbete',
-    nameEn: 'Livelihood & Work',
+    code: 'livelihood',
+    name: 'Försörjning',
+    nameEn: 'Livelihood',
     weight: 0.20,
-    icon: '💼',
-    description: 'Produktivt arbete, arbetskraftsdeltagande, reell inkomst, jobbens bärkraft',
-    descriptionEn: 'Productive work, labor participation, real income, job sustainability',
+    marker: '[FÖR]',
+    description: 'Sysselsättning, arbetskraft, reell inkomst, jobbens bärkraft',
+    descriptionEn: 'Employment, labor force, real income, job sustainability',
     indicators: [
       { code: 'employment_rate', name: 'Sysselsättningsgrad', nameEn: 'Employment rate', unit: '%', higherIsBetter: true },
       { code: 'labor_participation', name: 'Arbetskraftsdeltagande', nameEn: 'Labor participation', unit: '%', higherIsBetter: true },
@@ -165,13 +171,13 @@ const REALITY_DOMAINS: RealityDomain[] = [
     ]
   },
   {
-    code: 'knowledge_skills',
-    name: 'Kunskap & Kompetens',
-    nameEn: 'Knowledge & Skills',
+    code: 'capacity',
+    name: 'Kapacitet',
+    nameEn: 'Capacity',
     weight: 0.20,
-    icon: '📚',
-    description: 'Läskunnighet, utbildningsmatch, färdighetsutveckling, kompetensglapp',
-    descriptionEn: 'Literacy, education match, skills development, competency gap',
+    marker: '[KAP]',
+    description: 'Läskunnighet, utbildningsmatch, färdighetsutveckling',
+    descriptionEn: 'Literacy, education match, skills development',
     indicators: [
       { code: 'literacy_rate', name: 'Funktionell läskunnighet', nameEn: 'Functional literacy', unit: '%', higherIsBetter: true },
       { code: 'education_match', name: 'Utbildning-arbete-match', nameEn: 'Education-work match', unit: '%', higherIsBetter: true },
@@ -180,13 +186,13 @@ const REALITY_DOMAINS: RealityDomain[] = [
     ]
   },
   {
-    code: 'stability_security',
-    name: 'Stabilitet & Säkerhet',
-    nameEn: 'Stability & Security',
+    code: 'stability',
+    name: 'Stabilitet',
+    nameEn: 'Stability',
     weight: 0.20,
-    icon: '🛡️',
-    description: 'Våldsrelaterad dödlighet, institutionell kontinuitet, försörjningssäkerhet',
-    descriptionEn: 'Violence-related mortality, institutional continuity, supply security',
+    marker: '[STA]',
+    description: 'Våld, institutionell kontinuitet, försörjningssäkerhet, resiliens',
+    descriptionEn: 'Violence, institutional continuity, supply security, resilience',
     indicators: [
       { code: 'violence_mortality', name: 'Våldsrelaterad dödlighet', nameEn: 'Violence-related mortality', unit: 'per 100k', higherIsBetter: false },
       { code: 'institutional_stability', name: 'Institutionell kontinuitet', nameEn: 'Institutional continuity', unit: 'index', higherIsBetter: true },
@@ -195,13 +201,13 @@ const REALITY_DOMAINS: RealityDomain[] = [
     ]
   },
   {
-    code: 'resource_environment',
-    name: 'Resurs & Miljöbas',
-    nameEn: 'Resource & Environment',
+    code: 'sustainability',
+    name: 'Hållbarhet',
+    nameEn: 'Sustainability',
     weight: 0.20,
-    icon: '🌍',
-    description: 'Energi per capita, resurseffektivitet, miljöpåverkan, långsiktig bärkraft',
-    descriptionEn: 'Energy per capita, resource efficiency, environmental impact, long-term sustainability',
+    marker: '[HÅL]',
+    description: 'Energi, resurseffektivitet, miljöpåverkan, långsiktig bärkraft',
+    descriptionEn: 'Energy, resource efficiency, environmental impact, long-term viability',
     indicators: [
       { code: 'energy_per_capita', name: 'Energi per capita', nameEn: 'Energy per capita', unit: 'kWh', higherIsBetter: true },
       { code: 'resource_efficiency', name: 'Resurseffektivitet', nameEn: 'Resource efficiency', unit: 'index', higherIsBetter: true },
@@ -240,7 +246,7 @@ type ViewMode = 'overview' | 'timeline' | 'distribution' | 'ranking';
 // GeographyLevel removed - unused
 
 // Generate simulated but realistic-looking data
-function generateDomainScore(domain: RealityDomain, seed: number): DomainScore {
+function generateDomainScore(domain: DiagnosticDomainDef, seed: number): DomainScore {
   const baseScore = 45 + Math.sin(seed * domain.code.length) * 25;
   const previousScore = baseScore + (Math.random() - 0.5) * 8;
   const change = baseScore - previousScore;
@@ -359,7 +365,7 @@ function DomainBreakdown({
   isExpanded,
   onToggle 
 }: { 
-  domain: RealityDomain;
+  domain: DiagnosticDomainDef;
   domainScore: DomainScore;
   isExpanded: boolean;
   onToggle: () => void;
@@ -383,7 +389,7 @@ function DomainBreakdown({
         <CollapsibleTrigger asChild>
           <button className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors text-left">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">{domain.icon}</span>
+              <span className="font-mono text-sm font-bold text-muted-foreground">{domain.marker}</span>
               <div>
                 <div className="font-medium">{domain.name}</div>
                 <div className="text-xs text-muted-foreground">
@@ -991,7 +997,7 @@ export default function RealityIndex() {
   const domainScores = useMemo(() => {
     // Use country code as seed for consistent but different scores per country
     const seed = selectedCountry.code.charCodeAt(0) + selectedCountry.code.charCodeAt(1);
-    return REALITY_DOMAINS.map(domain => generateDomainScore(domain, seed));
+    return DISSG_DOMAINS.map(domain => generateDomainScore(domain, seed));
   }, [selectedCountry]);
 
   // Calculate composite index (equal weights as per spec)
@@ -1017,8 +1023,8 @@ export default function RealityIndex() {
       <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Globe className="h-5 w-5 text-primary" />
-            <span className="font-semibold">Reality Index 1.0</span>
+            <span className="font-mono text-xs text-muted-foreground">[DISSG]</span>
+            <span className="font-semibold">Baseline Index</span>
           </div>
           <div className="flex items-center gap-3">
             <CountrySelector
@@ -1038,13 +1044,20 @@ export default function RealityIndex() {
       <main className="max-w-4xl mx-auto px-4 py-6 sm:py-8 space-y-8">
         {/* Hero */}
         <section className="text-center space-y-3">
+          <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground font-mono">
+            <span>Civilisation</span>
+            <span>→</span>
+            <span>{selectedCountry.code === 'WORLD' ? 'Global' : selectedCountry.region}</span>
+            <span>→</span>
+            <span className="text-foreground">{selectedCountry.nameLocal}</span>
+          </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Global Reality Index
+            DISSG Baseline Index
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base">
-            Composite measurement framework for fundamental societal conditions.
+            Diagnostic Information System for Societal Governance
             <br />
-            <span className="text-xs">Observable data. Decomposable methodology. No editorial judgment.</span>
+            <span className="text-xs">Oscilloscope for Civilization · Observable data · No editorial judgment</span>
           </p>
         </section>
 
@@ -1086,7 +1099,7 @@ export default function RealityIndex() {
                 Klicka på en domän för att se underliggande indikatorer och rådata
               </p>
             </div>
-            {REALITY_DOMAINS.map((domain, i) => (
+            {DISSG_DOMAINS.map((domain, i) => (
               <motion.div
                 key={domain.code}
                 initial={{ opacity: 0, y: 20 }}
@@ -1171,17 +1184,17 @@ export default function RealityIndex() {
         <div className="grid grid-cols-2 gap-4">
           <Link to="/cities">
             <Card className="p-4 hover:bg-muted/50 transition-colors h-full">
-              <div className="font-medium text-sm">City-Level Analysis</div>
+              <div className="font-medium text-sm">Lokal Diagnostik</div>
               <div className="text-xs text-muted-foreground mt-1">
-                Reality Index disaggregated to municipal level
+                DISSG disaggregerat till kommunal nivå
               </div>
             </Card>
           </Link>
           <Link to="/cite">
             <Card className="p-4 hover:bg-muted/50 transition-colors h-full">
-              <div className="font-medium text-sm">API Documentation</div>
+              <div className="font-medium text-sm">API-dokumentation</div>
               <div className="text-xs text-muted-foreground mt-1">
-                Machine-readable endpoints for integration
+                Maskinläsbara endpoints för integration
               </div>
             </Card>
           </Link>
@@ -1189,9 +1202,10 @@ export default function RealityIndex() {
 
         {/* Footer */}
         <footer className="text-center text-xs text-muted-foreground pt-4 border-t">
-          <p>Global Reality Index v1.0 · Last updated: {timestamp}</p>
-          <p className="mt-1">
-            "Reality Index is not a verdict. It is a baseline measurement."
+          <p>DISSG v1.0.0 · Diagnostic Information System for Societal Governance</p>
+          <p className="mt-1">Senast uppdaterad: {timestamp}</p>
+          <p className="mt-2 font-mono text-[10px]">
+            "This platform does not tell you what to think. It shows what can be observed."
           </p>
         </footer>
       </main>
