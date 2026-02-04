@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { X, TrendingUp, TrendingDown, Minus, ChevronRight, AlertTriangle, Zap } from 'lucide-react';
+import { X } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -35,7 +35,7 @@ interface DiagnosticPanelProps {
 // Lambda gauge mini
 function LambdaGaugeMini({ lambda, trend }: { lambda: number; trend: string }) {
   const color = getLambdaColor(lambda);
-  const TrendIcon = trend === 'improving' ? TrendingUp : trend === 'declining' ? TrendingDown : Minus;
+  const trendMarker = trend === 'improving' ? '[↑]' : trend === 'declining' ? '[↓]' : '[→]';
   
   return (
     <div className="flex items-center gap-4">
@@ -57,8 +57,8 @@ function LambdaGaugeMini({ lambda, trend }: { lambda: number; trend: string }) {
         >
           {getSystemStatus(lambda).label.sv}
         </Badge>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <TrendIcon className="h-3 w-3" />
+        <div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
+          <span>{trendMarker}</span>
           <span>
             {trend === 'improving' ? 'Förbättras' : 
              trend === 'declining' ? 'Försämras' : 'Stabil'}
@@ -69,7 +69,7 @@ function LambdaGaugeMini({ lambda, trend }: { lambda: number; trend: string }) {
   );
 }
 
-// GEDI Code Card
+// GEDI Code Card - with clear clickability
 function GEDICodeCard({ 
   gedi, 
   onClick 
@@ -77,37 +77,40 @@ function GEDICodeCard({
   gedi: GEDICodeSummary; 
   onClick: () => void;
 }) {
-  const severityColors: Record<string, string> = {
-    INFO: '#3b82f6',
-    WARN: '#f59e0b',
-    MAJOR: '#f97316',
-    CRITICAL: '#dc2626',
+  const severityColors: Record<string, { bg: string; border: string; text: string }> = {
+    INFO: { bg: 'bg-blue-500/20', border: 'border-blue-500', text: 'text-blue-400' },
+    WARN: { bg: 'bg-amber-500/20', border: 'border-amber-500', text: 'text-amber-400' },
+    MAJOR: { bg: 'bg-orange-500/20', border: 'border-orange-500', text: 'text-orange-400' },
+    CRITICAL: { bg: 'bg-red-500/20', border: 'border-red-500', text: 'text-red-400' },
   };
+  
+  const colors = severityColors[gedi.severity] || severityColors.WARN;
   
   return (
     <button
       onClick={onClick}
-      className="w-full p-3 rounded-lg border text-left transition-all hover:scale-[1.02] hover:shadow-lg"
-      style={{ 
-        borderColor: severityColors[gedi.severity],
-        background: `${severityColors[gedi.severity]}20`,
-      }}
+      className={`
+        w-full p-4 rounded-lg border-2 text-left transition-all cursor-pointer
+        ${colors.bg} ${colors.border}
+        hover:scale-[1.02] hover:shadow-lg hover:brightness-110
+        active:scale-[0.98]
+        focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+      `}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Badge 
-            className="font-mono text-xs"
-            style={{ backgroundColor: severityColors[gedi.severity], color: 'white' }}
+            className={`font-mono text-xs px-2 py-1 ${colors.text} bg-background/80 border ${colors.border}`}
           >
             {gedi.code}
           </Badge>
-          <Badge variant="outline" className="text-[10px]">
+          <span className={`text-xs font-mono ${colors.text}`}>
             {gedi.status === 'ACTIVE' ? '● Aktiv' : '○ Historisk'}
-          </Badge>
+          </span>
         </div>
-        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        <span className="font-mono text-muted-foreground">[→]</span>
       </div>
-      <div className="mt-2 text-sm font-medium">{gedi.name}</div>
+      <div className="mt-2 text-sm font-semibold text-foreground">{gedi.name}</div>
       <div className="text-xs text-muted-foreground mt-1">{gedi.description}</div>
     </button>
   );
@@ -137,35 +140,34 @@ function CauseCard({ cause }: { cause: ProbableCause }) {
 
 // Lever Card
 function LeverCard({ lever, isPro }: { lever: Lever; isPro: boolean }) {
-  const difficultyColors = {
-    low: '#22c55e',
-    medium: '#f59e0b',
-    high: '#ef4444',
+  const difficultyLabels = {
+    low: { text: 'Enkel', color: 'text-green-400 border-green-500 bg-green-500/20' },
+    medium: { text: 'Medel', color: 'text-amber-400 border-amber-500 bg-amber-500/20' },
+    high: { text: 'Svår', color: 'text-red-400 border-red-500 bg-red-500/20' },
   };
+  
+  const diff = difficultyLabels[lever.difficulty];
   
   return (
     <div className={`p-3 rounded-lg border border-muted ${isPro ? 'bg-muted/20' : 'bg-muted/10 opacity-60'}`}>
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">{lever.label.sv}</span>
         <div className="flex items-center gap-2">
-          <Badge 
-            className="font-mono text-[10px]"
-            style={{ backgroundColor: `${difficultyColors[lever.difficulty]}30`, color: difficultyColors[lever.difficulty] }}
-          >
-            {lever.difficulty === 'low' ? 'Enkel' : lever.difficulty === 'medium' ? 'Medel' : 'Svår'}
+          <Badge className={`font-mono text-[10px] border ${diff.color}`}>
+            {diff.text}
           </Badge>
           <Badge variant="secondary" className="font-mono">
             +{(lever.impact * 100).toFixed(1)}%
           </Badge>
         </div>
       </div>
-      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-        <Zap className="h-3 w-3" />
+      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground font-mono">
+        <span>[→]</span>
         <span>Påverkar: {lever.axis}</span>
       </div>
       {!isPro && (
-        <div className="mt-2 text-xs text-amber-500">
-          🔒 PRO krävs för simulering
+        <div className="mt-2 text-xs text-amber-500 font-mono">
+          [LÅS] PRO krävs för simulering
         </div>
       )}
     </div>
@@ -266,7 +268,7 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
           {/* GEDI Codes */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              <span className="font-mono text-amber-500">[!]</span>
               <span className="text-xs text-muted-foreground font-mono">
                 SYSTEM DIAGNOSTICS ({gediCodes.length} aktiva)
               </span>
@@ -283,8 +285,8 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
                 ))}
               </div>
             ) : (
-              <div className="p-4 text-center text-sm text-muted-foreground bg-muted/20 rounded-lg">
-                ✓ Inga aktiva GEDI-koder
+              <div className="p-4 text-center text-sm text-muted-foreground bg-muted/20 rounded-lg font-mono">
+                [OK] Inga aktiva GEDI-koder
               </div>
             )}
           </div>
