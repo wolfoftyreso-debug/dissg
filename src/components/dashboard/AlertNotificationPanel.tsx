@@ -56,6 +56,11 @@ function AlertCard({
             <Badge variant={isCritical ? "destructive" : "secondary"} className="text-xs">
               {isCritical ? 'KRITISK' : 'VARNING'}
             </Badge>
+            {alert.priorityIndex !== undefined && (
+              <Badge variant="outline" className="text-xs font-mono">
+                P:{alert.priorityIndex}
+              </Badge>
+            )}
             <span className="text-xs text-muted-foreground">
               {alert.triggeredAt && format(new Date(alert.triggeredAt), 'HH:mm', { locale: sv })}
             </span>
@@ -218,14 +223,22 @@ export function AlertNotificationPanel() {
           ) : (
             <ScrollArea className="h-[400px] pr-2">
               <div className="space-y-3">
-                {activeAlerts.map((alert) => (
-                  <AlertCard
-                    key={`${alert.kpiId}-${alert.alertType}`}
-                    alert={alert}
-                    onAcknowledge={() => acknowledgeAlert(alert.kpiId)}
-                    onDismiss={() => dismissAlert(alert.kpiId)}
-                  />
-                ))}
+                {/* Sorted by priorityIndex (highest first) */}
+                {[...activeAlerts]
+                  .sort((a, b) => (b.priorityIndex ?? 0) - (a.priorityIndex ?? 0))
+                  .map((alert, index) => (
+                    <div key={`${alert.kpiId}-${alert.alertType}`} className="relative">
+                      {/* Rank indicator */}
+                      <div className="absolute -left-1 -top-1 bg-background border rounded-full h-5 w-5 flex items-center justify-center text-[10px] font-mono font-bold z-10">
+                        {index + 1}
+                      </div>
+                      <AlertCard
+                        alert={alert}
+                        onAcknowledge={() => acknowledgeAlert(alert.kpiId)}
+                        onDismiss={() => dismissAlert(alert.kpiId)}
+                      />
+                    </div>
+                  ))}
               </div>
             </ScrollArea>
           )}
