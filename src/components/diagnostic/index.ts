@@ -3,3 +3,4 @@
  */
 
 export { SystemAuditDashboard } from './SystemAuditDashboard';
+export { FaultCodeBrowser } from './FaultCodeBrowser';
