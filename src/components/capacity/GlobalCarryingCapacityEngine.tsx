@@ -18,6 +18,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronRight, Clock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { ExpandableBadge } from '@/components/ui/ExpandableBadge';
 import { EnergyBaselineCard, EnergyConsequenceCard } from '@/components/ui/ExpandableStatementCard';
 import { DescriptiveMetricCard } from '@/components/ui/MiniSparkline';
@@ -337,66 +338,323 @@ const EnergyHonestyPanel: React.FC = () => (
   </Card>
 );
 
-// Regional capacity view
-const RegionalCapacityPanel: React.FC = () => (
-  <Card>
-    <CardHeader>
-      <CardTitle className="text-base">Regional bärkraft</CardTitle>
-      <CardDescription>Lokal vs importerad kapacitet & sårbarhet</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <div className="space-y-3">
-        {REGIONAL_CAPACITY_DATA.map(region => (
-          <div key={region.id} className="p-3 border rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-sm">{region.nameSv}</span>
-              <Badge variant="outline" className="text-xs">
-                {region.energyPerCapita} MWh/cap
-              </Badge>
-            </div>
-            
-            <div className="grid gap-2 text-xs">
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-muted-foreground">Lokal kapacitet</span>
-                  <span>{region.localCapacity}%</span>
+// Regional capacity view - ALL ELEMENTS CLICKABLE
+const RegionalCapacityPanel: React.FC = () => {
+  const [expandedRegion, setExpandedRegion] = useState<string | null>(null);
+  const [expandedMetric, setExpandedMetric] = useState<{ regionId: string; metric: string } | null>(null);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Regional bärkraft</CardTitle>
+        <CardDescription>
+          Lokal vs importerad kapacitet & sårbarhet. 
+          <span className="text-primary ml-1">Klicka på varje region och mätstapel för djupare analys.</span>
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {REGIONAL_CAPACITY_DATA.map(region => (
+            <div key={region.id} className="border rounded-lg overflow-hidden">
+              {/* Clickable region header */}
+              <button
+                onClick={() => setExpandedRegion(expandedRegion === region.id ? null : region.id)}
+                className="w-full p-3 flex items-center justify-between hover:bg-muted/50 transition-colors text-left"
+              >
+                <span className="font-medium text-sm">{region.nameSv}</span>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs">
+                    {region.energyPerCapita} MWh/cap
+                  </Badge>
+                  <span className="text-xs opacity-50">{expandedRegion === region.id ? '−' : '+'}</span>
                 </div>
-                <Progress value={region.localCapacity} className="h-1.5" />
-              </div>
+              </button>
               
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-muted-foreground">Sårbarhet</span>
-                  <span>{region.vulnerabilityIndex}</span>
-                </div>
-                <Progress 
-                  value={region.vulnerabilityIndex} 
-                  className={`h-1.5 ${region.vulnerabilityIndex > 60 ? '[&>div]:bg-red-500' : region.vulnerabilityIndex > 40 ? '[&>div]:bg-yellow-500' : ''}`}
+              {/* Clickable metrics */}
+              <div className="px-3 pb-3 space-y-2">
+                {/* Local capacity bar - CLICKABLE */}
+                <ClickableMetricBar
+                  label="Lokal kapacitet"
+                  value={region.localCapacity}
+                  unit="%"
+                  regionId={region.id}
+                  metricType="localCapacity"
+                  isExpanded={expandedMetric?.regionId === region.id && expandedMetric?.metric === 'localCapacity'}
+                  onToggle={() => setExpandedMetric(
+                    expandedMetric?.regionId === region.id && expandedMetric?.metric === 'localCapacity'
+                      ? null
+                      : { regionId: region.id, metric: 'localCapacity' }
+                  )}
+                />
+                
+                {/* Vulnerability bar - CLICKABLE */}
+                <ClickableMetricBar
+                  label="Sårbarhet"
+                  value={region.vulnerabilityIndex}
+                  unit=""
+                  regionId={region.id}
+                  metricType="vulnerability"
+                  isExpanded={expandedMetric?.regionId === region.id && expandedMetric?.metric === 'vulnerability'}
+                  onToggle={() => setExpandedMetric(
+                    expandedMetric?.regionId === region.id && expandedMetric?.metric === 'vulnerability'
+                      ? null
+                      : { regionId: region.id, metric: 'vulnerability' }
+                  )}
+                  isWarning={region.vulnerabilityIndex > 40}
+                  isDanger={region.vulnerabilityIndex > 60}
                 />
               </div>
+              
+              {/* Expanded region details */}
+              {expandedRegion === region.id && (
+                <div className="px-3 pb-3 pt-0 border-t bg-muted/30">
+                  <RegionDeepInfo region={region} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        
+        <ExpandableInfoAlert
+          evidenceKey="imbalance-problem"
+          statement="Avslöjar sårbarhet utan moralism."
+          icon={<span className="text-sm">📌</span>}
+          variant="muted"
+          className="mt-4"
+          fallbackEvidence={{
+            scientificBasis: 'Sårbarhet kan mätas objektivt genom beroende av externa resurser, institutionell kapacitet och geografiska faktorer.',
+            sources: [
+              { title: 'Global Risk Report', type: 'report', source: 'World Economic Forum', year: 2024 }
+            ],
+            whatThisProves: ['Sårbarhet är strukturell, inte moralisk'],
+            limitations: ['Sårbarhetsmått är kontextberoende']
+          }}
+        />
+      </CardContent>
+    </Card>
+  );
+};
+
+// Clickable metric bar with expandable explanation
+interface ClickableMetricBarProps {
+  label: string;
+  value: number;
+  unit: string;
+  regionId: string;
+  metricType: 'localCapacity' | 'vulnerability';
+  isExpanded: boolean;
+  onToggle: () => void;
+  isWarning?: boolean;
+  isDanger?: boolean;
+}
+
+const ClickableMetricBar: React.FC<ClickableMetricBarProps> = ({
+  label, value, unit, metricType, isExpanded, onToggle, isWarning, isDanger
+}) => {
+  const getExplanation = () => {
+    if (metricType === 'localCapacity') {
+      return {
+        whatItMeasures: 'Andelen av regionens energi- och resursbehov som kan tillgodoses lokalt, utan import.',
+        whyItMatters: 'Hög lokal kapacitet = mindre sårbar för globala störningar (krig, handelskrig, pandemier).',
+        howCalculated: 'Lokal energiproduktion ÷ Total energikonsumtion × 100',
+        interpretation: value > 80 
+          ? 'Hög självförsörjning – regionen är relativt resilient.'
+          : value > 50 
+            ? 'Måttlig – regionen är delvis beroende av import.'
+            : 'Låg – regionen är starkt beroende av externa resurser.',
+        sources: ['IEA World Energy Outlook', 'Eurostat Energy Statistics']
+      };
+    } else {
+      return {
+        whatItMeasures: 'Sammansatt index av faktorer som gör en region känslig för störningar.',
+        whyItMatters: 'Hög sårbarhet innebär att små störningar kan få stora konsekvenser.',
+        howCalculated: 'Vägt genomsnitt av: Importberoende, institutionell svaghet, geografisk isolering, demografisk obalans',
+        interpretation: value > 60 
+          ? 'Kritiskt – regionen behöver strukturella förändringar för att bli hållbar.'
+          : value > 40 
+            ? 'Förhöjd risk – bör bevakas och förbättras.'
+            : 'Relativt robust – men ingen region är immun.',
+        sources: ['World Risk Report', 'UNDP Human Development Index']
+      };
+    }
+  };
+
+  const explanation = getExplanation();
+
+  return (
+    <div className="border rounded overflow-hidden">
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center gap-2 p-2 hover:bg-muted/50 transition-colors text-left"
+      >
+        <div className="flex-1">
+          <div className="flex justify-between mb-1">
+            <span className="text-xs text-muted-foreground">{label}</span>
+            <span className="text-xs font-medium">{value}{unit}</span>
+          </div>
+          <Progress 
+            value={value} 
+            className={cn(
+              "h-1.5",
+              isDanger && "[&>div]:bg-destructive",
+              isWarning && !isDanger && "[&>div]:bg-amber-500"
+            )}
+          />
+        </div>
+        <span className="text-xs opacity-50">{isExpanded ? '−' : '+'}</span>
+      </button>
+      
+      {isExpanded && (
+        <div className={cn(
+          "p-3 border-t space-y-3 text-xs",
+          isDanger ? "bg-destructive/10" :
+          isWarning ? "bg-amber-500/10" :
+          "bg-muted/30"
+        )}>
+          <div>
+            <p className="font-mono uppercase tracking-wider text-muted-foreground mb-1">VAD MÄTER DETTA?</p>
+            <p>{explanation.whatItMeasures}</p>
+          </div>
+          
+          <div>
+            <p className="font-mono uppercase tracking-wider text-muted-foreground mb-1">VARFÖR ÄR DET VIKTIGT?</p>
+            <p>{explanation.whyItMatters}</p>
+          </div>
+          
+          <div>
+            <p className="font-mono uppercase tracking-wider text-muted-foreground mb-1">HUR BERÄKNAS DET?</p>
+            <p className="font-mono bg-background/50 p-2 rounded">{explanation.howCalculated}</p>
+          </div>
+          
+          <div>
+            <p className="font-mono uppercase tracking-wider text-muted-foreground mb-1">TOLKNING AV {value}{unit}</p>
+            <p className={cn(
+              "p-2 rounded",
+              isDanger ? "bg-destructive/20" :
+              isWarning ? "bg-amber-500/20" :
+              "bg-chart-2/20"
+            )}>
+              {explanation.interpretation}
+            </p>
+          </div>
+          
+          <div>
+            <p className="font-mono uppercase tracking-wider text-muted-foreground mb-1">DATAKÄLLOR</p>
+            <div className="flex flex-wrap gap-1">
+              {explanation.sources.map((src, i) => (
+                <Badge key={i} variant="outline" className="text-xs">
+                  {src}
+                </Badge>
+              ))}
             </div>
           </div>
-        ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Deep info for expanded region
+interface RegionDeepInfoProps {
+  region: typeof REGIONAL_CAPACITY_DATA[0];
+}
+
+const RegionDeepInfo: React.FC<RegionDeepInfoProps> = ({ region }) => {
+  const getRegionAnalysis = () => {
+    const analyses: Record<string, { context: string; challenges: string[]; opportunities: string[] }> = {
+      'europe': {
+        context: 'Europa har historiskt hög energikonsumtion per capita men begränsade egna fossila resurser. Omställningen till förnybart pågår men går långsamt.',
+        challenges: [
+          'Beroende av importerad naturgas (primärt från Ryssland, nu LNG)',
+          'Åldrande befolkning skapar demografisk obalans',
+          'Höga levnadsstandard-förväntningar kräver mycket energi'
+        ],
+        opportunities: [
+          'Stark institutionell kapacitet för koordinerad omställning',
+          'Ledande inom förnybar teknik och policy',
+          'Hög utbildningsnivå möjliggör kunskapsintensiv ekonomi'
+        ]
+      },
+      'north-america': {
+        context: 'Nordamerika har rikliga naturresurser och hög energiproduktion. USA är världens största oljeproducent men också största konsument.',
+        challenges: [
+          'Extremt hög per capita-konsumtion (dubbelt EU-snitt)',
+          'Politisk polarisering försvårar klimatomställning',
+          'Infrastruktur byggd för bilberoende'
+        ],
+        opportunities: [
+          'Enorm potential för sol- och vindkraft',
+          'Innovationsekosystem världsledande',
+          'Stora jordbruksresurser'
+        ]
+      },
+      'east-asia': {
+        context: 'Östasien har snabb ekonomisk tillväxt men begränsade egna resurser. Kina är världens största energikonsument.',
+        challenges: [
+          'Massivt importberoende för energi och mat',
+          'Miljöförstöring och luftkvalitet',
+          'Geopolitiska spänningar påverkar handelsflöden'
+        ],
+        opportunities: [
+          'Världsledande inom solcellsproduktion',
+          'Snabb teknologisk utveckling',
+          'Stark statlig kapacitet för storskaliga projekt'
+        ]
+      },
+      'south-asia': {
+        context: 'Sydasien har världens största befolkning men låg energitillgång per capita. Indien växer snabbt men från låg nivå.',
+        challenges: [
+          'Mycket låg energitillgång per capita',
+          'Snabb befolkningstillväxt',
+          'Vattenstress och klimatsårbarhet'
+        ],
+        opportunities: [
+          'Ung befolkning = arbetskraftspotential',
+          'Snabb expansion av förnybar energi',
+          'Digital infrastruktur möjliggör snabba framsteg'
+        ]
+      }
+    };
+    return analyses[region.id] || analyses['europe'];
+  };
+
+  const analysis = getRegionAnalysis();
+
+  return (
+    <div className="space-y-4 py-3">
+      <div>
+        <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">KONTEXT</p>
+        <p className="text-sm">{analysis.context}</p>
       </div>
       
-      <ExpandableInfoAlert
-        evidenceKey="imbalance-problem"
-        statement="Avslöjar sårbarhet utan moralism."
-        icon={<span className="text-sm">📌</span>}
-        variant="muted"
-        className="mt-4"
-        fallbackEvidence={{
-          scientificBasis: 'Sårbarhet kan mätas objektivt genom beroende av externa resurser, institutionell kapacitet och geografiska faktorer.',
-          sources: [
-            { title: 'Global Risk Report', type: 'report', source: 'World Economic Forum', year: 2024 }
-          ],
-          whatThisProves: ['Sårbarhet är strukturell, inte moralisk'],
-          limitations: ['Sårbarhetsmått är kontextberoende']
-        }}
-      />
-    </CardContent>
-  </Card>
-);
+      <div className="grid gap-3 md:grid-cols-2">
+        <div>
+          <p className="text-xs font-mono uppercase tracking-wider text-destructive mb-2">UTMANINGAR</p>
+          <ul className="space-y-1">
+            {analysis.challenges.map((c, i) => (
+              <li key={i} className="text-xs flex items-start gap-2">
+                <span className="text-destructive mt-0.5">•</span>
+                {c}
+              </li>
+            ))}
+          </ul>
+        </div>
+        
+        <div>
+          <p className="text-xs font-mono uppercase tracking-wider text-green-600 dark:text-green-400 mb-2">MÖJLIGHETER</p>
+          <ul className="space-y-1">
+            {analysis.opportunities.map((o, i) => (
+              <li key={i} className="text-xs flex items-start gap-2">
+                <span className="text-green-500 mt-0.5">•</span>
+                {o}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Historical timeline
 const HistoricalTimelinePanel: React.FC = () => (
