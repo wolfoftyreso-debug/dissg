@@ -156,9 +156,9 @@ export function DescriptiveMetricCard({
   const [showDetails, setShowDetails] = React.useState(false);
   
   return (
-    <div 
+    <button 
       className={cn(
-        "p-4 rounded-lg border bg-card transition-all cursor-pointer hover:border-primary/50",
+        "p-4 rounded-lg border bg-card transition-all cursor-pointer hover:border-primary/50 text-left w-full min-h-[120px]",
         className
       )}
       onClick={() => setShowDetails(!showDetails)}
@@ -212,6 +212,6 @@ export function DescriptiveMetricCard({
           )}
         </div>
       )}
-    </div>
+    </button>
   );
 }

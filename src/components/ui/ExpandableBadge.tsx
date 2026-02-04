@@ -259,7 +259,7 @@ export const ExpandableBadge: React.FC<ExpandableBadgeProps> = ({
         <Badge 
           variant={variant} 
           className={cn(
-            "cursor-pointer transition-all hover:bg-primary/10 hover:border-primary/50 group",
+            "cursor-pointer transition-all hover:bg-primary/10 hover:border-primary/50 group min-h-[44px] px-3 py-2 text-sm",
             className
           )}
         >
