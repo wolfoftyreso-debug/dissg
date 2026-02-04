@@ -23,30 +23,23 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
-import { 
-  TrendingUp, 
-  TrendingDown,
-  Clock, 
-  BookOpen, 
-  Globe, 
-  ChevronRight,
-  ExternalLink,
-  History,
-  FileText,
-  Link2,
-  Scale,
-  CheckCircle2,
-  XCircle,
-  Download,
-  Share2,
-  Bookmark
-} from 'lucide-react';
+// No lucide icons - using text-based indicators per design doctrine
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
 import type { CapacityFactor } from '@/config/carryingCapacityConfig';
 import { 
   getFactorEvidence, 
   type FactorEvidence 
 } from '@/lib/registry/factorEvidenceRegistry';
+
+// Text-based outcome indicators
+const getOutcomeIndicator = (outcome: 'positive' | 'negative' | 'mixed') => {
+  switch (outcome) {
+    case 'positive': return '[+]';
+    case 'negative': return '[−]';
+    case 'mixed': return '[±]';
+    default: return '[?]';
+  }
+};
 
 interface FactorDeepDiveProps {
   factor: CapacityFactor | null;
@@ -95,7 +88,7 @@ const CaseStudyDetail: React.FC<{
       <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
         <SheetHeader>
           <div className="flex items-center gap-2">
-            <Globe className="h-5 w-5" />
+            <span className="font-mono text-xs text-muted-foreground">[GEO]</span>
             <SheetTitle>{caseStudy.region}</SheetTitle>
             <Badge variant="outline">{caseStudy.period}</Badge>
           </div>
@@ -107,13 +100,9 @@ const CaseStudyDetail: React.FC<{
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
-                {caseStudy.outcome === 'positive' ? (
-                  <TrendingUp className="h-4 w-4 text-primary" />
-                ) : caseStudy.outcome === 'negative' ? (
-                  <TrendingDown className="h-4 w-4 text-destructive" />
-                ) : (
-                  <Scale className="h-4 w-4 text-muted-foreground" />
-                )}
+                <span className="font-mono text-xs">
+                  {caseStudy.outcome === 'positive' ? '[+]' : caseStudy.outcome === 'negative' ? '[−]' : '[±]'}
+                </span>
                 Observerat utfall
               </CardTitle>
             </CardHeader>
@@ -179,10 +168,10 @@ const CaseStudyDetail: React.FC<{
           <Card className="bg-muted/30">
             <CardContent className="pt-4">
               <div className="flex items-center gap-2 text-sm">
-                <BookOpen className="h-4 w-4" />
+                <span className="font-mono text-xs">[REF]</span>
                 <span className="font-medium">Källa:</span>
                 <span className="text-muted-foreground">{caseStudy.source}</span>
-                <ExternalLink className="h-3 w-3 ml-auto cursor-pointer hover:text-primary" />
+                <a href="#" className="ml-auto text-xs hover:text-primary underline">[LÄNK]</a>
               </div>
             </CardContent>
           </Card>
@@ -252,15 +241,15 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
               
               <div className="space-y-2">
                 <Button variant="outline" size="sm" className="w-full justify-start text-xs">
-                  <Download className="h-3 w-3 mr-2" />
+                  <span className="font-mono mr-2">[EXP]</span>
                   Exportera
                 </Button>
                 <Button variant="outline" size="sm" className="w-full justify-start text-xs">
-                  <Share2 className="h-3 w-3 mr-2" />
+                  <span className="font-mono mr-2">[DEL]</span>
                   Dela
                 </Button>
                 <Button variant="outline" size="sm" className="w-full justify-start text-xs">
-                  <Bookmark className="h-3 w-3 mr-2" />
+                  <span className="font-mono mr-2">[SAV]</span>
                   Spara
                 </Button>
               </div>
@@ -317,7 +306,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                       <Card className="border-primary/30">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-sm flex items-center gap-2 text-primary">
-                            <CheckCircle2 className="h-4 w-4" />
+                            <span className="font-mono">[✓]</span>
                             Detta visar
                           </CardTitle>
                         </CardHeader>
@@ -354,7 +343,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                       <Card className="border-destructive/30">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-sm flex items-center gap-2 text-destructive">
-                            <XCircle className="h-4 w-4" />
+                            <span className="font-mono">[✗]</span>
                             Detta visar INTE
                           </CardTitle>
                         </CardHeader>
@@ -393,7 +382,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-sm flex items-center gap-2">
-                          <History className="h-4 w-4" />
+                          <span className="font-mono text-xs">[HIST]</span>
                           Historiska fallstudier
                         </CardTitle>
                         <CardDescription>Klicka för full fördjupning</CardDescription>
@@ -407,15 +396,15 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                           >
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-2">
-                                <Globe className="h-4 w-4 text-muted-foreground" />
+                                <span className="font-mono text-xs text-muted-foreground">[GEO]</span>
                                 <span className="font-medium">{caseStudy.region}</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Badge variant="outline">{caseStudy.period}</Badge>
-                                {caseStudy.outcome === 'positive' && <TrendingUp className="h-4 w-4 text-primary" />}
-                                {caseStudy.outcome === 'negative' && <TrendingDown className="h-4 w-4 text-destructive" />}
-                                {caseStudy.outcome === 'mixed' && <Scale className="h-4 w-4 text-muted-foreground" />}
-                                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                                <span className="font-mono text-xs">
+                                  {caseStudy.outcome === 'positive' ? '[+]' : caseStudy.outcome === 'negative' ? '[−]' : '[±]'}
+                                </span>
+                                <span className="font-mono text-xs text-muted-foreground group-hover:text-primary">[→]</span>
                               </div>
                             </div>
                             <p className="text-sm text-muted-foreground line-clamp-2">{caseStudy.description}</p>
@@ -433,7 +422,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-sm flex items-center gap-2">
-                          <Link2 className="h-4 w-4" />
+                          <span className="font-mono text-xs">[KAUSAL]</span>
                           Kausalkedja (hypotetisk)
                         </CardTitle>
                         <CardDescription>Varje steg har osäkerhet – detta är en modell, inte bevisad sanning</CardDescription>
@@ -507,7 +496,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-sm flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
+                          <span className="font-mono text-xs">[TID]</span>
                           Tidsfördröjning
                         </CardTitle>
                       </CardHeader>
@@ -718,7 +707,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                             <p className="text-sm italic">"{dissent.perspectiveSv || dissent.perspective}"</p>
                             <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
                               <div className="flex items-center gap-1">
-                                <BookOpen className="h-3 w-3" />
+                                <span className="font-mono">[REF]</span>
                                 <span>{dissent.source} ({dissent.year})</span>
                               </div>
                               <Badge variant="outline" className="text-xs">
@@ -790,7 +779,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                           <div key={idx} className="p-3 border rounded-lg">
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-2">
-                                <FileText className="h-4 w-4" />
+                                <span className="font-mono text-xs">[DATA]</span>
                                 <span className="font-medium text-sm">{source.name}</span>
                               </div>
                               <Badge variant="outline" className="text-xs">
@@ -801,9 +790,8 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                               <SourceReliabilityBar reliability={source.reliability} />
                               <div className="flex items-center justify-between text-xs text-muted-foreground">
                                 <span>Senast uppdaterad: {source.lastUpdated}</span>
-                                <a href={source.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-primary">
-                                  <ExternalLink className="h-3 w-3" />
-                                  Öppna källa
+                                <a href={source.url} target="_blank" rel="noopener noreferrer" className="hover:text-primary underline">
+                                  [ÖPPNA KÄLLA]
                                 </a>
                               </div>
                             </div>
@@ -821,7 +809,7 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                         <div className="flex gap-2">
                           {evidence.rawData.downloadFormats.map((format, idx) => (
                             <Button key={idx} variant="outline" size="sm">
-                              <Download className="h-4 w-4 mr-2" />
+                              <span className="font-mono text-xs mr-2">[DL]</span>
                               {format}
                             </Button>
                           ))}
