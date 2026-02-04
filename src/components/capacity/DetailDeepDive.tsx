@@ -18,6 +18,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
+import { ClickableSourceCitation } from '@/components/ui/ClickableSourceCitation';
 import {
   LineChart,
   Line,
@@ -36,7 +37,6 @@ import {
   Clock,
   BookOpen,
   Scale,
-  Database,
   ChevronRight,
   Lightbulb,
   Target,
@@ -295,11 +295,8 @@ const ChallengesView: React.FC<{ items: string[]; regionName: string }> = ({ ite
         })}
       </div>
       
-      {/* Data source */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Database className="h-3 w-3" />
-        <span>Källa: Aggregerad data från UNDP, World Bank, WHO</span>
-      </div>
+      {/* Data source - Clickable with real links */}
+      <ClickableSourceCitation sourceKey="undp-worldbank-who" />
     </div>
   );
 };
@@ -395,11 +392,8 @@ const SignalsView: React.FC<{ items: string[]; regionName: string }> = ({ items,
         ))}
       </div>
       
-      {/* Data source */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Database className="h-3 w-3" />
-        <span>Källa: Aggregerad data från internationella organisationer</span>
-      </div>
+      {/* Data source - Clickable with real links */}
+      <ClickableSourceCitation sourceKey="international-organizations" />
     </div>
   );
 };
@@ -528,11 +522,8 @@ const HistoryView: React.FC<{
         </div>
       </div>
       
-      {/* Data source */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Database className="h-3 w-3" />
-        <span>Källa: Historiska arkiv och akademisk forskning</span>
-      </div>
+      {/* Data source - Clickable with real links */}
+      <ClickableSourceCitation sourceKey="historical-archives" />
     </div>
   );
 };
@@ -678,11 +669,8 @@ const ScopeView: React.FC<{
         </CardContent>
       </Card>
       
-      {/* Data source */}
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Database className="h-3 w-3" />
-        <span>Källa: Intern metodologisk analys</span>
-      </div>
+      {/* Data source - Clickable with real links */}
+      <ClickableSourceCitation sourceKey="methodological-analysis" />
     </div>
   );
 };
