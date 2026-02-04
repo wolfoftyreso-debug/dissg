@@ -11,6 +11,7 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { ExpandableBadge } from '@/components/ui/ExpandableBadge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
@@ -503,17 +504,27 @@ export const SocietalCorrelationEngine: React.FC = () => {
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <p className="text-xs text-muted-foreground mb-2">Fokus på:</p>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-2">
                     {VIABILITY_CONNECTION.focus.sv.map(f => (
-                      <Badge key={f} variant="secondary" className="text-xs">{f}</Badge>
+                      <ExpandableBadge 
+                        key={f} 
+                        text={f} 
+                        variant="secondary"
+                        className="text-xs"
+                      />
                     ))}
                   </div>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-2">Inte om:</p>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-2">
                     {VIABILITY_CONNECTION.notAbout.sv.map(n => (
-                      <Badge key={n} variant="outline" className="text-xs line-through opacity-50">{n}</Badge>
+                      <ExpandableBadge 
+                        key={n} 
+                        text={n} 
+                        variant="outline"
+                        className="text-xs"
+                      />
                     ))}
                   </div>
                 </div>
