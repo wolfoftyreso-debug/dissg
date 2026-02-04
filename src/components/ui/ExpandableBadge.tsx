@@ -194,6 +194,124 @@ const BADGE_EVIDENCE_REGISTRY: Record<string, BadgeEvidence> = {
       'Historiska analogier ger lärdomar'
     ],
     limitations: ['Historiska analogier är begränsade', 'Kontext förändras']
+  },
+
+  // ═══ VIABILITY CONNECTION TERMS ═══
+  'arbete': {
+    title: 'Arbete',
+    scientificBasis: 'Tillgång till meningsfull sysselsättning är grundläggande för ekonomisk trygghet, självständighet och social integration.',
+    sources: [
+      { title: 'Employment Outlook', type: 'report', source: 'OECD', year: 2023 },
+      { title: 'Arbetsmarknadsekonomi', type: 'book', source: 'Cahuc & Zylberberg', year: 2014 },
+    ],
+    whatThisProves: [
+      'Arbetslöshet korrelerar med ohälsa och social exkludering',
+      'Sysselsättningsgrad påverkar statsfinanserna',
+      'Arbetsmarknadsintegration är mätbar'
+    ],
+    limitations: [
+      'Kvalitet på arbete varierar kraftigt',
+      'Informellt arbete syns inte i statistiken'
+    ]
+  },
+  'trygghet': {
+    title: 'Trygghet',
+    scientificBasis: 'Upplevd och faktisk säkerhet påverkar livskvalitet, boendemönster och ekonomisk aktivitet.',
+    sources: [
+      { title: 'Global Peace Index', type: 'data', source: 'Institute for Economics & Peace', year: 2023 },
+      { title: 'Nationella trygghetsundersökningen (NTU)', type: 'report', source: 'Brå', year: 2023 },
+    ],
+    whatThisProves: [
+      'Brottslighet påverkar bostadspriser och segregation',
+      'Otrygghet har mätbara ekonomiska konsekvenser'
+    ],
+    limitations: [
+      'Upplevd trygghet ≠ faktisk säkerhet',
+      'Mediebevakning påverkar perception'
+    ]
+  },
+  'integrationens-tempo': {
+    title: 'Integrationens tempo',
+    scientificBasis: 'Hastigheten för språk-, arbetsmarknads- och social integration avgör långsiktiga utfall för nyanlända och mottagarsamhälle.',
+    sources: [
+      { title: 'MIPEX Migration Integration Policy Index', type: 'data', source: 'Barcelona Centre for International Affairs', year: 2020 },
+      { title: 'Establishing Migrants', type: 'report', source: 'OECD/EU', year: 2018 },
+    ],
+    whatThisProves: [
+      'Tidiga arbetsmarknadsinsatser förbättrar integration',
+      'Integration är en mätbar process, inte ett binärt tillstånd'
+    ],
+    limitations: [
+      'Integration är multidimensionell',
+      'Tidsaxlar varierar per grupp och region'
+    ]
+  },
+  'institutionell-kapacitet': {
+    title: 'Institutionell kapacitet',
+    scientificBasis: 'Institutioners förmåga att leverera tjänster, upprätthålla lagar och anpassa sig avgör samhällets resiliens.',
+    sources: [
+      { title: 'Worldwide Governance Indicators', type: 'data', source: 'World Bank', year: 2023 },
+      { title: 'Quality of Government Dataset', type: 'data', source: 'University of Gothenburg', year: 2023 },
+    ],
+    whatThisProves: [
+      'Kapacitet korrelerar med utfall i vård, skola och integration',
+      'Kapacitetsbrister är mätbara'
+    ],
+    limitations: [
+      'Kapacitet varierar lokalt, aggregat kan dölja problem',
+      'Mätning är delvis subjektiv'
+    ]
+  },
+  'skuld': {
+    title: 'Skuld (exkluderad variabel)',
+    scientificBasis: 'Moraliska tillskrivanden av skuld saknar mätbar grund i data och leder till polarisering snarare än problemlösning.',
+    sources: [
+      { title: 'Moral Foundations Theory', type: 'study', source: 'Haidt & Graham', year: 2007 },
+      { title: 'Language of public policy', type: 'book', source: 'Deborah Stone', year: 2012 },
+    ],
+    whatThisProves: [
+      'Skuldretorik aktiverar affekt, inte analys',
+      'Fokus på skuld skymmer mekanismer'
+    ],
+    limitations: [
+      'Ansvarsutkrävande är legitim demokratifunktion',
+      'Distinktion mellan skuld och ansvar krävs'
+    ],
+    context: 'Detta system undviker skuldterminologi för att hålla fokus på mätbara effekter och åtgärdbara variabler.'
+  },
+  'identitet': {
+    title: 'Identitet (exkluderad variabel)',
+    scientificBasis: 'Identitetskategorier som etnicitet, religion och nationalitet är socialt konstruerade och inte direkt kausala för samhällsutfall.',
+    sources: [
+      { title: 'Ethnic Boundaries and Inequalities', type: 'book', source: 'Wimmer', year: 2013 },
+      { title: 'Social Identities', type: 'study', source: 'Tajfel & Turner', year: 1979 },
+    ],
+    whatThisProves: [
+      'Identitet medierar andra variabler (diskriminering, nätverk)',
+      'Grupptillhörighet är inte prediktiv utan kontext'
+    ],
+    limitations: [
+      'Identitet påverkar upplevelser och möjligheter',
+      'Att ignorera kan dölja diskriminering'
+    ],
+    context: 'Systemet fokuserar på strukturella variabler (utbildning, inkomst, anställning) snarare än grupptillhörighet.'
+  },
+  'ideologi': {
+    title: 'Ideologi (exkluderad variabel)',
+    scientificBasis: 'Politisk ideologi är ett ramverk för tolkning, inte en oberoende variabel som förklarar samhällsutfall.',
+    sources: [
+      { title: 'Ideology and Politics', type: 'book', source: 'Freeden', year: 2003 },
+      { title: 'Political psychology', type: 'study', source: 'Jost et al.', year: 2009 },
+    ],
+    whatThisProves: [
+      'Ideologi korrelerar med policypreferenser, inte direkt med utfall',
+      'Fokus på ideologi polariserar snarare än informerar'
+    ],
+    limitations: [
+      'Politiska beslut påverkas av ideologi',
+      'Att utesluta helt är inte möjligt'
+    ],
+    context: 'Systemet visar utfall av policyer utan att attribuera till ideologisk "sida".'
   }
 };
 
