@@ -69,16 +69,16 @@ export function SemanticLinkSection({
  */
 function LinkList({ links }: { links: SemanticLink[] }) {
   return (
-    <ul className="list-disc list-inside text-sm space-y-1">
+    <ul className="space-y-2">
       {links.map((link, index) => (
         <li key={`${link.url}-${index}`}>
           <Link
             to={link.url}
-            className="text-primary hover:underline"
+            className="group flex items-center gap-2 p-2 -mx-2 rounded-md text-sm text-primary hover:bg-primary/10 hover:underline transition-colors cursor-pointer"
             aria-label={link.ariaLabel}
-            // Never nofollow for internal links
           >
-            {link.title}
+            <span className="font-mono text-[10px] text-muted-foreground group-hover:text-primary">[→]</span>
+            <span className="flex-1">{link.title}</span>
           </Link>
         </li>
       ))}
@@ -104,12 +104,12 @@ export function InlineSemanticLinks({
   
   return (
     <span className="text-sm text-foreground/80">
-      See also:{' '}
+      <span className="font-mono text-[10px] text-muted-foreground mr-1">[RELATERAT]</span>
       {displayLinks.map((link, index) => (
         <React.Fragment key={link.url}>
           <Link
             to={link.url}
-            className="text-primary hover:underline"
+            className="text-primary hover:underline hover:bg-primary/10 px-1 py-0.5 rounded cursor-pointer transition-colors"
           >
             {link.title}
           </Link>
