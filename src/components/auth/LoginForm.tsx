@@ -52,7 +52,7 @@ export function LoginForm() {
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Logga in</CardTitle>
         <CardDescription>
-          Nationellt Ledningssystem för Offentlig Styrning
+          DISSG – Diagnostic Information System for Societal Governance
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

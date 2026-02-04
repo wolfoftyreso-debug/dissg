@@ -92,7 +92,7 @@ export function RegisterForm() {
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Skapa konto</CardTitle>
         <CardDescription>
-          Registrera dig för åtkomst till ledningssystemet
+          DISSG – Diagnostikinformationssystem för Samhällsstyrning
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
