@@ -587,26 +587,271 @@ export const VIABILITY_CONNECTION = {
   }
 };
 
-// === 10. TRANSPARENCY PRINCIPLES ===
+// === 10. TRANSPARENCY PRINCIPLES (DEEP) ===
+
+export interface TransparencyPrincipleDeep {
+  id: string;
+  title: { sv: string; en: string };
+  description: { sv: string; en: string };
+  methodology: { sv: string; en: string };
+  implementation: { sv: string[]; en: string[] };
+  benefits: { sv: string[]; en: string[] };
+  limitations: { sv: string[]; en: string[] };
+  sources: Array<{ title: string; source: string; year: number }>;
+  relatedPrinciples: string[];
+}
+
+export const TRANSPARENCY_PRINCIPLES_DEEP: TransparencyPrincipleDeep[] = [
+  {
+    id: 'visa-datan-oppet',
+    title: { sv: 'Visa datan öppet', en: 'Show data openly' },
+    description: {
+      sv: 'All underliggande data exponeras för användaren utan filter eller sammanfattningar som döljer ursprungsvärden.',
+      en: 'All underlying data is exposed to the user without filters or summaries that hide original values.'
+    },
+    methodology: {
+      sv: 'Varje aggregat kan dekonstrueras till sina beståndsdelar. Rådata är alltid tillgänglig med ett klick, inklusive insamlingsmetod och tidpunkt.',
+      en: 'Every aggregate can be deconstructed to its components. Raw data is always available with one click, including collection method and timestamp.'
+    },
+    implementation: {
+      sv: [
+        'Klickbara datapunkter som visar råvärden',
+        'Exportfunktion för alla dataset i öppna format (CSV, JSON)',
+        'API-åtkomst för programmatisk verifikation',
+        'Versionshistorik för alla dataändringar'
+      ],
+      en: [
+        'Clickable data points showing raw values',
+        'Export function for all datasets in open formats (CSV, JSON)',
+        'API access for programmatic verification',
+        'Version history for all data changes'
+      ]
+    },
+    benefits: {
+      sv: [
+        'Möjliggör oberoende verifikation',
+        'Förhindrar selektiv presentation',
+        'Bygger institutionellt förtroende'
+      ],
+      en: [
+        'Enables independent verification',
+        'Prevents selective presentation',
+        'Builds institutional trust'
+      ]
+    },
+    limitations: {
+      sv: [
+        'Rådata kan vara svårtolkad utan kontext',
+        'Datamängder kan överväldiga icke-experter'
+      ],
+      en: [
+        'Raw data can be difficult to interpret without context',
+        'Data volumes can overwhelm non-experts'
+      ]
+    },
+    sources: [
+      { title: 'Open Data Charter', source: 'Open Data Charter', year: 2015 },
+      { title: 'FAIR Data Principles', source: 'GO FAIR', year: 2016 }
+    ],
+    relatedPrinciples: ['visa-osakerheter', 'visa-hela-tidslinjer']
+  },
+  {
+    id: 'visa-osakerheter',
+    title: { sv: 'Visa osäkerheter', en: 'Show uncertainties' },
+    description: {
+      sv: 'Konfidensintervall, felmarginaler och datakvalitetsmått visas explicit för varje värde.',
+      en: 'Confidence intervals, error margins, and data quality measures are explicitly displayed for each value.'
+    },
+    methodology: {
+      sv: 'Varje numeriskt värde åtföljs av osäkerhetsintervall. Aggregeringar visar hur osäkerhet propagerar genom beräkningskedjan.',
+      en: 'Each numerical value is accompanied by uncertainty intervals. Aggregations show how uncertainty propagates through the calculation chain.'
+    },
+    implementation: {
+      sv: [
+        'Konfidensintervall på alla estimat (±95%)',
+        'Datakvalitetspoäng (0-100) för varje källa',
+        'Visuella osäkerhetsband i grafer',
+        'Flaggning av preliminära/reviderade data'
+      ],
+      en: [
+        'Confidence intervals on all estimates (±95%)',
+        'Data quality scores (0-100) for each source',
+        'Visual uncertainty bands in graphs',
+        'Flagging of preliminary/revised data'
+      ]
+    },
+    benefits: {
+      sv: [
+        'Förhindrar övertolkning av brusiga signaler',
+        'Kommunicerar vetenskaplig rimlighet',
+        'Möjliggör evidensbaserade beslut'
+      ],
+      en: [
+        'Prevents overinterpretation of noisy signals',
+        'Communicates scientific plausibility',
+        'Enables evidence-based decisions'
+      ]
+    },
+    limitations: {
+      sv: [
+        'Osäkerhet kan misstolkas som "vi vet inget"',
+        'Komplex visualisering kan förvirra'
+      ],
+      en: [
+        'Uncertainty can be misinterpreted as "we know nothing"',
+        'Complex visualization can confuse'
+      ]
+    },
+    sources: [
+      { title: 'Communicating Uncertainty', source: 'Nature', year: 2019 },
+      { title: 'Guidelines for Uncertainty Visualization', source: 'IEEE VIS', year: 2020 }
+    ],
+    relatedPrinciples: ['visa-datan-oppet', 'visa-alternativa-tolkningar']
+  },
+  {
+    id: 'visa-hela-tidslinjer',
+    title: { sv: 'Visa hela tidslinjer', en: 'Show complete timelines' },
+    description: {
+      sv: 'Data presenteras i sitt fulla historiska sammanhang, utan selektiva tidsfönster som kan ge missvisande intryck.',
+      en: 'Data is presented in its full historical context, without selective time windows that may give misleading impressions.'
+    },
+    methodology: {
+      sv: 'Standardvy visar längsta tillgängliga tidsserien. Användaren kan zooma in men varnas om cherry-picking-risker vid korta fönster.',
+      en: 'Default view shows the longest available time series. Users can zoom in but are warned about cherry-picking risks with short windows.'
+    },
+    implementation: {
+      sv: [
+        'Maximal tidsaxel som standardvy',
+        'Markering av strukturella brott och metodändringar',
+        'Jämförelse med historiska perioder',
+        'Varning vid zoomning under 5 år'
+      ],
+      en: [
+        'Maximum time axis as default view',
+        'Marking of structural breaks and method changes',
+        'Comparison with historical periods',
+        'Warning when zooming below 5 years'
+      ]
+    },
+    benefits: {
+      sv: [
+        'Förhindrar selektivt narrativbyggande',
+        'Visar långsiktiga trender och cykler',
+        'Kontextualiserar kortsiktiga fluktuationer'
+      ],
+      en: [
+        'Prevents selective narrative building',
+        'Shows long-term trends and cycles',
+        'Contextualizes short-term fluctuations'
+      ]
+    },
+    limitations: {
+      sv: [
+        'Historiska data kan ha sämre kvalitet',
+        'Definitioner ändras över tid'
+      ],
+      en: [
+        'Historical data may have lower quality',
+        'Definitions change over time'
+      ]
+    },
+    sources: [
+      { title: 'How to Lie with Statistics', source: 'Darrell Huff', year: 1954 },
+      { title: 'The Visual Display of Quantitative Information', source: 'Edward Tufte', year: 2001 }
+    ],
+    relatedPrinciples: ['visa-datan-oppet', 'visa-alternativa-tolkningar']
+  },
+  {
+    id: 'visa-alternativa-tolkningar',
+    title: { sv: 'Visa alternativa tolkningar', en: 'Show alternative interpretations' },
+    description: {
+      sv: 'Konkurrerande hypoteser och tolkningar presenteras sidoställt istället för att systemet driver en enskild narrativ.',
+      en: 'Competing hypotheses and interpretations are presented side-by-side instead of the system driving a single narrative.'
+    },
+    methodology: {
+      sv: 'För varje mönster visas minst två rimliga tolkningar. Användaren kan justera antaganden och se hur slutsatser ändras.',
+      en: 'For each pattern, at least two plausible interpretations are shown. Users can adjust assumptions and see how conclusions change.'
+    },
+    implementation: {
+      sv: [
+        '"Assumption Exposer" - justera underliggande antaganden',
+        'Sidoställd jämförelse av tolkningar',
+        'Falsifieringskriterier för varje hypotes',
+        'Länkning till akademiska debatter'
+      ],
+      en: [
+        '"Assumption Exposer" - adjust underlying assumptions',
+        'Side-by-side comparison of interpretations',
+        'Falsification criteria for each hypothesis',
+        'Linking to academic debates'
+      ]
+    },
+    benefits: {
+      sv: [
+        'Motverkar bekräftelsebias',
+        'Respekterar vetenskaplig osäkerhet',
+        'Förhindrar att plattformen blir auktoritär'
+      ],
+      en: [
+        'Counteracts confirmation bias',
+        'Respects scientific uncertainty',
+        'Prevents the platform from becoming authoritarian'
+      ]
+    },
+    limitations: {
+      sv: [
+        'Kan ge intryck av falsk ekvivalens',
+        'Kräver expertis att navigera'
+      ],
+      en: [
+        'May give impression of false equivalence',
+        'Requires expertise to navigate'
+      ]
+    },
+    sources: [
+      { title: 'Strong Inference', source: 'John Platt, Science', year: 1964 },
+      { title: 'Philosophy of Science', source: 'Karl Popper', year: 1959 }
+    ],
+    relatedPrinciples: ['visa-osakerheter', 'visa-hela-tidslinjer']
+  }
+];
 
 export const TRANSPARENCY_PRINCIPLES = {
-  sv: [
-    'Visa datan öppet',
-    'Visa osäkerheter',
-    'Visa hela tidslinjer',
-    'Visa alternativa tolkningar'
-  ],
-  en: [
-    'Show data openly',
-    'Show uncertainties',
-    'Show complete timelines',
-    'Show alternative interpretations'
+  sv: TRANSPARENCY_PRINCIPLES_DEEP.map(p => p.title.sv),
+  en: TRANSPARENCY_PRINCIPLES_DEEP.map(p => p.title.en)
+};
+
+export const TRANSPARENCY_OUTCOME_DEEP = {
+  title: { sv: 'Transparens ersätter polarisering.', en: 'Transparency replaces polarization.' },
+  description: {
+    sv: 'När alla kan verifiera data och metod, skiftar debatten från "vem ljuger" till "hur tolkar vi detta".',
+    en: 'When everyone can verify data and method, the debate shifts from "who is lying" to "how do we interpret this".'
+  },
+  mechanism: {
+    sv: 'Polarisering närs av misstro mot motpartens fakta. Öppen data eliminerar denna asymmetri och tvingar diskussionen till värderingar och prioriteringar istället.',
+    en: 'Polarization is fed by distrust of the opponent\'s facts. Open data eliminates this asymmetry and forces the discussion to values and priorities instead.'
+  },
+  evidence: {
+    sv: [
+      'Deliberativ demokrati-forskning visar att delad faktabas minskar affektiv polarisering',
+      'Open Government-initiativ korrelerar med högre institutionsförtroende',
+      'Faktakontroll-plattformar med öppen metod får högre trovärdighetsbetyg'
+    ],
+    en: [
+      'Deliberative democracy research shows that shared factual base reduces affective polarization',
+      'Open Government initiatives correlate with higher institutional trust',
+      'Fact-checking platforms with open methodology receive higher credibility ratings'
+    ]
+  },
+  sources: [
+    { title: 'Deliberative Democracy', source: 'James Fishkin', year: 2018 },
+    { title: 'Open Government Partnership', source: 'OGP', year: 2011 }
   ]
 };
 
 export const TRANSPARENCY_OUTCOME = {
-  sv: 'Transparens ersätter polarisering.',
-  en: 'Transparency replaces polarization.'
+  sv: TRANSPARENCY_OUTCOME_DEEP.title.sv,
+  en: TRANSPARENCY_OUTCOME_DEEP.title.en
 };
 
 // === HELPER FUNCTIONS ===
