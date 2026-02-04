@@ -1,35 +1,36 @@
 /**
  * GLOBAL CARRYING CAPACITY ENGINE (GCCE)
  * 
- * "Hur många människor kan leva bra – givet energi, teknik och resurser?"
+ * Systemisk beräkningsmodell för humankapacitet givet energitillgång,
+ * teknologisk effektivitet och institutionell stabilitet.
  * 
- * Inte ideologi. Inte klimatmoral. Inte tillväxtoptimism.
- * Bara fysik, biologi, teknik och mänskligt välbefinnande.
+ * Epistemiskt neutralt: Ingen normativ optimering.
+ * Observationsbaserat: Mäter kapacitet, inte preferenser.
  */
 
 // === 1. GRUNDDEFINITION ===
 
 export const GCCE_CORE_DEFINITION = {
-  sv: 'Hur många människor kan leva ett bra liv på jorden? Det beror på tre saker: hur mycket energi vi har, hur smart vår teknik är, och hur bra vi är på att samarbeta.',
-  en: 'How many people can live well on Earth? It depends on three things: how much energy we have, how smart our technology is, and how well we cooperate.'
+  sv: 'Beräkning av maximal humankapacitet vid definierade livskvalitetströsklar, givet energitillgång, teknologisk effektivitet och institutionell stabilitet.',
+  en: 'Computation of maximum human capacity at defined quality-of-life thresholds, given energy availability, technological efficiency, and institutional stability.'
 };
 
-// Simplified "what this is NOT" for 15-year-olds
+// Scope exclusions - institutional language
 export const GCCE_NOT_DEFINITIONS = [
   { 
-    sv: 'Inte "flest möjliga människor"', 
-    en: 'Not "maximum number of people"',
-    explanation: 'Vi räknar inte hur många som kan överleva på existensminimum – vi räknar hur många som kan leva bra.'
+    sv: 'Exkluderar maximal populationsdensitet', 
+    en: 'Excludes maximum population density',
+    explanation: 'Modellen optimerar inte för kvantitet vid subsistensnivå. Beräkningen förutsätter definierade livskvalitetströsklar.'
   },
   { 
-    sv: 'Inte "mest pengar"', 
-    en: 'Not "most money"',
-    explanation: 'BNP mäter ekonomisk aktivitet, inte om människor faktiskt mår bra. Vi fokuserar på livskvalitet.'
+    sv: 'Exkluderar BNP-maximering', 
+    en: 'Excludes GDP maximization',
+    explanation: 'Ekonomisk output är inte målvariabel. Kapacitet mäts i uppfyllnad av definierade humanbehovsindikatorer.'
   },
   { 
-    sv: 'Tänker på framtiden', 
-    en: 'Thinking about the future',
-    explanation: 'Vi får inte förstöra för nästa generation. Deras chanser räknas lika mycket som våra.'
+    sv: 'Inkluderar intergenerationell hållbarhet', 
+    en: 'Includes intergenerational sustainability',
+    explanation: 'Kapacitetsberäkningen viktar framtida generationers resursåtkomst ekvivalent med nuvarande.'
   }
 ];
 
