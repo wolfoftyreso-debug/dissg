@@ -336,7 +336,7 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
 
       {/* Footer */}
       <div className="p-3 border-t text-xs text-muted-foreground text-center">
-        Klicka på GEDI-kod för guidad felsökning →
+        Klicka på GEDI-kod för guidad analys →
       </div>
     </div>
   );

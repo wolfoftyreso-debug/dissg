@@ -226,7 +226,7 @@ function GuidedAnalysisPanel({ result }: { result: GEDICodeResult }) {
 
       {/* Guided Steps */}
       <div>
-        <h3 className="font-mono text-sm font-semibold mb-2">GUIDAD FELSÖKNING</h3>
+        <h3 className="font-mono text-sm font-semibold mb-2">GUIDAD ANALYS</h3>
         <div className="space-y-2">
           {definition.guidedAnalysisSteps.map((step, index) => (
             <div 
@@ -431,7 +431,7 @@ export function GEDIDashboard() {
                       <div className="text-center">
                         <div className="text-4xl mb-4">👈</div>
                         <div className="font-mono">Välj en GEDI-kod</div>
-                        <div className="text-sm mt-2">för guidad felsökning</div>
+                        <div className="text-sm mt-2">för guidad analys</div>
                       </div>
                     </div>
                   )}
