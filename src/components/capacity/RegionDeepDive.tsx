@@ -893,15 +893,24 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                   ))}
                 </div>
 
-                <Alert>
-                  <AlertDescription className="text-xs flex items-start gap-2">
-                    <span className="font-mono text-[10px] text-muted-foreground">[INFO]</span>
-                    <span>
-                      <strong>Behandlingsgap</strong> = andel av personer med beroende/skadligt bruk som INTE får behandling.
-                      Höga behandlingsgap indikerar bristande tillgång till vård, stigma, eller avsaknad av infrastruktur.
-                    </span>
-                  </AlertDescription>
-                </Alert>
+                <button 
+                  className="w-full text-left"
+                  onClick={() => {
+                    // TODO: Open ConceptExplorer for "treatment-gap"
+                    console.log('Open deep-dive: treatment-gap concept');
+                  }}
+                >
+                  <Alert className="hover:bg-muted/50 hover:border-primary/50 transition-all cursor-pointer group">
+                    <AlertDescription className="text-xs flex items-start gap-2">
+                      <span className="font-mono text-[10px] text-muted-foreground">[DEF]</span>
+                      <span className="flex-1">
+                        <strong className="group-hover:text-primary transition-colors">Behandlingsgap</strong> = andel av personer med beroende/skadligt bruk som INTE får behandling.
+                        Höga behandlingsgap indikerar bristande tillgång till vård, stigma, eller avsaknad av infrastruktur.
+                      </span>
+                      <span className="font-mono text-[10px] text-muted-foreground group-hover:text-primary transition-colors shrink-0">[→]</span>
+                    </AlertDescription>
+                  </Alert>
+                </button>
               </TabsContent>
 
               {/* SOURCES TAB */}
