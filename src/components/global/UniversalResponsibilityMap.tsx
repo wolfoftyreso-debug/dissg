@@ -21,6 +21,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { StatsDetailDialog } from './StatsDetailDialog';
 
 // ═══════════════════════════════════════════════════════════════
 // UNIVERSAL HUMAN NEEDS FRAMEWORK
@@ -465,8 +466,11 @@ const DomainCard: React.FC<{ domain: HumanNeedDomain; selectedLevel: string }> =
   );
 };
 
-// Statistics summary
+// Statistics summary - clickable cards with drill-down
 const StatsSummary: React.FC = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedStat, setSelectedStat] = useState<'domains' | 'indicators' | 'availability' | 'levels' | null>(null);
+
   const totalIndicators = HUMAN_NEEDS_DOMAINS.reduce(
     (sum, d) => sum + d.universalIndicators.length, 0
   );
@@ -474,25 +478,56 @@ const StatsSummary: React.FC = () => {
     (sum, d) => sum + d.universalIndicators.filter(i => i.dataAvailability === 'high').length, 0
   );
 
+  const handleStatClick = (stat: 'domains' | 'indicators' | 'availability' | 'levels') => {
+    setSelectedStat(stat);
+    setDialogOpen(true);
+  };
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono">
-      <Card className="p-4 text-center">
-        <div className="text-2xl font-bold text-primary">{HUMAN_NEEDS_DOMAINS.length}</div>
-        <div className="text-xs text-muted-foreground">Behovsdomäner</div>
-      </Card>
-      <Card className="p-4 text-center">
-        <div className="text-2xl font-bold">{totalIndicators}</div>
-        <div className="text-xs text-muted-foreground">Universella indikatorer</div>
-      </Card>
-      <Card className="p-4 text-center bg-emerald-500/10 border-emerald-500/30">
-        <div className="text-2xl font-bold text-emerald-400">{highAvailability}</div>
-        <div className="text-xs text-muted-foreground">Hög datatillgång</div>
-      </Card>
-      <Card className="p-4 text-center">
-        <div className="text-2xl font-bold">{GOVERNANCE_LEVELS.length}</div>
-        <div className="text-xs text-muted-foreground">Styrningsnivåer</div>
-      </Card>
-    </div>
+    <>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono">
+        <Card 
+          className="p-4 text-center cursor-pointer transition-all hover:ring-2 hover:ring-primary/50 hover:bg-primary/5"
+          onClick={() => handleStatClick('domains')}
+        >
+          <div className="text-2xl font-bold text-primary">{HUMAN_NEEDS_DOMAINS.length}</div>
+          <div className="text-xs text-muted-foreground">Behovsdomäner</div>
+          <div className="text-xs text-primary/60 mt-1">[KLICKA]</div>
+        </Card>
+        <Card 
+          className="p-4 text-center cursor-pointer transition-all hover:ring-2 hover:ring-primary/50 hover:bg-primary/5"
+          onClick={() => handleStatClick('indicators')}
+        >
+          <div className="text-2xl font-bold">{totalIndicators}</div>
+          <div className="text-xs text-muted-foreground">Universella indikatorer</div>
+          <div className="text-xs text-primary/60 mt-1">[KLICKA]</div>
+        </Card>
+        <Card 
+          className="p-4 text-center cursor-pointer transition-all hover:ring-2 hover:ring-primary/50 bg-accent/30 border-accent"
+          onClick={() => handleStatClick('availability')}
+        >
+          <div className="text-2xl font-bold text-accent-foreground">{highAvailability}</div>
+          <div className="text-xs text-muted-foreground">Hög datatillgång</div>
+          <div className="text-xs text-primary/60 mt-1">[KLICKA]</div>
+        </Card>
+        <Card 
+          className="p-4 text-center cursor-pointer transition-all hover:ring-2 hover:ring-primary/50 hover:bg-primary/5"
+          onClick={() => handleStatClick('levels')}
+        >
+          <div className="text-2xl font-bold">{GOVERNANCE_LEVELS.length}</div>
+          <div className="text-xs text-muted-foreground">Styrningsnivåer</div>
+          <div className="text-xs text-primary/60 mt-1">[KLICKA]</div>
+        </Card>
+      </div>
+
+      <StatsDetailDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        statType={selectedStat}
+        domains={HUMAN_NEEDS_DOMAINS}
+        governanceLevels={GOVERNANCE_LEVELS}
+      />
+    </>
   );
 };
 
