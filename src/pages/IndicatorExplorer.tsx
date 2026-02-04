@@ -233,6 +233,115 @@ const INDICATORS: Record<string, IndicatorDefinition> = {
       'Subjektiva definitioner av "matchning"',
       'Svårt att bedöma kvalitativa aspekter'
     ]
+  },
+  // ==================== NYA INDIKATORER ====================
+  gdp_growth: {
+    code: 'gdp_growth',
+    name: 'BNP-tillväxt',
+    nameEn: 'GDP Growth',
+    domain: 'livelihood_work',
+    domainName: 'Försörjning & Arbete',
+    unit: '% årlig',
+    description: 'Årlig procentuell förändring av bruttonationalprodukten i fasta priser.',
+    methodology: 'Nationalräkenskaper enligt SNA 2008 standard. Säsongsrensad och kalenderkorrigerad.',
+    sources: ['SCB', 'Eurostat', 'World Bank', 'IMF'],
+    higherIsBetter: true,
+    updateFrequency: 'Kvartalsvis',
+    coverage: '195 länder, 1960-2024',
+    limitations: [
+      'BNP mäter inte välbefinnande eller miljöpåverkan',
+      'Informell ekonomi underskattas i många länder'
+    ]
+  },
+  energy_efficiency: {
+    code: 'energy_efficiency',
+    name: 'Energieffektivitet',
+    nameEn: 'Energy Efficiency',
+    domain: 'resource_environment',
+    domainName: 'Resurs & Miljö',
+    unit: 'index',
+    description: 'BNP per energienhet förbrukad (energiintensitet inverterad).',
+    methodology: 'PPP-justerad BNP dividerat med total primär energiförbrukning.',
+    sources: ['IEA', 'World Bank', 'Energimyndigheten'],
+    higherIsBetter: true,
+    updateFrequency: 'Årligen',
+    coverage: '180+ länder, 1990-2023',
+    limitations: [
+      'Strukturella skillnader mellan ekonomier påverkar jämförbarheten',
+      'Exkluderar embodied energy i import'
+    ]
+  },
+  healthcare_wait_time: {
+    code: 'healthcare_wait_time',
+    name: 'Vårdkötid',
+    nameEn: 'Healthcare Wait Time',
+    domain: 'life_health',
+    domainName: 'Liv & Hälsa',
+    unit: 'dagar',
+    description: 'Genomsnittlig väntetid från remiss till första specialistvårdsbesök.',
+    methodology: 'Väntetidsdata från nationella hälsodataregister.',
+    sources: ['SKR', 'Väntetider i vården', 'OECD Health Statistics'],
+    higherIsBetter: false,
+    updateFrequency: 'Månadsvis',
+    coverage: 'Sverige regionalt, OECD-länder nationellt',
+    limitations: [
+      'Definitioner av "väntetid" varierar mellan regioner',
+      'Mäter endast specialistvård, inte primärvård'
+    ]
+  },
+  shootings: {
+    code: 'shootings',
+    name: 'Skjutningar',
+    nameEn: 'Gun Violence',
+    domain: 'stability_security',
+    domainName: 'Stabilitet & Säkerhet',
+    unit: 'per 100 000',
+    description: 'Antal bekräftade skjutningar (dödliga och icke-dödliga) per 100 000 invånare.',
+    methodology: 'BRÅ:s skjutningsstatistik baserad på polisanmälningar och bekräftade händelser.',
+    sources: ['BRÅ', 'Polisen', 'UNODC'],
+    higherIsBetter: false,
+    updateFrequency: 'Månadsvis',
+    coverage: 'Sverige, EU-jämförelser',
+    limitations: [
+      'Internationella jämförelser försvåras av olika definitioner',
+      'Mörkertal förekommer'
+    ]
+  },
+  housing_segregation: {
+    code: 'housing_segregation',
+    name: 'Boendesegregation',
+    nameEn: 'Housing Segregation',
+    domain: 'stability_security',
+    domainName: 'Stabilitet & Säkerhet',
+    unit: 'index',
+    description: 'Dissimilarity index som mäter geografisk separation mellan demografiska grupper.',
+    methodology: 'Beräknas på DeSO-nivå (demografiska statistikområden) baserat på födelseland.',
+    sources: ['SCB', 'Delmos', 'Boverket'],
+    higherIsBetter: false,
+    updateFrequency: 'Årligen',
+    coverage: 'Sverige kommunalt',
+    limitations: [
+      'Mäter endast bostadssegregation, inte arbetsplatser eller skolor',
+      'Statiska mått fångar inte mobilitet'
+    ]
+  },
+  teacher_shortage: {
+    code: 'teacher_shortage',
+    name: 'Lärarbrist',
+    nameEn: 'Teacher Shortage',
+    domain: 'knowledge_skills',
+    domainName: 'Kunskap & Kompetens',
+    unit: '%',
+    description: 'Andel lärartjänster som saknar behörig personal.',
+    methodology: 'Andel tjänster som tillsatts med obehöriga lärare eller är vakanta.',
+    sources: ['Skolverket', 'UKÄ', 'SKR'],
+    higherIsBetter: false,
+    updateFrequency: 'Årligen',
+    coverage: 'Sverige kommunalt och nationellt',
+    limitations: [
+      'Definition av "behörig" varierar mellan ämnen',
+      'Döljer kvalitativa skillnader i undervisning'
+    ]
   }
 };
 
