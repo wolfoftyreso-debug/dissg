@@ -9,8 +9,8 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { COUNTRIES, LAMBDA_OVERLAYS, getLambdaColor } from './mockData';
 
-// Get token from env
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+// Public Mapbox token - safe to store in frontend code
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
 
 interface MapContainerProps {
   theme: 'dark' | 'light';

@@ -37,7 +37,8 @@ export interface ChoroplethData {
  * Get map tile configuration based on region and availability
  */
 export function getMapTileConfig(): MapTileConfig {
-  const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+  // Public Mapbox token - safe to store in frontend code
+  const mapboxToken = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
   
   if (mapboxToken) {
     return {
@@ -61,7 +62,7 @@ export function getMapTileConfig(): MapTileConfig {
  * Geocode an address to coordinates
  */
 export async function geocodeAddress(query: string): Promise<GeocodingResult[]> {
-  const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+  const mapboxToken = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
   
   if (mapboxToken) {
     const response = await apiRequest<{ features: Array<{
@@ -109,7 +110,7 @@ export async function geocodeAddress(query: string): Promise<GeocodingResult[]> 
  * Reverse geocode coordinates to address
  */
 export async function reverseGeocode(lng: number, lat: number): Promise<GeocodingResult | null> {
-  const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+  const mapboxToken = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
   
   if (mapboxToken) {
     const response = await apiRequest<{ features: Array<{
