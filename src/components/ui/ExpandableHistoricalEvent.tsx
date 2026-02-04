@@ -570,7 +570,7 @@ export const ExpandableHistoricalEvent: React.FC<ExpandableHistoricalEventProps>
             </div>
           )}
           
-          {/* Related Events */}
+          {/* Related Events - Clickable navigation */}
           {fullEvent.relatedEvents && fullEvent.relatedEvents.length > 0 && (
             <div className="flex flex-wrap gap-1.5 pt-2">
               <span className="text-xs font-mono text-muted-foreground">
@@ -579,17 +579,22 @@ export const ExpandableHistoricalEvent: React.FC<ExpandableHistoricalEventProps>
               {fullEvent.relatedEvents.map((eventKey) => {
                 const related = HISTORICAL_EVENT_REGISTRY[eventKey];
                 return related ? (
-                  <Badge 
-                    key={eventKey} 
-                    variant="secondary" 
-                    className="text-xs cursor-pointer hover:bg-primary/20 transition-colors"
+                  <a 
+                    key={eventKey}
+                    href={`/history/${eventKey}`}
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
-                      // Could navigate or expand related event
+                      // Scroll to top and trigger navigation
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      // For now, open in dialog or navigate
+                      window.location.href = `/history/${eventKey}`;
                     }}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
                   >
+                    <span className="font-mono text-[10px]">[→]</span>
                     {related.year}: {related.event.substring(0, 25)}...
-                  </Badge>
+                  </a>
                 ) : null;
               })}
             </div>
