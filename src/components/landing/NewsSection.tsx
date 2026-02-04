@@ -106,18 +106,18 @@ export const NewsSection: React.FC = () => {
           <p className="text-sm text-muted-foreground mb-4">
             Universell hierarki – samma struktur för alla 195 länder
           </p>
-          <div className="flex flex-wrap justify-center gap-3 text-xs font-mono">
-            <span className="px-3 py-1.5 bg-muted rounded-sm border">🌍 CIVILISATION</span>
+          <div className="flex flex-wrap justify-center gap-2 text-xs font-mono">
+            <span className="px-3 py-1.5 bg-muted rounded-sm border">[◉] CIVILISATION</span>
             <span className="text-muted-foreground">→</span>
-            <span className="px-3 py-1.5 bg-muted rounded-sm border">🌐 VÄRLDSDEL</span>
+            <span className="px-3 py-1.5 bg-muted rounded-sm border">[▣] VÄRLDSDEL</span>
             <span className="text-muted-foreground">→</span>
-            <span className="px-3 py-1.5 bg-muted rounded-sm border">🏴 NATION</span>
+            <span className="px-3 py-1.5 bg-muted rounded-sm border">[▢] NATION</span>
             <span className="text-muted-foreground">→</span>
-            <span className="px-3 py-1.5 bg-muted rounded-sm border">📍 REGION</span>
+            <span className="px-3 py-1.5 bg-muted rounded-sm border">[◇] REGION</span>
             <span className="text-muted-foreground">→</span>
-            <span className="px-3 py-1.5 bg-muted rounded-sm border">🏘️ KOMMUN</span>
+            <span className="px-3 py-1.5 bg-muted rounded-sm border">[□] KOMMUN</span>
             <span className="text-muted-foreground">→</span>
-            <span className="px-3 py-1.5 bg-muted rounded-sm border">🏙️ STAD</span>
+            <span className="px-3 py-1.5 bg-muted rounded-sm border">[•] STAD</span>
           </div>
         </div>
       </div>
