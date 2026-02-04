@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { ExpandableSourceDocument } from '@/components/ui/ExpandableSourceDocument';
 import { ExpandableHistoricalEvent } from '@/components/ui/ExpandableHistoricalEvent';
 import { ExpandableIndicatorBadge } from '@/components/ui/ExpandableIndicatorBadge';
+import { ExpandableProofPoint } from '@/components/ui/ExpandableProofPoint';
 
 // ═══════════════════════════════════════════════════════════════
 // PRINCIPLE EVIDENCE DATA
@@ -426,37 +427,39 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
         
         {/* What This Proves / Limitations */}
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className="bg-green-50/50 dark:bg-green-950/20 border-green-200">
+          <Card className="border-primary/20">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-mono uppercase tracking-wider text-green-700 dark:text-green-400">
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-primary">
                 DETTA BEVISAR
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <ul className="space-y-1">
+            <CardContent className="pt-0">
+              <ul className="space-y-0">
                 {evidence.whatThisProves.map((point, idx) => (
-                  <li key={idx} className="text-xs flex items-start gap-2">
-                    <span className="text-green-500 mt-0.5">✓</span>
-                    {point}
-                  </li>
+                  <ExpandableProofPoint
+                    key={idx}
+                    point={point}
+                    type="proof"
+                  />
                 ))}
               </ul>
             </CardContent>
           </Card>
           
-          <Card className="bg-amber-50/50 dark:bg-amber-950/20 border-amber-200">
+          <Card className="border-muted-foreground/20">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-mono uppercase tracking-wider text-amber-700 dark:text-amber-400">
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                 BEGRÄNSNINGAR
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <ul className="space-y-1">
+            <CardContent className="pt-0">
+              <ul className="space-y-0">
                 {evidence.limitations.map((point, idx) => (
-                  <li key={idx} className="text-xs flex items-start gap-2">
-                    <span className="text-amber-500 mt-0.5">⚠</span>
-                    {point}
-                  </li>
+                  <ExpandableProofPoint
+                    key={idx}
+                    point={point}
+                    type="limitation"
+                  />
                 ))}
               </ul>
             </CardContent>
