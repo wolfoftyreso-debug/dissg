@@ -97,6 +97,7 @@ import DataPage from "./pages/DataPage";
 import Extras from "./pages/Extras";
 import Help from "./pages/Help";
 import DemocraticHealth from "./pages/DemocraticHealth";
+import BudgetPage from "./pages/BudgetPage";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -197,6 +198,7 @@ const App = () => (
               <Route path="/extras" element={<Extras />} />
               <Route path="/help" element={<Help />} />
               <Route path="/democratic-health" element={<DemocraticHealth />} />
+              <Route path="/budget" element={<BudgetPage />} />
               {/* Huvudsidan är publik - läsning utan inloggning */}
               <Route path="/" element={<Index />} />
               {/* Skyddade routes - kräver inloggning */}
