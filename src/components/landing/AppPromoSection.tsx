@@ -1,8 +1,8 @@
 /**
  * APP PROMO SECTION
  * 
- * "Håll koll på samhället direkt från mobilen" - App Store/Play Store promo.
- * Inspirerat av Avanzas app-sektion.
+ * "Håll koll på världen direkt från mobilen" - App Store/Play Store promo.
+ * GLOBALT PERSPEKTIV - jurisdiktionsneutral.
  */
 
 import React from 'react';
@@ -20,16 +20,16 @@ export const AppPromoSection: React.FC = () => {
     <section className="py-16 lg:py-24 bg-slate-900 text-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left: Text content */}
+          {/* Left: Text content - GLOBAL perspective */}
           <div className="space-y-6">
             <h2 className="text-3xl lg:text-4xl font-bold leading-tight">
-              Håll koll på samhället direkt från mobilen
+              Håll koll på civilisationen direkt från mobilen
             </h2>
             
             <p className="text-lg text-slate-300 leading-relaxed max-w-lg">
-              Gör som de flesta andra. Ladda ner vår app och se hur smidigt du kan 
-              följa samhällsutvecklingen, få notiser om anomalier och utforska data 
-              direkt från mobilen. Självklart kan du slå på dark mode om du vill det!
+              Följ 195 länder i realtid. Ladda ner appen och se globala trender, 
+              få notiser om anomalier och utforska data från vilken världsdel som 
+              helst. Välj ditt fokusland eller behåll det globala perspektivet.
             </p>
 
             {/* App store buttons */}
@@ -52,7 +52,7 @@ export const AppPromoSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: Phone mockups */}
+          {/* Right: Phone mockups - GLOBAL data */}
           <div className="hidden lg:flex justify-center">
             <div className="relative">
               {/* Phone 1 (front) */}
@@ -62,33 +62,34 @@ export const AppPromoSection: React.FC = () => {
                   <div className="w-16 h-1 bg-slate-600 rounded-full" />
                 </div>
                 
-                {/* Phone content */}
+                {/* Phone content - GLOBAL perspective */}
                 <div className="p-3 space-y-3 bg-slate-900">
                   <div className="text-[10px] text-slate-500 font-mono">[DISSG v1.0]</div>
                   
-                  {/* Dashboard preview */}
+                  {/* Global dashboard preview */}
                   <div className="space-y-2">
                     <div className="p-2 bg-slate-800 rounded-sm">
-                      <div className="text-[9px] text-slate-500 mb-1">SVERIGE LAMBDA</div>
-                      <div className="text-xl font-bold font-mono text-emerald-400">0.98</div>
+                      <div className="text-[9px] text-slate-500 mb-1">GLOBAL LAMBDA</div>
+                      <div className="text-xl font-bold font-mono text-emerald-400">0.76</div>
                     </div>
                     
+                    {/* Top regions by Lambda */}
                     <div className="grid grid-cols-2 gap-2">
                       <div className="p-2 bg-slate-800 rounded-sm">
-                        <div className="text-[8px] text-slate-500">Hälsa</div>
-                        <div className="text-sm font-mono text-emerald-400">+2.1%</div>
+                        <div className="text-[8px] text-slate-500">Europa</div>
+                        <div className="text-sm font-mono text-emerald-400">0.89</div>
                       </div>
                       <div className="p-2 bg-slate-800 rounded-sm">
-                        <div className="text-[8px] text-slate-500">Ekonomi</div>
-                        <div className="text-sm font-mono text-emerald-400">+1.4%</div>
+                        <div className="text-[8px] text-slate-500">Nordamerika</div>
+                        <div className="text-sm font-mono text-emerald-400">0.87</div>
                       </div>
                       <div className="p-2 bg-slate-800 rounded-sm">
-                        <div className="text-[8px] text-slate-500">Utbildning</div>
-                        <div className="text-sm font-mono text-amber-400">-0.3%</div>
+                        <div className="text-[8px] text-slate-500">Asien</div>
+                        <div className="text-sm font-mono text-amber-400">0.71</div>
                       </div>
                       <div className="p-2 bg-slate-800 rounded-sm">
-                        <div className="text-[8px] text-slate-500">Miljö</div>
-                        <div className="text-sm font-mono text-emerald-400">+0.8%</div>
+                        <div className="text-[8px] text-slate-500">Afrika</div>
+                        <div className="text-sm font-mono text-amber-400">0.54</div>
                       </div>
                     </div>
                     
@@ -103,6 +104,10 @@ export const AppPromoSection: React.FC = () => {
                           />
                         ))}
                       </div>
+                    </div>
+                    
+                    <div className="text-[8px] text-slate-500 text-center">
+                      195 länder • 7 världsdelar • 184 indikatorer
                     </div>
                   </div>
                 </div>

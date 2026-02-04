@@ -2,7 +2,7 @@
  * NEWS SECTION
  * 
  * "Aktuellt från DISSG" - Avanza-inspirerade nyhets-/feature-cards.
- * Med realistiska foton på datavisualisering och statistik.
+ * GLOBALT PERSPEKTIV - jurisdiktionsneutral.
  */
 
 import React from 'react';
@@ -27,8 +27,8 @@ interface NewsCard {
 const NEWS_ITEMS: NewsCard[] = [
   {
     id: '1',
-    title: 'Migrera din befintliga data till DISSG',
-    description: 'Har du redan samhällsdata? På 5 minuter kan du importera dina befintliga dataset. Dina insikter fortsätter ackumulera medan du får bättre analysverktyg.',
+    title: 'Koppla din data till 195 länder',
+    description: 'Har du befintlig data? Importera dina dataset och se dem i globalt sammanhang. Jämför med länder, regioner och städer världen över.',
     category: 'Guide',
     link: '/data',
     image: newsGlobalData,
@@ -36,21 +36,21 @@ const NEWS_ITEMS: NewsCard[] = [
   },
   {
     id: '2',
-    title: 'Få det bästa med Lambda Pro',
-    description: 'Tillgång till alla 184 indikatorer, regional breakdown till kommunnivå, och AI-assisterade insikter. Perfekt för forskare och analytiker.',
+    title: 'Djupdyk med Lambda Pro',
+    description: 'Tillgång till alla 184 indikatorer, breakdown från global till lokal nivå, och AI-assisterade insikter. För forskare, analytiker och beslutsfattare.',
     category: 'Tjänst',
     link: '/settings',
     image: newsLambdaPro,
-    badge: 'LAND → KOMMUN',
+    badge: 'ALLA NIVÅER',
   },
   {
     id: '3',
-    title: 'Kommun eller region? Jämför digitalt',
-    description: 'Hos oss kan du jämföra kommuner och regioner mot varandra – objektivt och transparent. Använd samma verktyg som beslutsfattare.',
+    title: 'Jämför städer och regioner globalt',
+    description: 'Jämför valfria städer, regioner eller länder mot varandra – objektivt och transparent. Samma metodologi överallt.',
     category: 'Verktyg',
     link: '/diagnostics',
     image: newsCompare,
-    badge: 'STAD ↔ STAD',
+    badge: '195 LÄNDER',
   },
 ];
 
@@ -101,19 +101,19 @@ export const NewsSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Geographic scope info */}
+        {/* Geographic scope info - GLOBAL hierarchy */}
         <div className="mt-12 text-center">
           <p className="text-sm text-muted-foreground mb-4">
-            Jämför data på alla nivåer i hierarkin
+            Universell hierarki – samma struktur för alla 195 länder
           </p>
           <div className="flex flex-wrap justify-center gap-3 text-xs font-mono">
-            <span className="px-3 py-1.5 bg-muted rounded-sm border">🌍 GLOBAL</span>
+            <span className="px-3 py-1.5 bg-muted rounded-sm border">🌍 CIVILISATION</span>
             <span className="text-muted-foreground">→</span>
-            <span className="px-3 py-1.5 bg-muted rounded-sm border">🌐 REGION</span>
+            <span className="px-3 py-1.5 bg-muted rounded-sm border">🌐 VÄRLDSDEL</span>
             <span className="text-muted-foreground">→</span>
-            <span className="px-3 py-1.5 bg-muted rounded-sm border">🏴 LAND</span>
+            <span className="px-3 py-1.5 bg-muted rounded-sm border">🏴 NATION</span>
             <span className="text-muted-foreground">→</span>
-            <span className="px-3 py-1.5 bg-muted rounded-sm border">📍 DELSTAT</span>
+            <span className="px-3 py-1.5 bg-muted rounded-sm border">📍 REGION</span>
             <span className="text-muted-foreground">→</span>
             <span className="px-3 py-1.5 bg-muted rounded-sm border">🏘️ KOMMUN</span>
             <span className="text-muted-foreground">→</span>

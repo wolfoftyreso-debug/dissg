@@ -2,6 +2,7 @@
  * LANDING FOOTER
  * 
  * Avanza-inspirerad footer med länkar och info.
+ * GLOBALT PERSPEKTIV - jurisdiktionsneutral.
  */
 
 import React from 'react';
@@ -23,7 +24,7 @@ export const LandingFooter: React.FC = () => {
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Diagnostic Information System for Societal Governance. 
-              Öppen samhällsdiagnostik för alla.
+              Global samhällsdiagnostik – öppen för alla, överallt.
             </p>
           </div>
 
@@ -62,11 +63,11 @@ export const LandingFooter: React.FC = () => {
         </div>
       </div>
 
-      {/* Bottom bar */}
+      {/* Bottom bar - GLOBAL statistics */}
       <div className="border-t">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            © 2024 DISSG. All data är öppen och spårbar.
+            © 2024 DISSG. All data är öppen och spårbar. Jurisdiktionsneutral.
           </p>
           
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -74,9 +75,9 @@ export const LandingFooter: React.FC = () => {
             <span>•</span>
             <span>184 indikatorer</span>
             <span>•</span>
-            <span>23 länder</span>
+            <span>195 länder</span>
             <span>•</span>
-            <span>Senaste uppdatering: 2024-Q4</span>
+            <span>7 världsdelar</span>
           </div>
         </div>
       </div>
