@@ -334,7 +334,7 @@ export const SocietalCorrelationEngine: React.FC = () => {
             className="w-full mt-4 min-h-[48px]" 
             onClick={() => setShowAnalysis(true)}
           >
-            Visa samvariation →
+            Visa samvariation
           </Button>
         </CardContent>
       </Card>
@@ -395,7 +395,7 @@ export const SocietalCorrelationEngine: React.FC = () => {
               <div className="mt-4 pt-4 border-t text-xs text-muted-foreground space-y-1">
                 <div>Period: {mockData[0]?.year}–{mockData[mockData.length - 1]?.year}</div>
                 {startYear < 1850 && (
-                  <div className="text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                  <div className="text-destructive flex items-center gap-1">
                     <span className="font-mono">[EST]</span>
                     Data före 1850 är rekonstruerade estimat
                   </div>
@@ -466,7 +466,7 @@ export const SocietalCorrelationEngine: React.FC = () => {
                 onClick={() => setShowCrossCountry(!showCrossCountry)}
               >
                 <span>{CROSS_COUNTRY_PROMPT.sv}</span>
-                <span className={`transition-transform ${showCrossCountry ? 'rotate-90' : ''}`}>→</span>
+                <span className={`transition-transform font-mono text-xs ${showCrossCountry ? 'rotate-90' : ''}`}>[+]</span>
               </Button>
               
               {showCrossCountry && (
@@ -474,8 +474,8 @@ export const SocietalCorrelationEngine: React.FC = () => {
                   <p className="text-sm font-medium mb-3">Internationell jämförelse visar att:</p>
                   <ul className="space-y-2">
                     {['Mönster är sällan unika för ett land', 'Kontext spelar stor roll', 'Institutioner spelar stor roll'].map((insight, i) => (
-                      <li key={i} className="text-sm flex items-center gap-2">
-                        <span className="text-primary">✓</span>
+                      <li key={i} className="text-sm flex items-start gap-2">
+                        <span className="font-mono text-primary text-xs">[+]</span>
                         {insight}
                       </li>
                     ))}
@@ -524,8 +524,8 @@ export const SocietalCorrelationEngine: React.FC = () => {
             <CardContent>
               <div className="grid gap-2 md:grid-cols-2">
                 {TRANSPARENCY_PRINCIPLES.sv.map((p, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
-                    <span className="text-primary">✓</span>
+                  <div key={i} className="flex items-start gap-2 text-sm">
+                    <span className="font-mono text-primary text-xs">[+]</span>
                     {p}
                   </div>
                 ))}
