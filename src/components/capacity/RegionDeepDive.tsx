@@ -68,6 +68,19 @@ interface RegionHealth {
   treatmentAccessRate: number;
 }
 
+// Country name to ISO code mapping for clickable links
+const COUNTRY_CODE_MAP: Record<string, string> = {
+  // Sahel
+  'Mali': 'ML', 'Niger': 'NE', 'Burkina Faso': 'BF', 'Tchad': 'TD', 'Mauritanien': 'MR', 'Senegal': 'SN',
+  // South Asia
+  'Indien': 'IN', 'Pakistan': 'PK', 'Bangladesh': 'BD', 'Nepal': 'NP', 'Sri Lanka': 'LK', 'Afghanistan': 'AF',
+  // Central America
+  'Guatemala': 'GT', 'Honduras': 'HN', 'El Salvador': 'SV', 'Nicaragua': 'NI', 'Costa Rica': 'CR', 'Panama': 'PA', 'Belize': 'BZ',
+  // MENA
+  'Egypten': 'EG', 'Marocko': 'MA', 'Algeriet': 'DZ', 'Tunisien': 'TN', 'Libyen': 'LY', 
+  'Jordanien': 'JO', 'Libanon': 'LB', 'Irak': 'IQ', 'Syrien': 'SY', 'Jemen': 'YE',
+};
+
 interface RegionEvidence {
   overview: {
     population: number;
@@ -964,7 +977,7 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                       {evidence.overview.countries.map((country) => (
                         <ClickableCountryName
                           key={country}
-                          countryCode={country.substring(0, 2).toUpperCase()}
+                          countryCode={COUNTRY_CODE_MAP[country] || country.substring(0, 2).toUpperCase()}
                           countryName={country}
                           variant="badge"
                         />
