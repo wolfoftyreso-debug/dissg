@@ -483,11 +483,56 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
           </Card>
         )}
         
-        {/* Data Source Footer */}
-        <div className="text-xs text-muted-foreground border-t pt-3 mt-2">
-          <span className="font-mono uppercase tracking-wider">KÄLLOR:</span>
-          <span className="ml-2">Vetenskapliga publikationer, officiella rapporter, internationella organisationer</span>
-        </div>
+        {/* Data Source Footer - Clickable */}
+        <Collapsible className="border-t pt-3 mt-2">
+          <CollapsibleTrigger className="group cursor-pointer w-full text-left">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors">
+              <span className="font-mono uppercase tracking-wider">KÄLLOR:</span>
+              <span className="flex-1">Vetenskapliga publikationer, officiella rapporter, internationella organisationer</span>
+              <span className="font-mono text-[10px] opacity-0 group-hover:opacity-100 transition-opacity">[KLICKA FÖR DETALJER]</span>
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-3 space-y-2">
+            <Card className="bg-muted/30">
+              <CardContent className="py-3 space-y-3">
+                <div>
+                  <span className="font-mono text-[10px] text-muted-foreground block mb-1">PRIMÄRKÄLLOR</span>
+                  <ul className="text-xs space-y-1">
+                    <li className="flex items-center gap-2 hover:text-primary cursor-pointer transition-colors">
+                      <span className="font-mono text-[10px]">[1]</span>
+                      Peer-reviewed vetenskapliga publikationer (Nature, Science, PNAS)
+                    </li>
+                    <li className="flex items-center gap-2 hover:text-primary cursor-pointer transition-colors">
+                      <span className="font-mono text-[10px]">[2]</span>
+                      FN-organ (IPCC, UNFCCC, UNEP, FAO, WHO)
+                    </li>
+                    <li className="flex items-center gap-2 hover:text-primary cursor-pointer transition-colors">
+                      <span className="font-mono text-[10px]">[3]</span>
+                      Internationella forskningsinstitut (Stockholm Resilience Centre, PIK)
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <span className="font-mono text-[10px] text-muted-foreground block mb-1">SEKUNDÄRKÄLLOR</span>
+                  <ul className="text-xs space-y-1">
+                    <li className="flex items-center gap-2 hover:text-primary cursor-pointer transition-colors">
+                      <span className="font-mono text-[10px]">[4]</span>
+                      Nationella statistikbyråer och miljömyndigheter
+                    </li>
+                    <li className="flex items-center gap-2 hover:text-primary cursor-pointer transition-colors">
+                      <span className="font-mono text-[10px]">[5]</span>
+                      Granskade rapporter från erkända organisationer
+                    </li>
+                  </ul>
+                </div>
+                <p className="text-[10px] text-muted-foreground p-2 bg-muted rounded">
+                  Alla källor genomgår validering enligt vår datakonstitution. 
+                  Klicka på specifika siffror i analysen ovan för att se exakt källhänvisning.
+                </p>
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
       </CollapsibleContent>
     </Collapsible>
   );
