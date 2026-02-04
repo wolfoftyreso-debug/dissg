@@ -23,6 +23,9 @@ import UniversalResponsibilityMap from '@/components/global/UniversalResponsibil
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { useGovRole } from '@/hooks/useGovRole';
 import { SYSTEM } from '@/config/system';
+import { UniversalBreadcrumb } from '@/components/navigation';
+import { MachineReadableHead } from '@/components/seo';
+import { useGeo } from '@/contexts/GeoContext';
 
 // Tab configuration
 const MAIN_TABS: ODISTab[] = [
@@ -49,6 +52,7 @@ const Index = () => {
   const [activeMode, setActiveMode] = useState('diagnosis');
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
   
+  const { scope } = useGeo();
   const { data: govRole } = useGovRole();
   const currentRole = govRole?.role || 'public';
   
@@ -116,12 +120,6 @@ const Index = () => {
   const criticalCount = kpis.filter(k => k.status === 'critical').length;
   const warningCount = kpis.filter(k => k.status === 'warning').length;
 
-  const leftInfo = [
-    { label: 'Country', value: 'SE' },
-    { label: 'Scope', value: currentRole === 'public' ? 'PUBLIC' : currentRole.toUpperCase() },
-    { label: 'Level', value: 'NATIONAL' },
-  ];
-
   const rightInfo = [
     { label: 'VER', value: `${SYSTEM.name} ${SYSTEM.version}` },
     { label: 'Coverage', value: `${kpis.length} indicators` },
@@ -150,12 +148,21 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Machine-readable metadata */}
+      <MachineReadableHead
+        entityType={scope.level as any}
+        entityCode={scope.code}
+        dataTimestamp={new Date().toISOString()}
+      />
+
       {/* ODIS Header */}
       <ODISHeader
-        leftInfo={leftInfo}
         rightInfo={rightInfo}
         statusIndicators={statusIndicators}
       />
+
+      {/* Universal Breadcrumb - ALWAYS VISIBLE */}
+      <UniversalBreadcrumb showDataTier variant="full" />
 
       {/* ODIS Tabs */}
       <ODISTabs
