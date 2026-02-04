@@ -13,7 +13,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
@@ -41,6 +41,7 @@ import {
 } from '@/config/carryingCapacityConfig';
 import { FactorDeepDive } from './FactorDeepDive';
 import { RegionDeepDive } from './RegionDeepDive';
+import { WelfarePrincipleExpander, PopulationCapacityExpander } from './SystemPrincipleExpander';
 
 // Sample sparkline data for each metric (would come from API in production)
 const SPARKLINE_DATA = {
@@ -483,12 +484,9 @@ const SystemConnectionsPanel: React.FC = () => {
           ))}
         </div>
         
-        <Alert className="mt-4 bg-primary/5 border-primary/20">
-          <AlertDescription className="text-sm text-center">
-            <span className="font-medium">Systemprincip: </span>
-            Alla välfärdsfrågor bottnar i fysisk kapacitet — därför landar allt här.
-          </AlertDescription>
-        </Alert>
+        <div className="mt-4">
+          <WelfarePrincipleExpander />
+        </div>
       </CardContent>
     </Card>
   );
@@ -574,18 +572,8 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
       {/* System connections */}
       <SystemConnectionsPanel />
 
-      {/* Core message */}
-      <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-        <CardContent className="pt-6 text-center">
-          <p className="text-sm font-medium max-w-lg mx-auto">
-            {KEY_MESSAGES.coreQuestion.sv}
-          </p>
-          <Separator className="my-4" />
-          <p className="text-xs text-muted-foreground">
-            Inte ideologi. Inte klimatmoral. Inte tillväxtoptimism. Bara fysik, biologi, teknik och mänskligt välbefinnande.
-          </p>
-        </CardContent>
-      </Card>
+      {/* Core message - EXPANDABLE */}
+      <PopulationCapacityExpander />
     </div>
   );
 };
