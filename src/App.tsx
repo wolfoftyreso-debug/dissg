@@ -85,6 +85,7 @@ import SelfTestPage from "./pages/SelfTest";
 import GEDIPage from "./pages/GEDI";
 import Lambda1Page from "./pages/Lambda1";
 import GDMPage from "./pages/GDM";
+import GGDPage from "./pages/GGD";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -173,6 +174,7 @@ const App = () => (
               <Route path="/gedi" element={<GEDIPage />} />
               <Route path="/lambda1" element={<Lambda1Page />} />
               <Route path="/gdm" element={<GDMPage />} />
+              <Route path="/ggd" element={<GGDPage />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
