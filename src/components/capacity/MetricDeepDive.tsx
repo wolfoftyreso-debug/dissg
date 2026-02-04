@@ -5,6 +5,8 @@
  * - Befolkning (nedbruten på ålder/kön)
  * - Länder i regionen
  * - Medellivslängd (historik och jämförelse)
+ * 
+ * ALL DATA FRÅN DATABASEN - INGEN MOCK-DATA
  */
 
 import React from 'react';
@@ -12,6 +14,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   BarChart, 
   Bar, 
@@ -26,7 +30,15 @@ import {
   LineChart,
   Line
 } from 'recharts';
-import { Users, Globe, Activity, TrendingUp, Calendar, MapPin } from 'lucide-react';
+import { Users, Globe, Activity, TrendingUp, Calendar, MapPin, Database, AlertCircle } from 'lucide-react';
+import {
+  useRegionalDemographics,
+  usePopulationHistory,
+  useLifeExpectancyHistory,
+  useRegionalCountries,
+  useRegionalStats,
+  useLifeExpectancyComparison,
+} from '@/hooks/useRegionalDemographics';
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -45,90 +57,91 @@ interface MetricDeepDiveProps {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// MOCK DATA (Would come from database in production)
+// LOADING & ERROR STATES
 // ═══════════════════════════════════════════════════════════════
 
-const getPopulationPyramid = (region: string) => {
-  // Simplified age/gender distribution
-  const ageGroups = ['0-4', '5-14', '15-24', '25-34', '35-44', '45-54', '55-64', '65-74', '75+'];
-  const isYoungRegion = region.toLowerCase().includes('sahel') || region.toLowerCase().includes('afrika');
+const LoadingState: React.FC<{ message?: string }> = ({ message = 'Laddar data från databasen...' }) => (
+  <div className="space-y-4">
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <Database className="h-4 w-4 animate-pulse" />
+      <span>{message}</span>
+    </div>
+    <Skeleton className="h-32 w-full" />
+    <Skeleton className="h-48 w-full" />
+    <Skeleton className="h-32 w-full" />
+  </div>
+);
+
+const EmptyState: React.FC<{ title: string; description: string }> = ({ title, description }) => (
+  <Alert>
+    <AlertCircle className="h-4 w-4" />
+    <AlertDescription>
+      <p className="font-medium">{title}</p>
+      <p className="text-sm text-muted-foreground mt-1">{description}</p>
+    </AlertDescription>
+  </Alert>
+);
+
+// ═══════════════════════════════════════════════════════════════
+// POPULATION VIEW - DATA FROM DATABASE
+// ═══════════════════════════════════════════════════════════════
+
+const PopulationView: React.FC<{ regionName: string }> = ({ regionName }) => {
+  const { data: demographics, isLoading: loadingDemo, error: demoError } = useRegionalDemographics(regionName);
+  const { data: history, isLoading: loadingHistory } = usePopulationHistory(regionName);
+  const { data: stats, isLoading: loadingStats } = useRegionalStats(regionName);
   
-  return ageGroups.map((age, idx) => {
-    const baseValue = isYoungRegion 
-      ? Math.max(5, 20 - idx * 2) // Young population pyramid
-      : Math.max(3, 12 - Math.abs(idx - 4) * 1.5); // More balanced
-    
-    return {
-      ageGroup: age,
-      male: -(baseValue + Math.random() * 2),
-      female: baseValue + Math.random() * 2,
-    };
-  });
-};
-
-const getPopulationHistory = () => [
-  { year: 1960, population: 120 },
-  { year: 1970, population: 160 },
-  { year: 1980, population: 210 },
-  { year: 1990, population: 280 },
-  { year: 2000, population: 340 },
-  { year: 2010, population: 400 },
-  { year: 2020, population: 450 },
-  { year: 2024, population: 480 },
-];
-
-const getLifeExpectancyHistory = (current: number) => {
-  return [
-    { year: 1960, value: current - 25 },
-    { year: 1970, value: current - 22 },
-    { year: 1980, value: current - 18 },
-    { year: 1990, value: current - 12 },
-    { year: 2000, value: current - 8 },
-    { year: 2010, value: current - 4 },
-    { year: 2020, value: current - 1.5 },
-    { year: 2024, value: current },
-  ];
-};
-
-const getLifeExpectancyByGender = (avg: number) => [
-  { gender: 'Kvinnor', value: avg + 3.5, fill: 'hsl(var(--chart-1))' },
-  { gender: 'Män', value: avg - 2.5, fill: 'hsl(var(--chart-2))' },
-];
-
-const getLifeExpectancyComparison = (regionValue: number) => [
-  { region: 'Denna region', value: regionValue, fill: 'hsl(var(--primary))' },
-  { region: 'Världen', value: 73.4, fill: 'hsl(var(--muted-foreground))' },
-  { region: 'Europa', value: 79.2, fill: 'hsl(var(--chart-1))' },
-  { region: 'Afrika', value: 64.5, fill: 'hsl(var(--chart-2))' },
-];
-
-// ═══════════════════════════════════════════════════════════════
-// COMPONENTS
-// ═══════════════════════════════════════════════════════════════
-
-const PopulationView: React.FC<{ regionName: string; population: number }> = ({ regionName, population }) => {
-  const pyramidData = getPopulationPyramid(regionName);
-  const historyData = getPopulationHistory();
+  if (loadingDemo || loadingHistory || loadingStats) {
+    return <LoadingState message="Hämtar befolkningsdata..." />;
+  }
+  
+  if (demoError || !demographics?.length) {
+    return (
+      <EmptyState 
+        title="Ingen befolkningsdata" 
+        description={`Ingen demografisk data finns för ${regionName} i databasen än.`}
+      />
+    );
+  }
+  
+  // Transform demographic data for pyramid chart
+  const pyramidData = demographics.map(d => ({
+    ageGroup: d.age_group,
+    male: -d.male_percent,
+    female: d.female_percent,
+  }));
+  
+  // Transform history for line chart
+  const historyData = history?.map(h => ({
+    year: h.year,
+    population: h.population_millions,
+  })) || [];
   
   return (
     <div className="space-y-6">
-      {/* Current stats */}
+      {/* Current stats from database */}
       <div className="grid grid-cols-3 gap-4">
         <Card className="p-4 text-center bg-primary/5">
-          <p className="text-2xl font-bold text-primary">{(population / 1_000_000).toFixed(0)}M</p>
+          <p className="text-2xl font-bold text-primary">{stats?.population.toFixed(0)}M</p>
           <p className="text-xs text-muted-foreground">Total befolkning</p>
         </Card>
         <Card className="p-4 text-center">
-          <p className="text-2xl font-bold">2.4%</p>
+          <p className="text-2xl font-bold">{stats?.growthRate?.toFixed(1) || '–'}%</p>
           <p className="text-xs text-muted-foreground">Årlig tillväxt</p>
         </Card>
         <Card className="p-4 text-center">
-          <p className="text-2xl font-bold">19.2</p>
+          <p className="text-2xl font-bold">{stats?.medianAge?.toFixed(1) || '–'}</p>
           <p className="text-xs text-muted-foreground">Medianålder</p>
         </Card>
       </div>
       
-      {/* Population pyramid */}
+      {/* Data source indicator */}
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Database className="h-3 w-3" />
+        <span>Källa: {demographics[0]?.data_source || 'Databas'} • År: {stats?.dataYear}</span>
+      </div>
+      
+      {/* Population pyramid from database */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
@@ -145,7 +158,7 @@ const PopulationView: React.FC<{ regionName: string; population: number }> = ({ 
                 margin={{ top: 10, right: 30, left: 40, bottom: 10 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                <XAxis type="number" domain={[-25, 25]} tickFormatter={(v) => `${Math.abs(v)}%`} />
+                <XAxis type="number" domain={[-15, 15]} tickFormatter={(v) => `${Math.abs(v)}%`} />
                 <YAxis type="category" dataKey="ageGroup" tick={{ fontSize: 11 }} />
                 <Tooltip 
                   formatter={(value: number) => [`${Math.abs(value).toFixed(1)}%`]}
@@ -172,57 +185,79 @@ const PopulationView: React.FC<{ regionName: string; population: number }> = ({ 
         </CardContent>
       </Card>
       
-      {/* Historical trend */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Befolkningstillväxt 1960–2024
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={historyData}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                <XAxis dataKey="year" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}M`} />
-                <Tooltip 
-                  formatter={(value: number) => [`${value}M`, 'Befolkning']}
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--background))',
-                    border: '1px solid hsl(var(--border))'
-                  }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="population" 
-                  stroke="hsl(var(--primary))" 
-                  strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--primary))' }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Historical trend from database */}
+      {historyData.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Befolkningstillväxt {historyData[0]?.year}–{historyData[historyData.length - 1]?.year}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={historyData}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                  <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}M`} />
+                  <Tooltip 
+                    formatter={(value: number) => [`${value}M`, 'Befolkning']}
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))'
+                    }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="population" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={2}
+                    dot={{ fill: 'hsl(var(--primary))' }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
 
-const CountriesView: React.FC<{ countries: string[] }> = ({ countries }) => {
-  // Mock country data
-  const countryData = countries.map((name, idx) => ({
-    name,
-    population: Math.floor(Math.random() * 100 + 10),
-    hdi: (Math.random() * 0.3 + 0.5).toFixed(2),
-    lifeExp: Math.floor(Math.random() * 15 + 60),
-  })).sort((a, b) => b.population - a.population);
+// ═══════════════════════════════════════════════════════════════
+// COUNTRIES VIEW - DATA FROM DATABASE
+// ═══════════════════════════════════════════════════════════════
+
+const CountriesView: React.FC<{ regionName: string }> = ({ regionName }) => {
+  const { data: countries, isLoading, error } = useRegionalCountries(regionName);
   
-  const pieData = countryData.map((c, idx) => ({
-    name: c.name,
-    value: c.population,
-    fill: `hsl(var(--chart-${(idx % 5) + 1}))`,
+  if (isLoading) {
+    return <LoadingState message="Hämtar landsdata..." />;
+  }
+  
+  if (error || !countries?.length) {
+    return (
+      <EmptyState 
+        title="Ingen landsdata" 
+        description={`Ingen landsdata finns för ${regionName} i databasen än.`}
+      />
+    );
+  }
+  
+  // Chart colors
+  const COLORS = [
+    'hsl(var(--chart-1))',
+    'hsl(var(--chart-2))',
+    'hsl(var(--chart-3))',
+    'hsl(var(--chart-4))',
+    'hsl(var(--chart-5))',
+  ];
+  
+  const pieData = countries.map((c, idx) => ({
+    name: c.country_name,
+    value: c.population_millions,
+    fill: COLORS[idx % COLORS.length],
   }));
   
   return (
@@ -233,6 +268,12 @@ const CountriesView: React.FC<{ countries: string[] }> = ({ countries }) => {
         <p className="text-3xl font-bold text-primary">{countries.length}</p>
         <p className="text-sm text-muted-foreground">Länder i regionen</p>
       </Card>
+      
+      {/* Data source */}
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Database className="h-3 w-3" />
+        <span>Källa: {countries[0]?.data_source || 'Databas'} • År: {countries[0]?.year}</span>
+      </div>
       
       {/* Population distribution */}
       <Card>
@@ -258,7 +299,7 @@ const CountriesView: React.FC<{ countries: string[] }> = ({ countries }) => {
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value: number) => [`${value}M`, 'Befolkning']}
+                  formatter={(value: number) => [`${value.toFixed(1)}M`, 'Befolkning']}
                   contentStyle={{ 
                     backgroundColor: 'hsl(var(--background))',
                     border: '1px solid hsl(var(--border))'
@@ -270,7 +311,7 @@ const CountriesView: React.FC<{ countries: string[] }> = ({ countries }) => {
         </CardContent>
       </Card>
       
-      {/* Country list */}
+      {/* Country list from database */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
@@ -280,21 +321,21 @@ const CountriesView: React.FC<{ countries: string[] }> = ({ countries }) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {countryData.map((country, idx) => (
+            {countries.map((country, idx) => (
               <div 
-                key={country.name} 
+                key={country.country_code} 
                 className="flex items-center justify-between p-2 rounded border hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <Badge variant="outline" className="w-6 h-6 p-0 flex items-center justify-center text-xs">
                     {idx + 1}
                   </Badge>
-                  <span className="font-medium text-sm">{country.name}</span>
+                  <span className="font-medium text-sm">{country.country_name}</span>
                 </div>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>{country.population}M</span>
-                  <Badge variant="secondary">HDI {country.hdi}</Badge>
-                  <span>{country.lifeExp} år</span>
+                  <span>{country.population_millions.toFixed(1)}M</span>
+                  {country.hdi && <Badge variant="secondary">HDI {country.hdi.toFixed(2)}</Badge>}
+                  {country.life_expectancy && <span>{country.life_expectancy.toFixed(0)} år</span>}
                 </div>
               </div>
             ))}
@@ -305,30 +346,96 @@ const CountriesView: React.FC<{ countries: string[] }> = ({ countries }) => {
   );
 };
 
-const LifeExpectancyView: React.FC<{ lifeExpectancy: number; regionName: string }> = ({ lifeExpectancy, regionName }) => {
-  const historyData = getLifeExpectancyHistory(lifeExpectancy);
-  const genderData = getLifeExpectancyByGender(lifeExpectancy);
-  const comparisonData = getLifeExpectancyComparison(lifeExpectancy);
+// ═══════════════════════════════════════════════════════════════
+// LIFE EXPECTANCY VIEW - DATA FROM DATABASE
+// ═══════════════════════════════════════════════════════════════
+
+const LifeExpectancyView: React.FC<{ regionName: string }> = ({ regionName }) => {
+  const { data: history, isLoading: loadingHistory } = useLifeExpectancyHistory(regionName);
+  const { data: stats, isLoading: loadingStats } = useRegionalStats(regionName);
+  const { data: comparison, isLoading: loadingComparison } = useLifeExpectancyComparison();
+  
+  if (loadingHistory || loadingStats || loadingComparison) {
+    return <LoadingState message="Hämtar livslängdsdata..." />;
+  }
+  
+  if (!history?.length) {
+    return (
+      <EmptyState 
+        title="Ingen livslängdsdata" 
+        description={`Ingen livslängdsdata finns för ${regionName} i databasen än.`}
+      />
+    );
+  }
+  
+  // Calculate year-over-year improvement
+  const latestYear = history[history.length - 1];
+  const previousYear = history[history.length - 2];
+  const yearlyImprovement = latestYear && previousYear
+    ? (latestYear.life_expectancy_overall - previousYear.life_expectancy_overall) / (latestYear.year - previousYear.year)
+    : 0;
+  
+  // Gender data from database
+  const genderData = [
+    { gender: 'Kvinnor', value: stats?.lifeExpectancyFemale || 0, fill: 'hsl(var(--chart-1))' },
+    { gender: 'Män', value: stats?.lifeExpectancyMale || 0, fill: 'hsl(var(--chart-2))' },
+  ];
+  
+  // History for chart
+  const historyData = history.map(h => ({
+    year: h.year,
+    value: h.life_expectancy_overall,
+  }));
+  
+  // Comparison data from database
+  const comparisonData = [
+    { 
+      region: regionName.substring(0, 15), 
+      value: stats?.lifeExpectancy || 0, 
+      fill: 'hsl(var(--primary))' 
+    },
+    { 
+      region: 'Världen (snitt)', 
+      value: comparison?.globalAverage || 73.4, 
+      fill: 'hsl(var(--muted-foreground))' 
+    },
+    ...(comparison?.regions
+      ?.filter(r => r.region_name !== regionName)
+      ?.slice(0, 2)
+      ?.map((r, idx) => ({
+        region: r.region_name.substring(0, 12),
+        value: r.life_expectancy_overall,
+        fill: `hsl(var(--chart-${idx + 1}))`,
+      })) || []),
+  ];
   
   return (
     <div className="space-y-6">
-      {/* Current stats */}
+      {/* Current stats from database */}
       <div className="grid grid-cols-3 gap-4">
         <Card className="p-4 text-center bg-primary/5">
-          <p className="text-2xl font-bold text-primary">{lifeExpectancy}</p>
+          <p className="text-2xl font-bold text-primary">{stats?.lifeExpectancy?.toFixed(1) || '–'}</p>
           <p className="text-xs text-muted-foreground">Medellivslängd (år)</p>
         </Card>
         <Card className="p-4 text-center">
-          <p className="text-2xl font-bold">{(lifeExpectancy - 8).toFixed(1)}</p>
+          <p className="text-2xl font-bold">{stats?.healthyLifeYears?.toFixed(1) || '–'}</p>
           <p className="text-xs text-muted-foreground">Friska levnadsår</p>
         </Card>
         <Card className="p-4 text-center">
-          <p className="text-2xl font-bold text-green-600">+0.4</p>
+          <p className={`text-2xl font-bold ${yearlyImprovement > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {yearlyImprovement > 0 ? '+' : ''}{yearlyImprovement.toFixed(1)}
+          </p>
           <p className="text-xs text-muted-foreground">År/år förbättring</p>
         </Card>
       </div>
       
-      {/* By gender */}
+      {/* Data source */}
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Database className="h-3 w-3" />
+        <span>Källa: {history[0]?.data_source || 'Databas'} • År: {stats?.dataYear}</span>
+      </div>
+      
+      {/* By gender from database */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
@@ -341,7 +448,7 @@ const LifeExpectancyView: React.FC<{ lifeExpectancy: number; regionName: string 
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={genderData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                <XAxis type="number" domain={[0, 85]} tick={{ fontSize: 11 }} />
+                <XAxis type="number" domain={[0, 90]} tick={{ fontSize: 11 }} />
                 <YAxis type="category" dataKey="gender" tick={{ fontSize: 12 }} width={80} />
                 <Tooltip 
                   formatter={(value: number) => [`${value.toFixed(1)} år`]}
@@ -361,12 +468,12 @@ const LifeExpectancyView: React.FC<{ lifeExpectancy: number; regionName: string 
         </CardContent>
       </Card>
       
-      {/* Historical trend */}
+      {/* Historical trend from database */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
-            Historisk utveckling 1960–2024
+            Historisk utveckling {historyData[0]?.year}–{historyData[historyData.length - 1]?.year}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -396,7 +503,7 @@ const LifeExpectancyView: React.FC<{ lifeExpectancy: number; regionName: string 
         </CardContent>
       </Card>
       
-      {/* Comparison */}
+      {/* Comparison from database */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm flex items-center gap-2">
@@ -441,9 +548,6 @@ export const MetricDeepDive: React.FC<MetricDeepDiveProps> = ({
   onOpenChange,
   metricType,
   regionName,
-  population,
-  countries,
-  lifeExpectancy
 }) => {
   const titles: Record<MetricType, { title: string; description: string; icon: React.ReactNode }> = {
     population: {
@@ -484,15 +588,15 @@ export const MetricDeepDive: React.FC<MetricDeepDiveProps> = ({
             </SheetHeader>
             
             {metricType === 'population' && (
-              <PopulationView regionName={regionName} population={population} />
+              <PopulationView regionName={regionName} />
             )}
             
             {metricType === 'countries' && (
-              <CountriesView countries={countries} />
+              <CountriesView regionName={regionName} />
             )}
             
             {metricType === 'lifeExpectancy' && (
-              <LifeExpectancyView lifeExpectancy={lifeExpectancy} regionName={regionName} />
+              <LifeExpectancyView regionName={regionName} />
             )}
           </div>
         </ScrollArea>

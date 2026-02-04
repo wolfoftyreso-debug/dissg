@@ -8322,6 +8322,159 @@ export type Database = {
           },
         ]
       }
+      regional_country_data: {
+        Row: {
+          country_code: string
+          country_name: string
+          created_at: string
+          data_source: string | null
+          gdp_per_capita: number | null
+          hdi: number | null
+          id: string
+          life_expectancy: number | null
+          population_millions: number
+          region_code: string
+          year: number
+        }
+        Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string
+          data_source?: string | null
+          gdp_per_capita?: number | null
+          hdi?: number | null
+          id?: string
+          life_expectancy?: number | null
+          population_millions: number
+          region_code: string
+          year?: number
+        }
+        Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          data_source?: string | null
+          gdp_per_capita?: number | null
+          hdi?: number | null
+          id?: string
+          life_expectancy?: number | null
+          population_millions?: number
+          region_code?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      regional_demographics: {
+        Row: {
+          age_group: string
+          created_at: string
+          data_source: string | null
+          female_percent: number
+          id: string
+          male_percent: number
+          region_code: string
+          region_name: string
+          year: number
+        }
+        Insert: {
+          age_group: string
+          created_at?: string
+          data_source?: string | null
+          female_percent: number
+          id?: string
+          male_percent: number
+          region_code: string
+          region_name: string
+          year?: number
+        }
+        Update: {
+          age_group?: string
+          created_at?: string
+          data_source?: string | null
+          female_percent?: number
+          id?: string
+          male_percent?: number
+          region_code?: string
+          region_name?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      regional_life_expectancy: {
+        Row: {
+          created_at: string
+          data_source: string | null
+          healthy_life_years: number | null
+          id: string
+          life_expectancy_female: number | null
+          life_expectancy_male: number | null
+          life_expectancy_overall: number
+          region_code: string
+          region_name: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          data_source?: string | null
+          healthy_life_years?: number | null
+          id?: string
+          life_expectancy_female?: number | null
+          life_expectancy_male?: number | null
+          life_expectancy_overall: number
+          region_code: string
+          region_name: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          data_source?: string | null
+          healthy_life_years?: number | null
+          id?: string
+          life_expectancy_female?: number | null
+          life_expectancy_male?: number | null
+          life_expectancy_overall?: number
+          region_code?: string
+          region_name?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      regional_population_history: {
+        Row: {
+          created_at: string
+          data_source: string | null
+          growth_rate_percent: number | null
+          id: string
+          median_age: number | null
+          population_millions: number
+          region_code: string
+          region_name: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          data_source?: string | null
+          growth_rate_percent?: number | null
+          id?: string
+          median_age?: number | null
+          population_millions: number
+          region_code: string
+          region_name: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          data_source?: string | null
+          growth_rate_percent?: number | null
+          id?: string
+          median_age?: number | null
+          population_millions?: number
+          region_code?: string
+          region_name?: string
+          year?: number
+        }
+        Relationships: []
+      }
       regional_subdivisions: {
         Row: {
           area_km2: number | null
