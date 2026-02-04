@@ -30,27 +30,7 @@ import {
   AreaChart,
   Area,
 } from 'recharts';
-import {
-  AlertTriangle,
-  TrendingUp,
-  TrendingDown,
-  Clock,
-  BookOpen,
-  Scale,
-  ChevronRight,
-  Lightbulb,
-  Target,
-  Zap,
-  Users,
-  Building2,
-  Droplets,
-  Sun,
-  GraduationCap,
-  Briefcase,
-  Shield,
-  Flame,
-  Info,
-} from 'lucide-react';
+// NO ICONS - Text markers only per design doctrine
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
@@ -70,21 +50,21 @@ interface DetailDeepDiveProps {
   historicalContext?: Array<{ period: string; event: string; impact: string }>;
 }
 
-// Challenge/signal categories for icons
-const getChallengeIcon = (text: string) => {
+// Challenge/signal categories - text markers only (NO ICONS)
+const getChallengeMarker = (text: string): string => {
   const lower = text.toLowerCase();
-  if (lower.includes('vatten')) return <Droplets className="h-4 w-4 text-blue-500" />;
-  if (lower.includes('energi') || lower.includes('el')) return <Zap className="h-4 w-4 text-yellow-500" />;
-  if (lower.includes('befolkning') || lower.includes('tillväxt')) return <Users className="h-4 w-4 text-purple-500" />;
-  if (lower.includes('institution') || lower.includes('stat')) return <Building2 className="h-4 w-4 text-gray-500" />;
-  if (lower.includes('utbildning') || lower.includes('skol')) return <GraduationCap className="h-4 w-4 text-indigo-500" />;
-  if (lower.includes('arbets') || lower.includes('jobb')) return <Briefcase className="h-4 w-4 text-orange-500" />;
-  if (lower.includes('konflikt') || lower.includes('krig')) return <Shield className="h-4 w-4 text-red-500" />;
-  if (lower.includes('klimat') || lower.includes('torka')) return <Flame className="h-4 w-4 text-orange-600" />;
-  if (lower.includes('sol') || lower.includes('förnybar')) return <Sun className="h-4 w-4 text-amber-500" />;
-  if (lower.includes('teknik') || lower.includes('digital')) return <Zap className="h-4 w-4 text-cyan-500" />;
-  if (lower.includes('ung') || lower.includes('median')) return <Users className="h-4 w-4 text-green-500" />;
-  return <Target className="h-4 w-4 text-muted-foreground" />;
+  if (lower.includes('vatten')) return '[H₂O]';
+  if (lower.includes('energi') || lower.includes('el')) return '[ENE]';
+  if (lower.includes('befolkning') || lower.includes('tillväxt')) return '[POP]';
+  if (lower.includes('institution') || lower.includes('stat')) return '[GOV]';
+  if (lower.includes('utbildning') || lower.includes('skol')) return '[EDU]';
+  if (lower.includes('arbets') || lower.includes('jobb')) return '[ARB]';
+  if (lower.includes('konflikt') || lower.includes('krig')) return '[KON]';
+  if (lower.includes('klimat') || lower.includes('torka')) return '[KLI]';
+  if (lower.includes('sol') || lower.includes('förnybar')) return '[SOL]';
+  if (lower.includes('teknik') || lower.includes('digital')) return '[TEK]';
+  if (lower.includes('ung') || lower.includes('median')) return '[DEM]';
+  return '[OBS]';
 };
 
 // Severity mapping for challenges
@@ -185,9 +165,9 @@ const ChallengesView: React.FC<{ items: string[]; regionName: string }> = ({ ite
     <div className="space-y-6">
       {/* Overview card */}
       <Card className="bg-red-50/50 dark:bg-red-950/20 border-red-200">
-        <CardContent className="pt-4">
+      <CardContent className="pt-4">
           <div className="flex items-center gap-3 mb-3">
-            <AlertTriangle className="h-6 w-6 text-red-500" />
+            <span className="font-mono text-sm text-destructive">[!]</span>
             <div>
               <p className="font-medium text-red-700 dark:text-red-400">
                 {items.length} huvudutmaningar identifierade
@@ -247,7 +227,7 @@ const ChallengesView: React.FC<{ items: string[]; regionName: string }> = ({ ite
               )}
             >
               <div className="flex items-start gap-3">
-                {getChallengeIcon(item)}
+                <span className="font-mono text-[10px] text-primary shrink-0">{getChallengeMarker(item)}</span>
                 <div className="flex-1">
                   <p className="text-sm font-medium">{item}</p>
                   <div className="flex items-center gap-2 mt-2">
@@ -263,7 +243,7 @@ const ChallengesView: React.FC<{ items: string[]; regionName: string }> = ({ ite
                     />
                   </div>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                <span className="font-mono text-[10px] text-muted-foreground">[→]</span>
               </div>
               
               {selectedChallenge === item && (
@@ -319,7 +299,7 @@ const SignalsView: React.FC<{ items: string[]; regionName: string }> = ({ items,
       <Card className="bg-green-50/50 dark:bg-green-950/20 border-green-200">
         <CardContent className="pt-4">
           <div className="flex items-center gap-3 mb-3">
-            <TrendingUp className="h-6 w-6 text-green-500" />
+            <span className="font-mono text-sm text-green-600">[↑]</span>
             <div>
               <p className="font-medium text-green-700 dark:text-green-400">
                 {items.length} positiva signaler
@@ -370,16 +350,16 @@ const SignalsView: React.FC<{ items: string[]; regionName: string }> = ({ items,
         {items.map((item, idx) => (
           <Card key={idx} className="p-4 hover:bg-muted/50 hover:border-primary/50 transition-all cursor-pointer">
             <div className="flex items-start gap-3">
-              {getChallengeIcon(item)}
+              <span className="font-mono text-[10px] text-primary shrink-0">{getChallengeMarker(item)}</span>
               <div className="flex-1">
                 <p className="text-sm font-medium">{item}</p>
                 <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                   <div className="flex items-center gap-1">
-                    <Lightbulb className="h-3 w-3 text-amber-500" />
+                    <span className="font-mono text-[10px]">[POT]</span>
                     <span>Hög potential</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3 text-green-500" />
+                    <span className="font-mono text-[10px]">[↑]</span>
                     <span>Positiv trend</span>
                   </div>
                 </div>
@@ -427,7 +407,7 @@ const HistoryView: React.FC<{
       <Card className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200">
         <CardContent className="pt-4">
           <div className="flex items-center gap-3 mb-3">
-            <Clock className="h-6 w-6 text-blue-500" />
+            <span className="font-mono text-sm text-blue-600">[TID]</span>
             <div>
               <p className="font-medium text-blue-700 dark:text-blue-400">
                 {events.length} historiska händelser
@@ -500,17 +480,17 @@ const HistoryView: React.FC<{
                   <p className="text-sm font-medium">{event.event}</p>
                   <p className="text-xs text-muted-foreground mt-1">{event.impact}</p>
                 </div>
-                <ChevronRight className={cn(
-                  "h-4 w-4 text-muted-foreground transition-transform",
+                <span className={cn(
+                  "font-mono text-[10px] text-muted-foreground transition-transform",
                   selectedEvent === idx && "rotate-90"
-                )} />
+                )}>[→]</span>
               </div>
               
               {selectedEvent === idx && (
                 <div className="mt-4 pt-4 border-t space-y-2">
                   <Alert>
-                    <Info className="h-4 w-4" />
                     <AlertDescription className="text-xs">
+                      <span className="font-mono text-[10px] mr-1">[INFO]</span>
                       Denna händelse hade långvariga konsekvenser för regionens utveckling.
                       Klicka för att utforska relaterade indikatorer och data.
                     </AlertDescription>
@@ -564,11 +544,10 @@ const ScopeView: React.FC<{
       )}>
         <CardContent className="pt-4">
           <div className="flex items-center gap-3 mb-3">
-            {isShows ? (
-              <BookOpen className="h-6 w-6 text-green-600" />
-            ) : (
-              <Scale className="h-6 w-6 text-red-600" />
-            )}
+            <span className={cn(
+              "font-mono text-sm",
+              isShows ? "text-green-600" : "text-red-600"
+            )}>{isShows ? '[VIS]' : '[!VIS]'}</span>
             <div>
               <p className={cn(
                 "font-medium",
@@ -588,8 +567,8 @@ const ScopeView: React.FC<{
       
       {/* Explanation */}
       <Alert>
-        <Info className="h-4 w-4" />
         <AlertDescription className="text-xs">
+          <span className="font-mono text-[10px] mr-1">[INFO]</span>
           {isShows 
             ? 'Dessa punkter representerar vad vi med säkerhet kan observera från datan. De är verifierade genom flera oberoende källor.'
             : 'Dessa punkter är viktiga begränsningar att ha i åtanke. Att data inte visar något betyder inte att det inte existerar – bara att vi inte kan dra slutsatser om det från tillgänglig data.'}
@@ -613,16 +592,12 @@ const ScopeView: React.FC<{
             >
               <div className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className={cn(
-                    "p-1 rounded",
-                    isShows ? "bg-green-100 dark:bg-green-900/30" : "bg-red-100 dark:bg-red-900/30"
+                  <span className={cn(
+                    "font-mono text-[10px] shrink-0 p-1 rounded",
+                    isShows ? "bg-green-100 text-green-600 dark:bg-green-900/30" : "bg-red-100 text-red-600 dark:bg-red-900/30"
                   )}>
-                    {isShows ? (
-                      <TrendingUp className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <TrendingDown className="h-4 w-4 text-red-600" />
-                    )}
-                  </div>
+                    {isShows ? '[↑]' : '[↓]'}
+                  </span>
                   <div className="flex-1">
                     <p className="text-sm">{item}</p>
                     <div className="flex items-center gap-2 mt-2">
@@ -687,31 +662,32 @@ export const DetailDeepDive: React.FC<DetailDeepDiveProps> = ({
   items,
   historicalContext = [],
 }) => {
-  const configs: Record<DetailType, { title: string; description: string; icon: React.ReactNode }> = {
+  // Text markers only - NO ICONS
+  const configs: Record<DetailType, { title: string; description: string; marker: string }> = {
     challenges: {
       title: 'Huvudutmaningar',
       description: 'Kritiska utmaningar som regionen står inför',
-      icon: <AlertTriangle className="h-5 w-5 text-red-500" />,
+      marker: '[!]',
     },
     signals: {
       title: 'Positiva signaler',
       description: 'Utvecklingsmöjligheter och positiva trender',
-      icon: <TrendingUp className="h-5 w-5 text-green-500" />,
+      marker: '[↑]',
     },
     history: {
       title: 'Historisk kontext',
       description: 'Nyckelmoment som format regionen',
-      icon: <Clock className="h-5 w-5 text-blue-500" />,
+      marker: '[TID]',
     },
     shows: {
       title: 'Detta visar',
       description: 'Vad datan faktiskt berättar',
-      icon: <BookOpen className="h-5 w-5 text-green-600" />,
+      marker: '[VIS]',
     },
     notShows: {
       title: 'Detta visar INTE',
       description: 'Begränsningar i datan',
-      icon: <Scale className="h-5 w-5 text-red-600" />,
+      marker: '[!VIS]',
     },
   };
   
@@ -724,9 +700,9 @@ export const DetailDeepDive: React.FC<DetailDeepDiveProps> = ({
           <div className="p-6 space-y-6">
             <SheetHeader>
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  {config.icon}
-                </div>
+                <span className="font-mono text-sm text-primary bg-primary/10 px-2 py-1 rounded">
+                  {config.marker}
+                </span>
                 <div>
                   <SheetTitle>{config.title}</SheetTitle>
                   <SheetDescription>{regionName}</SheetDescription>

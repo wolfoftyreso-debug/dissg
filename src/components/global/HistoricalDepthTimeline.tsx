@@ -12,7 +12,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Layers, Info, ZoomIn, ZoomOut, ChevronDown, Clock } from 'lucide-react';
+// NO ICONS - Text markers only per design doctrine
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -142,9 +142,9 @@ function ResolutionIndicator({ metadata, language }: { metadata: ResolutionMetad
 
   return (
     <Alert className="bg-slate-50 border-slate-200">
-      <Info className="h-4 w-4 text-slate-500" />
       <AlertDescription className="text-sm text-slate-600">
         <div className="flex flex-wrap items-center gap-2">
+          <span className="font-mono text-[10px] text-muted-foreground">[RES]</span>
           <Badge variant="outline" className={densityColors[metadata.data_density]}>
             {metadata.data_density}
           </Badge>
@@ -173,10 +173,10 @@ function LayerTogglePanel({
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Layers className="h-4 w-4" />
+        <Button variant="outline" size="sm" className="gap-2 font-mono">
+          <span className="text-[10px]">[LAGER]</span>
           {HISTORICAL_UI_TEXT.toggle_layers[language]}
-          <ChevronDown className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <span className={`text-[10px] transition-transform ${isOpen ? 'rotate-180' : ''}`}>{isOpen ? '▲' : '▼'}</span>
         </Button>
       </CollapsibleTrigger>
       <CollapsibleContent className="pt-3">
@@ -394,7 +394,7 @@ export function HistoricalDepthTimeline({
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-            <Clock className="h-6 w-6 text-primary" />
+            <span className="font-mono text-sm text-primary">[TID]</span>
             {title?.[language] || HISTORICAL_UI_TEXT.timeline_title[language]}
           </h2>
           <p className="text-muted-foreground mt-1">
@@ -402,13 +402,13 @@ export function HistoricalDepthTimeline({
           </p>
         </div>
         
-        {/* Zoom controls */}
+        {/* Zoom controls - text based */}
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={() => handleZoom('out')}>
-            <ZoomOut className="h-4 w-4" />
+          <Button variant="outline" size="sm" onClick={() => handleZoom('out')} className="font-mono text-xs">
+            [−]
           </Button>
-          <Button variant="outline" size="icon" onClick={() => handleZoom('in')}>
-            <ZoomIn className="h-4 w-4" />
+          <Button variant="outline" size="sm" onClick={() => handleZoom('in')} className="font-mono text-xs">
+            [+]
           </Button>
         </div>
       </div>
