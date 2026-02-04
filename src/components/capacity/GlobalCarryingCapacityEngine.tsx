@@ -808,10 +808,10 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Not definitions - with explanations for 15-year-olds */}
+      {/* Scope exclusions - institutional language */}
       <div className="space-y-2">
         <p className="text-xs text-center text-muted-foreground font-mono uppercase tracking-wider">
-          VAD VI INTE RÄKNAR
+          SCOPE EXCLUSIONS
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           {GCCE_NOT_DEFINITIONS.map((def, i) => (
