@@ -197,7 +197,7 @@ function FaultCodePanel({ faultCodes, selectedCode, onSelectCode }: FaultCodePan
       </div>
       {selectedCode && (
         <div className="mt-2 text-xs text-muted-foreground">
-          Vald felkod låser vyn till guidad felsökning
+          Vald felkod låser vyn till guidad analys
         </div>
       )}
     </div>
@@ -295,7 +295,7 @@ function GuidedFaultFinding({ steps, currentStep, onCompleteStep, selectedFaultC
     return (
       <div className="p-6 text-center">
         <div className="text-muted-foreground text-sm">
-          Välj en felkod ovan för att starta guidad felsökning
+          Välj en felkod ovan för att starta guidad analys
         </div>
       </div>
     );
@@ -307,7 +307,7 @@ function GuidedFaultFinding({ steps, currentStep, onCompleteStep, selectedFaultC
     <div className="p-4 space-y-4">
       <div className="flex justify-between items-center">
         <div className="font-mono text-sm font-semibold">
-          GUIDAD FELSÖKNING – STEG {currentStep + 1} AV {steps.length}
+          GUIDAD ANALYS – STEG {currentStep + 1} AV {steps.length}
         </div>
         <Progress value={(completedCount / steps.length) * 100} className="w-32 h-2" />
       </div>
@@ -719,7 +719,7 @@ export function DiagnosticView() {
           <div className="flex-1 border-b border-border overflow-auto">
             <div className="p-3 border-b border-border">
               <div className="font-mono text-xs text-muted-foreground">
-                GUIDAD FELSÖKNING
+                GUIDAD ANALYS
               </div>
             </div>
             <GuidedFaultFinding
