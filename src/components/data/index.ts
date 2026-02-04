@@ -37,7 +37,8 @@ export { DepthExplorer } from './DepthExplorer';
 export { DataDashboard } from './DataDashboard';
 export { DataOverview, MiniSparkline } from './DataOverview';
 export { DataAccessPage } from './DataAccessPage';
-export { SortableIndexTable, IndexCategoryTables } from './SortableIndexTable';
+export { SortableIndexTable, IndexCategoryTables, type IndexItem } from './SortableIndexTable';
+export { IndexDrilldown } from './IndexDrilldown';
 export { 
   SourcesDrilldown, 
   CountriesDrilldown, 
