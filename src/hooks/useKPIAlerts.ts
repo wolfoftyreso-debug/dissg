@@ -15,6 +15,36 @@ export interface KPIAlert {
   trendPercent: number;
   triggeredAt?: string;
   acknowledged?: boolean;
+  // Priority index for ranking (0-100, higher = more urgent)
+  priorityIndex?: number;
+  // Deviation from threshold as percentage
+  deviationPercent?: number;
+}
+
+/**
+ * Calculate priority index for an alert
+ * Based on: severity, deviation magnitude, trend acceleration
+ * Returns 0-100 (higher = more urgent)
+ */
+function calculatePriorityIndex(
+  severity: 'warning' | 'critical',
+  currentValue: number,
+  threshold: number,
+  trendPercent: number
+): number {
+  // Base score from severity
+  let score = severity === 'critical' ? 60 : 30;
+  
+  // Add deviation score (how far past threshold)
+  const deviation = Math.abs((currentValue - threshold) / threshold) * 100;
+  const deviationScore = Math.min(deviation * 0.5, 25); // max 25 points
+  score += deviationScore;
+  
+  // Add trend acceleration score
+  const trendScore = Math.min(Math.abs(trendPercent) * 0.3, 15); // max 15 points
+  score += trendScore;
+  
+  return Math.min(Math.round(score), 100);
 }
 
 // KPI threshold configuration for client-side fallback
@@ -64,6 +94,7 @@ function evaluateKPILocal(kpi: {
     : kpi.value <= threshold.warningThreshold;
   
   if (isCritical) {
+    const deviation = Math.abs((kpi.value - threshold.criticalThreshold) / threshold.criticalThreshold) * 100;
     return {
       kpiId: kpi.id,
       kpiName: kpi.name,
@@ -75,10 +106,13 @@ function evaluateKPILocal(kpi: {
       threshold: threshold.criticalThreshold,
       trendPercent: kpi.trendPercent,
       triggeredAt: new Date().toISOString(),
+      priorityIndex: calculatePriorityIndex('critical', kpi.value, threshold.criticalThreshold, kpi.trendPercent),
+      deviationPercent: deviation,
     };
   }
   
   if (isWarning) {
+    const deviation = Math.abs((kpi.value - threshold.warningThreshold) / threshold.warningThreshold) * 100;
     return {
       kpiId: kpi.id,
       kpiName: kpi.name,
@@ -90,6 +124,8 @@ function evaluateKPILocal(kpi: {
       threshold: threshold.warningThreshold,
       trendPercent: kpi.trendPercent,
       triggeredAt: new Date().toISOString(),
+      priorityIndex: calculatePriorityIndex('warning', kpi.value, threshold.warningThreshold, kpi.trendPercent),
+      deviationPercent: deviation,
     };
   }
   
@@ -114,6 +150,8 @@ function evaluateKPILocal(kpi: {
       threshold: threshold.velocityCritical,
       trendPercent: velocity,
       triggeredAt: new Date().toISOString(),
+      priorityIndex: calculatePriorityIndex('critical', velocity, threshold.velocityCritical, velocity),
+      deviationPercent: Math.abs((velocity - threshold.velocityCritical) / threshold.velocityCritical) * 100,
     };
   }
   
@@ -129,6 +167,8 @@ function evaluateKPILocal(kpi: {
       threshold: threshold.velocityWarning,
       trendPercent: velocity,
       triggeredAt: new Date().toISOString(),
+      priorityIndex: calculatePriorityIndex('warning', velocity, threshold.velocityWarning, velocity),
+      deviationPercent: Math.abs((velocity - threshold.velocityWarning) / threshold.velocityWarning) * 100,
     };
   }
   
@@ -186,10 +226,11 @@ export function useKPIAlerts() {
         }
       }
       
+      // Sort by priority index (highest first)
       localAlerts.sort((a, b) => {
-        if (a.severity === 'critical' && b.severity !== 'critical') return -1;
-        if (a.severity !== 'critical' && b.severity === 'critical') return 1;
-        return 0;
+        const priorityA = a.priorityIndex ?? 0;
+        const priorityB = b.priorityIndex ?? 0;
+        return priorityB - priorityA;
       });
       
       setAlerts(localAlerts);
