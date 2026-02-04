@@ -24,9 +24,24 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import type { IndexDefinition } from '@/lib/lambda';
+import { CountrySelector } from './CountrySelector';
+import { COUNTRY_BY_CODE } from '@/lib/data/world-countries';
+
+// Color palette for multi-country comparison
+const COUNTRY_COLORS = [
+  'hsl(var(--primary))',
+  'hsl(210, 100%, 50%)',    // Blue
+  'hsl(340, 80%, 55%)',     // Pink
+  'hsl(160, 70%, 45%)',     // Teal
+  'hsl(45, 90%, 50%)',      // Gold
+  'hsl(280, 70%, 55%)',     // Purple
+  'hsl(20, 80%, 50%)',      // Orange
+  'hsl(190, 80%, 45%)',     // Cyan
+  'hsl(0, 70%, 55%)',       // Red
+  'hsl(120, 50%, 45%)',     // Green
+];
 
 interface AdvancedIndexChartProps {
   index: IndexDefinition;
@@ -136,9 +151,31 @@ export function AdvancedIndexChart({ index, className }: AdvancedIndexChartProps
   const [chartType, setChartType] = useState<'line' | 'area' | 'band'>('line');
   const [showOptimalZone, setShowOptimalZone] = useState(true);
   const [showTrend, setShowTrend] = useState(false);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>(['SE']);
   
   const selectedRange = TIME_RANGES.find(r => r.id === timeRange) || TIME_RANGES[4];
   
+  // Generate data for all selected countries
+  const multiCountryData = useMemo(() => {
+    const baseData = generateTimeSeriesData(index, selectedRange.months);
+    
+    // Add data columns for each country
+    return baseData.map((point, idx) => {
+      const result: Record<string, number | string> = { date: point.date };
+      
+      selectedCountries.forEach((code, countryIdx) => {
+        // Generate slightly different values per country (seeded by country code)
+        const seed = code.charCodeAt(0) + code.charCodeAt(1);
+        const offset = (seed % 20 - 10) * 0.5;
+        const variation = Math.sin(idx * 0.1 + seed) * 3;
+        result[code] = Math.round((point.value + offset + variation) * 100) / 100;
+      });
+      
+      return result;
+    });
+  }, [index, selectedRange.months, selectedCountries]);
+  
+  // Keep single-country data for stats
   const data = useMemo(() => 
     generateTimeSeriesData(index, selectedRange.months),
     [index, selectedRange.months]
@@ -185,9 +222,16 @@ export function AdvancedIndexChart({ index, className }: AdvancedIndexChartProps
       </CardHeader>
       
       <CardContent className="space-y-4">
+        {/* Country selector */}
+        <CountrySelector
+          selectedCountries={selectedCountries}
+          onSelectionChange={setSelectedCountries}
+          maxSelections={10}
+        />
+
         {/* Time range selector - Avanza style */}
         <div className="flex items-center justify-between gap-4">
-          <div className="flex gap-1">
+          <div className="flex gap-1 flex-wrap">
             {TIME_RANGES.map(range => (
               <Button
                 key={range.id}
@@ -229,10 +273,10 @@ export function AdvancedIndexChart({ index, className }: AdvancedIndexChartProps
           </div>
         </div>
 
-        {/* Chart */}
+        {/* Chart - using multiCountryData for comparison */}
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <ComposedChart data={multiCountryData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid 
                 strokeDasharray="3 3" 
                 stroke="hsl(var(--border))" 
@@ -250,7 +294,29 @@ export function AdvancedIndexChart({ index, className }: AdvancedIndexChartProps
                 axisLine={{ stroke: 'hsl(var(--border))' }}
               />
               <Tooltip 
-                content={<CustomTooltip optimalRange={index.optimal_range} />}
+                content={({ active, payload, label }) => {
+                  if (!active || !payload?.length) return null;
+                  return (
+                    <div className="bg-popover border rounded-lg p-3 shadow-lg font-mono text-sm z-50">
+                      <div className="text-muted-foreground mb-2">[{label}]</div>
+                      <div className="space-y-1">
+                        {payload.map((entry, idx) => {
+                          const countryName = COUNTRY_BY_CODE[entry.dataKey as string]?.name_sv || entry.dataKey;
+                          return (
+                            <div key={idx} className="flex items-center justify-between gap-4">
+                              <span style={{ color: entry.color }}>{countryName}:</span>
+                              <span className="font-bold">{Number(entry.value).toFixed(2)}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                }}
+              />
+              <Legend 
+                formatter={(value) => COUNTRY_BY_CODE[value]?.name_sv || value}
+                wrapperStyle={{ fontSize: '11px', fontFamily: 'monospace' }}
               />
               
               {/* Optimal zone */}
@@ -290,36 +356,29 @@ export function AdvancedIndexChart({ index, className }: AdvancedIndexChartProps
                 />
               )}
               
-              {/* Area fill */}
-              {chartType === 'area' && (
-                <Area
+              {/* Multi-country lines */}
+              {selectedCountries.map((code, idx) => (
+                <Line
+                  key={code}
                   type="monotone"
-                  dataKey="value"
-                  fill="hsl(var(--primary))"
-                  fillOpacity={0.15}
-                  stroke="none"
+                  dataKey={code}
+                  stroke={COUNTRY_COLORS[idx % COUNTRY_COLORS.length]}
+                  strokeWidth={idx === 0 ? 2 : 1.5}
+                  dot={false}
+                  activeDot={{ r: 4 }}
                 />
-              )}
+              ))}
               
-              {/* Main line */}
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="hsl(var(--primary))"
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, fill: 'hsl(var(--primary))' }}
-              />
-              
-              {/* Trend line */}
-              {showTrend && (
+              {/* Trend line for first country */}
+              {showTrend && selectedCountries[0] && (
                 <Line
                   type="monotone"
-                  dataKey="trend"
+                  dataKey={selectedCountries[0]}
                   stroke="hsl(var(--muted-foreground))"
                   strokeWidth={1}
                   strokeDasharray="5 5"
                   dot={false}
+                  name={`${selectedCountries[0]} trend`}
                 />
               )}
             </ComposedChart>
