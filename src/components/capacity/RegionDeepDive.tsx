@@ -565,11 +565,13 @@ interface RegionDeepDiveProps {
   onOpenChange: (open: boolean) => void;
 }
 
+import { MetricDeepDive, type MetricType } from './MetricDeepDive';
+
 export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOpenChange }) => {
   const [activeTab, setActiveTab] = useState('overview');
-  // Future: deeper drill-down for individual indicators/substances
   const [_selectedIndicator, setSelectedIndicator] = useState<RegionIndicator | null>(null);
   const [_selectedSubstance, setSelectedSubstance] = useState<SubstanceData | null>(null);
+  const [selectedMetric, setSelectedMetric] = useState<MetricType | null>(null);
   
   if (!zone) return null;
   
@@ -594,10 +596,22 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
   }
   
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-3xl p-0">
-        <ScrollArea className="h-full">
-          <div className="p-6 space-y-6">
+    <>
+      {/* Metric Deep Dive */}
+      <MetricDeepDive
+        open={selectedMetric !== null}
+        onOpenChange={(open) => !open && setSelectedMetric(null)}
+        metricType={selectedMetric || 'population'}
+        regionName={zone.regionSv}
+        population={evidence.overview.population}
+        countries={evidence.overview.countries}
+        lifeExpectancy={evidence.health.lifeExpectancy}
+      />
+      
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent className="w-full sm:max-w-3xl p-0">
+          <ScrollArea className="h-full">
+            <div className="p-6 space-y-6">
             {/* Header */}
             <SheetHeader className="space-y-3">
               <div className="flex items-center gap-3">
@@ -626,25 +640,40 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                 </Badge>
               </div>
               
-              {/* Quick stats */}
+              {/* Quick stats - CLICKABLE */}
               <div className="grid grid-cols-3 gap-3 pt-2">
-                <Card className="p-3 text-center">
-                  <Users className="h-4 w-4 mx-auto text-muted-foreground" />
-                  <p className="text-lg font-bold mt-1">
-                    {(evidence.overview.population / 1_000_000).toFixed(0)}M
-                  </p>
-                  <p className="text-xs text-muted-foreground">Befolkning</p>
-                </Card>
-                <Card className="p-3 text-center">
-                  <Globe className="h-4 w-4 mx-auto text-muted-foreground" />
-                  <p className="text-lg font-bold mt-1">{evidence.overview.countries.length}</p>
-                  <p className="text-xs text-muted-foreground">Länder</p>
-                </Card>
-                <Card className="p-3 text-center">
-                  <Activity className="h-4 w-4 mx-auto text-muted-foreground" />
-                  <p className="text-lg font-bold mt-1">{evidence.health.lifeExpectancy}</p>
-                  <p className="text-xs text-muted-foreground">Medellivslängd</p>
-                </Card>
+                <button 
+                  onClick={() => setSelectedMetric('population')}
+                  className="text-left"
+                >
+                  <Card className="p-3 text-center hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer group">
+                    <Users className="h-4 w-4 mx-auto text-muted-foreground group-hover:text-primary transition-colors" />
+                    <p className="text-lg font-bold mt-1 group-hover:text-primary transition-colors">
+                      {(evidence.overview.population / 1_000_000).toFixed(0)}M
+                    </p>
+                    <p className="text-xs text-muted-foreground">Befolkning</p>
+                  </Card>
+                </button>
+                <button 
+                  onClick={() => setSelectedMetric('countries')}
+                  className="text-left"
+                >
+                  <Card className="p-3 text-center hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer group">
+                    <Globe className="h-4 w-4 mx-auto text-muted-foreground group-hover:text-primary transition-colors" />
+                    <p className="text-lg font-bold mt-1 group-hover:text-primary transition-colors">{evidence.overview.countries.length}</p>
+                    <p className="text-xs text-muted-foreground">Länder</p>
+                  </Card>
+                </button>
+                <button 
+                  onClick={() => setSelectedMetric('lifeExpectancy')}
+                  className="text-left"
+                >
+                  <Card className="p-3 text-center hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer group">
+                    <Activity className="h-4 w-4 mx-auto text-muted-foreground group-hover:text-primary transition-colors" />
+                    <p className="text-lg font-bold mt-1 group-hover:text-primary transition-colors">{evidence.health.lifeExpectancy}</p>
+                    <p className="text-xs text-muted-foreground">Medellivslängd</p>
+                  </Card>
+                </button>
               </div>
             </SheetHeader>
 
@@ -919,6 +948,7 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
         </ScrollArea>
       </SheetContent>
     </Sheet>
+    </>
   );
 };
 
