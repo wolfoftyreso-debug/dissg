@@ -175,11 +175,8 @@ const App = () => (
               <Route path="/lambda1" element={<Lambda1Page />} />
               <Route path="/gdm" element={<GDMPage />} />
               <Route path="/ggd" element={<GGDPage />} />
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              } />
+              {/* Huvudsidan är publik - läsning utan inloggning */}
+              <Route path="/" element={<Index />} />
               {/* Skyddade routes - kräver inloggning */}
               <Route path="/depth-demo" element={
                 <ProtectedRoute requiredRole="operativ">
