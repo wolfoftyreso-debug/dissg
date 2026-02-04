@@ -4599,6 +4599,45 @@ export type Database = {
           },
         ]
       }
+      gmi_weight_changes: {
+        Row: {
+          author: string
+          country_code: string | null
+          created_at: string
+          dimension_id: string
+          dimension_name: string
+          id: string
+          new_weight: number
+          previous_weight: number
+          reason: string
+          version: string
+        }
+        Insert: {
+          author?: string
+          country_code?: string | null
+          created_at?: string
+          dimension_id: string
+          dimension_name: string
+          id?: string
+          new_weight: number
+          previous_weight: number
+          reason: string
+          version: string
+        }
+        Update: {
+          author?: string
+          country_code?: string | null
+          created_at?: string
+          dimension_id?: string
+          dimension_name?: string
+          id?: string
+          new_weight?: number
+          previous_weight?: number
+          reason?: string
+          version?: string
+        }
+        Relationships: []
+      }
       governance_actions: {
         Row: {
           action_description: string
