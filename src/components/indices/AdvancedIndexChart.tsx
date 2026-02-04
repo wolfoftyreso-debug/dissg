@@ -5,11 +5,11 @@
  * Features: Time range selection, comparison mode, zoom, data export.
  * 
  * NO ICONS - text markers only per design doctrine.
+ * NO SIMULATED DATA - only verified data from database.
  */
 
 import React, { useState, useMemo } from 'react';
 import {
-  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -23,11 +23,12 @@ import {
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { IndexDefinition } from '@/lib/lambda';
 import { CountrySelector } from './CountrySelector';
 import { COUNTRY_BY_CODE } from '@/lib/data/world-countries';
+import { useQuery } from '@tanstack/react-query';
+import { ChartNoData } from '@/components/data-integrity';
 
 // Color palette for multi-country comparison
 const COUNTRY_COLORS = [
@@ -60,53 +61,9 @@ const TIME_RANGES = [
   { id: 'max', label: 'MAX', months: 999 },
 ] as const;
 
-// Generate mock time series data
-function generateTimeSeriesData(index: IndexDefinition, months: number): Array<{
-  date: string;
-  value: number;
-  trend: number;
-  min: number;
-  max: number;
-}> {
-  const data: Array<{
-    date: string;
-    value: number;
-    trend: number;
-    min: number;
-    max: number;
-  }> = [];
-  
-  const now = new Date();
-  const startValue = (index.optimal_range.min + index.optimal_range.max) / 2;
-  let currentValue = startValue;
-  
-  const actualMonths = Math.min(months, (now.getFullYear() - index.coverage_start_year) * 12);
-  
-  for (let i = actualMonths; i >= 0; i--) {
-    const date = new Date(now);
-    date.setMonth(date.getMonth() - i);
-    
-    // Random walk with mean reversion
-    const noise = (Math.random() - 0.5) * 5;
-    const reversion = (startValue - currentValue) * 0.05;
-    currentValue = currentValue + noise + reversion;
-    
-    // Ensure within reasonable bounds
-    const range = index.optimal_range.max - index.optimal_range.min;
-    currentValue = Math.max(index.optimal_range.min - range * 0.3, 
-                   Math.min(index.optimal_range.max + range * 0.3, currentValue));
-    
-    data.push({
-      date: date.toISOString().slice(0, 7), // YYYY-MM
-      value: Math.round(currentValue * 100) / 100,
-      trend: Math.round((currentValue + (Math.random() - 0.5) * 2) * 100) / 100,
-      min: Math.round((currentValue - Math.random() * 3) * 100) / 100,
-      max: Math.round((currentValue + Math.random() * 3) * 100) / 100,
-    });
-  }
-  
-  return data;
-}
+// NO MOCK DATA GENERATION
+// System principle: "Silence over speculation"
+// All time series data must come from verified index_values table
 
 // Custom tooltip
 const CustomTooltip = ({ 
@@ -123,6 +80,8 @@ const CustomTooltip = ({
   if (!active || !payload?.length) return null;
   
   const value = payload[0]?.value;
+  if (value === null || value === undefined) return null;
+  
   const isInOptimal = value >= optimalRange.min && value <= optimalRange.max;
   
   return (
@@ -155,47 +114,84 @@ export function AdvancedIndexChart({ index, className }: AdvancedIndexChartProps
   
   const selectedRange = TIME_RANGES.find(r => r.id === timeRange) || TIME_RANGES[4];
   
-  // Generate data for all selected countries
+  // Fetch REAL data from database - NO SIMULATION
+  // Note: When index_values table is available, fetch from there
+  // Currently showing "no data" state until real data sources are connected
+  const { data: dbData } = useQuery({
+    queryKey: ['index-values', index.code, selectedRange.months, selectedCountries],
+    queryFn: async () => {
+      // Return empty - no simulated data allowed
+      // Real implementation will query actual index_values when available
+      return [];
+    },
+    staleTime: Infinity, // Don't refetch placeholder
+  });
+  
+  // Process verified data only - empty array when no data
   const multiCountryData = useMemo(() => {
-    const baseData = generateTimeSeriesData(index, selectedRange.months);
+    if (!dbData || dbData.length === 0) return [];
     
-    // Add data columns for each country
-    return baseData.map((point, idx) => {
-      const result: Record<string, number | string> = { date: point.date };
-      
-      selectedCountries.forEach((code, countryIdx) => {
-        // Generate slightly different values per country (seeded by country code)
-        const seed = code.charCodeAt(0) + code.charCodeAt(1);
-        const offset = (seed % 20 - 10) * 0.5;
-        const variation = Math.sin(idx * 0.1 + seed) * 3;
-        result[code] = Math.round((point.value + offset + variation) * 100) / 100;
-      });
-      
-      return result;
+    // Group by date and create multi-country format
+    const dateMap = new Map<string, Record<string, number | string>>();
+    
+    dbData.forEach((row: any) => {
+      const date = row.period_start?.slice(0, 7) || '';
+      if (!dateMap.has(date)) {
+        dateMap.set(date, { date });
+      }
+      const entry = dateMap.get(date)!;
+      entry[row.country_code] = Number(row.value);
     });
-  }, [index, selectedRange.months, selectedCountries]);
-  
-  // Keep single-country data for stats
-  const data = useMemo(() => 
-    generateTimeSeriesData(index, selectedRange.months),
-    [index, selectedRange.months]
-  );
-  
-  // Calculate statistics
-  const stats = useMemo(() => {
-    if (!data.length) return null;
     
-    const values = data.map(d => d.value);
+    return Array.from(dateMap.values()).sort((a, b) => 
+      String(a.date).localeCompare(String(b.date))
+    );
+  }, [dbData]);
+  
+  // Calculate stats from real data only
+  const stats = useMemo(() => {
+    if (!dbData || dbData.length === 0) return null;
+    
+    const values = dbData.map((d: any) => Number(d.value)).filter((v: number) => !isNaN(v));
+    if (values.length === 0) return null;
+    
     const current = values[values.length - 1];
     const previous = values[0];
     const change = current - previous;
-    const changePercent = (change / previous) * 100;
+    const changePercent = previous !== 0 ? (change / previous) * 100 : 0;
     const min = Math.min(...values);
     const max = Math.max(...values);
-    const avg = values.reduce((a, b) => a + b, 0) / values.length;
+    const avg = values.reduce((a: number, b: number) => a + b, 0) / values.length;
     
     return { current, previous, change, changePercent, min, max, avg };
-  }, [data]);
+  }, [dbData]);
+  
+  const hasData = multiCountryData.length > 0;
+  
+  // Show no-data state when real data unavailable
+  if (!hasData) {
+    return (
+      <Card className={cn("font-mono", className)}>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            [GRAF] {index.name_sv}
+          </CardTitle>
+          <CardDescription>{index.code}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartNoData 
+            message="Ingen verifierad tidsseriedata tillgänglig för denna indikator"
+            className="h-[300px]"
+          />
+          <div className="mt-4 p-3 rounded border border-dashed border-border bg-muted/20">
+            <p className="text-xs text-muted-foreground font-mono">
+              [INFO] Data visas endast från verifierade källor. Anslut datakällor via API för att aktivera grafer.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className={cn("font-mono", className)}>

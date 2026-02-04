@@ -74,82 +74,22 @@ interface IndexItemDetailProps {
   type: 'improvement' | 'decline' | 'attention';
 }
 
-// Mock data generator för demonstration
-function generateMockData(item: IndexItemDetailProps['item'], type: IndexItemDetailProps['type']) {
-  if (!item) return null;
-
-  const isDecline = type === 'decline';
-  const changeAbs = Math.abs(item.change || 5);
-
-  const outcome: OutcomeData = {
-    description: isDecline 
-      ? `${item.name} har försämrats under mätperioden`
-      : `${item.name} har förbättrats under mätperioden`,
-    measurementPeriod: '2024-Q3 till 2025-Q1',
-    baselineValue: isDecline ? 100 : 85,
-    currentValue: isDecline ? 100 - changeAbs : 85 + changeAbs,
-    changePercent: item.change || changeAbs * (isDecline ? -1 : 1),
-    changeDirection: isDecline ? 'decline' : 'improvement',
-    targetValue: 95,
-    targetAchieved: !isDecline,
+// NO MOCK DATA - System principle: "Silence over speculation"
+// All data must come from verified database sources
+function getVerifiedData(_item: IndexItemDetailProps['item'], _type: IndexItemDetailProps['type']): {
+  outcome: OutcomeData | null;
+  population: PopulationImpact | null;
+  factors: ContributingFactor[];
+  responsibility: ResponsibilityChain[];
+} {
+  // Return empty/null states - data will be populated from real sources
+  // when connected to action_outcome_links, decision_outcomes, etc.
+  return {
+    outcome: null,
+    population: null,
+    factors: [],
+    responsibility: [],
   };
-
-  const population: PopulationImpact = {
-    totalAffected: Math.floor(Math.random() * 500000) + 50000,
-    affectedPercentage: Math.random() * 15 + 2,
-    demographicBreakdown: [
-      { category: '18-30 år', count: Math.floor(Math.random() * 100000), percentage: 22 },
-      { category: '31-50 år', count: Math.floor(Math.random() * 150000), percentage: 35 },
-      { category: '51-65 år', count: Math.floor(Math.random() * 120000), percentage: 28 },
-      { category: '65+ år', count: Math.floor(Math.random() * 80000), percentage: 15 },
-    ],
-    regionalDistribution: [
-      { region: 'Stockholm', count: Math.floor(Math.random() * 100000), severity: isDecline ? 'high' : 'low' },
-      { region: 'Västra Götaland', count: Math.floor(Math.random() * 80000), severity: 'medium' },
-      { region: 'Skåne', count: Math.floor(Math.random() * 60000), severity: isDecline ? 'high' : 'medium' },
-      { region: 'Övriga', count: Math.floor(Math.random() * 150000), severity: 'low' },
-    ],
-  };
-
-  const factors: ContributingFactor[] = [
-    {
-      factorName: 'Demografisk förskjutning',
-      impactWeight: Math.floor(Math.random() * 30) + 20,
-      direction: isDecline ? 'negative' : 'positive',
-      confidence: Math.floor(Math.random() * 20) + 75,
-      description: 'Förändringar i befolkningsstruktur påverkar utfallet',
-    },
-    {
-      factorName: 'Policyförändringar',
-      impactWeight: Math.floor(Math.random() * 25) + 15,
-      direction: 'mixed',
-      confidence: Math.floor(Math.random() * 25) + 60,
-      description: 'Genomförda reformer har haft observerbar effekt',
-    },
-    {
-      factorName: 'Ekonomiska cykler',
-      impactWeight: Math.floor(Math.random() * 20) + 10,
-      direction: isDecline ? 'negative' : 'positive',
-      confidence: Math.floor(Math.random() * 30) + 50,
-      description: 'Konjunkturläget korrelerar med observerad förändring',
-    },
-    {
-      factorName: 'Externa faktorer',
-      impactWeight: Math.floor(Math.random() * 15) + 5,
-      direction: 'mixed',
-      confidence: Math.floor(Math.random() * 40) + 30,
-      description: 'Globala trender och händelser kan ha bidragit',
-    },
-  ];
-
-  const responsibility: ResponsibilityChain[] = [
-    { level: 'national', entity: 'Socialdepartementet', role: 'Policyansvar', hasAction: Math.random() > 0.5 },
-    { level: 'regional', entity: 'Region Stockholm', role: 'Genomförandeansvar', hasAction: Math.random() > 0.6 },
-    { level: 'municipal', entity: 'Stockholms kommun', role: 'Operativt ansvar', hasAction: Math.random() > 0.7 },
-    { level: 'operational', entity: 'Socialstyrelsen', role: 'Tillsyn & uppföljning', hasAction: true },
-  ];
-
-  return { outcome, population, factors, responsibility };
 }
 
 export function IndexItemDetailDialog({ open, onOpenChange, item, type }: IndexItemDetailProps) {
@@ -157,18 +97,19 @@ export function IndexItemDetailDialog({ open, onOpenChange, item, type }: IndexI
   
   if (!item) return null;
 
-  const data = generateMockData(item, type);
-  if (!data) return null;
-
+  const data = getVerifiedData(item, type);
   const { outcome, population, factors, responsibility } = data;
 
   const typeLabels = {
-    improvement: { label: '[+] FÖRBÄTTRING', color: 'text-emerald-600 bg-emerald-50' },
-    decline: { label: '[-] FÖRSÄMRING', color: 'text-red-600 bg-red-50' },
-    attention: { label: '[!] KRÄVER UPPMÄRKSAMHET', color: 'text-amber-600 bg-amber-50' },
+    improvement: { label: '[+] FÖRBÄTTRING', color: 'text-status-positive bg-status-positive/10' },
+    decline: { label: '[-] FÖRSÄMRING', color: 'text-status-critical bg-status-critical/10' },
+    attention: { label: '[!] KRÄVER UPPMÄRKSAMHET', color: 'text-status-warning bg-status-warning/10' },
   };
 
   const typeConfig = typeLabels[type];
+
+  // Show no-data state when verified data is not available
+  const hasData = outcome !== null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -186,7 +127,7 @@ export function IndexItemDetailDialog({ open, onOpenChange, item, type }: IndexI
             <div className="text-right shrink-0">
               <div className={cn(
                 'text-2xl font-mono font-bold tabular-nums',
-                type === 'decline' ? 'text-red-600' : 'text-emerald-600'
+                type === 'decline' ? 'text-status-critical' : 'text-status-positive'
               )}>
                 {type === 'decline' ? '↓' : '↑'} {Math.abs(item.change || 0).toFixed(1)}%
               </div>
@@ -197,6 +138,18 @@ export function IndexItemDetailDialog({ open, onOpenChange, item, type }: IndexI
           </div>
         </DialogHeader>
 
+        {!hasData ? (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="text-center space-y-3">
+              <div className="text-3xl font-mono text-muted-foreground">—</div>
+              <h3 className="font-semibold">Data ej tillgänglig</h3>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                Detaljerad utfallsdata visas endast från verifierade datakällor.
+              </p>
+              <div className="text-xs font-mono text-status-warning">[DATA_UNAVAILABLE]</div>
+            </div>
+          </div>
+        ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
           <TabsList className="grid w-full grid-cols-4 shrink-0">
             <TabsTrigger value="outcome" className="text-xs font-mono">[UTFALL]</TabsTrigger>
@@ -210,16 +163,16 @@ export function IndexItemDetailDialog({ open, onOpenChange, item, type }: IndexI
             <TabsContent value="outcome" className="space-y-4 m-0">
               <div className="space-y-4">
                 <div className="p-4 bg-muted/50 rounded-lg space-y-3">
-                  <p className="text-sm">{outcome.description}</p>
+                  <p className="text-sm">{outcome?.description || '—'}</p>
                   <div className="text-xs text-muted-foreground font-mono">
-                    [PERIOD] {outcome.measurementPeriod}
+                    [PERIOD] {outcome?.measurementPeriod || '—'}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
                   <div className="p-4 border rounded-lg text-center">
                     <div className="text-xs text-muted-foreground font-mono mb-1">[BASLINJE]</div>
-                    <div className="text-2xl font-bold font-mono">{outcome.baselineValue.toFixed(1)}</div>
+                    <div className="text-2xl font-bold font-mono">{outcome?.baselineValue?.toFixed(1) ?? '—'}</div>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <div className="text-xs text-muted-foreground font-mono mb-1">[NULÄGE]</div>
@@ -424,6 +377,7 @@ export function IndexItemDetailDialog({ open, onOpenChange, item, type }: IndexI
             </TabsContent>
           </div>
         </Tabs>
+        )}
       </DialogContent>
     </Dialog>
   );
