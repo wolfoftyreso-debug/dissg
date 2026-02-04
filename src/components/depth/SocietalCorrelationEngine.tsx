@@ -30,13 +30,12 @@ import {
   MULTIPLE_FACTORS_NOTE,
   CROSS_COUNTRY_PROMPT,
   VIABILITY_CONNECTION,
-  TRANSPARENCY_PRINCIPLES,
-  TRANSPARENCY_OUTCOME,
   getCorrelationText,
   type TimePeriod,
   type GeoLevel
 } from '@/config/demographyCorrelationConfig';
 import { ControlVariableCard } from './ControlVariableCard';
+import { TransparencyPrinciplesDeep } from './TransparencyPrinciplesDeep';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 // Seeded random for reproducible indicator-specific data
@@ -532,26 +531,8 @@ export const SocietalCorrelationEngine: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Transparency Principles */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Transparensprinciper</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-2 md:grid-cols-2">
-                {TRANSPARENCY_PRINCIPLES.sv.map((p, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm">
-                    <span className="font-mono text-primary text-xs">[+]</span>
-                    {p}
-                  </div>
-                ))}
-              </div>
-              <Separator className="my-4" />
-              <p className="text-center text-sm font-medium text-primary">
-                {TRANSPARENCY_OUTCOME.sv}
-              </p>
-            </CardContent>
-          </Card>
+          {/* Transparency Principles - Deep Clickable */}
+          <TransparencyPrinciplesDeep />
         </>
       )}
     </div>
