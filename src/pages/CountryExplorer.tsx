@@ -1,13 +1,19 @@
 /**
- * COUNTRY EXPLORER PAGE
+ * ============================================================================
+ * DISSG NATION EXPLORER
+ * Diagnostic Information System for Societal Governance
+ * ============================================================================
+ * 
+ * Hierarchy Level: NATION (Level 2 of 7)
+ * Path: Civilisation → Världsdel → [Nation] → Region → System → Indikator → Datapunkt
  * 
  * Full-featured country data exploration with:
  * - Graph sandbox for any indicator
- * - Index comparisons (GMI, HDI, etc.)
+ * - Index comparisons (DISSG, HDI, etc.)
  * - Peer country benchmarking
  * - Historical timeline analysis
  * 
- * "Alltid klickbart" – Every country leads here.
+ * Core Principle: "Every number is clickable"
  */
 
 import React, { useState } from 'react';

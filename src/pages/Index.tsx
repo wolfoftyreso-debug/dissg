@@ -1,8 +1,14 @@
 /**
- * GDIS MAIN DASHBOARD
+ * ============================================================================
+ * DISSG – DIAGNOSTIC INFORMATION SYSTEM FOR SOCIETAL GOVERNANCE
+ * ============================================================================
  * 
- * Global Diagnostic Information System - Main Entry Point
- * Strukturmässigt lik VW ODIS / Volvo VIDA diagnostiksystem.
+ * Main Entry Point - "Oscilloscope for Civilization"
+ * 
+ * Clinical diagnostics for societal governance:
+ * - Makes reality measurable, comprehensible, independent of narrative
+ * - Treats the world like a vehicle fleet, nations as vehicles, indicators as sensors
+ * - Never provides policy recommendations
  */
 
 import { useState, useMemo } from 'react';
@@ -16,6 +22,7 @@ import { AlertNotificationPanel } from '@/components/dashboard/AlertNotification
 import UniversalResponsibilityMap from '@/components/global/UniversalResponsibilityMap';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { useGovRole } from '@/hooks/useGovRole';
+import { SYSTEM } from '@/config/system';
 
 // Tab configuration
 const MAIN_TABS: ODISTab[] = [
@@ -116,7 +123,7 @@ const Index = () => {
   ];
 
   const rightInfo = [
-    { label: 'VER', value: 'GDIS 1.0.4' },
+    { label: 'VER', value: `${SYSTEM.name} ${SYSTEM.version}` },
     { label: 'Coverage', value: `${kpis.length} indicators` },
   ];
 
@@ -213,7 +220,7 @@ const Index = () => {
         actions={footerActions}
         rightContent={
           <span className="font-mono text-[10px] text-muted-foreground">
-            GDIS_SE_NATIONAL_1.0@2024
+            {SYSTEM.name}_SE_NATIONAL_{SYSTEM.version}@2025
           </span>
         }
       />
