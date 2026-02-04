@@ -20,7 +20,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
@@ -130,7 +129,7 @@ const PRINCIPLE_EVIDENCE: Record<string, PrincipleEvidence> = {
   },
   'population-capacity': {
     id: 'population-capacity',
-    summary: 'Vi måste matcha mänskligt antal med faktisk systemkapacitet – annars sjunker levnadsförmågan.',
+    summary: 'Jordens resurser sätter en gräns för hur många människor som kan leva väl. Om befolkningen överstiger denna kapacitet sjunker livskvaliteten.',
     scientificBasis: 'Ekologisk bärkraft, resursekonomi, demografisk transitionsteori.',
     documents: [
       {
@@ -278,17 +277,14 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
                 {evidence.summary}
               </p>
               <Separator className="my-4" />
-              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                <span>Inte ideologi. Inte klimatmoral. Inte tillväxtoptimism. Bara fysik, biologi, teknik och mänskligt välbefinnande.</span>
-              </div>
+              <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                Vi utgår från fysik, biologi och teknik – inte från ideologi eller tillväxtantaganden. Målet är att visa vad som är mätbart och verifierbart.
+              </p>
               <div className="mt-4 flex items-center justify-center gap-2">
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs cursor-pointer hover:bg-primary/10">
                   {evidence.documents.length} källdokument
+                  <span className="ml-1 opacity-60">{isOpen ? '−' : '+'}</span>
                 </Badge>
-                <ChevronDown className={cn(
-                  "h-4 w-4 transition-transform",
-                  isOpen && "rotate-180"
-                )} />
               </div>
             </CardContent>
           </Card>
@@ -306,13 +302,10 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
                   {evidence.summary}
                 </span>
                 <div className="flex items-center gap-2 ml-4">
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs cursor-pointer hover:bg-primary/10">
                     {evidence.documents.length} källor
+                    <span className="ml-1 opacity-60">{isOpen ? '−' : '+'}</span>
                   </Badge>
-                  <ChevronDown className={cn(
-                    "h-4 w-4 transition-transform",
-                    isOpen && "rotate-180"
-                  )} />
                 </div>
               </div>
             </AlertDescription>
