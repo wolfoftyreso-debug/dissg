@@ -3,21 +3,6 @@ import { KPI } from '@/types/kpi';
 import { supabase } from '@/integrations/supabase/client';
 import { useLiveForecast, LiveDataPoint } from '@/hooks/useLiveForecast';
 import { LiveForecastChart } from './LiveForecastChart';
-import { 
-  TrendingUp, 
-  AlertTriangle, 
-  Clock, 
-  Target,
-  Loader2,
-  ChevronDown,
-  ChevronRight,
-  Lightbulb,
-  AlertCircle,
-  CheckCircle,
-  XCircle,
-  Radio,
-  RefreshCw
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ForecastPanelProps {
@@ -184,14 +169,12 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
   if (!forecast && !isLoading) {
     return (
       <div className="space-y-3">
-        <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Konsekvensanalys (Nivå 3)
+        <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground font-mono">
+          [KONSEKVENSANALYS] NIVÅ 3
         </h3>
         <div className="rounded-lg border border-border bg-muted/30 p-4">
           <div className="flex items-start gap-3">
-            <div className="rounded-full bg-primary/10 p-2">
-              <Lightbulb className="h-4 w-4 text-primary" />
-            </div>
+            <span className="font-mono text-sm font-bold text-primary">[PROGNOS]</span>
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">
                 AI-driven prognosfunktion
@@ -203,19 +186,9 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
               <button
                 onClick={generateForecast}
                 disabled={isLoading}
-                className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    Analyserar...
-                  </>
-                ) : (
-                  <>
-                    <TrendingUp className="h-3 w-3" />
-                    Generera prognos
-                  </>
-                )}
+                {isLoading ? '[...] Analyserar' : '[↑] Generera prognos'}
               </button>
             </div>
           </div>
@@ -227,12 +200,12 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Konsekvensanalys (Nivå 3)
+        <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground font-mono">
+          [KONSEKVENSANALYS] NIVÅ 3
         </h3>
         <div className="rounded-lg border border-border bg-card p-6">
           <div className="flex flex-col items-center justify-center gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="font-mono text-2xl animate-pulse">[...]</p>
             <p className="text-sm text-muted-foreground">
               Analyserar trender och beräknar prognos...
             </p>
@@ -245,20 +218,20 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
   if (error) {
     return (
       <div className="space-y-3">
-        <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Konsekvensanalys (Nivå 3)
+        <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground font-mono">
+          [KONSEKVENSANALYS] NIVÅ 3
         </h3>
         <div className="rounded-lg border border-status-critical/30 bg-status-critical/5 p-4">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-status-critical" />
+            <span className="font-mono text-sm font-bold text-status-critical">[FEL]</span>
             <div>
               <p className="text-sm font-medium text-status-critical">Fel vid analys</p>
               <p className="mt-1 text-xs text-muted-foreground">{error}</p>
               <button
                 onClick={generateForecast}
-                className="mt-2 text-xs text-primary hover:underline"
+                className="mt-2 text-xs text-primary hover:underline font-mono"
               >
-                Försök igen
+                [↻] Försök igen
               </button>
             </div>
           </div>
@@ -276,14 +249,14 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Konsekvensanalys (Nivå 3)
+        <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground font-mono">
+          [KONSEKVENSANALYS] NIVÅ 3
         </h3>
         <button
           onClick={generateForecast}
-          className="text-xs text-primary hover:underline"
+          className="text-xs text-primary hover:underline font-mono"
         >
-          Uppdatera
+          [↻ UPPDATERA]
         </button>
       </div>
 
@@ -295,23 +268,25 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
           : 'border-status-warning/30 bg-status-warning/5'
       )}>
         <div className="flex items-start gap-3">
-          <AlertTriangle className={cn(
-            'h-5 w-5 mt-0.5',
+          <span className={cn(
+            'font-mono text-sm font-bold mt-0.5',
             severity === 'critical' || severity === 'high' 
               ? 'text-status-critical' 
               : 'text-status-warning'
-          )} />
+          )}>
+            [!]
+          </span>
           <div>
             <div className="flex items-center gap-2">
               <p className="text-sm font-semibold text-foreground">
                 Vid status quo
               </p>
               <span className={cn(
-                'rounded px-1.5 py-0.5 text-[10px] font-medium',
+                'rounded px-1.5 py-0.5 text-[10px] font-medium font-mono',
                 severityConfig.bg,
                 severityConfig.color
               )}>
-                {severityConfig.label} risk
+                [{severityConfig.label.toUpperCase()}] RISK
               </span>
             </div>
             <p className="mt-1 text-sm text-foreground">
@@ -328,9 +303,8 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
             <div className="flex items-center gap-2">
               <p className="text-xs font-mono text-muted-foreground">[PROGNOS 12 MÅNADER]</p>
               {isLiveMode && (
-                <span className="flex items-center gap-1 text-[10px] font-mono text-status-positive">
-                  <Radio className="h-3 w-3 animate-pulse" />
-                  LIVE
+                <span className="flex items-center gap-1 text-[10px] font-mono text-status-positive animate-pulse">
+                  [LIVE]
                 </span>
               )}
             </div>
@@ -340,8 +314,8 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
                 disabled={liveForecast.isLoading}
                 className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
               >
-                <RefreshCw className={cn("h-3 w-3", liveForecast.isLoading && "animate-spin")} />
-                {liveForecast.lastUpdated ? `${Math.round((Date.now() - liveForecast.lastUpdated.getTime()) / 1000)}s` : '—'}
+                {liveForecast.isLoading ? '[...]' : '[↻]'}
+                {liveForecast.lastUpdated ? ` ${Math.round((Date.now() - liveForecast.lastUpdated.getTime()) / 1000)}s` : ''}
               </button>
             )}
           </div>
@@ -364,14 +338,12 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
             className="flex w-full items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors"
           >
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="font-mono text-xs text-muted-foreground">[TID]</span>
               <span className="text-sm font-medium">Tidslinje vid inaktivitet</span>
             </div>
-            {expandedSection === 'consequences' ? (
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            )}
+            <span className="font-mono text-xs text-muted-foreground">
+              {expandedSection === 'consequences' ? '[−]' : '[+]'}
+            </span>
           </button>
           {expandedSection === 'consequences' && forecast.status_quo_consequences?.timeline && (
             <div className="border-t border-border px-3 py-2 space-y-2">
@@ -389,14 +361,14 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
                     )}
                   </div>
                   <div className="flex-1 pb-2">
-                    <p className="text-xs font-medium text-foreground">{item.period}</p>
+                    <p className="text-xs font-medium text-foreground font-mono">[{item.period}]</p>
                     <p className="text-xs text-muted-foreground">{item.effect}</p>
                   </div>
                 </div>
               ))}
               {forecast.status_quo_consequences.cost_of_inaction && (
                 <div className="mt-2 rounded bg-muted/50 p-2">
-                  <p className="text-xs font-medium text-muted-foreground">Kostnad vid inaktivitet:</p>
+                  <p className="text-xs font-medium text-muted-foreground font-mono">[KOSTNAD VID INAKTIVITET]</p>
                   <p className="text-xs text-foreground">{forecast.status_quo_consequences.cost_of_inaction}</p>
                 </div>
               )}
@@ -411,22 +383,20 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
             className="flex w-full items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors"
           >
             <div className="flex items-center gap-2">
-              <Target className="h-4 w-4 text-muted-foreground" />
+              <span className="font-mono text-xs text-muted-foreground">[MÅL]</span>
               <span className="text-sm font-medium">Scenarioanalys</span>
             </div>
-            {expandedSection === 'scenarios' ? (
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            )}
+            <span className="font-mono text-xs text-muted-foreground">
+              {expandedSection === 'scenarios' ? '[−]' : '[+]'}
+            </span>
           </button>
           {expandedSection === 'scenarios' && forecast.forecast && (
             <div className="border-t border-border p-3 space-y-3">
               {/* Baseline */}
               <div className="rounded border border-primary/30 bg-primary/5 p-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-primary">Basscenario</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs font-medium text-primary font-mono">[BAS]</span>
+                  <span className="text-xs text-muted-foreground font-mono">
                     {forecast.forecast.scenario_baseline.confidence}% säkerhet
                   </span>
                 </div>
@@ -441,11 +411,8 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
               {/* Optimistic */}
               <div className="rounded border border-status-positive/30 bg-status-positive/5 p-2">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <CheckCircle className="h-3 w-3 text-status-positive" />
-                    <span className="text-xs font-medium text-status-positive">Optimistiskt</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs font-medium text-status-positive font-mono">[+] Optimistiskt</span>
+                  <span className="text-xs text-muted-foreground font-mono">
                     {forecast.forecast.scenario_optimistic.probability}% sannolikhet
                   </span>
                 </div>
@@ -454,10 +421,12 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
                 </p>
                 {forecast.forecast.scenario_optimistic.required_actions?.length > 0 && (
                   <div className="mt-1">
-                    <p className="text-[10px] font-medium text-muted-foreground">KRÄVER:</p>
-                    <ul className="text-xs text-muted-foreground list-disc list-inside">
+                    <p className="text-[10px] font-medium text-muted-foreground font-mono">[KRÄVER]</p>
+                    <ul className="text-xs text-muted-foreground list-none">
                       {forecast.forecast.scenario_optimistic.required_actions.map((action, i) => (
-                        <li key={i}>{action}</li>
+                        <li key={i} className="flex items-start gap-1">
+                          <span className="font-mono text-status-positive">[→]</span> {action}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -467,11 +436,8 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
               {/* Pessimistic */}
               <div className="rounded border border-status-critical/30 bg-status-critical/5 p-2">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <XCircle className="h-3 w-3 text-status-critical" />
-                    <span className="text-xs font-medium text-status-critical">Pessimistiskt</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs font-medium text-status-critical font-mono">[−] Pessimistiskt</span>
+                  <span className="text-xs text-muted-foreground font-mono">
                     {forecast.forecast.scenario_pessimistic.probability}% sannolikhet
                   </span>
                 </div>
@@ -480,10 +446,12 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
                 </p>
                 {forecast.forecast.scenario_pessimistic.risk_factors?.length > 0 && (
                   <div className="mt-1">
-                    <p className="text-[10px] font-medium text-muted-foreground">RISKFAKTORER:</p>
-                    <ul className="text-xs text-muted-foreground list-disc list-inside">
-                      {forecast.forecast.scenario_pessimistic.risk_factors.map((risk, i) => (
-                        <li key={i}>{risk}</li>
+                    <p className="text-[10px] font-medium text-muted-foreground font-mono">[RISKFAKTORER]</p>
+                    <ul className="text-xs text-muted-foreground list-none">
+                      {forecast.forecast.scenario_pessimistic.risk_factors.map((factor, i) => (
+                        <li key={i} className="flex items-start gap-1">
+                          <span className="font-mono text-status-critical">[!]</span> {factor}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -493,6 +461,48 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
           )}
         </div>
 
+        {/* Monitoring */}
+        {forecast.recommended_monitoring && (
+          <div className="rounded-lg border border-border bg-card overflow-hidden">
+            <button
+              onClick={() => toggleSection('monitoring')}
+              className="flex w-full items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs text-muted-foreground">[MONITOR]</span>
+                <span className="text-sm font-medium">Rekommenderad bevakning</span>
+              </div>
+              <span className="font-mono text-xs text-muted-foreground">
+                {expandedSection === 'monitoring' ? '[−]' : '[+]'}
+              </span>
+            </button>
+            {expandedSection === 'monitoring' && (
+              <div className="border-t border-border p-3 space-y-2">
+                <div>
+                  <p className="text-[10px] font-medium text-muted-foreground font-mono">[NYCKELINDIKATORER]</p>
+                  <ul className="text-xs text-foreground mt-1">
+                    {forecast.recommended_monitoring.key_indicators?.map((indicator, i) => (
+                      <li key={i} className="flex items-start gap-1">
+                        <span className="font-mono text-primary">[KPI]</span> {indicator}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="flex gap-4">
+                  <div>
+                    <p className="text-[10px] font-medium text-muted-foreground font-mono">[TRÖSKEL]</p>
+                    <p className="text-xs text-foreground">{forecast.recommended_monitoring.warning_threshold}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-medium text-muted-foreground font-mono">[FREKVENS]</p>
+                    <p className="text-xs text-foreground">{forecast.recommended_monitoring.review_frequency}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Uncertainty Factors */}
         {forecast.uncertainty_factors?.length > 0 && (
           <div className="rounded-lg border border-border bg-card overflow-hidden">
@@ -501,22 +511,19 @@ export function ForecastPanel({ kpi }: ForecastPanelProps) {
               className="flex w-full items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                <span className="font-mono text-xs text-muted-foreground">[?]</span>
                 <span className="text-sm font-medium">Osäkerhetsfaktorer</span>
               </div>
-              {expandedSection === 'uncertainty' ? (
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              )}
+              <span className="font-mono text-xs text-muted-foreground">
+                {expandedSection === 'uncertainty' ? '[−]' : '[+]'}
+              </span>
             </button>
             {expandedSection === 'uncertainty' && (
-              <div className="border-t border-border px-3 py-2">
-                <ul className="space-y-1">
+              <div className="border-t border-border p-3">
+                <ul className="text-xs text-muted-foreground space-y-1">
                   {forecast.uncertainty_factors.map((factor, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                      <span className="text-muted-foreground">•</span>
-                      {factor}
+                    <li key={i} className="flex items-start gap-1">
+                      <span className="font-mono text-status-warning">[?]</span> {factor}
                     </li>
                   ))}
                 </ul>
