@@ -9,6 +9,7 @@
  * - InfiniteDepthProvider: Context for managing depth navigation
  * - ClickableDataPoint: Wraps any value to make it explorable
  * - DepthExplorer: Full-screen modal for deep exploration
+ * - DataDashboard: Avanza-inspired overview dashboard
  */
 
 // Provider and context
@@ -29,6 +30,9 @@ export { ClickableDataPoint } from './ClickableDataPoint';
 
 // Explorer modal
 export { DepthExplorer } from './DepthExplorer';
+
+// Dashboard
+export { DataDashboard } from './DataDashboard';
 
 // Utility: Create a simple data point with basic depth
 export function createDataPoint(params: {

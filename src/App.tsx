@@ -93,7 +93,7 @@ import CountryExplorer from "./pages/CountryExplorer";
 import IndicatorExplorer from "./pages/IndicatorExplorer";
 import IndexPage from "./pages/IndexPage";
 import SystemLog from "./pages/SystemLog";
-import DataAccess from "./pages/DataAccess";
+import DataPage from "./pages/DataPage";
 import Extras from "./pages/Extras";
 import Help from "./pages/Help";
 import DemocraticHealth from "./pages/DemocraticHealth";
@@ -193,7 +193,7 @@ const App = () => (
               <Route path="/country/:code" element={<CountryExplorer />} />
               <Route path="/indicator/:code" element={<IndicatorExplorer />} />
               <Route path="/log" element={<SystemLog />} />
-              <Route path="/data" element={<DataAccess />} />
+              <Route path="/data" element={<DataPage />} />
               <Route path="/extras" element={<Extras />} />
               <Route path="/help" element={<Help />} />
               <Route path="/democratic-health" element={<DemocraticHealth />} />
