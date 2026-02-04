@@ -92,6 +92,10 @@ import WagesPage from "./pages/WagesPage";
 import CountryExplorer from "./pages/CountryExplorer";
 import IndicatorExplorer from "./pages/IndicatorExplorer";
 import IndexPage from "./pages/IndexPage";
+import SystemLog from "./pages/SystemLog";
+import DataAccess from "./pages/DataAccess";
+import Extras from "./pages/Extras";
+import Help from "./pages/Help";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -187,6 +191,10 @@ const App = () => (
               <Route path="/wages" element={<WagesPage />} />
               <Route path="/country/:code" element={<CountryExplorer />} />
               <Route path="/indicator/:code" element={<IndicatorExplorer />} />
+              <Route path="/log" element={<SystemLog />} />
+              <Route path="/data" element={<DataAccess />} />
+              <Route path="/extras" element={<Extras />} />
+              <Route path="/help" element={<Help />} />
               {/* Huvudsidan är publik - läsning utan inloggning */}
               <Route path="/" element={<Index />} />
               {/* Skyddade routes - kräver inloggning */}
