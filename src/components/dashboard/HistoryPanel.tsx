@@ -270,12 +270,12 @@ export function HistoryPanel({ kpi }: HistoryPanelProps) {
         />
       )}
       
-      {/* Mock data warning */}
+      {/* Data source status */}
       {isUsingMockData && (
-        <div className="flex items-center gap-2 rounded bg-muted/50 px-2 py-1.5">
-          <Info className="h-3 w-3 text-muted-foreground" />
-          <p className="text-[10px] text-muted-foreground">
-            Visar simulerad data. Anslut datakällor för riktig historik.
+        <div className="flex items-center gap-2 rounded border border-amber-500/30 bg-amber-500/10 px-2 py-1.5">
+          <Info className="h-3 w-3 text-amber-600" />
+          <p className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">
+            [DATA SAKNAS] Inga verifierade datakällor anslutna för denna indikator.
           </p>
         </div>
       )}
@@ -461,8 +461,11 @@ export function HistoryPanel({ kpi }: HistoryPanelProps) {
             </div>
             <div>
               <p className="text-muted-foreground">Datakälla</p>
-              <p className="font-medium text-foreground">
-                {isUsingMockData ? 'Simulerad' : 'Databas'}
+              <p className={cn(
+                "font-medium",
+                isUsingMockData ? "text-amber-600 dark:text-amber-400" : "text-foreground"
+              )}>
+                {isUsingMockData ? '—' : 'Verifierad'}
               </p>
             </div>
           </div>
