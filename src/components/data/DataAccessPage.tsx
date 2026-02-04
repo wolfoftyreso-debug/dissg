@@ -1,17 +1,17 @@
 /**
- * Data Dashboard - Full tabbed data access interface
+ * Data Access Page - Full tabbed interface
  * 
- * Combines Overview + Sources/Export/RawData/API tabs
+ * Shows sources, export, raw data, and API documentation
  */
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { DataOverview } from './DataOverview';
-// Tab content components are defined inline below
+import { useNavigate } from 'react-router-dom';
 
 // Stat card component
 const StatCard: React.FC<{
@@ -21,99 +21,17 @@ const StatCard: React.FC<{
 }> = ({ value, label, onClick }) => (
   <button
     onClick={onClick}
-    className="flex-1 p-4 md:p-6 bg-background border rounded-lg hover:shadow-md transition-shadow text-center min-w-0"
+    className="flex-1 p-6 bg-background border rounded-lg hover:shadow-md transition-shadow text-center"
   >
-    <p className="text-2xl md:text-3xl font-semibold">{value}</p>
-    <p className="text-xs text-muted-foreground font-mono mt-1 truncate">[{label}]</p>
+    <p className="text-3xl font-semibold">{value}</p>
+    <p className="text-xs text-muted-foreground font-mono mt-1">[{label}]</p>
   </button>
 );
 
-export const DataDashboard: React.FC<{ className?: string }> = ({ className }) => {
-  const [activeTab, setActiveTab] = useState('overview');
-
-  const { data: stats } = useQuery({
-    queryKey: ['data-dashboard-stats'],
-    queryFn: async () => {
-      const [sources, countries, kpis] = await Promise.all([
-        supabase.from('data_sources').select('id', { count: 'exact', head: true }).eq('is_active', true),
-        supabase.from('countries').select('id', { count: 'exact', head: true }).eq('is_active', true),
-        supabase.from('kpi_definitions').select('id', { count: 'exact', head: true }).eq('is_active', true),
-      ]);
-      
-      return {
-        sources: sources.count || 21,
-        countries: countries.count || 39,
-        indicators: kpis.count || 56,
-        tables: 7,
-      };
-    }
-  });
-
-  return (
-    <div className={cn('h-full flex flex-col bg-background', className)}>
-      <ScrollArea className="flex-1">
-        <div className="p-4 md:p-6 max-w-7xl mx-auto">
-          {/* Stats Row */}
-          <div className="flex gap-2 md:gap-4 mb-6">
-            <StatCard value={stats?.sources || 21} label="AKTIVA KÄLLOR" />
-            <StatCard value={stats?.countries || 39} label="LÄNDER" />
-            <StatCard value={stats?.indicators || 56} label="INDIKATORER" />
-            <StatCard value={stats?.tables || 7} label="DATATABELLER" />
-          </div>
-
-          {/* Main Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="w-full justify-start bg-transparent border-b rounded-none h-auto p-0 overflow-x-auto">
-              {[
-                { value: 'overview', label: 'ÖVERSIKT' },
-                { value: 'sources', label: 'KÄLLOR' },
-                { value: 'export', label: 'EXPORT' },
-                { value: 'rawdata', label: 'RÅDATA' },
-                { value: 'api', label: 'API' },
-              ].map((tab) => (
-                <TabsTrigger
-                  key={tab.value}
-                  value={tab.value}
-                  className={cn(
-                    'rounded-none border-b-2 border-transparent px-4 md:px-6 py-3 font-mono text-sm whitespace-nowrap',
-                    'data-[state=active]:border-primary data-[state=active]:bg-transparent'
-                  )}
-                >
-                  [{tab.label}]
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            <div className="mt-6">
-              <TabsContent value="overview" className="mt-0">
-                <DataOverview />
-              </TabsContent>
-              <TabsContent value="sources" className="mt-0">
-                <SourcesTabContent />
-              </TabsContent>
-              <TabsContent value="export" className="mt-0">
-                <ExportTabContent />
-              </TabsContent>
-              <TabsContent value="rawdata" className="mt-0">
-                <RawDataTabContent />
-              </TabsContent>
-              <TabsContent value="api" className="mt-0">
-                <ApiTabContent />
-              </TabsContent>
-            </div>
-          </Tabs>
-        </div>
-      </ScrollArea>
-    </div>
-  );
-};
-
 // Sources Tab Content
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-const SourcesTabContent: React.FC = () => {
+const SourcesTab: React.FC = () => {
   const { data: sources } = useQuery({
-    queryKey: ['data-sources-list'],
+    queryKey: ['data-sources'],
     queryFn: async () => {
       const { data } = await supabase
         .from('data_sources')
@@ -189,7 +107,7 @@ const SourcesTabContent: React.FC = () => {
 };
 
 // Export Tab Content  
-const ExportTabContent: React.FC = () => {
+const ExportTab: React.FC = () => {
   const exportFormats = [
     { code: 'csv', name: 'CSV', desc: 'Kommaseparerade värden, kompatibelt med Excel' },
     { code: 'json', name: 'JSON', desc: 'Strukturerad data för programmatisk användning' },
@@ -251,10 +169,11 @@ const ExportTabContent: React.FC = () => {
 };
 
 // Raw Data Tab Content
-const RawDataTabContent: React.FC = () => {
+const RawDataTab: React.FC = () => {
   const { data: tables } = useQuery({
-    queryKey: ['data-tables-counts'],
+    queryKey: ['data-tables-info'],
     queryFn: async () => {
+      // Get counts from various tables
       const [kpis, values, sources, countries] = await Promise.all([
         supabase.from('kpi_definitions').select('id', { count: 'exact', head: true }),
         supabase.from('kpi_values').select('id', { count: 'exact', head: true }),
@@ -323,9 +242,7 @@ const RawDataTabContent: React.FC = () => {
 };
 
 // API Tab Content
-import { useNavigate } from 'react-router-dom';
-
-const ApiTabContent: React.FC = () => {
+const ApiTab: React.FC = () => {
   const navigate = useNavigate();
 
   const apiSections = [
@@ -415,4 +332,81 @@ const ApiTabContent: React.FC = () => {
   );
 };
 
-export default DataDashboard;
+// Main Component
+export const DataAccessPage: React.FC<{ className?: string }> = ({ className }) => {
+  const [activeTab, setActiveTab] = useState('sources');
+
+  const { data: stats } = useQuery({
+    queryKey: ['data-stats'],
+    queryFn: async () => {
+      const [sources, countries, kpis] = await Promise.all([
+        supabase.from('data_sources').select('id', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('countries').select('id', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('kpi_definitions').select('id', { count: 'exact', head: true }).eq('is_active', true),
+      ]);
+      
+      return {
+        sources: sources.count || 21,
+        countries: countries.count || 39,
+        indicators: kpis.count || 56,
+        tables: 7,
+      };
+    }
+  });
+
+  return (
+    <div className={cn('h-full flex flex-col bg-background', className)}>
+      <ScrollArea className="flex-1">
+        <div className="p-6 max-w-5xl mx-auto">
+          {/* Stats Row */}
+          <div className="flex gap-4 mb-6">
+            <StatCard value={stats?.sources || 21} label="AKTIVA KÄLLOR" />
+            <StatCard value={stats?.countries || 39} label="LÄNDER" />
+            <StatCard value={stats?.indicators || 56} label="INDIKATORER" />
+            <StatCard value={stats?.tables || 7} label="DATATABELLER" />
+          </div>
+
+          {/* Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="w-full justify-start bg-transparent border-b rounded-none h-auto p-0">
+              {[
+                { value: 'sources', label: 'KÄLLOR' },
+                { value: 'export', label: 'EXPORT' },
+                { value: 'rawdata', label: 'RÅDATA' },
+                { value: 'api', label: 'API' },
+              ].map((tab) => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className={cn(
+                    'rounded-none border-b-2 border-transparent px-6 py-3 font-mono text-sm',
+                    'data-[state=active]:border-primary data-[state=active]:bg-transparent'
+                  )}
+                >
+                  [{tab.label}]
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            <div className="mt-6">
+              <TabsContent value="sources" className="mt-0">
+                <SourcesTab />
+              </TabsContent>
+              <TabsContent value="export" className="mt-0">
+                <ExportTab />
+              </TabsContent>
+              <TabsContent value="rawdata" className="mt-0">
+                <RawDataTab />
+              </TabsContent>
+              <TabsContent value="api" className="mt-0">
+                <ApiTab />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </div>
+      </ScrollArea>
+    </div>
+  );
+};
+
+export default DataAccessPage;
