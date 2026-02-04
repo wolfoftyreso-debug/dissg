@@ -199,6 +199,8 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
 }) => {
   const [selectedCase, setSelectedCase] = useState<FactorEvidence['cases'][0] | null>(null);
   const [activeLevel, setActiveLevel] = useState<'L1' | 'L2' | 'L3' | 'L4' | 'L5'>('L1');
+  const [expandedShowsIdx, setExpandedShowsIdx] = useState<number | null>(null);
+  const [expandedNotShowsIdx, setExpandedNotShowsIdx] = useState<number | null>(null);
   
   if (!factor) return null;
   
@@ -322,9 +324,27 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                         <CardContent>
                           <ul className="space-y-2">
                             {evidence.observation.thisShows.map((item, idx) => (
-                              <li key={idx} className="text-sm flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
-                                <span>{item}</span>
+                              <li key={idx}>
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedShowsIdx(expandedShowsIdx === idx ? null : idx)}
+                                  className="w-full text-left text-sm flex items-start gap-2 rounded-sm hover:bg-muted/30 px-1.5 py-1"
+                                  aria-expanded={expandedShowsIdx === idx}
+                                >
+                                  <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                                  <span className="flex-1">{item}</span>
+                                  <span className="text-[10px] font-mono text-muted-foreground shrink-0">
+                                    {expandedShowsIdx === idx ? '[−]' : '[+]'}
+                                  </span>
+                                </button>
+                                {expandedShowsIdx === idx && (
+                                  <div className="mt-1 ml-4 text-xs text-muted-foreground leading-relaxed">
+                                    Fördjupning: Punkten är en observation i detta evidenspaket. Den specificerar inte orsak, individnivå eller prediktion.
+                                    <div className="mt-1 text-[10px] font-mono text-muted-foreground">
+                                      REF: FACTOR::{factor.id}::SHOWS::{idx + 1}
+                                    </div>
+                                  </div>
+                                )}
                               </li>
                             ))}
                           </ul>
@@ -341,9 +361,27 @@ export const FactorDeepDive: React.FC<FactorDeepDiveProps> = ({
                         <CardContent>
                           <ul className="space-y-2">
                             {evidence.observation.thisDoesNotShow.map((item, idx) => (
-                              <li key={idx} className="text-sm flex items-start gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-destructive mt-2 shrink-0" />
-                                <span>{item}</span>
+                              <li key={idx}>
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedNotShowsIdx(expandedNotShowsIdx === idx ? null : idx)}
+                                  className="w-full text-left text-sm flex items-start gap-2 rounded-sm hover:bg-muted/30 px-1.5 py-1"
+                                  aria-expanded={expandedNotShowsIdx === idx}
+                                >
+                                  <div className="w-1.5 h-1.5 rounded-full bg-destructive mt-2 shrink-0" />
+                                  <span className="flex-1">{item}</span>
+                                  <span className="text-[10px] font-mono text-muted-foreground shrink-0">
+                                    {expandedNotShowsIdx === idx ? '[−]' : '[+]'}
+                                  </span>
+                                </button>
+                                {expandedNotShowsIdx === idx && (
+                                  <div className="mt-1 ml-4 text-xs text-muted-foreground leading-relaxed">
+                                    Fördjupning: Detta är en avgränsning. Den säger vad som inte kan utläsas ur detta datapaket utan ytterligare variabler eller metod (t.ex. kausal identifikation).
+                                    <div className="mt-1 text-[10px] font-mono text-muted-foreground">
+                                      REF: FACTOR::{factor.id}::NOT_SHOWS::{idx + 1}
+                                    </div>
+                                  </div>
+                                )}
                               </li>
                             ))}
                           </ul>
