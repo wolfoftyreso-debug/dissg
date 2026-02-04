@@ -83,7 +83,7 @@ const GlobalStatusPanel: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-3 md:grid-cols-5">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
           {/* Population */}
           <DescriptiveMetricCard
             title="Befolkning"
@@ -194,7 +194,7 @@ const ThreeAxesPanel: React.FC<{ onAxisClick: (axisId: string) => void }> = ({ o
               <button
                 key={axis.id}
                 onClick={() => onAxisClick(axis.id)}
-                className="w-full text-left p-3 border rounded-lg hover:bg-muted/30 hover:border-primary/50 transition-all cursor-pointer group"
+                className="w-full text-left p-4 border rounded-lg hover:bg-muted/30 hover:border-primary/50 transition-all cursor-pointer group min-h-[80px]"
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-sm group-hover:text-primary transition-colors">{axis.labelSv}</span>
@@ -248,11 +248,12 @@ const PressZonesPanel: React.FC<{ onZoneClick: (zone: PressZone) => void }> = ({
         <button
           key={zone.id}
           onClick={() => onZoneClick(zone)}
-          className={`w-full text-left p-4 border rounded-lg transition-all cursor-pointer group hover:border-primary/50 ${
-            zone.severity === 'high' ? 'border-destructive/30 bg-destructive/5 hover:bg-destructive/10' :
-            zone.severity === 'moderate' ? 'border-primary/30 bg-primary/5 hover:bg-primary/10' :
-            'border-secondary bg-secondary/30 hover:bg-secondary/50'
-          }`}
+          className={cn(
+            "w-full text-left p-4 border rounded-lg transition-all cursor-pointer group hover:border-primary/50 min-h-[100px]",
+            zone.severity === 'high' && 'border-destructive/30 bg-destructive/5 hover:bg-destructive/10',
+            zone.severity === 'moderate' && 'border-primary/30 bg-primary/5 hover:bg-primary/10',
+            zone.severity !== 'high' && zone.severity !== 'moderate' && 'border-secondary bg-secondary/30 hover:bg-secondary/50'
+          )}
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
@@ -734,7 +735,7 @@ const SystemConnectionsPanel: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-2 md:grid-cols-3">
+        <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
           {SYSTEM_CONNECTIONS.map(conn => (
             <Button 
               key={conn.id} 
@@ -830,12 +831,23 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Överblick</TabsTrigger>
-          <TabsTrigger value="factors">Faktorer</TabsTrigger>
-          <TabsTrigger value="regional">Regional</TabsTrigger>
-          <TabsTrigger value="history">Historia</TabsTrigger>
-        </TabsList>
+        {/* Mobile: horizontal scroll, Desktop: grid */}
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-4 gap-1">
+            <TabsTrigger value="overview" className="min-h-[44px] px-4 text-sm whitespace-nowrap">
+              Överblick
+            </TabsTrigger>
+            <TabsTrigger value="factors" className="min-h-[44px] px-4 text-sm whitespace-nowrap">
+              Faktorer
+            </TabsTrigger>
+            <TabsTrigger value="regional" className="min-h-[44px] px-4 text-sm whitespace-nowrap">
+              Regional
+            </TabsTrigger>
+            <TabsTrigger value="history" className="min-h-[44px] px-4 text-sm whitespace-nowrap">
+              Historia
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="overview" className="mt-4 space-y-6">
           <GlobalStatusPanel />
