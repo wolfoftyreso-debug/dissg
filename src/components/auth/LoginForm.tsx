@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Shield, LogIn } from 'lucide-react';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -36,11 +35,6 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
-        <div className="flex justify-center mb-4">
-          <div className="p-3 rounded-full bg-primary/10">
-            <Shield className="h-8 w-8 text-primary" />
-          </div>
-        </div>
         <CardTitle className="text-xl">Logga in</CardTitle>
         <CardDescription>
           Nationellt Ledningssystem för Offentlig Styrning
@@ -91,17 +85,7 @@ export function LoginForm() {
         
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loggar in...
-              </>
-            ) : (
-              <>
-                <LogIn className="mr-2 h-4 w-4" />
-                Logga in
-              </>
-            )}
+            {isLoading ? 'Loggar in...' : 'Logga in'}
           </Button>
           
           <p className="text-xs text-muted-foreground text-center">
