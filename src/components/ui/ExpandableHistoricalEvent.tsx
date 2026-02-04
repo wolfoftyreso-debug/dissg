@@ -369,6 +369,157 @@ const normalizeEventKey = (year: number, event: string): string => {
 };
 
 // ═══════════════════════════════════════════════════════════════
+// SOURCES COLLAPSIBLE COMPONENT
+// ═══════════════════════════════════════════════════════════════
+
+const SOURCE_METHODOLOGY = {
+  sustainability: {
+    primarySources: [
+      'IPCC Assessment Reports (peer-reviewed)',
+      'Nature, Science, PNAS',
+      'Stockholm Resilience Centre',
+    ],
+    secondarySources: [
+      'UNEP rapporter',
+      'Nationella miljömyndigheter',
+      'Vetenskapliga institutioner',
+    ],
+    methodology: 'Systematisk litteraturgenomgång av peer-reviewed publikationer. Kvantitativa data verifieras mot minst två oberoende källor.',
+    updateFrequency: 'Kontinuerlig uppdatering vid nya publikationer',
+    qualityAssurance: 'Alla källor genomgår validering enligt vår datakonstitution med SHA-256 checksummor.',
+  },
+  population: {
+    primarySources: [
+      'UN World Population Prospects',
+      'Our World in Data',
+      'Nationella statistikbyråer',
+    ],
+    secondarySources: [
+      'Demografiska forskningsinstitut',
+      'OECD Population Statistics',
+      'World Bank Open Data',
+    ],
+    methodology: 'Demografiska data hämtas från officiella folkräkningar och registreringsdata. Historiska estimat före 1950 baseras på akademiska rekonstruktioner.',
+    updateFrequency: 'Årlig uppdatering; UN-prognoser vartannat år',
+    qualityAssurance: 'Korsvalidering mellan FN, nationella byråer och akademiska källor.',
+  },
+  energy: {
+    primarySources: [
+      'IEA World Energy Outlook',
+      'BP Statistical Review of World Energy',
+      'EIA (U.S. Energy Information Administration)',
+    ],
+    secondarySources: [
+      'IRENA (International Renewable Energy Agency)',
+      'Ember Climate',
+      'Nationella energimyndigheter',
+    ],
+    methodology: 'Energidata samlas in via officiella rapporter från energimyndigheter. Primärenergiekvivalenter beräknas enligt IEA-standard.',
+    updateFrequency: 'Månads- till årsdata beroende på källa',
+    qualityAssurance: 'Jämförelse mellan IEA, BP och nationella källor för avvikelsedetektering.',
+  },
+  climate: {
+    primarySources: [
+      'NASA GISS',
+      'NOAA Global Monitoring Laboratory',
+      'IPCC Working Groups',
+    ],
+    secondarySources: [
+      'Met Office Hadley Centre',
+      'Copernicus Climate Change Service',
+      'Berkeley Earth',
+    ],
+    methodology: 'Temperaturanomalier beräknas relativt basperioden 1951-1980. Mätningar från land- och havsbaserade stationer samt satellitdata.',
+    updateFrequency: 'Månatliga uppdateringar',
+    qualityAssurance: 'Multipla oberoende dataserier för konsistensprövning.',
+  },
+  economy: {
+    primarySources: [
+      'World Bank Development Indicators',
+      'IMF World Economic Outlook',
+      'OECD Statistics',
+    ],
+    secondarySources: [
+      'Nationella statistikbyråer (SCB, Destatis, etc.)',
+      'Penn World Table',
+      'Maddison Project Database',
+    ],
+    methodology: 'BNP-data i konstant PPP-dollar för internationell jämförbarhet. Historiska serier länkas via standardiserade kedjemetoder.',
+    updateFrequency: 'Kvartals- till årsdata',
+    qualityAssurance: 'Verifiering mot nationella räkenskaper och revisionshistorik.',
+  },
+};
+
+const SourcesCollapsible: React.FC<{ category: HistoricalEventDetail['category'] }> = ({ category }) => {
+  const [isSourcesOpen, setIsSourcesOpen] = useState(false);
+  const sources = SOURCE_METHODOLOGY[category] || SOURCE_METHODOLOGY.sustainability;
+  
+  return (
+    <Collapsible open={isSourcesOpen} onOpenChange={setIsSourcesOpen} className="border-t pt-3 mt-2">
+      <CollapsibleTrigger className="group cursor-pointer w-full text-left">
+        <div className="flex items-center gap-2 text-xs text-primary hover:text-primary/80 transition-colors">
+          <span className="font-mono uppercase tracking-wider">KÄLLOR:</span>
+          <span className="flex-1">Vetenskapliga publikationer, officiella rapporter, internationella organisationer</span>
+          <span className="font-mono text-[10px]">
+            {isSourcesOpen ? '[−]' : '[+]'}
+          </span>
+        </div>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-3 space-y-3">
+        <Card className="bg-muted/30">
+          <CardContent className="py-3 space-y-4">
+            {/* Primary Sources */}
+            <div>
+              <span className="font-mono text-[10px] text-muted-foreground block mb-2">PRIMÄRKÄLLOR</span>
+              <ul className="text-xs space-y-1">
+                {sources.primarySources.map((source, idx) => (
+                  <li key={idx} className="flex items-center gap-2 hover:text-primary cursor-pointer transition-colors">
+                    <span className="font-mono text-[10px]">[{idx + 1}]</span>
+                    {source}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            {/* Secondary Sources */}
+            <div>
+              <span className="font-mono text-[10px] text-muted-foreground block mb-2">SEKUNDÄRKÄLLOR</span>
+              <ul className="text-xs space-y-1">
+                {sources.secondarySources.map((source, idx) => (
+                  <li key={idx} className="flex items-center gap-2 hover:text-primary cursor-pointer transition-colors">
+                    <span className="font-mono text-[10px]">[{sources.primarySources.length + idx + 1}]</span>
+                    {source}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            {/* Methodology */}
+            <div className="border-t pt-3">
+              <span className="font-mono text-[10px] text-muted-foreground block mb-2">DATAINSAMLINGSMETODIK</span>
+              <p className="text-xs">{sources.methodology}</p>
+            </div>
+            
+            {/* Update Frequency */}
+            <div className="flex gap-4 text-xs">
+              <div>
+                <span className="font-mono text-[10px] text-muted-foreground block">UPPDATERINGSFREKVENS</span>
+                <span>{sources.updateFrequency}</span>
+              </div>
+            </div>
+            
+            {/* Quality Assurance */}
+            <div className="p-2 bg-muted rounded text-[10px] text-muted-foreground">
+              <span className="font-mono">[QA]</span> {sources.qualityAssurance}
+            </div>
+          </CardContent>
+        </Card>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════
 // EXPANDABLE HISTORICAL EVENT COMPONENT
 // ═══════════════════════════════════════════════════════════════
 
@@ -585,9 +736,7 @@ export const ExpandableHistoricalEvent: React.FC<ExpandableHistoricalEventProps>
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      // Scroll to top and trigger navigation
                       window.scrollTo({ top: 0, behavior: 'smooth' });
-                      // For now, open in dialog or navigate
                       window.location.href = `/history/${eventKey}`;
                     }}
                     className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
@@ -599,6 +748,9 @@ export const ExpandableHistoricalEvent: React.FC<ExpandableHistoricalEventProps>
               })}
             </div>
           )}
+          
+          {/* KÄLLOR - Expandable Data Collection Methodology */}
+          <SourcesCollapsible category={fullEvent.category} />
         </CollapsibleContent>
       )}
     </Collapsible>
