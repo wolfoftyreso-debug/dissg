@@ -20,35 +20,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { 
-  MapPin, 
-  TrendingUp, 
-  TrendingDown,
-  Minus,
-  AlertTriangle,
-  Zap,
-  Users,
-  Building2,
-  Heart,
-  Pill,
-  Activity,
-  Globe,
-  ChevronRight,
-  ExternalLink,
-  Database,
-  FileText,
-  BookOpen,
-  Scale,
-  Clock,
-  Info,
-  Skull,
-  Wine,
-  Cigarette,
-  Syringe
-} from 'lucide-react';
+// NO ICONS - Text markers only per design doctrine
+// All lucide-react imports removed to comply with "descriptive-clarity-doctrine"
 import type { PressZone } from '@/config/carryingCapacityConfig';
 import { cn } from '@/lib/utils';
 import { ClickableCountryName } from '@/components/ui/ClickableCountryName';
+// ClickableValue and ClickableSourceCitation available for future deep-dive integration
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES & INTERFACES
@@ -403,9 +380,10 @@ const TrendIcon: React.FC<{ trend: 'up' | 'down' | 'stable'; size?: number; inve
     const isPositive = inverted ? trend === 'down' : trend === 'up';
     const isNegative = inverted ? trend === 'up' : trend === 'down';
     
-    if (isPositive) return <TrendingUp size={size} className="text-green-500" />;
-    if (isNegative) return <TrendingDown size={size} className="text-red-500" />;
-    return <Minus size={size} className="text-muted-foreground" />;
+    // NO ICONS - Text markers only
+    if (isPositive) return <span className="font-mono text-[10px] text-green-600">[↑]</span>;
+    if (isNegative) return <span className="font-mono text-[10px] text-red-600">[↓]</span>;
+    return <span className="font-mono text-[10px] text-muted-foreground">[−]</span>;
   };
 
 const DataQualityBadge: React.FC<{ quality: 'high' | 'medium' | 'low' }> = ({ quality }) => {
@@ -421,15 +399,20 @@ const DataQualityBadge: React.FC<{ quality: 'high' | 'medium' | 'low' }> = ({ qu
   );
 };
 
-const SubstanceIcon: React.FC<{ slug: string }> = ({ slug }) => {
-  switch (slug) {
-    case 'alkohol': return <Wine className="h-4 w-4 text-purple-500" />;
-    case 'tobak': return <Cigarette className="h-4 w-4 text-amber-600" />;
-    case 'heroin':
-    case 'fentanyl':
-    case 'opioider': return <Syringe className="h-4 w-4 text-red-500" />;
-    default: return <Pill className="h-4 w-4 text-blue-500" />;
-  }
+// NO ICONS - Text markers for substances
+const SubstanceMarker: React.FC<{ slug: string }> = ({ slug }) => {
+  const markers: Record<string, string> = {
+    'alkohol': '[ALK]',
+    'tobak': '[TOB]',
+    'heroin': '[OPI]',
+    'fentanyl': '[OPI]',
+    'opioider': '[OPI]',
+  };
+  return (
+    <span className="font-mono text-[10px] text-muted-foreground bg-muted px-1 py-0.5 rounded">
+      {markers[slug] || '[SUB]'}
+    </span>
+  );
 };
 
 // Indicator card - clickable for deep dive
@@ -452,7 +435,7 @@ const IndicatorCard: React.FC<{ indicator: RegionIndicator; onClick: () => void 
             {indicator.name}
           </p>
         </div>
-        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0 ml-2" />
+        <span className="font-mono text-[10px] text-muted-foreground group-hover:text-primary transition-colors shrink-0 ml-2">[→]</span>
       </div>
       <div className="flex items-end justify-between mt-2">
         <div>
@@ -490,13 +473,13 @@ const SubstanceCard: React.FC<{ substance: SubstanceData; onClick: () => void }>
     className="w-full text-left p-3 border rounded-lg bg-card hover:bg-muted/50 hover:border-primary/50 transition-all group"
   >
     <div className="flex items-start gap-3">
-      <SubstanceIcon slug={substance.slug} />
+      <SubstanceMarker slug={substance.slug} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
           <span className="font-medium text-sm group-hover:text-primary transition-colors">
             {substance.substance}
           </span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+          <span className="font-mono text-[10px] text-muted-foreground group-hover:text-primary transition-colors">[→]</span>
         </div>
         <div className="flex items-center gap-2 mt-1">
           <span className="text-lg font-bold">{substance.prevalence}</span>
@@ -505,7 +488,7 @@ const SubstanceCard: React.FC<{ substance: SubstanceData; onClick: () => void }>
         </div>
         {substance.yearlyDeaths && (
           <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-            <Skull className="h-3 w-3 text-red-500" />
+            <span className="font-mono text-[10px] text-red-600">[†]</span>
             {substance.yearlyDeaths.toLocaleString()} dödsfall/år
           </p>
         )}
@@ -524,18 +507,18 @@ const SubstanceCard: React.FC<{ substance: SubstanceData; onClick: () => void }>
   </button>
 );
 
-// Pressure factor visualization
+// Pressure factor visualization - NO ICONS
 const PressureGauge: React.FC<{ 
   label: string; 
   score: number; 
   description: string; 
   trend: string;
-  icon: React.ReactNode;
-}> = ({ label, score, description, trend, icon }) => (
+  marker: string;
+}> = ({ label, score, description, trend, marker }) => (
   <div className="space-y-2">
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
-        {icon}
+        <span className="font-mono text-[10px] text-muted-foreground bg-muted px-1 py-0.5 rounded">{marker}</span>
         <span className="font-medium text-sm">{label}</span>
       </div>
       <Badge variant={score > 70 ? 'destructive' : score > 40 ? 'secondary' : 'outline'}>
@@ -588,9 +571,9 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
             <SheetTitle>{zone.regionSv}</SheetTitle>
           </SheetHeader>
           <Alert className="mt-6">
-            <Info className="h-4 w-4" />
-            <AlertDescription>
-              Detaljerad data för denna region samlas in. Fullständig djupdykning kommer snart.
+            <AlertDescription className="flex items-start gap-2">
+              <span className="font-mono text-[10px] text-muted-foreground">[INFO]</span>
+              <span>Detaljerad data för denna region samlas in. Fullständig djupdykning kommer snart.</span>
             </AlertDescription>
           </Alert>
         </SheetContent>
@@ -635,17 +618,17 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
             <SheetHeader className="space-y-3">
               <div className="flex items-center gap-3">
                 <div className={cn(
-                  "p-2 rounded-lg",
+                  "p-2 rounded-lg flex items-center justify-center",
                   zone.severity === 'high' ? 'bg-red-100 dark:bg-red-900/30' :
                   zone.severity === 'moderate' ? 'bg-yellow-100 dark:bg-yellow-900/30' :
                   'bg-blue-100 dark:bg-blue-900/30'
                 )}>
-                  <MapPin className={cn(
-                    "h-5 w-5",
+                  <span className={cn(
+                    "font-mono text-sm font-bold",
                     zone.severity === 'high' ? 'text-red-600' :
                     zone.severity === 'moderate' ? 'text-yellow-600' :
                     'text-blue-600'
-                  )} />
+                  )}>[GEO]</span>
                 </div>
                 <div>
                   <SheetTitle className="text-xl">{zone.regionSv}</SheetTitle>
@@ -666,7 +649,7 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                   className="text-left"
                 >
                   <Card className="p-3 text-center hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer group">
-                    <Users className="h-4 w-4 mx-auto text-muted-foreground group-hover:text-primary transition-colors" />
+                    <span className="font-mono text-xs text-muted-foreground group-hover:text-primary transition-colors">[POP]</span>
                     <p className="text-lg font-bold mt-1 group-hover:text-primary transition-colors">
                       {(evidence.overview.population / 1_000_000).toFixed(0)}M
                     </p>
@@ -678,7 +661,7 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                   className="text-left"
                 >
                   <Card className="p-3 text-center hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer group">
-                    <Globe className="h-4 w-4 mx-auto text-muted-foreground group-hover:text-primary transition-colors" />
+                    <span className="font-mono text-xs text-muted-foreground group-hover:text-primary transition-colors">[GEO]</span>
                     <p className="text-lg font-bold mt-1 group-hover:text-primary transition-colors">{evidence.overview.countries.length}</p>
                     <p className="text-xs text-muted-foreground">Länder</p>
                   </Card>
@@ -688,7 +671,7 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                   className="text-left"
                 >
                   <Card className="p-3 text-center hover:bg-primary/10 hover:border-primary/50 transition-all cursor-pointer group">
-                    <Activity className="h-4 w-4 mx-auto text-muted-foreground group-hover:text-primary transition-colors" />
+                    <span className="font-mono text-xs text-muted-foreground group-hover:text-primary transition-colors">[LIV]</span>
                     <p className="text-lg font-bold mt-1 group-hover:text-primary transition-colors">{evidence.health.lifeExpectancy}</p>
                     <p className="text-xs text-muted-foreground">Medellivslängd</p>
                   </Card>
@@ -711,7 +694,7 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                      <span className="font-mono text-[10px] text-yellow-600">[!]</span>
                       Tryckfaktorer
                     </CardTitle>
                   </CardHeader>
@@ -721,21 +704,21 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                       score={evidence.pressureFactors.energy.score}
                       description={evidence.pressureFactors.energy.description}
                       trend={evidence.pressureFactors.energy.trend}
-                      icon={<Zap className="h-4 w-4 text-yellow-500" />}
+                      marker="[ENE]"
                     />
                     <PressureGauge 
                       label="Befolkningstryck" 
                       score={evidence.pressureFactors.population.score}
                       description={evidence.pressureFactors.population.description}
                       trend={evidence.pressureFactors.population.trend}
-                      icon={<Users className="h-4 w-4 text-blue-500" />}
+                      marker="[POP]"
                     />
                     <PressureGauge 
                       label="Institutionell svaghet" 
                       score={evidence.pressureFactors.institutions.score}
                       description={evidence.pressureFactors.institutions.description}
                       trend={evidence.pressureFactors.institutions.trend}
-                      icon={<Building2 className="h-4 w-4 text-red-500" />}
+                      marker="[GOV]"
                     />
                   </CardContent>
                 </Card>
@@ -746,9 +729,9 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                     <Card className="h-full hover:bg-red-50/50 dark:hover:bg-red-950/20 hover:border-red-300 transition-all cursor-pointer group">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-sm flex items-center gap-2">
-                          <AlertTriangle className="h-4 w-4 text-red-500" />
+                          <span className="font-mono text-[10px] text-red-600">[!]</span>
                           Huvudutmaningar
-                          <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-red-500 transition-colors" />
+                          <span className="font-mono text-[10px] ml-auto text-muted-foreground group-hover:text-red-500 transition-colors">[→]</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -768,9 +751,9 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                     <Card className="h-full hover:bg-green-50/50 dark:hover:bg-green-950/20 hover:border-green-300 transition-all cursor-pointer group">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-sm flex items-center gap-2">
-                          <TrendingUp className="h-4 w-4 text-green-500" />
+                          <span className="font-mono text-[10px] text-green-600">[+]</span>
                           Positiva signaler
-                          <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-green-500 transition-colors" />
+                          <span className="font-mono text-[10px] ml-auto text-muted-foreground group-hover:text-green-500 transition-colors">[→]</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -792,9 +775,9 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                   <Card className="hover:bg-blue-50/50 dark:hover:bg-blue-950/20 hover:border-blue-300 transition-all cursor-pointer group">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-blue-500" />
+                        <span className="font-mono text-[10px] text-blue-600">[TID]</span>
                         Historisk kontext
-                        <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground group-hover:text-blue-500 transition-colors" />
+                        <span className="font-mono text-[10px] ml-auto text-muted-foreground group-hover:text-blue-500 transition-colors">[→]</span>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -817,11 +800,13 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                 <div className="grid gap-4 md:grid-cols-2">
                   <button onClick={() => setSelectedDetail('shows')} className="text-left">
                     <Alert className="h-full bg-green-50/50 dark:bg-green-950/20 border-green-200 hover:border-green-400 transition-all cursor-pointer group">
-                      <BookOpen className="h-4 w-4 text-green-600" />
                       <AlertDescription>
                         <div className="flex items-center justify-between mb-1">
-                          <p className="font-medium text-green-700 dark:text-green-400 text-xs">Detta visar:</p>
-                          <ChevronRight className="h-3 w-3 text-green-500 group-hover:translate-x-1 transition-transform" />
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[10px] text-green-600">[VIS]</span>
+                            <p className="font-medium text-green-700 dark:text-green-400 text-xs">Detta visar:</p>
+                          </div>
+                          <span className="font-mono text-[10px] text-green-500 group-hover:translate-x-1 transition-transform">[→]</span>
                         </div>
                         <ul className="text-xs space-y-0.5">
                           {evidence.thisShows.map((item, i) => (
@@ -834,11 +819,13 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                   
                   <button onClick={() => setSelectedDetail('notShows')} className="text-left">
                     <Alert className="h-full bg-red-50/50 dark:bg-red-950/20 border-red-200 hover:border-red-400 transition-all cursor-pointer group">
-                      <Scale className="h-4 w-4 text-red-600" />
                       <AlertDescription>
                         <div className="flex items-center justify-between mb-1">
-                          <p className="font-medium text-red-700 dark:text-red-400 text-xs">Detta visar INTE:</p>
-                          <ChevronRight className="h-3 w-3 text-red-500 group-hover:translate-x-1 transition-transform" />
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[10px] text-red-600">[EJ]</span>
+                            <p className="font-medium text-red-700 dark:text-red-400 text-xs">Detta visar INTE:</p>
+                          </div>
+                          <span className="font-mono text-[10px] text-red-500 group-hover:translate-x-1 transition-transform">[→]</span>
                         </div>
                         <ul className="text-xs space-y-0.5">
                           {evidence.thisDoesNotShow.map((item, i) => (
@@ -870,24 +857,27 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                 <Card className="bg-primary/5 border-primary/20">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
-                      <Heart className="h-4 w-4 text-red-500" />
-                      Hälsöversikt
+                      <span className="font-mono text-[10px] text-primary">[HLT]</span>
+                      Hälsoöversikt
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-3 gap-3 text-center">
-                      <div>
+                      <button className="hover:bg-muted/50 p-2 rounded transition-colors cursor-pointer">
                         <p className="text-lg font-bold">{evidence.health.healthyLifeExpectancy}</p>
                         <p className="text-xs text-muted-foreground">Friska levnadsår</p>
-                      </div>
-                      <div>
+                        <p className="text-[10px] font-mono text-primary mt-1">[KLICKA]</p>
+                      </button>
+                      <button className="hover:bg-muted/50 p-2 rounded transition-colors cursor-pointer">
                         <p className="text-lg font-bold">{evidence.health.mentalHealthPrevalence}%</p>
                         <p className="text-xs text-muted-foreground">Psykisk ohälsa</p>
-                      </div>
-                      <div>
+                        <p className="text-[10px] font-mono text-primary mt-1">[KLICKA]</p>
+                      </button>
+                      <button className="hover:bg-muted/50 p-2 rounded transition-colors cursor-pointer">
                         <p className="text-lg font-bold">{evidence.health.treatmentAccessRate}%</p>
                         <p className="text-xs text-muted-foreground">Behandlingstillgång</p>
-                      </div>
+                        <p className="text-[10px] font-mono text-primary mt-1">[KLICKA]</p>
+                      </button>
                     </div>
                   </CardContent>
                 </Card>
@@ -904,10 +894,12 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                 </div>
 
                 <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription className="text-xs">
-                    <strong>Behandlingsgap</strong> = andel av personer med beroende/skadligt bruk som INTE får behandling.
-                    Höga behandlingsgap indikerar bristande tillgång till vård, stigma, eller avsaknad av infrastruktur.
+                  <AlertDescription className="text-xs flex items-start gap-2">
+                    <span className="font-mono text-[10px] text-muted-foreground">[INFO]</span>
+                    <span>
+                      <strong>Behandlingsgap</strong> = andel av personer med beroende/skadligt bruk som INTE får behandling.
+                      Höga behandlingsgap indikerar bristande tillgång till vård, stigma, eller avsaknad av infrastruktur.
+                    </span>
                   </AlertDescription>
                 </Alert>
               </TabsContent>
@@ -917,7 +909,7 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
-                      <Database className="h-4 w-4" />
+                      <span className="font-mono text-[10px] text-muted-foreground">[SRC]</span>
                       Datakällor
                     </CardTitle>
                     <CardDescription>Klicka för att öppna originalkälla</CardDescription>
@@ -932,7 +924,7 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                         className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 hover:border-primary/50 transition-all group"
                       >
                         <div className="flex items-center gap-3">
-                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-mono text-[10px] text-muted-foreground">[DOC]</span>
                           <div>
                             <p className="text-sm font-medium group-hover:text-primary transition-colors">
                               {source.name}
@@ -946,7 +938,7 @@ export const RegionDeepDive: React.FC<RegionDeepDiveProps> = ({ zone, open, onOp
                         <div className="flex items-center gap-2">
                           <Progress value={source.reliability} className="w-16 h-1.5" />
                           <span className="text-xs text-muted-foreground">{source.reliability}%</span>
-                          <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                          <span className="font-mono text-[10px] text-muted-foreground group-hover:text-primary">[↗]</span>
                         </div>
                       </a>
                     ))}
