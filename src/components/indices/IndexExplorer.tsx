@@ -1,57 +1,67 @@
 /**
  * INDEX EXPLORER - Avanza-inspired Dashboard
  * 
- * Clean, professional financial app aesthetic.
- * Data-dense but readable. No decorative elements.
- * 
- * NO ICONS - text markers only per design doctrine.
+ * Full-width world map with regional indices + category panels below.
+ * Professional financial app aesthetic. Click any index for drill-down.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import {
-  INDEX_REGISTRY,
-  INDEX_CATEGORIES,
-  getIndicesByCategory,
-  type IndexDefinition,
-  type IndexCategory,
-} from '@/lib/lambda';
-import { IndexCategoryPanel } from './IndexCategoryPanel';
+import { IndexWorldMap } from './IndexWorldMap';
+import { IndexPanel } from './IndexPanel';
 import { IndexDetailView } from './IndexDetailView';
-import { IndexComparisonView } from './IndexComparisonView';
+import type { IndexDefinition } from '@/lib/lambda';
 
 interface IndexExplorerProps {
   className?: string;
-  initialCategory?: IndexCategory;
 }
 
-export function IndexExplorer({ 
-  className, 
-  initialCategory,
-}: IndexExplorerProps) {
-  const [selectedCategory] = useState<IndexCategory | null>(
-    initialCategory || null
-  );
+// Mock data for panels
+const NORDIC_INDICES = [
+  { code: 'SWE_RI', name: 'Sweden Reality Index', flag: '🇸🇪', change: 0.31, value: 72.45, time: '17:29' },
+  { code: 'NOR_RI', name: 'Norway Reality Index', flag: '🇳🇴', change: 0.28, value: 74.12, time: '17:29' },
+  { code: 'DEN_RI', name: 'Denmark Reality Index', flag: '🇩🇰', change: -0.15, value: 73.88, time: '17:33' },
+  { code: 'FIN_RI', name: 'Finland Reality Index', flag: '🇫🇮', change: 0.42, value: 71.56, time: '17:30' },
+  { code: 'ISL_RI', name: 'Iceland Reality Index', flag: '🇮🇸', change: -0.08, value: 75.23, time: '17:30' },
+];
+
+const WORLD_INDICES = [
+  { code: 'USA_RI', name: 'US Reality Index', flag: '🇺🇸', change: -0.67, value: 65.34, time: '22:04' },
+  { code: 'CHN_RI', name: 'China Reality Index', flag: '🇨🇳', change: -0.89, value: 58.92, time: '23:15' },
+  { code: 'JPN_RI', name: 'Japan Reality Index', flag: '🇯🇵', change: -0.34, value: 68.45, time: '22:04' },
+  { code: 'GBR_RI', name: 'UK Reality Index', flag: '🇬🇧', change: 0.21, value: 66.78, time: '18:00' },
+  { code: 'AUS_RI', name: 'Australia Reality Index', flag: '🇦🇺', change: 0.89, value: 70.12, time: '08:30' },
+];
+
+const EUROPEAN_INDICES = [
+  { code: 'DEU_RI', name: 'Germany Reality Index', flag: '🇩🇪', change: -0.52, value: 69.23, time: '18:00' },
+  { code: 'FRA_RI', name: 'France Reality Index', flag: '🇫🇷', change: 0.18, value: 67.45, time: '17:35' },
+  { code: 'NLD_RI', name: 'Netherlands Reality Index', flag: '🇳🇱', change: 0.34, value: 72.56, time: '18:15' },
+  { code: 'CHE_RI', name: 'Switzerland Reality Index', flag: '🇨🇭', change: 0.56, value: 76.89, time: '17:45' },
+  { code: 'ESP_RI', name: 'Spain Reality Index', flag: '🇪🇸', change: -0.23, value: 64.12, time: '18:00' },
+];
+
+const DOMAIN_INDICES = [
+  { code: 'HEALTH_IDX', name: 'Hälsoindex', flag: '🏥', change: -0.45, value: 68.34, time: '00:30' },
+  { code: 'ECON_IDX', name: 'Ekonomiindex', flag: '📈', change: 0.82, value: 71.23, time: '00:30' },
+  { code: 'EDU_IDX', name: 'Utbildningsindex', flag: '🎓', change: 0.12, value: 74.56, time: '00:30' },
+  { code: 'ENV_IDX', name: 'Miljöindex', flag: '🌿', change: -0.67, value: 62.89, time: '00:30' },
+  { code: 'SOC_IDX', name: 'Socialindex', flag: '👥', change: 0.28, value: 69.45, time: '00:30' },
+];
+
+const SECTOR_INDICES = [
+  { code: 'HOUSING_IDX', name: 'Bostadsindex', flag: '🏠', change: -1.23, value: 54.67, time: '00:26' },
+  { code: 'LABOR_IDX', name: 'Arbetsmarknadsindex', flag: '💼', change: 0.45, value: 67.89, time: '00:26' },
+  { code: 'CRIME_IDX', name: 'Trygghetsindex', flag: '🛡️', change: -0.89, value: 58.34, time: '00:26' },
+  { code: 'TRUST_IDX', name: 'Tillitsindex', flag: '🤝', change: -0.34, value: 71.23, time: '00:26' },
+  { code: 'DEMO_IDX', name: 'Demografiindex', flag: '👶', change: -0.56, value: 63.45, time: '00:26' },
+];
+
+export function IndexExplorer({ className }: IndexExplorerProps) {
   const [selectedIndex, setSelectedIndex] = useState<IndexDefinition | null>(null);
-  const [searchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [activeTab, setActiveTab] = useState<'browse' | 'compare' | 'trends'>('browse');
-
-  // Group indices by category
-  const indexesByCategory = useMemo(() => {
-    const grouped: Record<IndexCategory, IndexDefinition[]> = {} as any;
-    INDEX_CATEGORIES.forEach(cat => {
-      grouped[cat.code] = getIndicesByCategory(cat.code);
-    });
-    return grouped;
-  }, []);
-
-  const handleSelectIndex = (index: IndexDefinition) => {
-    setSelectedIndex(index);
-  };
+  const [activeTab, setActiveTab] = useState<'today' | 'watchlist' | 'notes' | 'alerts'>('today');
 
   const handleBackToList = () => {
     setSelectedIndex(null);
@@ -69,94 +79,86 @@ export function IndexExplorer({
   }
 
   return (
-    <div className={cn("flex flex-col h-full bg-muted/30", className)}>
-      {/* Compact Tab Navigation - Avanza style */}
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex-1 flex flex-col">
-        <div className="flex-shrink-0 bg-card border-b">
-          <div className="flex items-center justify-between px-4 py-2">
-            {/* Tabs */}
-            <TabsList className="bg-transparent p-0 h-auto gap-1">
-              <TabsTrigger 
-                value="browse" 
-                className="font-mono text-sm px-3 py-1.5 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none"
-              >
-                [UTFORSKA] Utforska
-              </TabsTrigger>
-              <TabsTrigger 
-                value="compare" 
-                className="font-mono text-sm px-3 py-1.5 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none"
-              >
-                [JÄMFÖR] Jämför
-              </TabsTrigger>
-              <TabsTrigger 
-                value="trends" 
-                className="font-mono text-sm px-3 py-1.5 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none"
-              >
-                [TREND] Trender
-              </TabsTrigger>
-            </TabsList>
+    <div className={cn("flex flex-col h-full bg-background overflow-hidden", className)}>
+      {/* Header with Tabs */}
+      <div className="flex-shrink-0 border-b bg-card">
+        <div className="px-6 pt-4 pb-0">
+          <h1 className="text-xl font-semibold mb-1">Indexöversikt</h1>
+          
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+            <div className="flex items-center justify-between">
+              <TabsList className="bg-transparent p-0 h-auto gap-1">
+                <TabsTrigger 
+                  value="today" 
+                  className="px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none text-sm"
+                >
+                  Index idag
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="watchlist" 
+                  className="px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none text-sm"
+                >
+                  Mina bevakningar
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="notes" 
+                  className="px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none text-sm"
+                >
+                  Anteckningar
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="alerts" 
+                  className="px-4 py-2 data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none text-sm"
+                >
+                  Larm
+                </TabsTrigger>
+              </TabsList>
 
-            {/* View Toggle */}
-            <div className="flex items-center gap-1">
-              <Button
-                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-                className="font-mono text-xs h-7 px-2"
-              >
-                [RUTNÄT]
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-                className="font-mono text-xs h-7 px-2"
-              >
-                [LISTA]
-              </Button>
+              <div className="flex items-center gap-2 pb-2">
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1">
+                  Index idag
+                  <span className="text-muted-foreground">▼</span>
+                </Button>
+                <Button variant="outline" size="sm" className="h-8 text-xs">
+                  + Lägg till
+                </Button>
+                <Button variant="outline" size="sm" className="h-8 text-xs">
+                  ↕ Sortera
+                </Button>
+                <span className="text-xs text-muted-foreground">Drag and drop</span>
+                <Button variant="secondary" size="sm" className="h-8 text-xs">
+                  Auto
+                </Button>
+              </div>
             </div>
+          </Tabs>
+        </div>
+      </div>
+
+      {/* Disclaimer Banner */}
+      <div className="flex-shrink-0 bg-status-warning/10 border-b border-status-warning/30 px-6 py-2">
+        <p className="text-xs text-status-warning">
+          <span className="font-semibold">Index innebär osäkerhet.</span> Att jämföra länder och regioner över tid är komplext. 
+          Index visar trender och relativa positioner, men ger inte fullständig bild. Klicka på valfritt index för fullständig metodbeskrivning.
+        </p>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        <div className="p-6 space-y-6">
+          {/* World Map Section */}
+          <IndexWorldMap />
+
+          {/* Index Panels Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            <IndexPanel title="Nordiska index" items={NORDIC_INDICES} />
+            <IndexPanel title="Världsindex" items={WORLD_INDICES} />
+            <IndexPanel title="Europeiska index" items={EUROPEAN_INDICES} />
+            <IndexPanel title="Domänindex" items={DOMAIN_INDICES} />
+            <IndexPanel title="Sektorindex" items={SECTOR_INDICES} />
           </div>
         </div>
-
-        <TabsContent value="browse" className="flex-1 m-0 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="p-4 space-y-4">
-              {/* Show all categories */}
-              {!searchQuery && !selectedCategory ? (
-                INDEX_CATEGORIES.map(category => (
-                  <IndexCategoryPanel
-                    key={category.code}
-                    category={category}
-                    indices={indexesByCategory[category.code]}
-                    viewMode={viewMode}
-                    onSelectIndex={handleSelectIndex}
-                  />
-                ))
-              ) : (
-                // Filtered view placeholder
-                <div className="text-center py-8 font-mono text-muted-foreground">
-                  [FILTER] Filtrerad vy
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-        </TabsContent>
-
-        <TabsContent value="compare" className="flex-1 m-0 overflow-hidden">
-          <IndexComparisonView indices={INDEX_REGISTRY} />
-        </TabsContent>
-
-        <TabsContent value="trends" className="flex-1 m-0 p-4">
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <span className="text-4xl font-mono text-muted-foreground mb-4">[TREND]</span>
-            <h3 className="text-lg font-semibold mb-2 font-mono">Trend-analys</h3>
-            <p className="text-sm text-muted-foreground max-w-md font-mono">
-              Visualisera historisk utveckling och prognoser för index. 
-              Välj ett index ovan för att se detaljerad trend-data.
-            </p>
-          </div>
-        </TabsContent>
-      </Tabs>
+      </div>
     </div>
   );
 }
