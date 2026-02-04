@@ -8,10 +8,11 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { StructuralPositionAlert, DecisionCorrelationAlert } from '@/components/ui/ExpandableInfoAlert';
 import {
   Clock,
   Users,
@@ -134,12 +135,7 @@ const CohortViewPanel: React.FC = () => {
           <Badge variant="outline">{cohort.labelSv}</Badge>
         </div>
 
-        <Alert className="bg-muted/30">
-          <Info className="h-4 w-4" />
-          <AlertDescription className="text-sm">
-            {KEY_MESSAGES.structuralPosition.sv}
-          </AlertDescription>
-        </Alert>
+        <StructuralPositionAlert statement={KEY_MESSAGES.structuralPosition.sv} />
 
         <div className="grid gap-4 lg:grid-cols-2">
           {/* Stats */}
@@ -402,11 +398,7 @@ const MandatePeriodPanel: React.FC = () => (
         ))}
       </div>
 
-      <Alert className="mt-4 bg-muted/30">
-        <AlertDescription className="text-xs">
-          📌 {KEY_MESSAGES.decisionCorrelation.sv}
-        </AlertDescription>
-      </Alert>
+      <DecisionCorrelationAlert statement={KEY_MESSAGES.decisionCorrelation.sv} className="mt-4" />
     </CardContent>
   </Card>
 );

@@ -13,13 +13,20 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronRight, Clock, Info } from 'lucide-react';
 import { DescriptiveMetricCard } from '@/components/ui/MiniSparkline';
+import {
+  ExpandableInfoAlert,
+  SystemInterpretationAlert,
+  PopulationResultAlert,
+  ImbalanceProblemAlert,
+  PhysicalLawAlert,
+  GCCEDefinitionAlert,
+} from '@/components/ui/ExpandableInfoAlert';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
@@ -140,12 +147,7 @@ const GlobalStatusPanel: React.FC = () => {
           />
         </div>
         
-        <Alert>
-          <AlertDescription className="text-sm">
-            <span className="font-medium">Systemtolkning: </span>
-            {KEY_MESSAGES.currentState.sv}
-          </AlertDescription>
-        </Alert>
+        <SystemInterpretationAlert statement={KEY_MESSAGES.currentState.sv} />
       </CardContent>
     </Card>
   );
@@ -202,11 +204,7 @@ const ThreeAxesPanel: React.FC = () => {
           </div>
         </div>
         
-        <Alert className="mt-4 bg-muted/30">
-          <AlertDescription className="text-xs">
-            📌 Befolkning är resultat, inte primärvariabel.
-          </AlertDescription>
-        </Alert>
+        <PopulationResultAlert className="mt-4" />
       </CardContent>
     </Card>
   );
@@ -261,12 +259,7 @@ const PressZonesPanel: React.FC<{ onZoneClick: (zone: PressZone) => void }> = ({
         </button>
       ))}
       
-      <Alert className="bg-primary/5 mt-4">
-        <Info className="h-4 w-4" />
-        <AlertDescription className="text-xs font-medium">
-          {KEY_MESSAGES.notOverpopulation.sv}
-        </AlertDescription>
-      </Alert>
+      <ImbalanceProblemAlert className="mt-4" />
     </CardContent>
   </Card>
 );
@@ -329,13 +322,7 @@ const EnergyHonestyPanel: React.FC = () => (
         </p>
       </div>
       
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertDescription className="text-sm">
-          <span className="font-medium">Fysikalisk lag: </span>
-          {ENERGY_HONESTY.physics.sv}
-        </AlertDescription>
-      </Alert>
+      <PhysicalLawAlert statement={ENERGY_HONESTY.physics.sv} />
     </CardContent>
   </Card>
 );
@@ -382,11 +369,21 @@ const RegionalCapacityPanel: React.FC = () => (
         ))}
       </div>
       
-      <Alert className="mt-4 bg-muted/30">
-        <AlertDescription className="text-xs">
-          📌 Avslöjar sårbarhet utan moralism.
-        </AlertDescription>
-      </Alert>
+      <ExpandableInfoAlert
+        evidenceKey="imbalance-problem"
+        statement="Avslöjar sårbarhet utan moralism."
+        icon={<span className="text-sm">📌</span>}
+        variant="muted"
+        className="mt-4"
+        fallbackEvidence={{
+          scientificBasis: 'Sårbarhet kan mätas objektivt genom beroende av externa resurser, institutionell kapacitet och geografiska faktorer.',
+          sources: [
+            { title: 'Global Risk Report', type: 'report', source: 'World Economic Forum', year: 2024 }
+          ],
+          whatThisProves: ['Sårbarhet är strukturell, inte moralisk'],
+          limitations: ['Sårbarhetsmått är kontextberoende']
+        }}
+      />
     </CardContent>
   </Card>
 );
@@ -523,13 +520,8 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
         </p>
       </div>
 
-      {/* Core definition */}
-      <Alert className="bg-primary/5 border-primary/20">
-        <Info className="h-4 w-4" />
-        <AlertDescription className="text-sm">
-          <strong>Definition:</strong> {GCCE_CORE_DEFINITION.sv}
-        </AlertDescription>
-      </Alert>
+      {/* Core definition - EXPANDABLE */}
+      <GCCEDefinitionAlert statement={GCCE_CORE_DEFINITION.sv} />
 
       {/* Not definitions */}
       <div className="flex flex-wrap justify-center gap-2">
