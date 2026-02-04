@@ -3,6 +3,11 @@
  * 
  * Editor for Global Master Index weights.
  * Allows adjustment of dimension weights with full transparency and audit logging.
+ * 
+ * FACTORY DIAGNOSTIC PROTOCOL:
+ * - All changes are immutable and stored in database
+ * - No mock data - real audit trail
+ * - Every modification requires mandatory justification
  */
 
 import React, { useState } from 'react';
@@ -14,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { 
@@ -31,6 +37,12 @@ import {
   Building2,
   Users
 } from 'lucide-react';
+import { 
+  useGmiWeightChanges, 
+  useLatestGmiVersion, 
+  useInsertWeightChange,
+  incrementVersion
+} from '@/hooks/useGmiWeightChanges';
 
 interface GmiDimension {
   id: string;
@@ -45,16 +57,6 @@ interface GmiDimension {
     name: string;
     weight: number;
   }>;
-}
-
-interface WeightChange {
-  dimensionId: string;
-  previousWeight: number;
-  newWeight: number;
-  reason: string;
-  timestamp: string;
-  author: string;
-  version: string;
 }
 
 const GMI_DIMENSIONS: GmiDimension[] = [
@@ -180,28 +182,13 @@ const GMI_DIMENSIONS: GmiDimension[] = [
   },
 ];
 
-const CHANGE_LOG: WeightChange[] = [
-  {
-    dimensionId: 'environment',
-    previousWeight: 10,
-    newWeight: 12,
-    reason: 'Ökad vikt på miljö efter klimatpanelens rekommendation och samråd med expertgrupp',
-    timestamp: '2024-11-01T09:00:00Z',
-    author: 'methodology_board',
-    version: '2.1.0',
-  },
-  {
-    dimensionId: 'economy',
-    previousWeight: 15,
-    newWeight: 12,
-    reason: 'Balansering efter att ekonomiska indikatorer överrepresenterades i tidigare version',
-    timestamp: '2024-11-01T09:00:00Z',
-    author: 'methodology_board',
-    version: '2.1.0',
-  },
-];
-
+// No mock data - all changes come from database
 export default function GmiWeightEditor() {
+  // Database hooks
+  const { data: weightChanges, isLoading: changesLoading } = useGmiWeightChanges();
+  const { data: latestVersion } = useLatestGmiVersion();
+  const insertWeightChange = useInsertWeightChange();
+  
   const [dimensions, setDimensions] = useState<GmiDimension[]>(GMI_DIMENSIONS);
   const [pendingChanges, setPendingChanges] = useState<Map<string, { newWeight: number; reason: string }>>(new Map());
   const [selectedDimension, setSelectedDimension] = useState<string | null>(null);
@@ -232,7 +219,8 @@ export default function GmiWeightEditor() {
     }
   };
   
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
+    // Validate all changes have reasons
     for (const [dimensionId, change] of pendingChanges) {
       if (!change.reason.trim()) {
         toast.error(`Förklaring krävs för ${dimensions.find(d => d.id === dimensionId)?.nameSv}`);
@@ -245,13 +233,38 @@ export default function GmiWeightEditor() {
       return;
     }
     
-    setDimensions(dimensions.map(d => {
-      const pending = pendingChanges.get(d.id);
-      return pending ? { ...d, currentWeight: pending.newWeight } : d;
-    }));
+    // Calculate new version
+    const newVersion = latestVersion ? incrementVersion(latestVersion) : '2.1.0';
     
-    toast.success('Vikter uppdaterade - ny version skapad');
-    setPendingChanges(new Map());
+    // Prepare database records
+    const changesToInsert = Array.from(pendingChanges.entries()).map(([dimensionId, change]) => {
+      const dim = dimensions.find(d => d.id === dimensionId);
+      return {
+        dimension_id: dimensionId,
+        dimension_name: dim?.nameSv || dimensionId,
+        previous_weight: dim?.currentWeight || 0,
+        new_weight: change.newWeight,
+        reason: change.reason,
+        version: newVersion,
+      };
+    });
+    
+    try {
+      // Insert to database (immutable audit log)
+      await insertWeightChange.mutateAsync(changesToInsert);
+      
+      // Update local state
+      setDimensions(dimensions.map(d => {
+        const pending = pendingChanges.get(d.id);
+        return pending ? { ...d, currentWeight: pending.newWeight } : d;
+      }));
+      
+      toast.success(`Vikter uppdaterade - version ${newVersion}`);
+      setPendingChanges(new Map());
+    } catch (error) {
+      console.error('Failed to save weight changes:', error);
+      toast.error('Kunde inte spara ändringar till databasen');
+    }
   };
   
   return (
@@ -276,8 +289,8 @@ export default function GmiWeightEditor() {
             </p>
           </div>
           
-          <Badge variant="outline" className="text-sm">
-            Version 2.1.0
+          <Badge variant="outline" className="text-sm font-mono">
+            Version {latestVersion || '2.0.0'}
           </Badge>
         </div>
         
@@ -507,44 +520,58 @@ export default function GmiWeightEditor() {
                 <CardDescription>Alla viktjusteringar med motivering</CardDescription>
               </CardHeader>
               <CardContent>
-                <ScrollArea className="h-[500px]">
+                {changesLoading ? (
                   <div className="space-y-4">
-                    {CHANGE_LOG.map((change, i) => {
-                      const dim = dimensions.find(d => d.id === change.dimensionId);
-                      const Icon = dim?.icon || Globe;
-                      
-                      return (
-                        <div key={i} className="p-4 rounded-lg border bg-muted/30">
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-3">
-                              <Icon className="h-5 w-5 text-muted-foreground" />
-                              <div>
-                                <span className="font-medium">{dim?.nameSv || change.dimensionId}</span>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge variant="outline" className="text-xs">
-                                    {change.previousWeight}% → {change.newWeight}%
-                                  </Badge>
-                                  <Badge variant="secondary" className="text-xs">
-                                    v{change.version}
-                                  </Badge>
+                    {[1, 2, 3].map(i => (
+                      <Skeleton key={i} className="h-24 w-full" />
+                    ))}
+                  </div>
+                ) : !weightChanges || weightChanges.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <History className="h-12 w-12 mx-auto mb-4 opacity-30" />
+                    <p>Ingen ändringshistorik registrerad</p>
+                    <p className="text-xs mt-2">Viktändringar loggas automatiskt vid sparande</p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[500px]">
+                    <div className="space-y-4">
+                      {weightChanges.map((change) => {
+                        const dim = dimensions.find(d => d.id === change.dimension_id);
+                        const Icon = dim?.icon || Globe;
+                        
+                        return (
+                          <div key={change.id} className="p-4 rounded-lg border bg-muted/30">
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-3">
+                                <Icon className="h-5 w-5 text-muted-foreground" />
+                                <div>
+                                  <span className="font-medium">{dim?.nameSv || change.dimension_name}</span>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <Badge variant="outline" className="text-xs">
+                                      {change.previous_weight}% → {change.new_weight}%
+                                    </Badge>
+                                    <Badge variant="secondary" className="text-xs">
+                                      v{change.version}
+                                    </Badge>
+                                  </div>
                                 </div>
                               </div>
+                              <span className="text-xs text-muted-foreground font-mono">
+                                {new Date(change.created_at).toLocaleDateString('sv-SE')}
+                              </span>
                             </div>
-                            <span className="text-xs text-muted-foreground font-mono">
-                              {new Date(change.timestamp).toLocaleDateString('sv-SE')}
-                            </span>
+                            <p className="text-sm text-muted-foreground mt-3 italic">
+                              "{change.reason}"
+                            </p>
+                            <div className="text-xs text-muted-foreground mt-2">
+                              Av: {change.author}
+                            </div>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-3 italic">
-                            "{change.reason}"
-                          </p>
-                          <div className="text-xs text-muted-foreground mt-2">
-                            Av: {change.author}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </ScrollArea>
+                        );
+                      })}
+                    </div>
+                  </ScrollArea>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
