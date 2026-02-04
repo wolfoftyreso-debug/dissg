@@ -16,13 +16,14 @@ import {
   SEVERITY_CONFIG,
   type FaultSeverity 
 } from '@/lib/fault-codes';
+import { DiagnosticScopeSelector, type DiagnosticScope, type DiagnosticScopeLevel } from './DiagnosticScopeSelector';
 
 // =============================================================================
 // TYPES
 // =============================================================================
 
 interface SystemIdentity {
-  level: 'global' | 'country' | 'region' | 'city';
+  level: DiagnosticScopeLevel;
   name: string;
   code: string;
   periodStart: string;
@@ -97,10 +98,10 @@ function SystemIdentityHeader({ system }: { system: SystemIdentity }) {
       ? 'text-orange-500' 
       : 'text-red-500';
 
-  const levelLabels = {
+  const levelLabels: Record<DiagnosticScopeLevel, string> = {
     global: 'GLOBAL',
-    country: 'LAND',
-    region: 'REGION',
+    continent: 'VÄRLDSDEL',
+    country: 'NATION',
     city: 'STAD',
   };
 
@@ -528,62 +529,79 @@ function SessionLockBanner({ canClose, completedSteps, totalSteps, onClose }: Se
 // =============================================================================
 
 export function DiagnosticView() {
-  // Demo session state
-  const [session, setSession] = useState<DiagnosticSession>({
-    id: 'diag-001',
-    startedAt: new Date().toISOString(),
-    system: {
-      level: 'country',
-      name: 'Sverige',
-      code: 'SE',
-      periodStart: '1990',
-      periodEnd: '2025',
-      dataCoverage: 94,
-      lambda: 0.82,
-      lambdaStatus: 'warning',
-    },
-    activeFaultCodes: [
-      { code: 'HEA-SUB-SYS-402', severity: 'critical', description: 'Systemiskt missbruksproblem', triggeredAt: '2024-01-15' },
-      { code: 'SOC-HOU-STR-021', severity: 'warning', description: 'Strukturellt bostadsproblem', triggeredAt: '2024-02-20' },
-      { code: 'ECO-INE-TRE-145', severity: 'warning', description: 'Ökande inkomstojämlikhet', triggeredAt: '2024-03-10' },
-    ],
-    selectedFaultCode: null,
-    measureBlocks: [
-      { code: 'ECO-INE-GINI', name: 'Inkomstojämlikhet (Gini)', currentValue: 0.34, unit: '', setpointMin: 0.25, setpointMax: 0.30, status: 'critical', trend: 'up', trendPeriod: '2005–2025', lastUpdated: '2024-11-12', source: 'OECD Income Distribution Database' },
-      { code: 'HEA-SUB-OPIOID', name: 'Opioidrelaterade dödsfall', currentValue: 8.2, unit: 'per 100k', setpointMin: null, setpointMax: 5.0, status: 'critical', trend: 'up', trendPeriod: '2015–2025', lastUpdated: '2024-10-01', source: 'Socialstyrelsen' },
-      { code: 'SOC-HOU-SUPPLY', name: 'Bostadsbestånd vs efterfrågan', currentValue: 0.92, unit: 'ratio', setpointMin: 1.0, setpointMax: 1.2, status: 'warning', trend: 'down', trendPeriod: '2010–2025', lastUpdated: '2024-09-15', source: 'SCB Bostadsstatistik' },
-      { code: 'SOC-TRU-INST', name: 'Institutionell tillit', currentValue: 62, unit: '%', setpointMin: 65, setpointMax: null, status: 'warning', trend: 'down', trendPeriod: '2000–2025', lastUpdated: '2024-06-01', source: 'SOM-institutet' },
-      { code: 'DEM-FER-RATE', name: 'Fertilitet (TFR)', currentValue: 1.52, unit: '', setpointMin: 2.1, setpointMax: null, status: 'critical', trend: 'down', trendPeriod: '1990–2025', lastUpdated: '2024-11-01', source: 'SCB Befolkningsstatistik' },
-      { code: 'ENV-EMI-CO2', name: 'CO2-utsläpp per capita', currentValue: 4.2, unit: 'ton', setpointMin: null, setpointMax: 2.0, status: 'warning', trend: 'down', trendPeriod: '1990–2025', lastUpdated: '2024-08-01', source: 'Naturvårdsverket' },
-    ],
-    guidedSteps: [
-      { id: 'step-1', title: 'Granska historik för primärt mätblock', description: 'Öppna och granska den historiska trenden för det primära mätblocket kopplat till felkoden.', type: 'review_history', completed: false, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
-      { id: 'step-2', title: 'Jämför med peer-länder', description: 'Jämför nuvarande värde med liknande länder för att fastställa relativ position.', type: 'peer_compare', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
-      { id: 'step-3', title: 'Visa korrelation mot sekundära mätblock', description: 'Undersök korrelationen mellan primärt mätblock och potentiellt påverkande faktorer.', type: 'correlation', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI', 'SOC-POV-RATE'] },
-      { id: 'step-4', title: 'Kontrollera tidsförskjutning', description: 'Analysera om det finns en tidsförskjutning mellan orsak och effekt.', type: 'timelag', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
-      { id: 'step-5', title: 'Bekräfta datakvalitet', description: 'Verifiera att datakvaliteten är tillräcklig för att dra slutsatser.', type: 'data_quality', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
-    ],
-    probableCauses: [
-      { rank: 1, description: 'Kapitalinkomsternas ökande andel', probability: 42, evidence: 'Stark korrelation', relatedCountries: 12, yearsOfData: 20 },
-      { rank: 2, description: 'Förändrad arbetsmarknadsstruktur', probability: 31, evidence: 'Tidsförskjutning 3–5 år', relatedCountries: 8, yearsOfData: 15 },
-      { rank: 3, description: 'Systemisk effekt av globalisering', probability: 17, evidence: 'Ej isolerbar till en parameter', relatedCountries: 25, yearsOfData: 30 },
-    ],
-    canClose: false,
-    completedSteps: 0,
-    totalSteps: 5,
-  });
-
+  // Demo session state - initialized when scope is selected
+  const [session, setSession] = useState<DiagnosticSession | null>(null);
   const [selectedBlock, setSelectedBlock] = useState<MeasureBlock | null>(null);
 
+  // Handle scope selection
+  const handleSelectScope = useCallback((scope: DiagnosticScope) => {
+    // Initialize session based on selected scope
+    const baseSession: DiagnosticSession = {
+      id: `diag-${Date.now()}`,
+      startedAt: new Date().toISOString(),
+      system: {
+        level: scope.level,
+        name: scope.name,
+        code: scope.code,
+        periodStart: '1990',
+        periodEnd: '2025',
+        dataCoverage: scope.dataCoverage,
+        lambda: scope.level === 'global' ? 0.78 : scope.level === 'continent' ? 0.81 : 0.82,
+        lambdaStatus: 'warning',
+      },
+      activeFaultCodes: scope.level === 'global' 
+        ? [
+            { code: 'GLO-CLI-WAR-001', severity: 'critical', description: 'Klimatsystemavvikelse', triggeredAt: '2024-01-01' },
+            { code: 'GLO-INE-TRE-002', severity: 'systemic', description: 'Global ojämlikhetsacceleration', triggeredAt: '2024-02-15' },
+            { code: 'GLO-DEM-FER-003', severity: 'warning', description: 'Fertilitetskris i utvecklade länder', triggeredAt: '2024-03-01' },
+          ]
+        : [
+            { code: 'HEA-SUB-SYS-402', severity: 'critical', description: 'Systemiskt missbruksproblem', triggeredAt: '2024-01-15' },
+            { code: 'SOC-HOU-STR-021', severity: 'warning', description: 'Strukturellt bostadsproblem', triggeredAt: '2024-02-20' },
+            { code: 'ECO-INE-TRE-145', severity: 'warning', description: 'Ökande inkomstojämlikhet', triggeredAt: '2024-03-10' },
+          ],
+      selectedFaultCode: null,
+      measureBlocks: [
+        { code: 'ECO-INE-GINI', name: 'Inkomstojämlikhet (Gini)', currentValue: 0.34, unit: '', setpointMin: 0.25, setpointMax: 0.30, status: 'critical', trend: 'up', trendPeriod: '2005–2025', lastUpdated: '2024-11-12', source: 'OECD Income Distribution Database' },
+        { code: 'HEA-SUB-OPIOID', name: 'Opioidrelaterade dödsfall', currentValue: 8.2, unit: 'per 100k', setpointMin: null, setpointMax: 5.0, status: 'critical', trend: 'up', trendPeriod: '2015–2025', lastUpdated: '2024-10-01', source: 'WHO Global Health Observatory' },
+        { code: 'SOC-HOU-SUPPLY', name: 'Bostadsbestånd vs efterfrågan', currentValue: 0.92, unit: 'ratio', setpointMin: 1.0, setpointMax: 1.2, status: 'warning', trend: 'down', trendPeriod: '2010–2025', lastUpdated: '2024-09-15', source: 'UN Habitat' },
+        { code: 'SOC-TRU-INST', name: 'Institutionell tillit', currentValue: 62, unit: '%', setpointMin: 65, setpointMax: null, status: 'warning', trend: 'down', trendPeriod: '2000–2025', lastUpdated: '2024-06-01', source: 'World Values Survey' },
+        { code: 'DEM-FER-RATE', name: 'Fertilitet (TFR)', currentValue: 1.52, unit: '', setpointMin: 2.1, setpointMax: null, status: 'critical', trend: 'down', trendPeriod: '1990–2025', lastUpdated: '2024-11-01', source: 'UN Population Division' },
+        { code: 'ENV-EMI-CO2', name: 'CO2-utsläpp per capita', currentValue: 4.2, unit: 'ton', setpointMin: null, setpointMax: 2.0, status: 'warning', trend: 'down', trendPeriod: '1990–2025', lastUpdated: '2024-08-01', source: 'Global Carbon Project' },
+      ],
+      guidedSteps: [
+        { id: 'step-1', title: 'Granska historik för primärt mätblock', description: 'Öppna och granska den historiska trenden för det primära mätblocket kopplat till felkoden.', type: 'review_history', completed: false, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+        { id: 'step-2', title: 'Jämför med peer-system', description: 'Jämför nuvarande värde med liknande system för att fastställa relativ position.', type: 'peer_compare', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+        { id: 'step-3', title: 'Visa korrelation mot sekundära mätblock', description: 'Undersök korrelationen mellan primärt mätblock och potentiellt påverkande faktorer.', type: 'correlation', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI', 'SOC-POV-RATE'] },
+        { id: 'step-4', title: 'Kontrollera tidsförskjutning', description: 'Analysera om det finns en tidsförskjutning mellan orsak och effekt.', type: 'timelag', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+        { id: 'step-5', title: 'Bekräfta datakvalitet', description: 'Verifiera att datakvaliteten är tillräcklig för att dra slutsatser.', type: 'data_quality', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+      ],
+      probableCauses: [
+        { rank: 1, description: 'Kapitalinkomsternas ökande andel', probability: 42, evidence: 'Stark korrelation', relatedCountries: 12, yearsOfData: 20 },
+        { rank: 2, description: 'Förändrad arbetsmarknadsstruktur', probability: 31, evidence: 'Tidsförskjutning 3–5 år', relatedCountries: 8, yearsOfData: 15 },
+        { rank: 3, description: 'Systemisk effekt av globalisering', probability: 17, evidence: 'Ej isolerbar till en parameter', relatedCountries: 25, yearsOfData: 30 },
+      ],
+      canClose: false,
+      completedSteps: 0,
+      totalSteps: 5,
+    };
+    
+    setSession(baseSession);
+  }, []);
+
   const handleSelectFaultCode = useCallback((code: string) => {
-    setSession(prev => ({
-      ...prev,
-      selectedFaultCode: prev.selectedFaultCode === code ? null : code,
-    }));
+    setSession(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        selectedFaultCode: prev.selectedFaultCode === code ? null : code,
+      };
+    });
   }, []);
 
   const handleCompleteStep = useCallback((stepId: string) => {
     setSession(prev => {
+      if (!prev) return prev;
       const newSteps = prev.guidedSteps.map((step, index) => {
         if (step.id === stepId) {
           return { ...step, completed: true };
@@ -607,19 +625,47 @@ export function DiagnosticView() {
   }, []);
 
   const handleCloseSession = useCallback(() => {
-    if (session.canClose) {
+    if (session?.canClose) {
       // Would generate diagnostic log here
       alert('Diagnoslogg genererad. Session avslutad.');
+      // Reset to scope selection
+      setSession(null);
     }
-  }, [session.canClose]);
+  }, [session?.canClose]);
+
+  // Handle going back to scope selection
+  const handleBackToScopeSelection = useCallback(() => {
+    setSession(null);
+  }, []);
+
+  // Show scope selector if no session is active
+  if (!session) {
+    return <DiagnosticScopeSelector onSelectScope={handleSelectScope} />;
+  }
 
   const currentStepIndex = session.guidedSteps.findIndex(s => !s.completed);
   const allStepsComplete = session.completedSteps === session.totalSteps;
 
   return (
     <div className="h-screen flex flex-col bg-background">
-      {/* System Identity Header */}
-      <SystemIdentityHeader system={session.system} />
+      {/* System Identity Header with back button */}
+      <div className="bg-muted/30 border-b border-border">
+        <div className="flex items-center gap-2 p-2 border-b border-border/50">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleBackToScopeSelection}
+            className="font-mono text-xs"
+          >
+            ← ÄNDRA OMFATTNING
+          </Button>
+          <span className="text-xs text-muted-foreground">|</span>
+          <span className="text-xs font-mono text-muted-foreground">
+            SESSION: {session.id}
+          </span>
+        </div>
+        <SystemIdentityHeader system={session.system} />
+      </div>
 
       {/* Fault Code Panel */}
       <FaultCodePanel 
