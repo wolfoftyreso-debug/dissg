@@ -11,7 +11,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { DataOverview } from './DataOverview';
-// Tab content components are defined inline below
+import { 
+  SourcesDrilldown, 
+  CountriesDrilldown, 
+  IndicatorsDrilldown, 
+  TablesDrilldown 
+} from './StatDrilldown';
 
 // Stat card component
 const StatCard: React.FC<{
@@ -30,6 +35,10 @@ const StatCard: React.FC<{
 
 export const DataDashboard: React.FC<{ className?: string }> = ({ className }) => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [countriesOpen, setCountriesOpen] = useState(false);
+  const [indicatorsOpen, setIndicatorsOpen] = useState(false);
+  const [tablesOpen, setTablesOpen] = useState(false);
 
   const { data: stats } = useQuery({
     queryKey: ['data-dashboard-stats'],
@@ -51,14 +60,36 @@ export const DataDashboard: React.FC<{ className?: string }> = ({ className }) =
 
   return (
     <div className={cn('h-full flex flex-col bg-background', className)}>
+      {/* Drilldown Dialogs */}
+      <SourcesDrilldown open={sourcesOpen} onOpenChange={setSourcesOpen} />
+      <CountriesDrilldown open={countriesOpen} onOpenChange={setCountriesOpen} />
+      <IndicatorsDrilldown open={indicatorsOpen} onOpenChange={setIndicatorsOpen} />
+      <TablesDrilldown open={tablesOpen} onOpenChange={setTablesOpen} />
+
       <ScrollArea className="flex-1">
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
           {/* Stats Row */}
           <div className="flex gap-2 md:gap-4 mb-6">
-            <StatCard value={stats?.sources || 21} label="AKTIVA KÄLLOR" />
-            <StatCard value={stats?.countries || 39} label="LÄNDER" />
-            <StatCard value={stats?.indicators || 56} label="INDIKATORER" />
-            <StatCard value={stats?.tables || 7} label="DATATABELLER" />
+            <StatCard 
+              value={stats?.sources || 21} 
+              label="AKTIVA KÄLLOR" 
+              onClick={() => setSourcesOpen(true)}
+            />
+            <StatCard 
+              value={stats?.countries || 39} 
+              label="LÄNDER" 
+              onClick={() => setCountriesOpen(true)}
+            />
+            <StatCard 
+              value={stats?.indicators || 56} 
+              label="INDIKATORER" 
+              onClick={() => setIndicatorsOpen(true)}
+            />
+            <StatCard 
+              value={stats?.tables || 7} 
+              label="DATATABELLER" 
+              onClick={() => setTablesOpen(true)}
+            />
           </div>
 
           {/* Main Tabs */}
