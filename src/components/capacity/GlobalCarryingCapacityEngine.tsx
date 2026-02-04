@@ -17,7 +17,8 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ChevronRight, Clock, Info } from 'lucide-react';
+import { ChevronRight, Clock } from 'lucide-react';
+import { ExpandableBadge } from '@/components/ui/ExpandableBadge';
 import { DescriptiveMetricCard } from '@/components/ui/MiniSparkline';
 import {
   ExpandableInfoAlert,
@@ -523,12 +524,10 @@ const GlobalCarryingCapacityEngine: React.FC = () => {
       {/* Core definition - EXPANDABLE */}
       <GCCEDefinitionAlert statement={GCCE_CORE_DEFINITION.sv} />
 
-      {/* Not definitions */}
+      {/* Not definitions - EXPANDABLE */}
       <div className="flex flex-wrap justify-center gap-2">
         {GCCE_NOT_DEFINITIONS.map((def, i) => (
-          <Badge key={i} variant="outline" className="text-xs">
-            {def.sv}
-          </Badge>
+          <ExpandableBadge key={i} text={def.sv} className="text-xs" />
         ))}
       </div>
 
