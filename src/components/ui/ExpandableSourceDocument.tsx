@@ -20,16 +20,10 @@ import {
   ChevronDown,
   BookOpen,
   FileText,
-  ExternalLink,
   Database,
-  CheckCircle2,
-  AlertTriangle,
   Atom,
   Scale,
-  Quote,
-  Lightbulb,
   Link2,
-  MessageSquareQuote,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -289,35 +283,56 @@ export const ExpandableSourceDocument: React.FC<ExpandableSourceDocumentProps> =
         </div>
       </CollapsibleTrigger>
       
-      <CollapsibleContent className="mt-2 space-y-3 pl-4 border-l-2 border-primary/30 ml-4">
-        {/* Our Summary */}
+      <CollapsibleContent className="mt-2 space-y-4 pl-4 border-l-2 border-primary/30 ml-4">
+        {/* What is this source? - Accessible explanation */}
         <Card className="bg-primary/5 border-primary/20">
           <CardHeader className="pb-2 pt-3">
-            <CardTitle className="text-xs flex items-center gap-2">
-              <MessageSquareQuote className="h-3.5 w-3.5 text-primary" />
-              Vår tolkning
+            <CardTitle className="text-sm font-semibold">
+              Vad är det här för källa?
             </CardTitle>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              En kort förklaring av vad dokumentet handlar om, skriven av oss.
+            </p>
           </CardHeader>
           <CardContent className="pb-3">
-            <p className="text-sm">{doc.ourSummary}</p>
+            <p className="text-sm leading-relaxed">{doc.ourSummary}</p>
+            
+            {/* Source type explanation for accessibility */}
+            <div className="mt-3 p-2 bg-muted/50 rounded text-xs">
+              <span className="font-mono text-[10px] text-muted-foreground">TYP:</span>{' '}
+              <span className="font-medium">{getDocumentTypeName(doc.type)}</span>
+              <span className="text-muted-foreground mx-2">•</span>
+              <span className="text-muted-foreground">
+                {doc.type === 'study' && 'Forskare har undersökt något och publicerat sina resultat i en vetenskaplig tidskrift.'}
+                {doc.type === 'report' && 'En organisation har sammanställt data och analys i ett officiellt dokument.'}
+                {doc.type === 'book' && 'En eller flera experter har skrivit en hel bok om ämnet.'}
+                {doc.type === 'data' && 'Ren statistik och mätdata från officiella källor.'}
+                {doc.type === 'law' && 'Beslut tagna av politiska organ som är juridiskt bindande.'}
+                {doc.type === 'article' && 'En kortare text som diskuterar eller analyserar ett ämne.'}
+              </span>
+            </div>
           </CardContent>
         </Card>
         
-        {/* Key Findings */}
+        {/* Key Findings - Made more accessible */}
         {doc.keyFindings.length > 0 && (
           <Card>
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs flex items-center gap-2">
-                <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
-                Nyckelfynd
+              <CardTitle className="text-sm font-semibold">
+                De viktigaste upptäckterna
               </CardTitle>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Vad forskarna/författarna kom fram till i sin studie.
+              </p>
             </CardHeader>
             <CardContent className="pb-3">
-              <ul className="space-y-1.5">
+              <ul className="space-y-2">
                 {doc.keyFindings.map((finding, idx) => (
-                  <li key={idx} className="text-xs flex items-start gap-2">
-                    <span className="text-primary mt-0.5 font-bold">{idx + 1}.</span>
-                    {finding}
+                  <li key={idx} className="flex items-start gap-3 p-2 rounded bg-muted/30">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
+                      {idx + 1}
+                    </span>
+                    <span className="text-sm leading-relaxed">{finding}</span>
                   </li>
                 ))}
               </ul>
@@ -325,34 +340,47 @@ export const ExpandableSourceDocument: React.FC<ExpandableSourceDocumentProps> =
           </Card>
         )}
         
-        {/* How We Use It */}
-        <Card className="bg-blue-50/30 dark:bg-blue-950/10 border-blue-200/50">
+        {/* How We Use It - Made crystal clear */}
+        <Card className="bg-blue-50/50 dark:bg-blue-950/20 border-blue-200/50">
           <CardHeader className="pb-2 pt-3">
-            <CardTitle className="text-xs flex items-center gap-2 text-blue-700 dark:text-blue-400">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              Hur vi använder detta
+            <CardTitle className="text-sm font-semibold text-blue-800 dark:text-blue-300">
+              Så använder vi denna källa
             </CardTitle>
+            <p className="text-[11px] text-blue-700/70 dark:text-blue-400/70 mt-0.5">
+              Hur informationen från detta dokument påverkar beräkningarna du ser på sidan.
+            </p>
           </CardHeader>
           <CardContent className="pb-3">
-            <p className="text-xs">{doc.howWeUseIt}</p>
+            <p className="text-sm leading-relaxed">{doc.howWeUseIt}</p>
+            
+            {/* Practical example */}
+            <div className="mt-3 p-2 bg-blue-100/50 dark:bg-blue-900/30 rounded text-xs">
+              <span className="font-mono text-[10px] text-blue-600 dark:text-blue-400 block mb-1">PRAKTISKT EXEMPEL:</span>
+              <span className="text-blue-900 dark:text-blue-200">
+                När du ser en siffra om {doc.type === 'study' ? 'planetära gränser' : doc.type === 'report' ? 'energiproduktion' : 'resurser'}, 
+                har denna källa bidragit till att beräkna eller validera den.
+              </span>
+            </div>
           </CardContent>
         </Card>
         
-        {/* Critical Notes */}
+        {/* Critical Notes - Honest limitations */}
         {doc.criticalNotes && doc.criticalNotes.length > 0 && (
-          <Card className="bg-amber-50/30 dark:bg-amber-950/10 border-amber-200/50">
+          <Card className="bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/50">
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                <AlertTriangle className="h-3.5 w-3.5" />
-                Kritiska noteringar
+              <CardTitle className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                Varningar och begränsningar
               </CardTitle>
+              <p className="text-[11px] text-amber-700/70 dark:text-amber-400/70 mt-0.5">
+                Inget är perfekt. Här är saker du bör veta om denna källa innan du litar på den helt.
+              </p>
             </CardHeader>
             <CardContent className="pb-3">
-              <ul className="space-y-1">
+              <ul className="space-y-2">
                 {doc.criticalNotes.map((note, idx) => (
-                  <li key={idx} className="text-xs flex items-start gap-1.5">
-                    <span className="text-amber-500 mt-0.5">⚠</span>
-                    {note}
+                  <li key={idx} className="flex items-start gap-2 text-sm">
+                    <span className="font-mono text-amber-600 dark:text-amber-400 mt-0.5 text-xs">[!]</span>
+                    <span className="leading-relaxed">{note}</span>
                   </li>
                 ))}
               </ul>
@@ -360,35 +388,49 @@ export const ExpandableSourceDocument: React.FC<ExpandableSourceDocumentProps> =
           </Card>
         )}
         
-        {/* Related Concepts */}
+        {/* Related Concepts - Learning paths */}
         {doc.relatedConcepts && doc.relatedConcepts.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {doc.relatedConcepts.map((concept, idx) => (
-              <Badge key={idx} variant="secondary" className="text-xs">
-                {concept}
-              </Badge>
-            ))}
+          <div>
+            <p className="text-xs font-medium mb-2 text-muted-foreground">
+              Vill du förstå mer? Dessa begrepp är relaterade:
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {doc.relatedConcepts.map((concept, idx) => (
+                <Badge key={idx} variant="secondary" className="text-xs cursor-pointer hover:bg-secondary/80">
+                  {concept}
+                </Badge>
+              ))}
+            </div>
           </div>
         )}
         
         {/* Citation info and Original Source Link */}
-        <div className="flex items-center justify-between pt-2 border-t">
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="flex items-center justify-between pt-3 border-t">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs text-muted-foreground">
             {doc.citationCount && (
               <span className="flex items-center gap-1">
-                <Quote className="h-3 w-3" />
-                {doc.citationCount.toLocaleString()} citeringar
+                <span className="font-mono text-[10px]">[CITERINGAR]</span>
+                <span className="font-medium">{doc.citationCount.toLocaleString()}</span>
+                <span className="text-[10px] text-muted-foreground/70">
+                  (andra forskare som använt denna källa)
+                </span>
               </span>
             )}
             {doc.impactFactor && (
-              <span>IF: {doc.impactFactor}</span>
+              <span className="flex items-center gap-1">
+                <span className="font-mono text-[10px]">[IF]</span>
+                <span className="font-medium">{doc.impactFactor}</span>
+                <span className="text-[10px] text-muted-foreground/70">
+                  (tidskriftens trovärdighetspoäng)
+                </span>
+              </span>
             )}
           </div>
           {doc.url && (
-            <Button variant="outline" size="sm" className="h-7" asChild>
+            <Button variant="outline" size="sm" className="h-8 text-xs" asChild>
               <a href={doc.url} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-3 w-3 mr-1.5" />
-                Läs originalkälla
+                <span className="font-mono mr-1">[→]</span>
+                Läs originalkällan
               </a>
             </Button>
           )}
