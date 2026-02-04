@@ -10,6 +10,7 @@
  */
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -445,33 +446,53 @@ const HistoricalTimelinePanel: React.FC = () => (
   </Card>
 );
 
-// System connections - descriptive cards without abstract icons
-const SystemConnectionsPanel: React.FC = () => (
-  <Card className="bg-muted/30">
-    <CardHeader>
-      <CardTitle className="text-base">Systemkopplingar</CardTitle>
-      <CardDescription>
-        Bärkraftsmotorn är navet som alla andra moduler refererar till
-      </CardDescription>
-    </CardHeader>
-    <CardContent>
-      <div className="grid gap-2 md:grid-cols-3">
-        {SYSTEM_CONNECTIONS.map(conn => (
-          <Button key={conn.id} variant="outline" className="justify-start h-auto py-3">
-            <span className="text-sm">{conn.labelSv}</span>
-          </Button>
-        ))}
-      </div>
-      
-      <Alert className="mt-4 bg-primary/5 border-primary/20">
-        <AlertDescription className="text-sm text-center">
-          <span className="font-medium">Systemprincip: </span>
-          Alla välfärdsfrågor bottnar i fysisk kapacitet — därför landar allt här.
-        </AlertDescription>
-      </Alert>
-    </CardContent>
-  </Card>
-);
+// Route mapping for system connections
+const CONNECTION_ROUTES: Record<string, string> = {
+  demography: '/demography',
+  economy: '/reality-index',
+  climate: '/scenario',
+  energy: '/sweden', // Energy section in Sweden dashboard
+  resilience: '/resilience',
+  intergenerational: '/fairness'
+};
+
+// System connections - descriptive cards with navigation
+const SystemConnectionsPanel: React.FC = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <Card className="bg-muted/30">
+      <CardHeader>
+        <CardTitle className="text-base">Systemkopplingar</CardTitle>
+        <CardDescription>
+          Bärkraftsmotorn är navet som alla andra moduler refererar till
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid gap-2 md:grid-cols-3">
+          {SYSTEM_CONNECTIONS.map(conn => (
+            <Button 
+              key={conn.id} 
+              variant="outline" 
+              className="justify-start h-auto py-3 hover:bg-primary/10 hover:border-primary/50 transition-all group"
+              onClick={() => navigate(CONNECTION_ROUTES[conn.id] || '/')}
+            >
+              <ChevronRight className="h-4 w-4 mr-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="text-sm">{conn.labelSv}</span>
+            </Button>
+          ))}
+        </div>
+        
+        <Alert className="mt-4 bg-primary/5 border-primary/20">
+          <AlertDescription className="text-sm text-center">
+            <span className="font-medium">Systemprincip: </span>
+            Alla välfärdsfrågor bottnar i fysisk kapacitet — därför landar allt här.
+          </AlertDescription>
+        </Alert>
+      </CardContent>
+    </Card>
+  );
+};
 
 // Main component
 const GlobalCarryingCapacityEngine: React.FC = () => {
