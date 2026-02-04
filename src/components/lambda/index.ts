@@ -39,3 +39,6 @@ export { assessZone, getZoneColor, getZoneLabel, getSetpointDefinition, listSetp
 
 // Lambda System Dashboard
 export { LambdaSystemDashboard } from './LambdaSystemDashboard';
+
+// Lambda 1.0 Dashboard
+export { Lambda1Dashboard } from './Lambda1Dashboard';

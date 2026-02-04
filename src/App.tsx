@@ -83,6 +83,7 @@ import DiagnosticsPage from "./pages/Diagnostics";
 import AIGovernancePage from "./pages/AIGovernance";
 import SelfTestPage from "./pages/SelfTest";
 import GEDIPage from "./pages/GEDI";
+import Lambda1Page from "./pages/Lambda1";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -169,6 +170,7 @@ const App = () => (
               <Route path="/ai-governance" element={<AIGovernancePage />} />
               <Route path="/self-test" element={<SelfTestPage />} />
               <Route path="/gedi" element={<GEDIPage />} />
+              <Route path="/lambda1" element={<Lambda1Page />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />
