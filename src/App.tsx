@@ -88,6 +88,7 @@ import GDMPage from "./pages/GDM";
 import GGDPage from "./pages/GGD";
 import WagesPage from "./pages/WagesPage";
 import CountryExplorer from "./pages/CountryExplorer";
+import IndicatorExplorer from "./pages/IndicatorExplorer";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -179,6 +180,7 @@ const App = () => (
               <Route path="/ggd" element={<GGDPage />} />
               <Route path="/wages" element={<WagesPage />} />
               <Route path="/country/:code" element={<CountryExplorer />} />
+              <Route path="/indicator/:code" element={<IndicatorExplorer />} />
               {/* Huvudsidan är publik - läsning utan inloggning */}
               <Route path="/" element={<Index />} />
               {/* Skyddade routes - kräver inloggning */}
