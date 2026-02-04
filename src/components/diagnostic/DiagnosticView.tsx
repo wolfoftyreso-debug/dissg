@@ -552,6 +552,7 @@ export function DiagnosticView() {
       activeFaultCodes: scope.level === 'global' 
         ? [
             { code: 'GLO-CLI-WAR-001', severity: 'critical', description: 'Klimatsystemavvikelse', triggeredAt: '2024-01-01' },
+            { code: 'GLO-DEM-STR-301', severity: 'critical', description: 'Strukturell demokratisk erosion globalt', triggeredAt: '2024-02-01' },
             { code: 'GLO-INE-TRE-002', severity: 'systemic', description: 'Global ojämlikhetsacceleration', triggeredAt: '2024-02-15' },
             { code: 'GLO-DEM-FER-003', severity: 'warning', description: 'Fertilitetskris i utvecklade länder', triggeredAt: '2024-03-01' },
           ]
@@ -561,14 +562,32 @@ export function DiagnosticView() {
             { code: 'ECO-INE-TRE-145', severity: 'warning', description: 'Ökande inkomstojämlikhet', triggeredAt: '2024-03-10' },
           ],
       selectedFaultCode: null,
-      measureBlocks: [
-        { code: 'ECO-INE-GINI', name: 'Inkomstojämlikhet (Gini)', currentValue: 0.34, unit: '', setpointMin: 0.25, setpointMax: 0.30, status: 'critical', trend: 'up', trendPeriod: '2005–2025', lastUpdated: '2024-11-12', source: 'OECD Income Distribution Database' },
-        { code: 'HEA-SUB-OPIOID', name: 'Opioidrelaterade dödsfall', currentValue: 8.2, unit: 'per 100k', setpointMin: null, setpointMax: 5.0, status: 'critical', trend: 'up', trendPeriod: '2015–2025', lastUpdated: '2024-10-01', source: 'WHO Global Health Observatory' },
-        { code: 'SOC-HOU-SUPPLY', name: 'Bostadsbestånd vs efterfrågan', currentValue: 0.92, unit: 'ratio', setpointMin: 1.0, setpointMax: 1.2, status: 'warning', trend: 'down', trendPeriod: '2010–2025', lastUpdated: '2024-09-15', source: 'UN Habitat' },
-        { code: 'SOC-TRU-INST', name: 'Institutionell tillit', currentValue: 62, unit: '%', setpointMin: 65, setpointMax: null, status: 'warning', trend: 'down', trendPeriod: '2000–2025', lastUpdated: '2024-06-01', source: 'World Values Survey' },
-        { code: 'DEM-FER-RATE', name: 'Fertilitet (TFR)', currentValue: 1.52, unit: '', setpointMin: 2.1, setpointMax: null, status: 'critical', trend: 'down', trendPeriod: '1990–2025', lastUpdated: '2024-11-01', source: 'UN Population Division' },
-        { code: 'ENV-EMI-CO2', name: 'CO2-utsläpp per capita', currentValue: 4.2, unit: 'ton', setpointMin: null, setpointMax: 2.0, status: 'warning', trend: 'down', trendPeriod: '1990–2025', lastUpdated: '2024-08-01', source: 'Global Carbon Project' },
-      ],
+      measureBlocks: scope.level === 'global' 
+        ? [
+            // Economic
+            { code: 'ECO-INE-GINI', name: 'Global Gini-koefficient', currentValue: 0.70, unit: '', setpointMin: 0.30, setpointMax: 0.45, status: 'critical', trend: 'stable', trendPeriod: '1990–2025', lastUpdated: '2024-11-12', source: 'World Bank' },
+            // Democratic Health
+            { code: 'GOV-DEM-TURNOUT', name: 'Globalt valdeltagande', currentValue: 66.2, unit: '%', setpointMin: 70, setpointMax: null, status: 'warning', trend: 'stable', trendPeriod: '2000–2024', lastUpdated: '2024-11-01', source: 'IDEA International' },
+            { code: 'GOV-DEM-INDEX', name: 'Demokratiindex (global)', currentValue: 5.29, unit: 'index', setpointMin: 6.0, setpointMax: null, status: 'critical', trend: 'down', trendPeriod: '2015–2024', lastUpdated: '2024-10-01', source: 'Economist Intelligence Unit' },
+            { code: 'GOV-DEM-FREEDOM', name: 'Global frihet', currentValue: 55.0, unit: 'poäng', setpointMin: 60, setpointMax: null, status: 'warning', trend: 'down', trendPeriod: '2010–2024', lastUpdated: '2024-09-01', source: 'Freedom House' },
+            { code: 'GOV-DEM-PRESS', name: 'Global pressfrihet', currentValue: 44.3, unit: 'index', setpointMin: 60, setpointMax: null, status: 'critical', trend: 'down', trendPeriod: '2015–2024', lastUpdated: '2024-08-01', source: 'Reporters Without Borders' },
+            // Demographics
+            { code: 'DEM-FER-RATE', name: 'Global fertilitet (TFR)', currentValue: 2.31, unit: '', setpointMin: 2.1, setpointMax: 2.5, status: 'within_tolerance', trend: 'down', trendPeriod: '1990–2025', lastUpdated: '2024-11-01', source: 'UN Population Division' },
+            // Environment
+            { code: 'ENV-EMI-CO2', name: 'Global CO2 per capita', currentValue: 4.7, unit: 'ton', setpointMin: null, setpointMax: 2.0, status: 'critical', trend: 'stable', trendPeriod: '1990–2025', lastUpdated: '2024-08-01', source: 'Global Carbon Project' },
+            // Health
+            { code: 'HEA-LIF-EXPECT', name: 'Global livslängd', currentValue: 72.8, unit: 'år', setpointMin: 75, setpointMax: null, status: 'warning', trend: 'up', trendPeriod: '1990–2025', lastUpdated: '2024-10-01', source: 'WHO' },
+          ]
+        : [
+            { code: 'ECO-INE-GINI', name: 'Inkomstojämlikhet (Gini)', currentValue: 0.34, unit: '', setpointMin: 0.25, setpointMax: 0.30, status: 'critical', trend: 'up', trendPeriod: '2005–2025', lastUpdated: '2024-11-12', source: 'OECD Income Distribution Database' },
+            { code: 'HEA-SUB-OPIOID', name: 'Opioidrelaterade dödsfall', currentValue: 8.2, unit: 'per 100k', setpointMin: null, setpointMax: 5.0, status: 'critical', trend: 'up', trendPeriod: '2015–2025', lastUpdated: '2024-10-01', source: 'WHO Global Health Observatory' },
+            { code: 'SOC-HOU-SUPPLY', name: 'Bostadsbestånd vs efterfrågan', currentValue: 0.92, unit: 'ratio', setpointMin: 1.0, setpointMax: 1.2, status: 'warning', trend: 'down', trendPeriod: '2010–2025', lastUpdated: '2024-09-15', source: 'UN Habitat' },
+            { code: 'SOC-TRU-INST', name: 'Institutionell tillit', currentValue: 62, unit: '%', setpointMin: 65, setpointMax: null, status: 'warning', trend: 'down', trendPeriod: '2000–2025', lastUpdated: '2024-06-01', source: 'World Values Survey' },
+            { code: 'GOV-DEM-TURNOUT', name: 'Valdeltagande', currentValue: 84.2, unit: '%', setpointMin: 80, setpointMax: null, status: 'within_tolerance', trend: 'stable', trendPeriod: '2000–2024', lastUpdated: '2024-09-15', source: 'National Electoral Commission' },
+            { code: 'GOV-DEM-INDEX', name: 'Demokratiindex', currentValue: 9.39, unit: 'index', setpointMin: 8.0, setpointMax: null, status: 'within_tolerance', trend: 'stable', trendPeriod: '2010–2024', lastUpdated: '2024-10-01', source: 'Economist Intelligence Unit' },
+            { code: 'DEM-FER-RATE', name: 'Fertilitet (TFR)', currentValue: 1.52, unit: '', setpointMin: 2.1, setpointMax: null, status: 'critical', trend: 'down', trendPeriod: '1990–2025', lastUpdated: '2024-11-01', source: 'UN Population Division' },
+            { code: 'ENV-EMI-CO2', name: 'CO2-utsläpp per capita', currentValue: 4.2, unit: 'ton', setpointMin: null, setpointMax: 2.0, status: 'warning', trend: 'down', trendPeriod: '1990–2025', lastUpdated: '2024-08-01', source: 'Global Carbon Project' },
+          ],
       guidedSteps: [
         { id: 'step-1', title: 'Granska historik för primärt mätblock', description: 'Öppna och granska den historiska trenden för det primära mätblocket kopplat till felkoden.', type: 'review_history', completed: false, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
         { id: 'step-2', title: 'Jämför med peer-system', description: 'Jämför nuvarande värde med liknande system för att fastställa relativ position.', type: 'peer_compare', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
