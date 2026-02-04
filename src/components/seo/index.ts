@@ -18,6 +18,9 @@ export { IndicatorPageTemplate, type IndicatorPageData } from './IndicatorPageTe
 export { DebatePageTemplate, type DebatePageData } from './DebatePageTemplate';
 export { SemanticLinkSection, InlineSemanticLinks } from './SemanticLinkSection';
 
+// Machine-readable metadata for AI grounding
+export { MachineReadableHead } from './MachineReadableHead';
+
 // Re-export config utilities
 export { 
   createDatasetSchema,
