@@ -16,17 +16,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import {
-  ChevronDown,
-  ExternalLink,
-  BookOpen,
-  Users,
-  Lightbulb,
-  ArrowRight,
-  AlertTriangle,
-  CheckCircle2,
-  Link2,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // ═══════════════════════════════════════════════════════════════
@@ -454,10 +443,12 @@ export const ExpandableHistoricalEvent: React.FC<ExpandableHistoricalEventProps>
             <p className="text-xs text-muted-foreground">{significance}</p>
           </div>
           {hasFullData && (
-            <ChevronDown className={cn(
-              "absolute right-0 top-2 h-4 w-4 text-muted-foreground transition-transform",
+            <span className={cn(
+              "absolute right-0 top-2 font-mono text-xs text-muted-foreground transition-transform",
               isOpen && "rotate-180"
-            )} />
+            )}>
+              {isOpen ? '[−]' : '[+]'}
+            </span>
           )}
         </div>
       </CollapsibleTrigger>
@@ -479,16 +470,15 @@ export const ExpandableHistoricalEvent: React.FC<ExpandableHistoricalEventProps>
           {/* Key Actors */}
           <Card className="bg-muted/30">
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs flex items-center gap-2">
-                <Users className="h-3.5 w-3.5 text-blue-500" />
-                Nyckelaktörer
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                NYCKELAKTÖRER
               </CardTitle>
             </CardHeader>
             <CardContent className="pb-3">
               <ul className="space-y-1">
                 {fullEvent.keyActors.map((actor, idx) => (
-                  <li key={idx} className="text-xs flex items-start gap-1.5">
-                    <span className="text-primary mt-0.5">•</span>
+                  <li key={idx} className="text-xs flex items-start gap-1.5 hover:text-primary cursor-pointer transition-colors">
+                    <span className="font-mono text-[10px] text-muted-foreground">[{idx + 1}]</span>
                     {actor}
                   </li>
                 ))}
@@ -500,16 +490,15 @@ export const ExpandableHistoricalEvent: React.FC<ExpandableHistoricalEventProps>
           {fullEvent.mainFindings && fullEvent.mainFindings.length > 0 && (
             <Card className="bg-primary/5 border-primary/20">
               <CardHeader className="pb-2 pt-3">
-                <CardTitle className="text-xs flex items-center gap-2 text-primary">
-                  <Lightbulb className="h-3.5 w-3.5" />
-                  Huvudslutsatser
+                <CardTitle className="text-xs font-mono uppercase tracking-wider text-primary">
+                  HUVUDSLUTSATSER
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-3">
                 <ul className="space-y-1.5">
                   {fullEvent.mainFindings.map((finding, idx) => (
-                    <li key={idx} className="text-xs flex items-start gap-2">
-                      <span className="text-primary font-bold mt-0.5">{idx + 1}.</span>
+                    <li key={idx} className="text-xs flex items-start gap-2 hover:text-primary cursor-pointer transition-colors">
+                      <span className="font-mono text-[10px] text-primary">[{idx + 1}]</span>
                       {finding}
                     </li>
                   ))}
@@ -521,26 +510,24 @@ export const ExpandableHistoricalEvent: React.FC<ExpandableHistoricalEventProps>
           {/* How It Changed Thinking */}
           <Card className="bg-blue-50/30 dark:bg-blue-950/10 border-blue-200/50">
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs flex items-center gap-2 text-blue-700 dark:text-blue-400">
-                <ArrowRight className="h-3.5 w-3.5" />
-                Hur det förändrade tänkandet
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-blue-700 dark:text-blue-400">
+                [→] HUR DET FÖRÄNDRADE TÄNKANDET
               </CardTitle>
             </CardHeader>
             <CardContent className="pb-3">
-              <p className="text-xs">{fullEvent.howItChangedThinking}</p>
+              <p className="text-xs hover:text-primary cursor-pointer transition-colors">{fullEvent.howItChangedThinking}</p>
             </CardContent>
           </Card>
           
           {/* Legacy Today */}
           <Card className="bg-green-50/30 dark:bg-green-950/10 border-green-200/50">
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs flex items-center gap-2 text-green-700 dark:text-green-400">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                Arv idag
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-green-700 dark:text-green-400">
+                [✓] ARV IDAG
               </CardTitle>
             </CardHeader>
             <CardContent className="pb-3">
-              <p className="text-xs">{fullEvent.legacyToday}</p>
+              <p className="text-xs hover:text-primary cursor-pointer transition-colors">{fullEvent.legacyToday}</p>
             </CardContent>
           </Card>
           
@@ -548,16 +535,15 @@ export const ExpandableHistoricalEvent: React.FC<ExpandableHistoricalEventProps>
           {fullEvent.criticisms && fullEvent.criticisms.length > 0 && (
             <Card className="bg-amber-50/30 dark:bg-amber-950/10 border-amber-200/50">
               <CardHeader className="pb-2 pt-3">
-                <CardTitle className="text-xs flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                  <AlertTriangle className="h-3.5 w-3.5" />
-                  Kritik och begränsningar
+                <CardTitle className="text-xs font-mono uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                  [!] KRITIK OCH BEGRÄNSNINGAR
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-3">
                 <ul className="space-y-1">
                   {fullEvent.criticisms.map((criticism, idx) => (
-                    <li key={idx} className="text-xs flex items-start gap-1.5">
-                      <span className="text-amber-500 mt-0.5">⚠</span>
+                    <li key={idx} className="text-xs flex items-start gap-1.5 hover:text-primary cursor-pointer transition-colors">
+                      <span className="font-mono text-[10px] text-amber-500">[!]</span>
                       {criticism}
                     </li>
                   ))}
@@ -570,13 +556,13 @@ export const ExpandableHistoricalEvent: React.FC<ExpandableHistoricalEventProps>
           {fullEvent.primarySource && (
             <div className="flex items-center justify-between pt-2 border-t">
               <div className="text-xs text-muted-foreground flex items-center gap-2">
-                <BookOpen className="h-3 w-3" />
+                <span className="font-mono text-[10px]">[SRC]</span>
                 <span>{fullEvent.primarySource.title}</span>
               </div>
               {fullEvent.primarySource.url && (
                 <Button variant="outline" size="sm" className="h-7" asChild>
                   <a href={fullEvent.primarySource.url} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-3 w-3 mr-1.5" />
+                    <span className="font-mono text-[10px] mr-1">[→]</span>
                     Primärkälla
                   </a>
                 </Button>
@@ -587,14 +573,21 @@ export const ExpandableHistoricalEvent: React.FC<ExpandableHistoricalEventProps>
           {/* Related Events */}
           {fullEvent.relatedEvents && fullEvent.relatedEvents.length > 0 && (
             <div className="flex flex-wrap gap-1.5 pt-2">
-              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                <Link2 className="h-3 w-3" />
-                Relaterat:
+              <span className="text-xs font-mono text-muted-foreground">
+                [REL]
               </span>
               {fullEvent.relatedEvents.map((eventKey) => {
                 const related = HISTORICAL_EVENT_REGISTRY[eventKey];
                 return related ? (
-                  <Badge key={eventKey} variant="secondary" className="text-xs">
+                  <Badge 
+                    key={eventKey} 
+                    variant="secondary" 
+                    className="text-xs cursor-pointer hover:bg-primary/20 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Could navigate or expand related event
+                    }}
+                  >
                     {related.year}: {related.event.substring(0, 25)}...
                   </Badge>
                 ) : null;
