@@ -171,11 +171,17 @@ const Index = () => {
 
       {/* Main content area with sidebar */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Main content - switches based on activeMode from sidebar */}
+        {/* Main content - respects both tabs and modes */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          {/* DIAGNOSIS MODE */}
-          {activeMode === 'diagnosis' && (
+          
+          {/* INDEX MODE - Full screen Index Explorer (overrides tabs) */}
+          {activeMode === 'index' ? (
+            <div className="flex-1 overflow-hidden">
+              <IndexExplorer />
+            </div>
+          ) : (
             <>
+              {/* DIAGNOSIS TAB - Tree view with alerts */}
               {activeTab === 'diagnosis' && (
                 <div className="flex-1 flex flex-col p-3 gap-3 overflow-hidden">
                   <AlertNotificationPanel />
@@ -191,64 +197,53 @@ const Index = () => {
                 </div>
               )}
 
+              {/* CONTROL MODULES TAB - Subscription/System modules */}
               {activeTab === 'modules' && (
                 <div className="flex-1 p-3 overflow-auto">
                   <SubscriptionDashboard />
                 </div>
               )}
 
+              {/* TIMELINE TAB - Prioritized dashboard with trends */}
               {activeTab === 'timeline' && (
                 <div className="flex-1 p-3 overflow-auto">
                   <PrioritizedDashboard />
                 </div>
               )}
 
+              {/* OPERATION TAB - Responsibility map */}
               {activeTab === 'operation' && (
                 <div className="flex-1 p-3 overflow-auto">
                   <UniversalResponsibilityMap />
                 </div>
               )}
-            </>
-          )}
 
-          {/* INDEX MODE - Full Index Explorer */}
-          {activeMode === 'index' && (
-            <div className="flex-1 overflow-hidden">
-              <IndexExplorer />
-            </div>
-          )}
-
-          {/* MEASUREMENT MODE */}
-          {activeMode === 'measurement' && (
-            <div className="flex-1 p-3 overflow-auto">
-              <PrioritizedDashboard />
-            </div>
-          )}
-
-          {/* INFO MODE */}
-          {activeMode === 'info' && (
-            <div className="flex-1 p-3 overflow-auto flex items-center justify-center">
-              <div className="text-center font-mono space-y-4 max-w-lg">
-                <div className="text-4xl">[INFO]</div>
-                <h2 className="text-xl font-bold">{SYSTEM.name} v{SYSTEM.version}</h2>
-                <p className="text-muted-foreground text-sm">
-                  Diagnostic Information System for Societal Governance. 
-                  Klinisk diagnostik för samhällsstyrning.
-                </p>
-                <div className="text-xs text-muted-foreground border-t pt-4 mt-4">
-                  <div>[DATA] {kpis.length} indikatorer</div>
-                  <div>[GEO] {scope.level}: {scope.code}</div>
-                  <div>[STATUS] {criticalCount} kritiska, {warningCount} varningar</div>
+              {/* Contextual overlays based on active mode */}
+              {activeMode === 'info' && (
+                <div className="absolute inset-0 bg-background/95 flex items-center justify-center z-10">
+                  <div className="text-center font-mono space-y-4 max-w-lg p-8 bg-card border rounded-lg shadow-lg">
+                    <div className="text-4xl">[INFO]</div>
+                    <h2 className="text-xl font-bold">{SYSTEM.name} v{SYSTEM.version}</h2>
+                    <p className="text-muted-foreground text-sm">
+                      Diagnostic Information System for Societal Governance. 
+                      Klinisk diagnostik för samhällsstyrning.
+                    </p>
+                    <div className="text-xs text-muted-foreground border-t pt-4 mt-4 space-y-1">
+                      <div>[DATA] {kpis.length} indikatorer</div>
+                      <div>[GEO] {scope.level.toUpperCase()}: {scope.code}</div>
+                      <div>[STATUS] {criticalCount} kritiska, {warningCount} varningar</div>
+                      <div>[FLIK] Aktiv: {activeTab}</div>
+                    </div>
+                    <button 
+                      onClick={() => setActiveMode('diagnosis')}
+                      className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded text-sm font-mono"
+                    >
+                      [X] Stäng
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
-
-          {/* ADMIN MODE */}
-          {activeMode === 'admin' && (
-            <div className="flex-1 p-3 overflow-auto">
-              <SubscriptionDashboard />
-            </div>
+              )}
+            </>
           )}
         </main>
 
