@@ -1,0 +1,77 @@
+{
+  "app": {
+    "name": "DISSG",
+    "tagline": "Diagnostiskt Informationssystem för Samhällsstyrning",
+    "description": "Ett civilisatoriskt diagnostiksystem som behandlar världen som en fordonsflotta, länder som fordon och indikatorer som sensorer."
+  },
+  "nav": {
+    "dashboard": "Översikt",
+    "indicators": "Indikatorer",
+    "regions": "Regioner",
+    "timeline": "Tidslinje",
+    "analysis": "Analys",
+    "settings": "Inställningar",
+    "documentation": "Dokumentation"
+  },
+  "auth": {
+    "signIn": "Logga in",
+    "signUp": "Skapa konto",
+    "signOut": "Logga ut",
+    "email": "E-post",
+    "password": "Lösenord",
+    "forgotPassword": "Glömt lösenord?",
+    "noAccount": "Har du inget konto?",
+    "hasAccount": "Har du redan ett konto?"
+  },
+  "tiers": {
+    "guest": "Gäst",
+    "observer": "Observatör",
+    "analyst": "Analytiker",
+    "institutional": "Institutionell",
+    "guestDesc": "Begränsad tillgång till offentlig data",
+    "observerDesc": "Full transparens, grundläggande funktioner",
+    "analystDesc": "Scenariolab, export, API-åtkomst",
+    "institutionalDesc": "Företagsfunktioner, teamkonton"
+  },
+  "actions": {
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "confirm": "Bekräfta",
+    "delete": "Ta bort",
+    "edit": "Redigera",
+    "view": "Visa",
+    "export": "Exportera",
+    "import": "Importera",
+    "filter": "Filtrera",
+    "search": "Sök",
+    "refresh": "Uppdatera"
+  },
+  "status": {
+    "loading": "Laddar...",
+    "error": "Ett fel uppstod",
+    "success": "Klart",
+    "noData": "Ingen data tillgänglig",
+    "updating": "Uppdaterar..."
+  },
+  "regions": {
+    "global": "Globalt",
+    "europe": "Europa",
+    "northAmerica": "Nordamerika",
+    "asia": "Asien",
+    "africa": "Afrika",
+    "southAmerica": "Sydamerika",
+    "oceania": "Oceanien"
+  },
+  "governance": {
+    "observation": "Observation",
+    "mechanism": "Mekanism",
+    "method": "Metod",
+    "limitations": "Begränsningar",
+    "rawData": "Rådata"
+  },
+  "disclaimers": {
+    "noAdvice": "Denna plattform ger inga policyrekommendationer.",
+    "observational": "Allt innehåll är observationsbaserad beslutsstödsinfrastruktur.",
+    "userResponsibility": "Tolkning och beslut vilar helt på användaren."
+  }
+}
