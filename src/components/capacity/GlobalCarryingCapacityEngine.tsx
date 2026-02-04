@@ -19,6 +19,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronRight, Clock } from 'lucide-react';
 import { ExpandableBadge } from '@/components/ui/ExpandableBadge';
+import { EnergyBaselineCard, EnergyConsequenceCard } from '@/components/ui/ExpandableStatementCard';
 import { DescriptiveMetricCard } from '@/components/ui/MiniSparkline';
 import {
   ExpandableInfoAlert,
@@ -309,20 +310,8 @@ const EnergyHonestyPanel: React.FC = () => (
       </CardDescription>
     </CardHeader>
     <CardContent className="space-y-4">
-      <div className="p-4 bg-background rounded-lg">
-        <p className="text-sm font-medium mb-2">Baslinje:</p>
-        <p className="text-sm text-muted-foreground">
-          {ENERGY_HONESTY.baseline.sv.replace('{x}', '21')}
-        </p>
-      </div>
-      
-      <div className="p-4 bg-background rounded-lg border-l-4 border-primary">
-        <p className="text-sm font-medium mb-2">Konsekvens:</p>
-        <p className="text-sm text-muted-foreground">
-          {ENERGY_HONESTY.consequence.sv}
-        </p>
-      </div>
-      
+      <EnergyBaselineCard energyValue={21} />
+      <EnergyConsequenceCard />
       <PhysicalLawAlert statement={ENERGY_HONESTY.physics.sv} />
     </CardContent>
   </Card>
