@@ -20,10 +20,7 @@ import {
   ChevronRight,
   BookOpen,
   FileText,
-  ExternalLink,
   Database,
-  CheckCircle2,
-  AlertTriangle,
   Atom,
   Scale,
 } from 'lucide-react';
@@ -308,87 +305,307 @@ export const ExpandableBadge: React.FC<ExpandableBadgeProps> = ({
             </Card>
           )}
           
-          {/* Sources */}
+          {/* Sources - CLICKABLE with real links */}
           {evidence.sources.length > 0 && (
             <Card>
               <CardHeader className="pb-2 pt-3">
-                <CardTitle className="text-xs flex items-center gap-2">
-                  <FileText className="h-3.5 w-3.5 text-blue-500" />
-                  Källor ({evidence.sources.length})
+                <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                  KÄLLOR ({evidence.sources.length})
                 </CardTitle>
               </CardHeader>
               <CardContent className="pb-3 space-y-2">
                 {evidence.sources.map((source, idx) => (
-                  <div key={idx} className="flex items-start gap-2 p-2 rounded bg-muted/30">
-                    {getSourceIcon(source.type)}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">{source.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {source.source}{source.year && ` (${source.year})`}
-                      </p>
-                    </div>
-                    {source.url && (
-                      <Button variant="ghost" size="sm" className="h-6 px-2" asChild>
-                        <a href={source.url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      </Button>
-                    )}
-                  </div>
+                  <ClickableSource key={idx} source={source} />
                 ))}
               </CardContent>
             </Card>
           )}
           
-          {/* What this proves / Limitations */}
-          <div className="grid gap-3 md:grid-cols-2">
-            {evidence.whatThisProves.length > 0 && (
-              <Card className="bg-green-50/30 dark:bg-green-950/10 border-green-200/50">
-                <CardHeader className="pb-1 pt-2">
-                  <CardTitle className="text-xs flex items-center gap-2 text-green-700 dark:text-green-400">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    Detta visar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <ul className="space-y-0.5">
-                    {evidence.whatThisProves.map((point, idx) => (
-                      <li key={idx} className="text-xs flex items-start gap-1.5">
-                        <span className="text-green-500 mt-0.5">✓</span>
-                        {point}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
-            
-            {evidence.limitations.length > 0 && (
-              <Card className="bg-amber-50/30 dark:bg-amber-950/10 border-amber-200/50">
-                <CardHeader className="pb-1 pt-2">
-                  <CardTitle className="text-xs flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                    <AlertTriangle className="h-3.5 w-3.5" />
-                    Begränsningar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <ul className="space-y-0.5">
-                    {evidence.limitations.map((point, idx) => (
-                      <li key={idx} className="text-xs flex items-start gap-1.5">
-                        <span className="text-amber-500 mt-0.5">⚠</span>
-                        {point}
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+          {/* What this proves - CLICKABLE for deeper understanding */}
+          {evidence.whatThisProves.length > 0 && (
+            <Card className="bg-green-50/30 dark:bg-green-950/10 border-green-200/50">
+              <CardHeader className="pb-1 pt-2">
+                <CardTitle className="text-xs font-mono uppercase tracking-wider text-green-700 dark:text-green-400">
+                  DETTA VISAR
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Klicka på varje punkt för att förstå varför
+                </p>
+              </CardHeader>
+              <CardContent className="pb-2 space-y-1">
+                {evidence.whatThisProves.map((point, idx) => (
+                  <ClickableProofPoint 
+                    key={idx} 
+                    point={point} 
+                    type="proof"
+                    parentContext={evidence.title}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Limitations - CLICKABLE for deeper understanding */}
+          {evidence.limitations.length > 0 && (
+            <Card className="bg-amber-50/30 dark:bg-amber-950/10 border-amber-200/50">
+              <CardHeader className="pb-1 pt-2">
+                <CardTitle className="text-xs font-mono uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                  BEGRÄNSNINGAR
+                </CardTitle>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Klicka för att förstå vad detta betyder
+                </p>
+              </CardHeader>
+              <CardContent className="pb-2 space-y-1">
+                {evidence.limitations.map((point, idx) => (
+                  <ClickableProofPoint 
+                    key={idx} 
+                    point={point} 
+                    type="limitation"
+                    parentContext={evidence.title}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </DialogContent>
     </Dialog>
   );
 };
+
+// ═══════════════════════════════════════════════════════════════
+// CLICKABLE SOURCE COMPONENT
+// ═══════════════════════════════════════════════════════════════
+
+interface ClickableSourceProps {
+  source: BadgeEvidence['sources'][0];
+}
+
+const ClickableSource: React.FC<ClickableSourceProps> = ({ source }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Generate Google Scholar search URL if no direct URL
+  const searchUrl = source.url || 
+    `https://scholar.google.com/scholar?q=${encodeURIComponent(source.title + ' ' + source.source)}`;
+  
+  return (
+    <div className="border rounded-lg overflow-hidden">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full flex items-start gap-2 p-2 hover:bg-muted/50 transition-colors text-left"
+      >
+        {getSourceIcon(source.type)}
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium">{source.title}</p>
+          <p className="text-xs text-muted-foreground">
+            {source.source}{source.year && ` (${source.year})`}
+          </p>
+        </div>
+        <span className="text-xs opacity-50">{isExpanded ? '−' : '+'}</span>
+      </button>
+      
+      {isExpanded && (
+        <div className="p-3 bg-muted/30 border-t space-y-3">
+          <div>
+            <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
+              VAD DENNA KÄLLA HANDLAR OM
+            </p>
+            <p className="text-xs">
+              {getSourceExplanation(source)}
+            </p>
+          </div>
+          
+          <div>
+            <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
+              VARFÖR VI ANVÄNDER DEN
+            </p>
+            <p className="text-xs">
+              {getSourceRelevance(source)}
+            </p>
+          </div>
+          
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="text-xs h-7" asChild>
+              <a href={searchUrl} target="_blank" rel="noopener noreferrer">
+                Läs källan →
+              </a>
+            </Button>
+            <Button variant="ghost" size="sm" className="text-xs h-7" asChild>
+              <a 
+                href={`https://scholar.google.com/scholar?q=${encodeURIComponent(source.title)}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                Sök fler studier
+              </a>
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+function getSourceExplanation(source: BadgeEvidence['sources'][0]): string {
+  const explanations: Record<string, string> = {
+    'study': 'En vetenskaplig studie som har granskats av andra forskare (peer review) innan publicering.',
+    'report': 'En officiell rapport från en organisation som samlar in och analyserar data.',
+    'book': 'En bok skriven av experter inom området, ofta med djupare analys än kortare artiklar.',
+    'data': 'Ren statistik och siffror från officiella datakällor.',
+    'law': 'Lagtext eller officiellt regelverk som styr hur saker fungerar.'
+  };
+  return explanations[source.type] || 'En källa som ger evidens för påståendet.';
+}
+
+function getSourceRelevance(source: BadgeEvidence['sources'][0]): string {
+  if (source.title.toLowerCase().includes('stiglitz') || source.title.toLowerCase().includes('mismeasuring')) {
+    return 'Stiglitz-kommissionen (med två Nobelpristagare) fick i uppdrag att utreda alternativ till BNP. Deras slutsatser är brett accepterade.';
+  }
+  if (source.title.toLowerCase().includes('spirit level')) {
+    return 'The Spirit Level visade med data från 23 länder att ojämlikhet korrelerar med sämre hälsa, brottslighet och livskvalitet.';
+  }
+  if (source.title.toLowerCase().includes('capability')) {
+    return 'Amartya Sen fick Nobelpriset i ekonomi för sitt arbete med "capability approach" – att mäta vad människor faktiskt kan göra.';
+  }
+  return `Denna källa är relevant för att den ger ${source.type === 'data' ? 'hårda siffror' : 'vetenskapligt stöd'} för påståendet.`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLICKABLE PROOF/LIMITATION POINT
+// ═══════════════════════════════════════════════════════════════
+
+interface ClickableProofPointProps {
+  point: string;
+  type: 'proof' | 'limitation';
+  parentContext: string;
+}
+
+const ClickableProofPoint: React.FC<ClickableProofPointProps> = ({ point, type, parentContext }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const explanation = getPointExplanation(point, type, parentContext);
+  
+  return (
+    <div className="border rounded overflow-hidden">
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={cn(
+          "w-full flex items-start gap-2 p-2 text-left transition-colors",
+          type === 'proof' 
+            ? "hover:bg-green-100/50 dark:hover:bg-green-900/20" 
+            : "hover:bg-amber-100/50 dark:hover:bg-amber-900/20"
+        )}
+      >
+        <span className={cn(
+          "mt-0.5 shrink-0",
+          type === 'proof' ? "text-green-500" : "text-amber-500"
+        )}>
+          {type === 'proof' ? '✓' : '⚠'}
+        </span>
+        <span className="text-xs flex-1">{point}</span>
+        <span className="text-xs opacity-50">{isExpanded ? '−' : '+'}</span>
+      </button>
+      
+      {isExpanded && (
+        <div className={cn(
+          "p-3 border-t space-y-2",
+          type === 'proof' 
+            ? "bg-green-50/50 dark:bg-green-950/20" 
+            : "bg-amber-50/50 dark:bg-amber-950/20"
+        )}>
+          <div>
+            <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
+              VAD BETYDER DETTA?
+            </p>
+            <p className="text-xs">{explanation.meaning}</p>
+          </div>
+          
+          <div>
+            <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
+              VARFÖR ÄR DET VIKTIGT?
+            </p>
+            <p className="text-xs">{explanation.importance}</p>
+          </div>
+          
+          {explanation.example && (
+            <div>
+              <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-1">
+                EXEMPEL
+              </p>
+              <p className="text-xs italic">{explanation.example}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface PointExplanation {
+  meaning: string;
+  importance: string;
+  example?: string;
+}
+
+function getPointExplanation(point: string, type: 'proof' | 'limitation', context: string): PointExplanation {
+  // BNP-related explanations
+  if (point.toLowerCase().includes('bnp') && point.toLowerCase().includes('korrelerar')) {
+    return {
+      meaning: 'När ett land blir rikare (mätt i BNP) så blir inte människor automatiskt lyckligare eller friskare efter en viss nivå.',
+      importance: 'Det visar att pengar inte löser allt. Efter att grundbehoven är täckta spelar andra saker större roll – som relationer, hälsa och frihet.',
+      example: 'USA har mycket högre BNP per person än Costa Rica, men Costa Rica har nästan samma förväntade livslängd och högre självrapporterad lycka.'
+    };
+  }
+  
+  if (point.toLowerCase().includes('fördelning')) {
+    return {
+      meaning: 'Det spelar större roll hur pengarna fördelas mellan människor än hur mycket pengar ett land totalt har.',
+      importance: 'Ett land kan ha hög BNP men ändå ha många fattiga om pengarna är ojämnt fördelade.',
+      example: 'Brasilien har hög BNP men stor ojämlikhet. Sverige har lägre BNP men jämnare fördelning och högre livskvalitet för de flesta.'
+    };
+  }
+  
+  if (point.toLowerCase().includes('negativa externaliteter')) {
+    return {
+      meaning: '"Externaliteter" är effekter som inte syns i prislappen. Föroreningar är negativt men kan öka BNP (fabriker producerar mer). Att städa upp föroreningar ökar också BNP!',
+      importance: 'BNP räknar både problemet och lösningen som "tillväxt". Det betyder att BNP kan stiga även när samhället faktiskt mår sämre.',
+      example: 'En oljeolycka sänker inte BNP – tvärtom. Städningen, sjukvården och reparationerna räknas som ekonomisk aktivitet.'
+    };
+  }
+  
+  // Limitation explanations
+  if (point.toLowerCase().includes('fortfarande nödvändigt') || point.toLowerCase().includes('resursfördelning')) {
+    return {
+      meaning: 'Även om BNP inte mäter välbefinnande perfekt, behöver vi ändå resurser. Pengar köper mat, medicin och tak över huvudet.',
+      importance: 'Kritik mot BNP betyder inte att ekonomi är oviktigt – det betyder att vi behöver fler mått, inte färre.',
+      example: 'Ett fattigt land behöver först öka sin BNP för att kunna erbjuda grundläggande vård och utbildning.'
+    };
+  }
+  
+  if (point.toLowerCase().includes('svårare att mäta')) {
+    return {
+      meaning: 'Det är lättare att räkna pengar än att mäta lycka, frihet eller mening. Alternativa mått är mer komplicerade.',
+      importance: 'Enklare mått vinner ofta över bättre mått, även om de bättre måtten ger en sannare bild.',
+      example: 'BNP beräknas varje kvartal. Ett "lyckoindex" kräver omfattande enkäter och subjektiva bedömningar.'
+    };
+  }
+  
+  // Generic explanations based on type
+  if (type === 'proof') {
+    return {
+      meaning: `Detta är något som data och forskning visar inom området "${context}".`,
+      importance: 'Det hjälper oss förstå hur verkligheten fungerar, inte bara hur vi tror att den fungerar.',
+      example: undefined
+    };
+  } else {
+    return {
+      meaning: `Detta är en begränsning vi måste ha i åtanke när vi tolkar information om "${context}".`,
+      importance: 'Ingen mätning är perfekt. Att veta begränsningarna hjälper oss undvika felaktiga slutsatser.',
+      example: undefined
+    };
+  }
+}
 
 // Export registry for external use
 export { BADGE_EVIDENCE_REGISTRY };
