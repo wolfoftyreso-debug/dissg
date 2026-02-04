@@ -36,6 +36,7 @@ export type DiagnosticStep =
   | 'correlation_verification'
   | 'lambda_projection'
   | 'action_classes'
+  | 'simulation'
   | 'report_generation';
 
 export const DIAGNOSTIC_STEPS: DiagnosticStep[] = [
@@ -47,6 +48,7 @@ export const DIAGNOSTIC_STEPS: DiagnosticStep[] = [
   'correlation_verification',
   'lambda_projection',
   'action_classes',
+  'simulation',
   'report_generation',
 ];
 
@@ -59,6 +61,7 @@ export const STEP_LABELS: Record<DiagnosticStep, { sv: string; en: string }> = {
   correlation_verification: { sv: '6. Verifiering', en: '6. Verification' },
   lambda_projection: { sv: '7. Systemstatus', en: '7. System Status' },
   action_classes: { sv: '8. Åtgärdsklasser', en: '8. Action Classes' },
+  simulation: { sv: '9. Simulering', en: '9. Simulation' },
   report_generation: { sv: 'Rapport', en: 'Report' },
 };
 

@@ -13,6 +13,7 @@ export { StepProbableCauses } from './steps/StepProbableCauses';
 export { StepCorrelationVerification } from './steps/StepCorrelationVerification';
 export { StepLambdaProjection } from './steps/StepLambdaProjection';
 export { StepActionClasses } from './steps/StepActionClasses';
+export { StepSimulation } from './steps/StepSimulation';
 export { StepReportGeneration } from './steps/StepReportGeneration';
 
 // Types

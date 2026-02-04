@@ -18,6 +18,7 @@ import { StepProbableCauses } from './steps/StepProbableCauses';
 import { StepCorrelationVerification } from './steps/StepCorrelationVerification';
 import { StepLambdaProjection } from './steps/StepLambdaProjection';
 import { StepActionClasses } from './steps/StepActionClasses';
+import { StepSimulation } from './steps/StepSimulation';
 import { StepReportGeneration } from './steps/StepReportGeneration';
 import {
   createDiagnosticCase,
@@ -29,7 +30,7 @@ import {
   getProjectionData,
   getActionClasses,
 } from './mockData';
-import { DIAGNOSTIC_STEPS, STEP_LABELS, type DiagnosticStep, type DiagnosticCase } from './types';
+import { DIAGNOSTIC_STEPS, STEP_LABELS, type DiagnosticCase } from './types';
 import type { LambdaAxis } from '@/lib/lambda/lambda-1.0';
 
 interface GuidedDiagnosticsProps {
@@ -61,6 +62,7 @@ export function GuidedDiagnostics({
   const [secondaryAxes, setSecondaryAxes] = useState<LambdaAxis[]>([]);
   const [causes, setCauses] = useState<ReturnType<typeof getProbableCauses>>([]);
   const [faultCodes, setFaultCodes] = useState<ReturnType<typeof getGEDIFaultCodes>>([]);
+  const [actionClasses, setActionClasses] = useState<ReturnType<typeof getActionClasses>>([]);
 
   // Progress calculation
   const progress = ((currentStepIndex + 1) / DIAGNOSTIC_STEPS.length) * 100;
@@ -90,6 +92,7 @@ export function GuidedDiagnostics({
     // Load data for next steps
     setCauses(getProbableCauses(geoCode, primary));
     setFaultCodes(getGEDIFaultCodes(geoCode));
+    setActionClasses(getActionClasses(primary));
     goToNextStep();
   }, [geoCode, goToNextStep]);
 
@@ -168,10 +171,24 @@ export function GuidedDiagnostics({
       case 'action_classes':
         return primaryAxis ? (
           <StepActionClasses
-            actionClasses={getActionClasses(primaryAxis)}
+            actionClasses={actionClasses}
             onConfirm={goToNextStep}
           />
         ) : null;
+
+      case 'simulation':
+        return (
+          <StepSimulation
+            actionClasses={actionClasses}
+            currentLambda={diagnosticCase.lambdaDeviation > 0 
+              ? 1 + (diagnosticCase.lambdaDeviation / 100)
+              : 1 - (Math.abs(diagnosticCase.lambdaDeviation) / 100)
+            }
+            isPro={isPro}
+            onConfirm={() => goToNextStep()}
+            onSkip={goToNextStep}
+          />
+        );
 
       case 'report_generation':
         return primaryAxis ? (

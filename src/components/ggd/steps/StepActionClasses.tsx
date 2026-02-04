@@ -31,7 +31,7 @@ export function StepActionClasses({ actionClasses, onConfirm }: StepActionClasse
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-6">
-        <Badge variant="outline" className="mb-4 font-mono">STEG 8 / 8</Badge>
+        <Badge variant="outline" className="mb-4 font-mono">STEG 8 / 10</Badge>
         <h2 className="text-2xl font-bold mb-2">Åtgärdsklasser</h2>
         <p className="text-muted-foreground">
           Historiskt effektiva åtgärdskategorier baserat på empiriska data
@@ -149,7 +149,7 @@ export function StepActionClasses({ actionClasses, onConfirm }: StepActionClasse
           onClick={onConfirm}
           className="font-mono"
         >
-          Generera diagnosrapport
+          Fortsätt till simulering
           <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
