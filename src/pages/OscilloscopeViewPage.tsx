@@ -1,17 +1,17 @@
 /**
- * OSCILLOSCOPE VIEW PAGE
+ * OSCILLOSCOPE VIEW PAGE - Pedagogisk version
  * 
- * Full-page oscilloscope mode for viewing societal signals as raw waveforms.
- * No interpretation - just signal traces like an ECU diagnostic.
+ * En "pulstagare" för samhället - som en hjärtmonitor fast för hela Sverige.
+ * Designad så en 15-åring kan förstå och använda den.
  */
 
 import React, { useState, useEffect } from 'react';
 import { OscilloscopeView } from '@/components/lambda';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Activity, Zap, AlertTriangle, TrendingUp, TrendingDown, Minus, Radio } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 import {
   type OscilloscopeConfig,
   type SignalTrace,
@@ -20,7 +20,6 @@ import {
   type TimeBase,
   type OscilloscopeChannel,
 } from '@/lib/lambda/oscilloscope-mode';
-import { cn } from '@/lib/utils';
 
 // Generate synthetic signal data for demo
 function generateSignalData(points: number, baseValue: number, volatility: number): number[] {
@@ -57,55 +56,233 @@ function createChannel(id: string, label: string, color: string): OscilloscopeCh
   };
 }
 
-// Demo signal presets
-const SIGNAL_PRESETS: Array<{ id: string; name: string; channels: OscilloscopeChannel[] }> = [
+// Signal presets med enkla förklaringar
+const SIGNAL_PRESETS: Array<{ 
+  id: string; 
+  name: string; 
+  simpleExplanation: string;
+  channels: OscilloscopeChannel[];
+}> = [
   {
     id: 'economic',
-    name: 'Ekonomiska signaler',
+    name: 'Pengasignaler',
+    simpleExplanation: 'Visar hur det går för Sveriges ekonomi - tjänar folk pengar, har de jobb?',
     channels: [
-      createChannel('gdp', 'BNP-tillväxt', 'hsl(142, 76%, 45%)'),
-      createChannel('employment', 'Sysselsättning', 'hsl(217, 91%, 60%)'),
-      createChannel('inflation', 'Inflation', 'hsl(24, 95%, 53%)'),
+      createChannel('gdp', 'Hur rika vi blir (BNP)', 'hsl(142, 76%, 45%)'),
+      createChannel('employment', 'Hur många som har jobb', 'hsl(217, 91%, 60%)'),
+      createChannel('inflation', 'Hur dyrt allt blir', 'hsl(24, 95%, 53%)'),
     ],
   },
   {
     id: 'demographic',
-    name: 'Demografiska signaler',
+    name: 'Befolkningssignaler',
+    simpleExplanation: 'Visar hur Sveriges befolkning förändras - föds barn, flyttar folk hit?',
     channels: [
-      createChannel('population', 'Befolkning', 'hsl(263, 70%, 50%)'),
-      createChannel('birth_rate', 'Födelseantal', 'hsl(330, 81%, 60%)'),
-      createChannel('migration', 'Nettomigration', 'hsl(172, 66%, 50%)'),
+      createChannel('population', 'Antal människor', 'hsl(263, 70%, 50%)'),
+      createChannel('birth_rate', 'Hur många barn föds', 'hsl(330, 81%, 60%)'),
+      createChannel('migration', 'Flytt till/från Sverige', 'hsl(172, 66%, 50%)'),
     ],
   },
   {
     id: 'health',
     name: 'Hälsosignaler',
+    simpleExplanation: 'Visar hur friska svenskarna är - lever vi länge, mår vi bra?',
     channels: [
-      createChannel('life_exp', 'Livslängd', 'hsl(142, 76%, 45%)'),
-      createChannel('healthcare_load', 'Vårdbelastning', 'hsl(0, 84%, 60%)'),
+      createChannel('life_exp', 'Hur länge vi lever', 'hsl(142, 76%, 45%)'),
+      createChannel('healthcare_load', 'Tryck på sjukvården', 'hsl(0, 84%, 60%)'),
       createChannel('mental_health', 'Psykisk hälsa', 'hsl(270, 70%, 60%)'),
     ],
   },
   {
     id: 'education',
-    name: 'Utbildningssignaler',
+    name: 'Skolsignaler',
+    simpleExplanation: 'Visar hur det går i skolan - lär sig eleverna, hoppar någon av?',
     channels: [
       createChannel('literacy', 'PISA-resultat', 'hsl(217, 91%, 60%)'),
-      createChannel('enrollment', 'Inskrivning', 'hsl(142, 76%, 45%)'),
-      createChannel('dropout', 'Avhopp', 'hsl(0, 84%, 60%)'),
+      createChannel('enrollment', 'Antal i skolan', 'hsl(142, 76%, 45%)'),
+      createChannel('dropout', 'Som hoppar av', 'hsl(0, 84%, 60%)'),
     ],
   },
 ];
 
-// Signal diagnostics
-const SIGNAL_DIAGNOSTICS = [
-  { code: 'SIG-001', description: 'Hög volatilitet i BNP-signal', severity: 'warning' as const },
-  { code: 'SIG-002', description: 'Fas-förskjutning mellan sysselsättning och tillväxt', severity: 'info' as const },
-  { code: 'SIG-003', description: 'Anomali detekterad i migrationsdata', severity: 'critical' as const },
-  { code: 'SIG-004', description: 'Signal-brus ratio låg för hälsoindex', severity: 'warning' as const },
-];
+// Pedagogisk onboarding-komponent
+const WelcomeCard: React.FC<{ onDismiss: () => void }> = ({ onDismiss }) => (
+  <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/30 mb-6">
+    <CardContent className="p-6">
+      <div className="flex items-start gap-4">
+        <span className="text-4xl">💓</span>
+        <div className="flex-1">
+          <h2 className="text-xl font-bold mb-2">Vad är detta?</h2>
+          <p className="text-muted-foreground mb-4">
+            Tänk dig en <strong className="text-foreground">hjärtmonitor på sjukhus</strong> - den visar 
+            hjärtats slag som en våglinje. Den här sidan gör samma sak, fast för <strong className="text-foreground">hela Sverige</strong>!
+          </p>
+          <div className="grid sm:grid-cols-3 gap-4 mb-4">
+            <div className="p-3 rounded-lg bg-background/80">
+              <p className="font-medium mb-1">[↑] Linjen går uppåt</p>
+              <p className="text-sm text-muted-foreground">= Det ökar (fler jobb, mer pengar, osv.)</p>
+            </div>
+            <div className="p-3 rounded-lg bg-background/80">
+              <p className="font-medium mb-1">[↓] Linjen går nedåt</p>
+              <p className="text-sm text-muted-foreground">= Det minskar</p>
+            </div>
+            <div className="p-3 rounded-lg bg-background/80">
+              <p className="font-medium mb-1">[~] Linjen hoppar mycket</p>
+              <p className="text-sm text-muted-foreground">= Ostadig situation</p>
+            </div>
+          </div>
+          <Button onClick={onDismiss} className="w-full sm:w-auto">
+            Jag fattar – visa mig signalerna
+          </Button>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+// Hjälp-dialog med visuella förklaringar
+const HelpDialog: React.FC = () => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button variant="outline" size="sm" className="gap-2">
+        [?] Hur läser jag detta?
+      </Button>
+    </DialogTrigger>
+    <DialogContent className="max-w-lg">
+      <DialogHeader>
+        <DialogTitle>Så här läser du signalerna</DialogTitle>
+      </DialogHeader>
+      <div className="space-y-6">
+        <div className="space-y-3">
+          <h3 className="font-semibold">De olika linjerna</h3>
+          <p className="text-sm text-muted-foreground">
+            Varje färgad linje representerar en mätning. Klicka på en linjes namn 
+            längst ner för att dölja/visa den.
+          </p>
+        </div>
+        
+        <div className="space-y-3">
+          <h3 className="font-semibold">Vad betyder rörelserna?</h3>
+          <div className="grid gap-2 text-sm">
+            <div className="flex items-center gap-3 p-2 rounded bg-muted/50">
+              <span className="text-lg">📈</span>
+              <div>
+                <p className="font-medium">Uppåt = ökning</p>
+                <p className="text-muted-foreground">Värdet växer (t.ex. fler jobb)</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-2 rounded bg-muted/50">
+              <span className="text-lg">📉</span>
+              <div>
+                <p className="font-medium">Nedåt = minskning</p>
+                <p className="text-muted-foreground">Värdet krymper</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-2 rounded bg-muted/50">
+              <span className="text-lg">📊</span>
+              <div>
+                <p className="font-medium">Hoppig linje = osäkerhet</p>
+                <p className="text-muted-foreground">Mycket förändring, svårare att förutsäga</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-2 rounded bg-muted/50">
+              <span className="text-lg">➡️</span>
+              <div>
+                <p className="font-medium">Rak linje = stabilt</p>
+                <p className="text-muted-foreground">Inte mycket förändring</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="space-y-3">
+          <h3 className="font-semibold">Det suddiga området</h3>
+          <p className="text-sm text-muted-foreground">
+            Den genomskinliga ytan runt varje linje visar <strong>osäkerheten</strong> i mätningen. 
+            Bredare = mer osäker data. Smalare = pålitligare data.
+          </p>
+        </div>
+        
+        <div className="p-3 rounded-lg border bg-amber-500/10 border-amber-500/30">
+          <p className="text-sm">
+            <strong className="text-amber-700">Kom ihåg:</strong> Bara för att två linjer rör sig 
+            samtidigt betyder det inte att den ena <em>orsakar</em> den andra. Det kan vara slump!
+          </p>
+        </div>
+      </div>
+    </DialogContent>
+  </Dialog>
+);
+
+// Preset-kort med tydlig förklaring
+const PresetCard: React.FC<{
+  preset: typeof SIGNAL_PRESETS[0];
+  isActive: boolean;
+  onClick: () => void;
+}> = ({ preset, isActive, onClick }) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      'p-4 rounded-lg border text-left transition-all w-full',
+      isActive 
+        ? 'border-primary bg-primary/5 ring-2 ring-primary/20' 
+        : 'border-border hover:border-primary/50 hover:bg-muted/50'
+    )}
+  >
+    <p className="font-semibold mb-1">{preset.name}</p>
+    <p className="text-sm text-muted-foreground">{preset.simpleExplanation}</p>
+    <div className="flex gap-2 mt-3">
+      {preset.channels.map(ch => (
+        <div 
+          key={ch.id} 
+          className="w-3 h-3 rounded-full" 
+          style={{ backgroundColor: ch.color }}
+          title={ch.label}
+        />
+      ))}
+    </div>
+  </button>
+);
+
+// Enkel signalstatus
+const SignalStatusCard: React.FC<{
+  channel: OscilloscopeChannel;
+  trace: SignalTrace | undefined;
+}> = ({ channel, trace }) => {
+  if (!trace) return null;
+  
+  const current = trace.values[trace.values.length - 1] || 0;
+  const prev = trace.values[trace.values.length - 2] || current;
+  const change = current - prev;
+  const isUp = change > 0.5;
+  const isDown = change < -0.5;
+  
+  return (
+    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+      <div 
+        className="w-4 h-4 rounded-full shrink-0"
+        style={{ backgroundColor: channel.color }}
+      />
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-sm truncate">{channel.label}</p>
+      </div>
+      <div className="text-right">
+        <p className="font-mono font-bold text-lg">{current.toFixed(0)}</p>
+        <p className={cn(
+          'text-xs font-mono',
+          isUp && 'text-emerald-600',
+          isDown && 'text-red-600',
+          !isUp && !isDown && 'text-muted-foreground'
+        )}>
+          {isUp ? '[↑]' : isDown ? '[↓]' : '[→]'} {isUp && '+'}{change.toFixed(1)}
+        </p>
+      </div>
+    </div>
+  );
+};
 
 export default function OscilloscopeViewPage() {
+  const [showWelcome, setShowWelcome] = useState(true);
   const [activePreset, setActivePreset] = useState(SIGNAL_PRESETS[0]);
   const [timeBase, setTimeBase] = useState<TimeBase>('1y');
   const [traces, setTraces] = useState<SignalTrace[]>([]);
@@ -120,19 +297,7 @@ export default function OscilloscopeViewPage() {
     show_warning_thresholds: true,
   };
   
-  const warnings: SignalWarning[] = [
-    {
-      channel_id: 'gdp',
-      signal_type: 'amplitude',
-      status: 'warning',
-      value: 2.3,
-      threshold: 3.0,
-      message_sv: 'Ökad volatilitet senaste 6 månader',
-      message_en: 'Increased volatility last 6 months',
-      first_detected: new Date().toISOString(),
-      duration_hours: 48,
-    },
-  ];
+  const warnings: SignalWarning[] = [];
   
   const systemStatus: SystemStatus = {
     overall_health: 'stable',
@@ -182,48 +347,54 @@ export default function OscilloscopeViewPage() {
   
   return (
     <div className="min-h-screen bg-background">
-      <div className="container max-w-7xl mx-auto py-8 px-4">
+      <div className="container max-w-6xl mx-auto py-8 px-4">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
-            <div className="flex items-center gap-3">
-              <Activity className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl font-bold">Oscilloskop-läge</h1>
-              {isLive && (
-                <Badge variant="destructive" className="animate-pulse">
-                  <Radio className="h-3 w-3 mr-1" />
-                  LIVE
-                </Badge>
-              )}
-            </div>
-            <p className="text-muted-foreground mt-2 max-w-2xl">
-              Råa signalspår utan tolkning. Systemet visar vad som mäts – inte vad det betyder.
-              Som att läsa av en ECU-diagnostik för civilisationen.
+            <h1 className="text-3xl font-bold mb-2">Sveriges Pulstagare</h1>
+            <p className="text-muted-foreground max-w-xl">
+              Se hur det går för Sverige i realtid. Linjerna visar mätningar som uppdateras hela tiden.
             </p>
           </div>
           
-          <Button
-            variant={isLive ? "destructive" : "outline"}
-            onClick={() => setIsLive(!isLive)}
-          >
-            <Zap className="h-4 w-4 mr-2" />
-            {isLive ? 'Stoppa live' : 'Starta live'}
-          </Button>
+          <div className="flex items-center gap-2">
+            <HelpDialog />
+            <Button
+              variant={isLive ? "destructive" : "default"}
+              onClick={() => setIsLive(!isLive)}
+              className="gap-2"
+            >
+              {isLive ? (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  Stoppa live
+                </>
+              ) : (
+                '[▶] Starta live'
+              )}
+            </Button>
+          </div>
         </div>
         
-        {/* Signal preset tabs */}
-        <Tabs value={activePreset.id} onValueChange={(v) => {
-          const preset = SIGNAL_PRESETS.find(p => p.id === v);
-          if (preset) setActivePreset(preset);
-        }}>
-          <TabsList className="mb-4">
+        {/* Welcome onboarding */}
+        {showWelcome && <WelcomeCard onDismiss={() => setShowWelcome(false)} />}
+        
+        {/* Preset selection - mobile friendly */}
+        <div className="mb-6">
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">
+            Vad vill du se? Välj en kategori:
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {SIGNAL_PRESETS.map(preset => (
-              <TabsTrigger key={preset.id} value={preset.id}>
-                {preset.name}
-              </TabsTrigger>
+              <PresetCard
+                key={preset.id}
+                preset={preset}
+                isActive={activePreset.id === preset.id}
+                onClick={() => setActivePreset(preset)}
+              />
             ))}
-          </TabsList>
-        </Tabs>
+          </div>
+        </div>
         
         {/* Main oscilloscope */}
         <OscilloscopeView
@@ -236,102 +407,52 @@ export default function OscilloscopeViewPage() {
           language="sv"
         />
         
-        {/* Signal diagnostics */}
-        <div className="grid md:grid-cols-2 gap-6 mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5" />
-                Signaldiagnostik
-              </CardTitle>
-              <CardDescription>Automatiskt detekterade signalavvikelser</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {SIGNAL_DIAGNOSTICS.map((diag, idx) => (
-                  <div 
-                    key={idx}
-                    className={cn(
-                      "p-3 rounded-lg border flex items-start gap-3",
-                      diag.severity === 'critical' && "bg-destructive/10 border-destructive/30",
-                      diag.severity === 'warning' && "bg-orange-500/10 border-orange-500/30",
-                      diag.severity === 'info' && "bg-blue-500/10 border-blue-500/30",
-                    )}
-                  >
-                    <code className="text-xs font-mono text-muted-foreground shrink-0">
-                      {diag.code}
-                    </code>
-                    <span className="text-sm">{diag.description}</span>
-                    <Badge 
-                      variant={diag.severity === 'critical' ? 'destructive' : 'secondary'}
-                      className="ml-auto shrink-0"
-                    >
-                      {diag.severity === 'critical' ? 'Kritisk' : 
-                       diag.severity === 'warning' ? 'Varning' : 'Info'}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Signal metrics */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Signalmetrik</CardTitle>
-              <CardDescription>Tekniska mätvärden för aktiva kanaler</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {activePreset.channels.filter(c => c.visible).map((channel) => {
-                  const trace = traces.find(t => t.channel_id === channel.id);
-                  if (!trace) return null;
-                  
-                  const current = trace.values[trace.values.length - 1] || 0;
-                  const prev = trace.values[trace.values.length - 2] || current;
-                  const change = current - prev;
-                  const avg = trace.values.reduce((a, b) => a + b, 0) / trace.values.length;
-                  const volatility = Math.sqrt(
-                    trace.values.reduce((sum, v) => sum + Math.pow(v - avg, 2), 0) / trace.values.length
-                  );
-                  
-                  return (
-                    <div key={channel.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-                      <div 
-                        className="w-3 h-3 rounded-full shrink-0"
-                        style={{ backgroundColor: channel.color }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm truncate">{channel.label}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Volatilitet: {volatility.toFixed(1)} | Snitt: {avg.toFixed(1)}
-                        </div>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <div className="font-mono font-bold">{current.toFixed(1)}</div>
-                        <div className={cn(
-                          "text-xs flex items-center gap-1 justify-end",
-                          change > 0 ? "text-green-500" : change < 0 ? "text-red-500" : "text-muted-foreground"
-                        )}>
-                          {change > 0 ? <TrendingUp className="h-3 w-3" /> : 
-                           change < 0 ? <TrendingDown className="h-3 w-3" /> : 
-                           <Minus className="h-3 w-3" />}
-                          {change > 0 ? '+' : ''}{change.toFixed(2)}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Simple signal cards */}
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold mb-3">Just nu visar signalerna:</h2>
+          <div className="grid sm:grid-cols-3 gap-3">
+            {activePreset.channels.filter(c => c.visible).map(channel => (
+              <SignalStatusCard
+                key={channel.id}
+                channel={channel}
+                trace={traces.find(t => t.channel_id === channel.id)}
+              />
+            ))}
+          </div>
         </div>
         
-        {/* Footer disclaimer */}
-        <div className="mt-8 p-4 rounded-lg border bg-muted/30 text-sm text-muted-foreground text-center">
-          <strong>Oscilloskop-principer:</strong> Visa, tolka inte • Korrelation ≠ kausalitet • 
-          Signalen ÄR datan • Brus är information • Ingen politisk färg
+        {/* Time selector - simpler */}
+        <div className="mt-6">
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">
+            Hur långt tillbaka vill du se?
+          </h2>
+          <Tabs value={timeBase} onValueChange={(v) => setTimeBase(v as TimeBase)}>
+            <TabsList>
+              <TabsTrigger value="1m">1 månad</TabsTrigger>
+              <TabsTrigger value="3m">3 månader</TabsTrigger>
+              <TabsTrigger value="1y">1 år</TabsTrigger>
+              <TabsTrigger value="5y">5 år</TabsTrigger>
+              <TabsTrigger value="10y">10 år</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
+        
+        {/* Footer with important disclaimer */}
+        <Card className="mt-8 border-amber-500/30 bg-amber-500/5">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">⚠️</span>
+              <div>
+                <p className="font-semibold text-amber-700 mb-1">Viktigt att förstå</p>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• <strong>Korrelation ≠ orsak:</strong> Bara för att två linjer går åt samma håll betyder det inte att den ena påverkar den andra</li>
+                  <li>• <strong>Data är inte hela sanningen:</strong> Det finns alltid saker som inte går att mäta</li>
+                  <li>• <strong>Titta på trenden, inte enskilda hopp:</strong> Ett tillfälligt hopp kan vara slump</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
