@@ -287,25 +287,35 @@ export function KPIDetailPanel({ kpi, onClose }: KPIDetailPanelProps) {
 
         {/* Datakällor */}
         <section className="space-y-2">
-          <h3 className="section-header">Datakällor</h3>
+          <h3 className="section-header font-mono">[DATAKÄLLOR]</h3>
           <div className="space-y-2">
-            {kpi.dataSources.map((source, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between rounded-sm border border-border bg-card p-3"
-              >
-                <div className="flex items-center gap-2">
-                  <Database className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground">{source.name}</span>
+            {kpi.dataSources && kpi.dataSources.length > 0 ? (
+              kpi.dataSources.map((source, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between rounded-sm border border-border bg-card p-3"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs text-muted-foreground">[SRC]</span>
+                    <span className="text-sm text-foreground">{source.name}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-muted-foreground font-mono">
+                      [{source.updateFrequency?.toUpperCase() || 'N/A'}]
+                    </span>
+                    <ConfidenceBar value={source.reliability} />
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground">
-                    {source.updateFrequency}
-                  </span>
-                  <ConfidenceBar value={source.reliability} />
-                </div>
+              ))
+            ) : (
+              <div className="rounded-sm border border-dashed border-border bg-muted/30 p-4 text-center">
+                <p className="text-sm text-muted-foreground font-mono">—</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Inga verifierade datakällor konfigurerade
+                </p>
+                <p className="text-xs font-mono text-status-warning mt-2">[NO_SOURCES]</p>
               </div>
-            ))}
+            )}
           </div>
         </section>
       </div>
