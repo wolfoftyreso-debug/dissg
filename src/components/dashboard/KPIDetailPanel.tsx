@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { KPI } from '@/types/kpi';
 import { StatusBadge } from './StatusBadge';
 import { TrendIndicator } from './TrendIndicator';
@@ -5,18 +6,21 @@ import { ConfidenceBar } from './ConfidenceBar';
 import { ForecastPanel } from './ForecastPanel';
 import { DecisionSupportPanel } from './DecisionSupportPanel';
 import { HistoryPanel } from './HistoryPanel';
+import { ResponsibilityDrilldown } from './ResponsibilityDrilldown';
 import { 
   X, 
   AlertTriangle, 
-  Database, 
   Clock, 
   MapPin, 
-  Users, 
-  ChevronRight,
-  Building2,
-  FileText
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+interface ResponsibilityLevel {
+  type: 'primary' | 'secondary' | 'operational';
+  label: string;
+  entity: string;
+}
 
 interface KPIDetailPanelProps {
   kpi: KPI;
@@ -63,12 +67,22 @@ const DEPARTMENT_MAP: Record<string, { primary: string; secondary: string; opera
 };
 
 export function KPIDetailPanel({ kpi, onClose }: KPIDetailPanelProps) {
+  const [selectedResponsibility, setSelectedResponsibility] = useState<ResponsibilityLevel | null>(null);
   const dept = DEPARTMENT_MAP[kpi.category] || DEPARTMENT_MAP.systemrisk_styrning;
   
   // Real data only - no simulation
   // These values will come from verified database sources
   const weeksNegative: number | null = null; // Will be populated from kpi_values
   const hasRegisteredActions: boolean | null = null; // Will be populated from policy_actions
+
+  const handleResponsibilityClick = (type: 'primary' | 'secondary' | 'operational', entity: string) => {
+    const labels = {
+      primary: 'Primärt ansvar',
+      secondary: 'Sekundärt ansvar',
+      operational: 'Operativ nivå',
+    };
+    setSelectedResponsibility({ type, label: labels[type], entity });
+  };
 
   return (
     <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[28rem] lg:w-[32rem] xl:w-[36rem] overflow-y-auto border-l border-border bg-background shadow-xl animate-in slide-in-from-right-full duration-300">
@@ -187,42 +201,51 @@ export function KPIDetailPanel({ kpi, onClose }: KPIDetailPanelProps) {
 
         {/* D. Ansvar - Systemets ryggrad */}
         <section className="space-y-2">
-          <h3 className="section-header">Ansvar</h3>
+          <h3 className="section-header font-mono">[ANSVAR]</h3>
           <div className="space-y-2">
             {/* Primärt ansvar */}
-            <button className="flex w-full items-center justify-between rounded-sm border border-border bg-card p-3 text-left hover:bg-muted/50 transition-colors">
+            <button 
+              onClick={() => handleResponsibilityClick('primary', dept.primary)}
+              className="flex w-full items-center justify-between rounded-sm border border-border bg-card p-3 text-left hover:bg-muted/50 hover:border-primary/50 transition-colors group"
+            >
               <div className="flex items-center gap-3">
-                <Building2 className="h-4 w-4 text-primary" />
+                <span className="font-mono text-xs text-primary">[P]</span>
                 <div>
                   <p className="text-sm font-medium text-foreground">Primärt ansvar</p>
                   <p className="text-xs text-muted-foreground">{dept.primary}</p>
                 </div>
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              <span className="font-mono text-xs text-muted-foreground group-hover:text-primary transition-colors">[→]</span>
             </button>
             
             {/* Sekundärt ansvar */}
-            <button className="flex w-full items-center justify-between rounded-sm border border-border bg-card p-3 text-left hover:bg-muted/50 transition-colors">
+            <button 
+              onClick={() => handleResponsibilityClick('secondary', dept.secondary)}
+              className="flex w-full items-center justify-between rounded-sm border border-border bg-card p-3 text-left hover:bg-muted/50 hover:border-primary/50 transition-colors group"
+            >
               <div className="flex items-center gap-3">
-                <Building2 className="h-4 w-4 text-muted-foreground" />
+                <span className="font-mono text-xs text-muted-foreground">[S]</span>
                 <div>
                   <p className="text-sm font-medium text-foreground">Sekundärt ansvar</p>
                   <p className="text-xs text-muted-foreground">{dept.secondary}</p>
                 </div>
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              <span className="font-mono text-xs text-muted-foreground group-hover:text-primary transition-colors">[→]</span>
             </button>
             
             {/* Operativt ansvar */}
-            <button className="flex w-full items-center justify-between rounded-sm border border-border bg-card p-3 text-left hover:bg-muted/50 transition-colors">
+            <button 
+              onClick={() => handleResponsibilityClick('operational', dept.operational)}
+              className="flex w-full items-center justify-between rounded-sm border border-border bg-card p-3 text-left hover:bg-muted/50 hover:border-primary/50 transition-colors group"
+            >
               <div className="flex items-center gap-3">
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <span className="font-mono text-xs text-muted-foreground">[O]</span>
                 <div>
                   <p className="text-sm font-medium text-foreground">Operativ nivå</p>
                   <p className="text-xs text-muted-foreground">{dept.operational}</p>
                 </div>
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              <span className="font-mono text-xs text-muted-foreground group-hover:text-primary transition-colors">[→]</span>
             </button>
           </div>
         </section>
@@ -319,6 +342,13 @@ export function KPIDetailPanel({ kpi, onClose }: KPIDetailPanelProps) {
           </div>
         </section>
       </div>
+
+      {/* Responsibility Drilldown Modal */}
+      <ResponsibilityDrilldown
+        responsibility={selectedResponsibility}
+        onClose={() => setSelectedResponsibility(null)}
+        kpiCode={kpi.id}
+      />
     </div>
   );
 }
