@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { GeoProvider } from "@/contexts/GeoContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { SpotlessProvider } from "@/context/SpotlessContext";
 import { InfiniteDepthProvider, DepthExplorer } from "@/components/data";
@@ -96,9 +97,10 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <AuthProvider>
-        <SpotlessProvider>
-          <InfiniteDepthProvider>
-            <TruthLayerProvider>
+        <GeoProvider>
+          <SpotlessProvider>
+            <InfiniteDepthProvider>
+              <TruthLayerProvider>
               <TooltipProvider>
               <Toaster />
               <Sonner />
@@ -207,7 +209,8 @@ const App = () => (
             </TruthLayerProvider>
           </InfiniteDepthProvider>
         </SpotlessProvider>
-      </AuthProvider>
+      </GeoProvider>
+    </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
