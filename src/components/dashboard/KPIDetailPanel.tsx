@@ -70,7 +70,7 @@ export function KPIDetailPanel({ kpi, onClose }: KPIDetailPanelProps) {
   const hasRegisteredActions = Math.random() > 0.6;
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg overflow-y-auto border-l border-border bg-background shadow-lg">
+    <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[28rem] lg:w-[32rem] xl:w-[36rem] overflow-y-auto border-l border-border bg-background shadow-xl animate-in slide-in-from-right-full duration-300">
       {/* Header - Klar rubrik */}
       <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background px-4 py-3">
         <div>
