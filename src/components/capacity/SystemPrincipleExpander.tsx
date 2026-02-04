@@ -20,23 +20,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import {
-  Info,
-  ChevronDown,
-  FileText,
-  Database,
-  Scale,
-  TrendingUp,
-  Clock,
-  AlertTriangle,
-  CheckCircle2,
-  Atom,
-} from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { ExpandableSourceDocument } from '@/components/ui/ExpandableSourceDocument';
 import { ExpandableHistoricalEvent } from '@/components/ui/ExpandableHistoricalEvent';
+import { ExpandableIndicatorBadge } from '@/components/ui/ExpandableIndicatorBadge';
 
 // ═══════════════════════════════════════════════════════════════
 // PRINCIPLE EVIDENCE DATA
@@ -308,11 +298,10 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
             isOpen && "border-primary ring-1 ring-primary/20",
             className
           )}>
-            <Info className="h-4 w-4" />
             <AlertDescription className="text-sm">
               <div className="flex items-center justify-between">
                 <span>
-                  <strong>Systemprincip: </strong>
+                  <Badge variant="secondary" className="mr-2 font-mono text-xs">PRINCIP</Badge>
                   {evidence.summary}
                 </span>
                 <div className="flex items-center gap-2 ml-4">
@@ -334,9 +323,8 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
         {/* Scientific Basis */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Atom className="h-4 w-4 text-purple-500" />
-              Vetenskaplig grund
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              VETENSKAPLIG GRUND
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -347,9 +335,8 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
         {/* Source Documents - Now Expandable */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <FileText className="h-4 w-4 text-blue-500" />
-              Källdokument ({evidence.documents.length})
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              KÄLLDOKUMENT ({evidence.documents.length})
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -377,9 +364,8 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
         {/* Historical Context - Now Expandable */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Clock className="h-4 w-4 text-amber-500" />
-              Historisk kontext ({evidence.historicalContext.length})
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              HISTORISK KONTEXT ({evidence.historicalContext.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -404,9 +390,8 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
         {/* Related Indicators from Database */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              Relaterade indikatorer
+            <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+              RELATERADE INDIKATORER
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -418,22 +403,21 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
             ) : relatedKpis && relatedKpis.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {relatedKpis.map((kpi: any) => (
-                  <Badge 
-                    key={kpi.id} 
-                    variant="outline" 
-                    className="cursor-pointer hover:bg-primary/10"
-                  >
-                    {kpi.name_sv || kpi.name}
-                    {kpi.unit && <span className="text-muted-foreground ml-1">({kpi.unit})</span>}
-                  </Badge>
+                  <ExpandableIndicatorBadge 
+                    key={kpi.id}
+                    code={kpi.code || kpi.id}
+                    displayName={kpi.name_sv || kpi.name}
+                    unit={kpi.unit}
+                  />
                 ))}
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {evidence.relatedIndicators.map((code) => (
-                  <Badge key={code} variant="outline">
-                    {code.replace(/_/g, ' ')}
-                  </Badge>
+                  <ExpandableIndicatorBadge 
+                    key={code}
+                    code={code}
+                  />
                 ))}
               </div>
             )}
@@ -444,9 +428,8 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="bg-green-50/50 dark:bg-green-950/20 border-green-200">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2 text-green-700 dark:text-green-400">
-                <CheckCircle2 className="h-4 w-4" />
-                Detta bevisar
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-green-700 dark:text-green-400">
+                DETTA BEVISAR
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -463,9 +446,8 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
           
           <Card className="bg-amber-50/50 dark:bg-amber-950/20 border-amber-200">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                <AlertTriangle className="h-4 w-4" />
-                Begränsningar
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                BEGRÄNSNINGAR
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -485,9 +467,8 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
         {constitutionArticles && constitutionArticles.length > 0 && (
           <Card className="bg-muted/30">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Scale className="h-4 w-4 text-amber-500" />
-                Relaterade artiklar i Datakonstitutionen
+              <CardTitle className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                RELATERADE ARTIKLAR I DATAKONSTITUTIONEN
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -507,11 +488,9 @@ export const ExpandablePrinciple: React.FC<ExpandablePrincipleProps> = ({
         )}
         
         {/* Data Source Footer */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Database className="h-3 w-3" />
-          <span>
-            Källor: Vetenskapliga publikationer, officiella rapporter, internationella organisationer
-          </span>
+        <div className="text-xs text-muted-foreground border-t pt-3 mt-2">
+          <span className="font-mono uppercase tracking-wider">KÄLLOR:</span>
+          <span className="ml-2">Vetenskapliga publikationer, officiella rapporter, internationella organisationer</span>
         </div>
       </CollapsibleContent>
     </Collapsible>
