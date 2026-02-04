@@ -1,98 +1,358 @@
 /**
+ * ═══════════════════════════════════════════════════════════════════════════════
  * COMPLETE DATA AGGREGATION MANIFEST
+ * Machine-Readable Data Source Registry
+ * ═══════════════════════════════════════════════════════════════════════════════
  * 
- * Defines ALL data sources the system should aggregate.
+ * VERSION: 2.0.0
+ * LAST_UPDATED: 2026-02-04
+ * SCHEMA: https://schema.org/Dataset
+ * 
+ * This manifest defines ALL data sources the system aggregates.
  * Organized by ingestion channel per architecture specification.
  * 
  * CHANNELS:
- * A - Official APIs (structured, verified, empirical)
- * B - Semi-official/Real-time (non-empirical, flagged)
- * C - Document extraction (PDFs, reports, claims)
- * D - Aggregated external (pre-processed datasets)
+ * ┌─────────┬────────────────────────────────────────────────────────────────────┐
+ * │ CHANNEL │ DESCRIPTION                                                        │
+ * ├─────────┼────────────────────────────────────────────────────────────────────┤
+ * │ A       │ Official APIs (structured, verified, empirical)                   │
+ * │ B       │ Semi-official/Real-time (non-empirical, flagged)                  │
+ * │ C       │ Document extraction (PDFs, reports, claims)                       │
+ * │ D       │ Aggregated external (pre-processed datasets)                      │
+ * └─────────┴────────────────────────────────────────────────────────────────────┘
+ * 
+ * MACHINE-READABLE EXPORTS:
+ * - toSchemaOrg(): Export as Schema.org/Dataset JSON-LD
+ * - toSDMX(): Export as SDMX-ML structure
+ * - validate(): Run structural validation
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════════
  */
 
 // =============================================================================
-// DATA DOMAINS - What we measure
+// TYPE DEFINITIONS - Strict enumerated types for machine parsing
 // =============================================================================
 
-export type DataDomain = 
-  | 'demographics'      // Population, age, migration, fertility
-  | 'economy'           // GDP, employment, trade, prices
-  | 'health'            // Mortality, morbidity, healthcare access
-  | 'education'         // Enrollment, attainment, literacy
-  | 'environment'       // Emissions, energy, resources, climate
-  | 'governance'        // Transparency, rule of law, elections
-  | 'infrastructure'    // Transport, digital, utilities
-  | 'social'            // Inequality, poverty, crime, housing
-  | 'security'          // Defense, conflicts, terrorism
-  | 'technology'        // R&D, patents, innovation
-  | 'culture'           // Media, heritage, tourism
-  | 'finance'           // Markets, banking, debt;
+/**
+ * DATA DOMAINS
+ * Taxonomic classification of what is measured.
+ * Maps to SDMX concept scheme.
+ */
+export const DATA_DOMAIN_CODES = [
+  'demographics',
+  'economy', 
+  'health',
+  'education',
+  'environment',
+  'governance',
+  'infrastructure',
+  'social',
+  'security',
+  'technology',
+  'culture',
+  'finance'
+] as const;
 
-export type DataChannel = 'A' | 'B' | 'C' | 'D';
+export type DataDomain = typeof DATA_DOMAIN_CODES[number];
 
-export type DataTier = 
-  | 'tier_1'  // Primary official (national statistics offices)
-  | 'tier_2'  // Secondary official (international organizations)
-  | 'tier_3'  // Academic/research verified
-  | 'tier_4'  // Commercial/monitored;
+export const DATA_DOMAIN_LABELS: Record<DataDomain, { en: string; sv: string; sdmxCode: string }> = {
+  demographics: { en: 'Demographics', sv: 'Demografi', sdmxCode: 'POP' },
+  economy: { en: 'Economy', sv: 'Ekonomi', sdmxCode: 'ECO' },
+  health: { en: 'Health', sv: 'Hälsa', sdmxCode: 'HLT' },
+  education: { en: 'Education', sv: 'Utbildning', sdmxCode: 'EDU' },
+  environment: { en: 'Environment', sv: 'Miljö & Klimat', sdmxCode: 'ENV' },
+  governance: { en: 'Governance', sv: 'Styrning & Demokrati', sdmxCode: 'GOV' },
+  infrastructure: { en: 'Infrastructure', sv: 'Infrastruktur', sdmxCode: 'INF' },
+  social: { en: 'Social Conditions', sv: 'Sociala förhållanden', sdmxCode: 'SOC' },
+  security: { en: 'Security', sv: 'Säkerhet', sdmxCode: 'SEC' },
+  technology: { en: 'Technology', sv: 'Teknologi & Innovation', sdmxCode: 'TEC' },
+  culture: { en: 'Culture', sv: 'Kultur & Media', sdmxCode: 'CUL' },
+  finance: { en: 'Finance', sv: 'Finansmarknader', sdmxCode: 'FIN' }
+};
 
-export type UpdateFrequency = 
-  | 'realtime'    // < 1 minute
-  | 'hourly'      // Every hour
-  | 'daily'       // Every day
-  | 'weekly'      // Every week
-  | 'monthly'     // Every month
-  | 'quarterly'   // Every quarter
-  | 'annual'      // Every year
-  | 'irregular';  // No fixed schedule
+/**
+ * DATA CHANNELS
+ * Ingestion pathway classification.
+ */
+export const DATA_CHANNEL_CODES = ['A', 'B', 'C', 'D'] as const;
+export type DataChannel = typeof DATA_CHANNEL_CODES[number];
 
-export type GeographicScope = 
-  | 'global'        // Worldwide coverage
-  | 'continental'   // Regional blocs (EU, ASEAN, etc.)
-  | 'national'      // Country-level
-  | 'subnational'   // Regions, provinces
-  | 'municipal'     // Cities, municipalities
-  | 'granular';     // Point data, addresses
-
-// =============================================================================
-// DATA SOURCE REGISTRY
-// =============================================================================
-
-export interface DataSourceDefinition {
-  id: string;
+export const DATA_CHANNEL_METADATA: Record<DataChannel, {
   name: string;
+  description: string;
+  isEmpirical: boolean;
+  trustLevel: 'high' | 'medium' | 'low';
+  pipelineSteps: string[];
+}> = {
+  A: {
+    name: 'Official Statistical APIs',
+    description: 'Primary official sources - national statistics offices and international organizations',
+    isEmpirical: true,
+    trustLevel: 'high',
+    pipelineSteps: ['fetch', 'validate_schema', 'normalize', 'version', 'publish']
+  },
+  B: {
+    name: 'Real-time & Market Feeds',
+    description: 'Semi-official and commercial real-time data streams',
+    isEmpirical: false,
+    trustLevel: 'medium',
+    pipelineSteps: ['fetch', 'flag_non_empirical', 'validate', 'normalize', 'version', 'publish']
+  },
+  C: {
+    name: 'Document Extraction',
+    description: 'PDFs, reports, legislation - claim extraction pipeline',
+    isEmpirical: true,
+    trustLevel: 'medium',
+    pipelineSteps: ['fetch', 'ocr', 'claim_extract', 'verify_claim', 'normalize', 'version', 'publish']
+  },
+  D: {
+    name: 'Aggregated Datasets',
+    description: 'Pre-processed academic and research datasets',
+    isEmpirical: true,
+    trustLevel: 'medium',
+    pipelineSteps: ['fetch', 'validate_methodology', 'cross_reference', 'normalize', 'version', 'publish']
+  }
+};
+
+/**
+ * DATA TIERS
+ * Source authority classification.
+ */
+export const DATA_TIER_CODES = ['tier_1', 'tier_2', 'tier_3', 'tier_4'] as const;
+export type DataTier = typeof DATA_TIER_CODES[number];
+
+export const DATA_TIER_METADATA: Record<DataTier, {
+  name: string;
+  description: string;
+  minReliabilityScore: number;
+  examples: string[];
+}> = {
+  tier_1: {
+    name: 'Primary Official',
+    description: 'National statistics offices, central banks, primary government agencies',
+    minReliabilityScore: 90,
+    examples: ['SCB', 'Eurostat', 'Census Bureau', 'Riksbank']
+  },
+  tier_2: {
+    name: 'Secondary Official',
+    description: 'International organizations, supranational bodies',
+    minReliabilityScore: 80,
+    examples: ['World Bank', 'IMF', 'WHO', 'OECD']
+  },
+  tier_3: {
+    name: 'Academic/Research',
+    description: 'Peer-reviewed research institutions and academic datasets',
+    minReliabilityScore: 70,
+    examples: ['Gapminder', 'Our World in Data', 'V-Dem']
+  },
+  tier_4: {
+    name: 'Commercial/Monitored',
+    description: 'Commercial providers requiring verification',
+    minReliabilityScore: 50,
+    examples: ['Yahoo Finance', 'Bloomberg', 'Refinitiv']
+  }
+};
+
+/**
+ * UPDATE FREQUENCY
+ * Data refresh cadence.
+ */
+export const UPDATE_FREQUENCY_CODES = [
+  'realtime',
+  'hourly',
+  'daily',
+  'weekly',
+  'monthly',
+  'quarterly',
+  'annual',
+  'irregular'
+] as const;
+
+export type UpdateFrequency = typeof UPDATE_FREQUENCY_CODES[number];
+
+export const UPDATE_FREQUENCY_METADATA: Record<UpdateFrequency, {
+  maxLatencyMs: number;
+  description: string;
+  iso8601Duration: string;
+}> = {
+  realtime: { maxLatencyMs: 60000, description: '< 1 minute', iso8601Duration: 'PT1M' },
+  hourly: { maxLatencyMs: 3600000, description: 'Every hour', iso8601Duration: 'PT1H' },
+  daily: { maxLatencyMs: 86400000, description: 'Every day', iso8601Duration: 'P1D' },
+  weekly: { maxLatencyMs: 604800000, description: 'Every week', iso8601Duration: 'P1W' },
+  monthly: { maxLatencyMs: 2678400000, description: 'Every month', iso8601Duration: 'P1M' },
+  quarterly: { maxLatencyMs: 7948800000, description: 'Every quarter', iso8601Duration: 'P3M' },
+  annual: { maxLatencyMs: 31536000000, description: 'Every year', iso8601Duration: 'P1Y' },
+  irregular: { maxLatencyMs: -1, description: 'No fixed schedule', iso8601Duration: '' }
+};
+
+/**
+ * GEOGRAPHIC SCOPE
+ * Spatial coverage classification.
+ */
+export const GEOGRAPHIC_SCOPE_CODES = [
+  'global',
+  'continental',
+  'national',
+  'subnational',
+  'municipal',
+  'granular'
+] as const;
+
+export type GeographicScope = typeof GEOGRAPHIC_SCOPE_CODES[number];
+
+export const GEOGRAPHIC_SCOPE_METADATA: Record<GeographicScope, {
+  nutsLevel: number | null;
+  description: string;
+}> = {
+  global: { nutsLevel: null, description: 'Worldwide coverage' },
+  continental: { nutsLevel: 0, description: 'Regional blocs (EU, ASEAN, etc.)' },
+  national: { nutsLevel: 0, description: 'Country-level' },
+  subnational: { nutsLevel: 2, description: 'Regions, provinces (NUTS-2)' },
+  municipal: { nutsLevel: 3, description: 'Cities, municipalities (NUTS-3/LAU)' },
+  granular: { nutsLevel: null, description: 'Point data, addresses' }
+};
+
+/**
+ * LICENSE TYPES
+ * Data usage rights classification.
+ */
+export const LICENSE_CODES = ['open', 'attribution', 'restricted', 'commercial'] as const;
+export type LicenseType = typeof LICENSE_CODES[number];
+
+export const LICENSE_METADATA: Record<LicenseType, {
+  spdxIdentifier: string | null;
+  requiresAttribution: boolean;
+  allowsRedistribution: boolean;
+  allowsCommercialUse: boolean;
+}> = {
+  open: {
+    spdxIdentifier: 'CC0-1.0',
+    requiresAttribution: false,
+    allowsRedistribution: true,
+    allowsCommercialUse: true
+  },
+  attribution: {
+    spdxIdentifier: 'CC-BY-4.0',
+    requiresAttribution: true,
+    allowsRedistribution: true,
+    allowsCommercialUse: true
+  },
+  restricted: {
+    spdxIdentifier: null,
+    requiresAttribution: true,
+    allowsRedistribution: false,
+    allowsCommercialUse: false
+  },
+  commercial: {
+    spdxIdentifier: null,
+    requiresAttribution: true,
+    allowsRedistribution: false,
+    allowsCommercialUse: true
+  }
+};
+
+/**
+ * API TYPES
+ * Technical interface classification.
+ */
+export const API_TYPE_CODES = ['rest', 'graphql', 'sdmx', 'odata', 'bulk', 'websocket'] as const;
+export type ApiType = typeof API_TYPE_CODES[number];
+
+// =============================================================================
+// DATA SOURCE DEFINITION - Core schema
+// =============================================================================
+
+/**
+ * Complete data source definition.
+ * Follows Schema.org/Dataset with extensions.
+ */
+export interface DataSourceDefinition {
+  /** Unique machine identifier (lowercase, underscore-separated) */
+  id: string;
+  
+  /** Human-readable full name */
+  name: string;
+  
+  /** Short code for display (uppercase) */
   shortName: string;
+  
+  /** Ingestion channel classification */
   channel: DataChannel;
+  
+  /** Authority tier */
   tier: DataTier;
+  
+  /** Subject matter domains */
   domains: DataDomain[];
   
-  // Coverage
+  // ─────────────────────────────────────────────────────────────────────────
+  // COVERAGE
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  /** Spatial coverage level */
   geographicScope: GeographicScope;
-  countries?: string[];  // ISO codes if not global
+  
+  /** ISO 3166-1 alpha-2 country codes (if not global) */
+  countries?: string[];
+  
+  /** Temporal coverage */
   temporalCoverage: {
-    start: string;  // YYYY or YYYY-MM
+    /** Start date (YYYY or YYYY-MM) */
+    start: string;
+    /** End date or 'present' */
     end: 'present' | string;
   };
   
-  // Technical
+  // ─────────────────────────────────────────────────────────────────────────
+  // TECHNICAL
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  /** Data refresh frequency */
   updateFrequency: UpdateFrequency;
+  
+  /** API endpoint URL */
   apiEndpoint?: string;
-  apiType?: 'rest' | 'graphql' | 'sdmx' | 'odata' | 'bulk';
+  
+  /** API type/protocol */
+  apiType?: ApiType;
+  
+  /** Authentication required */
   authRequired: boolean;
   
-  // Quality
+  // ─────────────────────────────────────────────────────────────────────────
+  // QUALITY
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  /** Empirical (measured) vs modeled/estimated */
   isEmpirical: boolean;
-  reliabilityScore: number;  // 0-100
+  
+  /** Reliability score (0-100) */
+  reliabilityScore: number;
+  
+  /** Methodology documentation URL */
   methodology?: string;
   
-  // Legal
-  license: 'open' | 'attribution' | 'restricted' | 'commercial';
+  // ─────────────────────────────────────────────────────────────────────────
+  // LEGAL
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  /** License type */
+  license: LicenseType;
+  
+  /** Citation required in outputs */
   citationRequired: boolean;
   
-  // Status
+  // ─────────────────────────────────────────────────────────────────────────
+  // STATUS
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  /** Source is active in ingestion */
   isActive: boolean;
+  
+  /** Last verification date (ISO 8601) */
   lastVerified?: string;
+  
+  /** Additional notes */
   notes?: string;
 }
 
@@ -101,7 +361,9 @@ export interface DataSourceDefinition {
 // =============================================================================
 
 export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
+  // ─────────────────────────────────────────────────────────────────────────
   // INTERNATIONAL ORGANIZATIONS
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 'eurostat',
     name: 'Eurostat - European Statistical Office',
@@ -117,9 +379,11 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     authRequired: false,
     isEmpirical: true,
     reliabilityScore: 95,
+    methodology: 'https://ec.europa.eu/eurostat/web/quality/european-quality-standards',
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Primary source for EU27+EFTA data'
   },
   {
@@ -137,9 +401,11 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     authRequired: false,
     isEmpirical: true,
     reliabilityScore: 90,
+    methodology: 'https://datahelpdesk.worldbank.org/knowledgebase/topics/19280-data-quality-and-effectiveness',
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'imf',
@@ -158,7 +424,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 92,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'oecd',
@@ -178,7 +445,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 93,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'who',
@@ -197,7 +465,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 88,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'ilo',
@@ -216,7 +485,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 88,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'un_data',
@@ -235,7 +505,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 90,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'fao',
@@ -254,10 +525,13 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 88,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
-  
-  // NATIONAL STATISTICS OFFICES (Priority Countries)
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // NATIONAL STATISTICS OFFICES
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 'scb',
     name: 'Statistiska centralbyrån (Sweden)',
@@ -274,9 +548,11 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     authRequired: false,
     isEmpirical: true,
     reliabilityScore: 98,
+    methodology: 'https://www.scb.se/om-scb/kvalitet/',
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Oldest continuous national statistics office (1749)'
   },
   {
@@ -297,7 +573,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 97,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'dst',
@@ -317,7 +594,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 97,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'tilastokeskus',
@@ -337,7 +615,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 97,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'ons',
@@ -357,7 +636,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 96,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'destatis',
@@ -377,7 +657,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 96,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'insee',
@@ -397,7 +678,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 95,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'cbs',
@@ -417,7 +699,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 97,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'bfs',
@@ -437,7 +720,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 97,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'census_us',
@@ -457,7 +741,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 94,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'bls',
@@ -477,7 +762,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 95,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'fred',
@@ -496,7 +782,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 96,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'abs',
@@ -516,7 +803,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 95,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'statcan',
@@ -536,7 +824,8 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
     reliabilityScore: 96,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   }
 ];
 
@@ -545,7 +834,9 @@ export const CHANNEL_A_SOURCES: DataSourceDefinition[] = [
 // =============================================================================
 
 export const CHANNEL_B_SOURCES: DataSourceDefinition[] = [
+  // ─────────────────────────────────────────────────────────────────────────
   // FINANCIAL MARKETS
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 'ecb_market',
     name: 'European Central Bank Market Data',
@@ -564,6 +855,7 @@ export const CHANNEL_B_SOURCES: DataSourceDefinition[] = [
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Exchange rates, interest rates, monetary aggregates'
   },
   {
@@ -584,10 +876,13 @@ export const CHANNEL_B_SOURCES: DataSourceDefinition[] = [
     license: 'commercial',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Stock prices, indices - NOT for critical analysis'
   },
-  
+
+  // ─────────────────────────────────────────────────────────────────────────
   // WEATHER & CLIMATE
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 'openmeteo',
     name: 'Open-Meteo Weather API',
@@ -606,6 +901,7 @@ export const CHANNEL_B_SOURCES: DataSourceDefinition[] = [
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Current weather and forecasts'
   },
   {
@@ -626,10 +922,13 @@ export const CHANNEL_B_SOURCES: DataSourceDefinition[] = [
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Satellite and reanalysis climate data'
   },
-  
+
+  // ─────────────────────────────────────────────────────────────────────────
   // ENERGY
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 'entsoe',
     name: 'ENTSO-E Transparency Platform',
@@ -648,6 +947,7 @@ export const CHANNEL_B_SOURCES: DataSourceDefinition[] = [
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'European electricity generation/consumption'
   },
   {
@@ -668,10 +968,13 @@ export const CHANNEL_B_SOURCES: DataSourceDefinition[] = [
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Global energy production/consumption'
   },
-  
+
+  // ─────────────────────────────────────────────────────────────────────────
   // TRANSPORT
+  // ─────────────────────────────────────────────────────────────────────────
   {
     id: 'flightradar',
     name: 'Flight Radar 24',
@@ -690,6 +993,7 @@ export const CHANNEL_B_SOURCES: DataSourceDefinition[] = [
     license: 'commercial',
     citationRequired: true,
     isActive: false,
+    lastVerified: '2026-02-01',
     notes: 'Live air traffic - commercial API'
   },
   {
@@ -702,18 +1006,19 @@ export const CHANNEL_B_SOURCES: DataSourceDefinition[] = [
     geographicScope: 'global',
     temporalCoverage: { start: '2010', end: 'present' },
     updateFrequency: 'realtime',
+    authRequired: true,
     isEmpirical: false,
     reliabilityScore: 70,
-    authRequired: true,
     license: 'commercial',
     citationRequired: true,
     isActive: false,
+    lastVerified: '2026-02-01',
     notes: 'Vessel tracking - commercial API'
   }
 ];
 
 // =============================================================================
-// CHANNEL C: DOCUMENT EXTRACTION (Claim-based)
+// CHANNEL C: DOCUMENT EXTRACTION
 // =============================================================================
 
 export const CHANNEL_C_SOURCES: DataSourceDefinition[] = [
@@ -728,12 +1033,13 @@ export const CHANNEL_C_SOURCES: DataSourceDefinition[] = [
     countries: ['SE'],
     temporalCoverage: { start: '1990', end: 'present' },
     updateFrequency: 'annual',
+    authRequired: false,
     isEmpirical: true,
     reliabilityScore: 98,
-    authRequired: false,
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'PDF extraction via claim pipeline'
   },
   {
@@ -747,12 +1053,13 @@ export const CHANNEL_C_SOURCES: DataSourceDefinition[] = [
     countries: ['SE'],
     temporalCoverage: { start: '1922', end: 'present' },
     updateFrequency: 'irregular',
+    authRequired: false,
     isEmpirical: true,
     reliabilityScore: 95,
-    authRequired: false,
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Official investigations and reports'
   },
   {
@@ -767,12 +1074,13 @@ export const CHANNEL_C_SOURCES: DataSourceDefinition[] = [
     updateFrequency: 'daily',
     apiEndpoint: 'https://eur-lex.europa.eu/eurlex-ws',
     apiType: 'rest',
+    authRequired: false,
     isEmpirical: true,
     reliabilityScore: 100,
-    authRequired: false,
     license: 'open',
     citationRequired: true,
-    isActive: true
+    isActive: true,
+    lastVerified: '2026-02-01'
   },
   {
     id: 'ipcc_reports',
@@ -784,12 +1092,13 @@ export const CHANNEL_C_SOURCES: DataSourceDefinition[] = [
     geographicScope: 'global',
     temporalCoverage: { start: '1990', end: 'present' },
     updateFrequency: 'irregular',
+    authRequired: false,
     isEmpirical: true,
     reliabilityScore: 90,
-    authRequired: false,
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Climate assessment reports'
   },
   {
@@ -805,12 +1114,13 @@ export const CHANNEL_C_SOURCES: DataSourceDefinition[] = [
     updateFrequency: 'monthly',
     apiEndpoint: 'https://www.riksbank.se/api',
     apiType: 'rest',
+    authRequired: false,
     isEmpirical: true,
     reliabilityScore: 98,
-    authRequired: false,
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Oldest central bank (1668)'
   }
 ];
@@ -830,12 +1140,13 @@ export const CHANNEL_D_SOURCES: DataSourceDefinition[] = [
     geographicScope: 'global',
     temporalCoverage: { start: '1800', end: 'present' },
     updateFrequency: 'annual',
+    authRequired: false,
     isEmpirical: true,
     reliabilityScore: 85,
-    authRequired: false,
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Curated historical datasets'
   },
   {
@@ -850,12 +1161,13 @@ export const CHANNEL_D_SOURCES: DataSourceDefinition[] = [
     updateFrequency: 'weekly',
     apiEndpoint: 'https://github.com/owid/owid-datasets',
     apiType: 'bulk',
+    authRequired: false,
     isEmpirical: true,
     reliabilityScore: 85,
-    authRequired: false,
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Pre-aggregated research datasets'
   },
   {
@@ -870,12 +1182,13 @@ export const CHANNEL_D_SOURCES: DataSourceDefinition[] = [
     updateFrequency: 'monthly',
     apiEndpoint: 'https://mortality.org',
     apiType: 'bulk',
+    authRequired: true,
     isEmpirical: true,
     reliabilityScore: 95,
-    authRequired: true,
     license: 'attribution',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Gold standard mortality data'
   },
   {
@@ -888,12 +1201,13 @@ export const CHANNEL_D_SOURCES: DataSourceDefinition[] = [
     geographicScope: 'global',
     temporalCoverage: { start: '1', end: 'present' },
     updateFrequency: 'annual',
+    authRequired: false,
     isEmpirical: true,
     reliabilityScore: 80,
-    authRequired: false,
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Historical GDP estimates from year 1'
   },
   {
@@ -906,12 +1220,13 @@ export const CHANNEL_D_SOURCES: DataSourceDefinition[] = [
     geographicScope: 'global',
     temporalCoverage: { start: '1789', end: 'present' },
     updateFrequency: 'annual',
+    authRequired: false,
     isEmpirical: true,
     reliabilityScore: 85,
-    authRequired: false,
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Academic democracy measurement'
   },
   {
@@ -924,12 +1239,13 @@ export const CHANNEL_D_SOURCES: DataSourceDefinition[] = [
     geographicScope: 'global',
     temporalCoverage: { start: '1996', end: 'present' },
     updateFrequency: 'annual',
+    authRequired: false,
     isEmpirical: true,
     reliabilityScore: 88,
-    authRequired: false,
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'World Bank governance metrics'
   },
   {
@@ -944,12 +1260,13 @@ export const CHANNEL_D_SOURCES: DataSourceDefinition[] = [
     updateFrequency: 'annual',
     apiEndpoint: 'https://ghsl.jrc.ec.europa.eu',
     apiType: 'bulk',
+    authRequired: false,
     isEmpirical: true,
     reliabilityScore: 90,
-    authRequired: false,
     license: 'open',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'Satellite-derived urbanization data'
   },
   {
@@ -962,12 +1279,13 @@ export const CHANNEL_D_SOURCES: DataSourceDefinition[] = [
     geographicScope: 'global',
     temporalCoverage: { start: '1990', end: 'present' },
     updateFrequency: 'annual',
+    authRequired: true,
     isEmpirical: true,
     reliabilityScore: 90,
-    authRequired: true,
     license: 'attribution',
     citationRequired: true,
     isActive: true,
+    lastVerified: '2026-02-01',
     notes: 'IHME disease burden estimates'
   }
 ];
@@ -976,91 +1294,123 @@ export const CHANNEL_D_SOURCES: DataSourceDefinition[] = [
 // COMPLETE MANIFEST
 // =============================================================================
 
-export const DATA_MANIFEST = {
-  version: '1.0.0',
-  lastUpdated: '2026-02-04',
+export interface ManifestStatistics {
+  totalSources: number;
+  activeSources: number;
+  tier1Sources: number;
+  tier2Sources: number;
+  tier3Sources: number;
+  tier4Sources: number;
+  empiricalSources: number;
+  byChannel: Record<DataChannel, number>;
+  byDomain: Record<DataDomain, number>;
+}
+
+function calculateStatistics(): ManifestStatistics {
+  const allSources = [
+    ...CHANNEL_A_SOURCES,
+    ...CHANNEL_B_SOURCES,
+    ...CHANNEL_C_SOURCES,
+    ...CHANNEL_D_SOURCES
+  ];
   
+  const byChannel: Record<DataChannel, number> = { A: 0, B: 0, C: 0, D: 0 };
+  const byDomain: Partial<Record<DataDomain, number>> = {};
+  
+  allSources.forEach(s => {
+    byChannel[s.channel]++;
+    s.domains.forEach(d => {
+      byDomain[d] = (byDomain[d] || 0) + 1;
+    });
+  });
+  
+  return {
+    totalSources: allSources.length,
+    activeSources: allSources.filter(s => s.isActive).length,
+    tier1Sources: allSources.filter(s => s.tier === 'tier_1').length,
+    tier2Sources: allSources.filter(s => s.tier === 'tier_2').length,
+    tier3Sources: allSources.filter(s => s.tier === 'tier_3').length,
+    tier4Sources: allSources.filter(s => s.tier === 'tier_4').length,
+    empiricalSources: allSources.filter(s => s.isEmpirical).length,
+    byChannel,
+    byDomain: byDomain as Record<DataDomain, number>
+  };
+}
+
+export const DATA_MANIFEST = {
+  // ─────────────────────────────────────────────────────────────────────────
+  // METADATA
+  // ─────────────────────────────────────────────────────────────────────────
+  '@context': 'https://schema.org',
+  '@type': 'DataCatalog',
+  version: '2.0.0',
+  lastUpdated: '2026-02-04T00:00:00Z',
+  schemaVersion: 'https://schema.org/Dataset',
+  
+  // ─────────────────────────────────────────────────────────────────────────
+  // CHANNELS
+  // ─────────────────────────────────────────────────────────────────────────
   channels: {
     A: {
-      name: 'Official Statistical APIs',
-      description: 'Primary official sources - national statistics offices and international organizations',
-      isEmpirical: true,
+      ...DATA_CHANNEL_METADATA.A,
       sources: CHANNEL_A_SOURCES
     },
     B: {
-      name: 'Real-time & Market Feeds',
-      description: 'Semi-official and commercial real-time data streams',
-      isEmpirical: false,
+      ...DATA_CHANNEL_METADATA.B,
       sources: CHANNEL_B_SOURCES
     },
     C: {
-      name: 'Document Extraction',
-      description: 'PDFs, reports, legislation - claim extraction pipeline',
-      isEmpirical: true,
+      ...DATA_CHANNEL_METADATA.C,
       sources: CHANNEL_C_SOURCES
     },
     D: {
-      name: 'Aggregated Datasets',
-      description: 'Pre-processed academic and research datasets',
-      isEmpirical: true,
+      ...DATA_CHANNEL_METADATA.D,
       sources: CHANNEL_D_SOURCES
     }
   },
   
-  domains: [
-    { id: 'demographics', name: 'Demografi', indicatorCount: 0 },
-    { id: 'economy', name: 'Ekonomi', indicatorCount: 0 },
-    { id: 'health', name: 'Hälsa', indicatorCount: 0 },
-    { id: 'education', name: 'Utbildning', indicatorCount: 0 },
-    { id: 'environment', name: 'Miljö & Klimat', indicatorCount: 0 },
-    { id: 'governance', name: 'Styrning & Demokrati', indicatorCount: 0 },
-    { id: 'infrastructure', name: 'Infrastruktur', indicatorCount: 0 },
-    { id: 'social', name: 'Sociala förhållanden', indicatorCount: 0 },
-    { id: 'security', name: 'Säkerhet', indicatorCount: 0 },
-    { id: 'technology', name: 'Teknologi & Innovation', indicatorCount: 0 },
-    { id: 'culture', name: 'Kultur & Media', indicatorCount: 0 },
-    { id: 'finance', name: 'Finansmarknader', indicatorCount: 0 }
-  ] as const,
+  // ─────────────────────────────────────────────────────────────────────────
+  // DOMAINS
+  // ─────────────────────────────────────────────────────────────────────────
+  domains: DATA_DOMAIN_CODES.map(id => ({
+    id,
+    ...DATA_DOMAIN_LABELS[id]
+  })),
   
-  // Statistics
-  get totalSources() {
-    return CHANNEL_A_SOURCES.length + 
-           CHANNEL_B_SOURCES.length + 
-           CHANNEL_C_SOURCES.length + 
-           CHANNEL_D_SOURCES.length;
-  },
-  
-  get activeSources() {
-    return [...CHANNEL_A_SOURCES, ...CHANNEL_B_SOURCES, ...CHANNEL_C_SOURCES, ...CHANNEL_D_SOURCES]
-      .filter(s => s.isActive).length;
-  },
-  
-  get tier1Sources() {
-    return [...CHANNEL_A_SOURCES, ...CHANNEL_B_SOURCES, ...CHANNEL_C_SOURCES, ...CHANNEL_D_SOURCES]
-      .filter(s => s.tier === 'tier_1').length;
-  }
+  // ─────────────────────────────────────────────────────────────────────────
+  // STATISTICS
+  // ─────────────────────────────────────────────────────────────────────────
+  statistics: calculateStatistics()
 };
 
 // =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
 
-export function getSourcesByDomain(domain: DataDomain): DataSourceDefinition[] {
+/**
+ * Get all sources as flat array
+ */
+export function getAllSources(): DataSourceDefinition[] {
   return [
     ...CHANNEL_A_SOURCES,
     ...CHANNEL_B_SOURCES,
     ...CHANNEL_C_SOURCES,
     ...CHANNEL_D_SOURCES
-  ].filter(s => s.domains.includes(domain) && s.isActive);
+  ];
 }
 
+/**
+ * Get sources by domain
+ */
+export function getSourcesByDomain(domain: DataDomain): DataSourceDefinition[] {
+  return getAllSources().filter(s => s.domains.includes(domain) && s.isActive);
+}
+
+/**
+ * Get sources by country (ISO 3166-1 alpha-2)
+ */
 export function getSourcesByCountry(countryCode: string): DataSourceDefinition[] {
-  return [
-    ...CHANNEL_A_SOURCES,
-    ...CHANNEL_B_SOURCES,
-    ...CHANNEL_C_SOURCES,
-    ...CHANNEL_D_SOURCES
-  ].filter(s => 
+  return getAllSources().filter(s => 
     s.isActive && 
     (s.geographicScope === 'global' || 
      s.geographicScope === 'continental' ||
@@ -1068,6 +1418,9 @@ export function getSourcesByCountry(countryCode: string): DataSourceDefinition[]
   );
 }
 
+/**
+ * Get sources by channel
+ */
 export function getSourcesByChannel(channel: DataChannel): DataSourceDefinition[] {
   switch (channel) {
     case 'A': return CHANNEL_A_SOURCES.filter(s => s.isActive);
@@ -1077,22 +1430,210 @@ export function getSourcesByChannel(channel: DataChannel): DataSourceDefinition[
   }
 }
 
-export function getEmpiricalSources(): DataSourceDefinition[] {
-  return [
-    ...CHANNEL_A_SOURCES,
-    ...CHANNEL_B_SOURCES,
-    ...CHANNEL_C_SOURCES,
-    ...CHANNEL_D_SOURCES
-  ].filter(s => s.isEmpirical && s.isActive);
+/**
+ * Get sources by tier
+ */
+export function getSourcesByTier(tier: DataTier): DataSourceDefinition[] {
+  return getAllSources().filter(s => s.tier === tier && s.isActive);
 }
 
-export function getSourceReliability(sourceId: string): number {
-  const source = [
-    ...CHANNEL_A_SOURCES,
-    ...CHANNEL_B_SOURCES,
-    ...CHANNEL_C_SOURCES,
-    ...CHANNEL_D_SOURCES
-  ].find(s => s.id === sourceId);
+/**
+ * Get empirical sources only
+ */
+export function getEmpiricalSources(): DataSourceDefinition[] {
+  return getAllSources().filter(s => s.isEmpirical && s.isActive);
+}
+
+/**
+ * Get source reliability score
+ */
+export function getSourceReliability(sourceId: string): number | null {
+  const source = getAllSources().find(s => s.id === sourceId);
+  return source?.reliabilityScore ?? null;
+}
+
+/**
+ * Get source by ID
+ */
+export function getSourceById(sourceId: string): DataSourceDefinition | undefined {
+  return getAllSources().find(s => s.id === sourceId);
+}
+
+// =============================================================================
+// VALIDATION FUNCTIONS
+// =============================================================================
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+/**
+ * Validate a single data source definition
+ */
+export function validateSource(source: DataSourceDefinition): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
   
-  return source?.reliabilityScore ?? 0;
+  // Required fields
+  if (!source.id || !/^[a-z][a-z0-9_]*$/.test(source.id)) {
+    errors.push(`Invalid source ID: ${source.id} (must be lowercase snake_case)`);
+  }
+  
+  if (!source.name || source.name.length < 3) {
+    errors.push(`Invalid source name: ${source.name}`);
+  }
+  
+  if (!DATA_CHANNEL_CODES.includes(source.channel)) {
+    errors.push(`Invalid channel: ${source.channel}`);
+  }
+  
+  if (!DATA_TIER_CODES.includes(source.tier)) {
+    errors.push(`Invalid tier: ${source.tier}`);
+  }
+  
+  if (!source.domains.length) {
+    errors.push('Source must have at least one domain');
+  }
+  
+  source.domains.forEach(d => {
+    if (!DATA_DOMAIN_CODES.includes(d)) {
+      errors.push(`Invalid domain: ${d}`);
+    }
+  });
+  
+  // Reliability score validation
+  const tierMeta = DATA_TIER_METADATA[source.tier];
+  if (source.reliabilityScore < tierMeta.minReliabilityScore) {
+    warnings.push(
+      `Reliability score ${source.reliabilityScore} is below tier minimum ${tierMeta.minReliabilityScore}`
+    );
+  }
+  
+  // Temporal coverage
+  const startYear = parseInt(source.temporalCoverage.start);
+  if (isNaN(startYear) || startYear < 1 || startYear > 2100) {
+    errors.push(`Invalid temporal coverage start: ${source.temporalCoverage.start}`);
+  }
+  
+  // API endpoint for applicable types
+  if (source.apiEndpoint) {
+    try {
+      new URL(source.apiEndpoint);
+    } catch {
+      errors.push(`Invalid API endpoint URL: ${source.apiEndpoint}`);
+    }
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
+/**
+ * Validate entire manifest
+ */
+export function validateManifest(): ValidationResult {
+  const allSources = getAllSources();
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  
+  // Check for duplicate IDs
+  const ids = new Set<string>();
+  allSources.forEach(s => {
+    if (ids.has(s.id)) {
+      errors.push(`Duplicate source ID: ${s.id}`);
+    }
+    ids.add(s.id);
+  });
+  
+  // Validate each source
+  allSources.forEach(s => {
+    const result = validateSource(s);
+    errors.push(...result.errors.map(e => `[${s.id}] ${e}`));
+    warnings.push(...result.warnings.map(w => `[${s.id}] ${w}`));
+  });
+  
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
+// =============================================================================
+// SERIALIZATION FUNCTIONS
+// =============================================================================
+
+/**
+ * Export source as Schema.org/Dataset JSON-LD
+ */
+export function toSchemaOrgDataset(source: DataSourceDefinition): object {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    '@id': `urn:datasource:${source.id}`,
+    name: source.name,
+    alternateName: source.shortName,
+    description: source.notes || `Data source from ${source.name}`,
+    creator: {
+      '@type': 'Organization',
+      name: source.name
+    },
+    distribution: source.apiEndpoint ? {
+      '@type': 'DataDownload',
+      contentUrl: source.apiEndpoint,
+      encodingFormat: source.apiType === 'sdmx' ? 'application/xml' : 'application/json'
+    } : undefined,
+    temporalCoverage: `${source.temporalCoverage.start}/${source.temporalCoverage.end === 'present' ? '' : source.temporalCoverage.end}`,
+    spatialCoverage: source.geographicScope === 'global' ? 'World' : 
+                     source.countries?.join(', ') || source.geographicScope,
+    keywords: source.domains.map(d => DATA_DOMAIN_LABELS[d].en),
+    license: LICENSE_METADATA[source.license].spdxIdentifier || source.license,
+    isAccessibleForFree: !source.authRequired,
+    measurementTechnique: source.isEmpirical ? 'Direct measurement' : 'Modeled/estimated'
+  };
+}
+
+/**
+ * Export entire manifest as Schema.org DataCatalog
+ */
+export function toSchemaOrgCatalog(): object {
+  const allSources = getAllSources();
+  
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'DataCatalog',
+    '@id': 'urn:datacatalog:manifest',
+    name: 'Data Aggregation Manifest',
+    description: 'Complete registry of all data sources aggregated by the system',
+    dateModified: DATA_MANIFEST.lastUpdated,
+    dataset: allSources.map(toSchemaOrgDataset)
+  };
+}
+
+/**
+ * Export manifest statistics as machine-readable summary
+ */
+export function getManifestSummary(): object {
+  const stats = calculateStatistics();
+  
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'DataCatalog',
+    dateModified: DATA_MANIFEST.lastUpdated,
+    version: DATA_MANIFEST.version,
+    numberOfItems: stats.totalSources,
+    additionalProperty: [
+      { '@type': 'PropertyValue', name: 'activeSources', value: stats.activeSources },
+      { '@type': 'PropertyValue', name: 'tier1Sources', value: stats.tier1Sources },
+      { '@type': 'PropertyValue', name: 'tier2Sources', value: stats.tier2Sources },
+      { '@type': 'PropertyValue', name: 'tier3Sources', value: stats.tier3Sources },
+      { '@type': 'PropertyValue', name: 'tier4Sources', value: stats.tier4Sources },
+      { '@type': 'PropertyValue', name: 'empiricalSources', value: stats.empiricalSources }
+    ]
+  };
 }
