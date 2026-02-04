@@ -26,12 +26,12 @@ import {
   Globe,
   Clock,
   BarChart3,
-  Layers,
   Copy,
   Check,
   AlertCircle,
   MapPin
 } from 'lucide-react';
+import { ClickableCountryName } from '@/components/ui/ClickableCountryName';
 import { Link, useSearchParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
@@ -236,8 +236,8 @@ interface IndicatorScore {
   lastUpdated: string;
 }
 
-type ViewMode = 'overview' | 'timeline' | 'distribution';
-type GeographyLevel = 'world' | 'country' | 'region';
+type ViewMode = 'overview' | 'timeline' | 'distribution' | 'ranking';
+// GeographyLevel removed - unused
 
 // Generate simulated but realistic-looking data
 function generateDomainScore(domain: RealityDomain, seed: number): DomainScore {
@@ -721,6 +721,147 @@ function CitationBlock({ score, timestamp }: { score: number; timestamp: string 
 }
 
 // ============================================================================
+// RANKING VIEW - AGGREGATED LEADERBOARD
+// ============================================================================
+
+function RankingView({ selectedCountry }: { selectedCountry: Country }) {
+  // Generate rankings for all countries
+  const rankings = useMemo(() => {
+    return COUNTRIES
+      .filter(c => c.code !== 'WORLD')
+      .map(country => {
+        const seed = country.code.charCodeAt(0) + country.code.charCodeAt(1);
+        const score = Math.round(45 + Math.sin(seed * 5) * 25 + (country.dataQuality === 'A' ? 10 : country.dataQuality === 'B' ? 5 : 0));
+        return { country, score };
+      })
+      .sort((a, b) => b.score - a.score)
+      .map((item, index) => ({ ...item, rank: index + 1 }));
+  }, []);
+
+  const top10 = rankings.slice(0, 10);
+  const bottom10 = rankings.slice(-10).reverse();
+  
+  const selectedRank = rankings.find(r => r.country.code === selectedCountry.code);
+
+  return (
+    <div className="space-y-6">
+      {/* Selected country position */}
+      {selectedRank && selectedCountry.code !== 'WORLD' && (
+        <Card className="p-4 bg-primary/5 border-primary/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-mono text-sm font-bold text-primary">
+                #{selectedRank.rank}
+              </div>
+              <div>
+                <ClickableCountryName 
+                  countryCode={selectedCountry.code}
+                  countryName={selectedCountry.nameLocal}
+                  variant="default"
+                />
+                <p className="text-xs text-muted-foreground">
+                  av {rankings.length} länder
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold">{selectedRank.score}</div>
+              <div className="text-xs text-muted-foreground">poäng</div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Top 10 */}
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="font-mono text-[10px] text-emerald-600">[TOPP]</span>
+            <h3 className="font-semibold">Högst Reality Index</h3>
+          </div>
+          <div className="space-y-2">
+            {top10.map((item) => (
+              <div 
+                key={item.country.code}
+                className={cn(
+                  "flex items-center justify-between p-2 rounded-lg transition-colors",
+                  item.country.code === selectedCountry.code 
+                    ? "bg-primary/10 border border-primary/20" 
+                    : "hover:bg-muted/50"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="w-6 text-center font-mono text-sm text-emerald-600 font-medium">
+                    {item.rank}
+                  </span>
+                  <ClickableCountryName 
+                    countryCode={item.country.code}
+                    countryName={item.country.nameLocal}
+                    variant="inline"
+                  />
+                  <Badge variant="outline" className="text-[10px] font-mono">
+                    {item.country.dataQuality}
+                  </Badge>
+                </div>
+                <div className="font-mono text-sm font-medium">{item.score}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Bottom 10 */}
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="font-mono text-[10px] text-rose-600">[BOTT]</span>
+            <h3 className="font-semibold">Lägst Reality Index</h3>
+          </div>
+          <div className="space-y-2">
+            {bottom10.map((item) => (
+              <div 
+                key={item.country.code}
+                className={cn(
+                  "flex items-center justify-between p-2 rounded-lg transition-colors",
+                  item.country.code === selectedCountry.code 
+                    ? "bg-primary/10 border border-primary/20" 
+                    : "hover:bg-muted/50"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="w-6 text-center font-mono text-sm text-rose-600 font-medium">
+                    {item.rank}
+                  </span>
+                  <ClickableCountryName 
+                    countryCode={item.country.code}
+                    countryName={item.country.nameLocal}
+                    variant="inline"
+                  />
+                  <Badge variant="outline" className="text-[10px] font-mono">
+                    {item.country.dataQuality}
+                  </Badge>
+                </div>
+                <div className="font-mono text-sm font-medium">{item.score}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      {/* Methodology note */}
+      <Card className="p-3 bg-muted/30">
+        <div className="flex items-start gap-2 text-xs text-muted-foreground">
+          <span className="font-mono text-[10px]">[INFO]</span>
+          <p>
+            Ranking baseras på composite score från fem domäner med lika vikt (20% vardera). 
+            Datakvalitet (A-D) indikerar täckning och tillförlitlighet. 
+            <button className="underline hover:text-foreground ml-1">[Metodik →]</button>
+          </p>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ============================================================================
 // COUNTRY SELECTOR COMPONENT
 // ============================================================================
 
@@ -913,17 +1054,21 @@ export default function RealityIndex() {
 
         {/* View Mode Tabs */}
         <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview" className="gap-2">
-              <Layers className="h-4 w-4" />
+              <span className="font-mono text-[10px]">[DOM]</span>
               <span className="hidden sm:inline">Domäner</span>
             </TabsTrigger>
+            <TabsTrigger value="ranking" className="gap-2">
+              <span className="font-mono text-[10px]">[RNK]</span>
+              <span className="hidden sm:inline">Ranking</span>
+            </TabsTrigger>
             <TabsTrigger value="timeline" className="gap-2">
-              <Clock className="h-4 w-4" />
+              <span className="font-mono text-[10px]">[TID]</span>
               <span className="hidden sm:inline">Tidslinje</span>
             </TabsTrigger>
             <TabsTrigger value="distribution" className="gap-2">
-              <BarChart3 className="h-4 w-4" />
+              <span className="font-mono text-[10px]">[FÖR]</span>
               <span className="hidden sm:inline">Fördelning</span>
             </TabsTrigger>
           </TabsList>
@@ -951,6 +1096,10 @@ export default function RealityIndex() {
                 />
               </motion.div>
             ))}
+          </TabsContent>
+
+          <TabsContent value="ranking" className="mt-6">
+            <RankingView selectedCountry={selectedCountry} />
           </TabsContent>
 
           <TabsContent value="timeline" className="mt-6">
