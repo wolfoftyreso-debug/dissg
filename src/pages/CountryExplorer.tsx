@@ -16,7 +16,7 @@
  * Core Principle: "Every number is clickable"
  */
 
-import React, { useState } from 'react';
+ import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCountry, useCountries } from '@/hooks/useGlobalData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,30 +45,54 @@ const AVAILABLE_INDICATORS = [
 ];
 
 // Generate mock historical data
-function generateMockData(countryCode: string, indicator: string) {
-  const baseValue = Math.random() * 50 + 30;
-  const trend = Math.random() * 0.5 - 0.25;
+ function generateMockData(countryCode: string, indicator: string): Array<{year: number; value: number}> {
+   // Use deterministic seed based on countryCode and indicator
+   const seed = hashCode(`${countryCode}-${indicator}`);
+   const baseValue = seededRandom(seed) * 50 + 30;
+   const trend = seededRandom(seed + 1) * 0.5 - 0.25;
   
   return Array.from({ length: 30 }, (_, i) => ({
     year: 1995 + i,
-    value: Math.max(0, baseValue + trend * i + (Math.random() - 0.5) * 5),
+     value: Math.max(0, baseValue + trend * i + (seededRandom(seed + i + 100) - 0.5) * 5),
   }));
 }
 
 // Generate comparison data for multiple countries
-function generateComparisonData(countries: string[], indicator: string) {
+ function generateComparisonData(countries: string[], indicator: string): Array<Record<string, number | string>> {
   const years = Array.from({ length: 30 }, (_, i) => 1995 + i);
   
   return years.map(year => {
     const point: Record<string, number | string> = { year };
     countries.forEach(code => {
-      const baseValue = Math.random() * 50 + 30;
-      const trend = Math.random() * 0.5 - 0.25;
-      point[code] = Math.max(0, baseValue + trend * (year - 1995) + (Math.random() - 0.5) * 5);
+       // Use deterministic seed based on code, indicator, and year
+       const seed = hashCode(`${code}-${indicator}`);
+       // Add more variation between countries
+       const countryOffset = hashCode(code) % 30;
+       const baseValue = seededRandom(seed) * 30 + 40 + countryOffset;
+       const trend = seededRandom(seed + 1) * 0.5 - 0.25;
+       const yearIndex = year - 1995;
+       point[code] = Math.max(0, baseValue + trend * yearIndex + (seededRandom(seed + yearIndex + 100) - 0.5) * 5);
     });
     return point;
   });
 }
+ 
+ // Simple hash function for deterministic seed
+ function hashCode(str: string): number {
+   let hash = 0;
+   for (let i = 0; i < str.length; i++) {
+     const char = str.charCodeAt(i);
+     hash = ((hash << 5) - hash) + char;
+     hash = hash & hash; // Convert to 32bit integer
+   }
+   return Math.abs(hash);
+ }
+ 
+ // Seeded random number generator (deterministic)
+ function seededRandom(seed: number): number {
+   const x = Math.sin(seed * 9999) * 10000;
+   return x - Math.floor(x);
+ }
 
 // Color palette for comparison lines - NO icons, only colors
 const COMPARISON_COLORS = [
@@ -109,6 +133,19 @@ export default function CountryExplorer() {
     );
   };
   
+   // Get primary indicator data  
+   const primaryIndicator = AVAILABLE_INDICATORS.find(i => i.code === selectedIndicators[0]);
+   const allComparisonCountries = [countryCode, ...comparisonCountries];
+    
+   // Memoize chart data to prevent regeneration on every render
+   const chartData = useMemo(() => {
+     if (comparisonCountries.length > 0) {
+       return generateComparisonData(allComparisonCountries, selectedIndicators[0]);
+     }
+     return generateMockData(countryCode, selectedIndicators[0]);
+   // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [countryCode, JSON.stringify(comparisonCountries), selectedIndicators[0]]);
+   
   if (loadingCountry) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -119,13 +156,6 @@ export default function CountryExplorer() {
   }
   
   const displayName = country?.name || countryCode;
-  const allComparisonCountries = [countryCode, ...comparisonCountries];
-  
-  // Get primary indicator data
-  const primaryIndicator = AVAILABLE_INDICATORS.find(i => i.code === selectedIndicators[0]);
-  const chartData = comparisonCountries.length > 0
-    ? generateComparisonData(allComparisonCountries, selectedIndicators[0])
-    : generateMockData(countryCode, selectedIndicators[0]);
   
   // Index data for radar chart
   const indexData = [
