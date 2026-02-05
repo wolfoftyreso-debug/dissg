@@ -51,7 +51,7 @@ export interface PopulationScope {
 }
 
 export interface TimeScope {
-  readonly type: 'point' | 'range' | 'series';
+  readonly type: 'point' | 'range' | 'series' | 'trend';
   readonly start: string;
   readonly end?: string;
   readonly granularity: 'year' | 'quarter' | 'month' | 'week' | 'day';
@@ -120,25 +120,41 @@ export interface TruthNodeMetadata {
 }
 
 /**
+ * EXTENDED NODE OPTIONS
+ */
+export interface CreateTruthNodeOptions {
+  readonly node_id?: string;
+  readonly label?: string;
+  readonly description?: string;
+  readonly unit?: string;
+  readonly category?: string;
+  readonly signal_disclaimer?: string;
+  readonly historical_note?: string;
+  readonly limitations?: readonly string[];
+  readonly data_ref?: readonly DataReference[];
+}
+
+/**
  * CREATE TRUTH NODE
  */
 export function createTruthNode(
   type: TruthNodeType,
   scope: TruthScope,
   importance: SemanticImportanceMarkers,
-  confidence: number
+  confidence: number,
+  options?: CreateTruthNodeOptions
 ): TruthNode {
   const now = new Date().toISOString();
-  const node_id = `tn_${type}_${scope.geo.code}_${Date.now()}`;
+  const node_id = options?.node_id || `tn_${type}_${scope.geo.code}_${Date.now()}`;
   
   return {
     node_id,
     type,
     scope,
     semantic_importance: importance,
-    data_ref: [],
+    data_ref: options?.data_ref || [],
     confidence,
-    limitations: [],
+    limitations: options?.limitations ? [...options.limitations] : [],
     relations: {
       up: [],
       down: [],
