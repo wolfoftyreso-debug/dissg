@@ -1,169 +1,128 @@
  /**
-  * YOUTH & MEDICAL ANSWER LAYER - TYPES
+  * YOUTH ANSWER LAYER TYPES
   * 
-  * Core types for youth-focused, medically-safe answer generation.
-  * 
-  * FUNDAMENTAL PRINCIPLE (LOCKED):
-  * The system informs, normalizes, and guides –
-  * it NEVER diagnoses and NEVER replaces care.
+  * Complete type definitions for Youth domain.
+  * Compatible with existing packet files.
   */
  
- /**
-  * YOUTH QUESTION CLASSES (6 STABLE CATEGORIES)
-  * 95% of all youth questions fall into these categories.
-  */
- export const YOUTH_QUESTION_CLASSES = {
-   NORMALITY: 'normality',           // "Is this normal?"
-   BODY_DEVELOPMENT: 'body_development',  // "Is my body weird?"
-   PSYCHE_EMOTIONS: 'psyche_emotions',    // "Why do I feel this way?"
-   SEXUALITY_IDENTITY: 'sexuality_identity', // "Is this okay?"
-   RISK_FEAR: 'risk_fear',           // "Should I be worried?"
-   SOCIAL_BELONGING: 'social_belonging',   // "Am I the only one?"
- } as const;
+ export type YouthQuestionClass = 
+   | 'normality'       // "Is this normal?"
+   | 'prevalence'      // "How common is this?"
+   | 'informational'   // "What is...?"
+   | 'help_seeking'    // "Where can I get help?"
+   | 'crisis';         // High-risk - immediate redirect
  
- export type YouthQuestionClass = typeof YOUTH_QUESTION_CLASSES[keyof typeof YOUTH_QUESTION_CLASSES];
+ export type YouthRiskLevel = 'low' | 'medium' | 'high' | 'crisis';
  
- /**
-  * RISK LEVELS FOR YOUTH QUESTIONS
-  */
- export const YOUTH_RISK_LEVELS = {
-   LOW: 'low',           // General curiosity, safe to answer directly
-   MODERATE: 'moderate', // Requires careful framing, disclaimers
-   HIGH: 'high',         // May indicate distress, needs support resources
-   CRISIS: 'crisis',     // Immediate safety concern, switch to crisis mode
- } as const;
+ export type YouthAnswerSection = 
+   | 'normalize'
+   | 'limits'
+   | 'when_to_seek_help'
+   | 'crisis_resources'
+   | 'what_is_common'
+   | 'variation_is_normal'
+   | 'what_this_is_not';
  
- export type YouthRiskLevel = typeof YOUTH_RISK_LEVELS[keyof typeof YOUTH_RISK_LEVELS];
- 
- /**
-  * MEDICAL SCOPE CONSTRAINTS (HARD RULES)
-  */
- export interface MedicalScopeConstraints {
-   readonly diagnosis: 'forbidden';      // ALWAYS forbidden
-   readonly treatment: 'forbidden';      // ALWAYS forbidden
-   readonly education: 'allowed';        // General information
-   readonly normalization: 'required';   // ALWAYS required for youth
-   readonly help_guidance: 'required';   // ALWAYS required
- }
- 
- /**
-  * YOUTH ANSWER PACKET
-  */
  export interface YouthAnswerPacket {
    readonly id: string;
-   readonly version: number;
-   readonly status: 'draft' | 'review' | 'stable';
-   
-   readonly intent: {
-     readonly domain: string;
-     readonly question_class: YouthQuestionClass;
-     readonly question_patterns: readonly string[];
-     readonly blocked_patterns: readonly string[];
-   };
-   
-   readonly audience: {
-     readonly age_range: [number, number];
-     readonly tone: 'reassuring' | 'informative' | 'supportive';
-     readonly language_level: 'simple' | 'moderate';
-   };
-   
-   readonly medical_scope: MedicalScopeConstraints;
-   
-   readonly risk_classification: {
-     readonly base_risk: YouthRiskLevel;
-     readonly escalation_triggers: readonly string[];
-     readonly crisis_keywords: readonly string[];
-   };
-   
-   readonly content: {
+   readonly version?: string;
+   readonly question_class: YouthQuestionClass;
+   readonly risk_level: YouthRiskLevel;
+   readonly answer_type: string;
+   readonly text: string;
+   readonly population_scope?: string;
+   readonly age_range?: { min: number; max: number };
+   readonly measure_id?: string;
+   readonly sections: {
      readonly normalize: boolean;
-     readonly explain_variation: boolean;
-     readonly red_flags_required: boolean;
-     readonly help_guidance_required: boolean;
+     readonly limits: boolean;
+     readonly when_to_seek_help: boolean;
+     readonly crisis_resources?: boolean;
+     readonly what_is_common?: boolean;
+     readonly variation_is_normal?: boolean;
+     readonly what_this_is_not?: boolean;
    };
-   
-   readonly output: {
-     readonly template: string;
-     readonly sections: readonly YouthAnswerSection[];
-     readonly mandatory_disclaimers: readonly string[];
+   readonly confidence: {
+     readonly coverage: 'high' | 'medium' | 'low' | 'not_applicable';
+     readonly tier: 1 | 2 | 3;
    };
-   
-   readonly safety: {
-     readonly crisis_escalation: boolean;
-     readonly age_gate: boolean;
-     readonly parental_guidance_note: boolean;
+   readonly sources?: readonly string[];
+   readonly help_urgency?: 'none' | 'optional' | 'recommended' | 'encouraged' | 'immediate';
+   readonly metadata?: {
+     readonly created?: string;
+     readonly last_validated?: string;
+     readonly owner?: string;
    };
  }
  
  /**
-  * ANSWER SECTIONS (MANDATORY STRUCTURE)
+  * MEDICAL SCOPE CONSTRAINTS
   */
- export const YOUTH_ANSWER_SECTIONS = {
-   WHAT_IS_COMMON: 'what_is_common',
-   WHY_IT_HAPPENS: 'why_it_happens',
-   VARIATION_IS_NORMAL: 'variation_is_normal',
-   WHEN_TO_SEEK_HELP: 'when_to_seek_help',
-   WHAT_THIS_IS_NOT: 'what_this_is_not',
-   RESOURCES: 'resources',
- } as const;
+ export interface MedicalScopeConstraints {
+   readonly population_only: true;
+   readonly no_diagnosis: true;
+   readonly no_treatment: true;
+   readonly no_individual_risk: true;
+ }
  
- export type YouthAnswerSection = typeof YOUTH_ANSWER_SECTIONS[keyof typeof YOUTH_ANSWER_SECTIONS];
+ export const YOUTH_MEDICAL_CONSTRAINTS: MedicalScopeConstraints = {
+   population_only: true,
+   no_diagnosis: true,
+   no_treatment: true,
+   no_individual_risk: true,
+ };
  
  /**
   * CRISIS MODE RESPONSE
   */
  export interface CrisisModeResponse {
-   readonly mode: 'crisis_support';
-   readonly triggered_by: string;
-   readonly priority: 'immediate';
-   readonly response: {
-     readonly message: string;
-     readonly hotlines: readonly CrisisResource[];
-     readonly chat_resources: readonly CrisisResource[];
-     readonly safety_message: string;
-   };
-   readonly analytics_disabled: boolean;
-   readonly follow_up_blocked: boolean;
+   readonly triggered: true;
+   readonly reason: string;
+   readonly redirect_to: 'human_support';
+   readonly resources: CrisisResource[];
+   readonly mode?: string;
  }
-
  
  export interface CrisisResource {
    readonly name: string;
-   readonly country_code: string;
-   readonly phone: string | null;
-   readonly url: string | null;
-   readonly hours: '24/7' | 'limited';
-   readonly languages: readonly string[];
+   readonly country_code?: string;
+   readonly phone?: string;
+   readonly text?: string;
+   readonly chat?: string;
+   readonly url?: string;
+   readonly available: string;
  }
  
  /**
-  * MEDICAL SOURCE TIERS (TRUST CLASSIFICATION)
+  * MEDICAL SOURCE TIER
   */
- export const MEDICAL_SOURCE_TIERS = {
-   TIER_1: {
-     level: 1,
-     name: 'Authoritative Health Bodies',
-     examples: ['WHO', 'CDC', 'National Health Authorities'],
-     youth_allowed: true,
-   },
-   TIER_2: {
-     level: 2,
-     name: 'Peer-Reviewed Research',
-     examples: ['NEJM', 'Lancet', 'JAMA', 'BMJ'],
-     youth_allowed: true,
-   },
-   TIER_3: {
-     level: 3,
-     name: 'Clinical Guidelines',
-     examples: ['NICE', 'UpToDate', 'Professional Associations'],
-     youth_allowed: false, // Too clinical for youth packets
-   },
-   TIER_4: {
-     level: 4,
-     name: 'Epidemiological Compilations',
-     examples: ['Meta-analyses', 'Systematic Reviews'],
-     youth_allowed: false,
-   },
+ export type MedicalSourceTier = 1 | 2 | 3 | '1' | '2' | '3';
+ 
+ /**
+  * CONSTANTS
+  */
+ export const YOUTH_QUESTION_CLASSES: YouthQuestionClass[] = [
+   'normality',
+   'prevalence', 
+   'informational',
+   'help_seeking',
+   'crisis',
+ ];
+ 
+ export const YOUTH_RISK_LEVELS: YouthRiskLevel[] = ['low', 'medium', 'high', 'crisis'];
+ 
+ export const YOUTH_ANSWER_SECTIONS = {
+   NORMALIZE: 'normalize',
+   LIMITS: 'limits',
+   WHEN_TO_SEEK_HELP: 'when_to_seek_help',
+   CRISIS_RESOURCES: 'crisis_resources',
+   WHAT_IS_COMMON: 'what_is_common',
+   VARIATION_IS_NORMAL: 'variation_is_normal',
+   WHAT_THIS_IS_NOT: 'what_this_is_not',
  } as const;
  
- export type MedicalSourceTier = keyof typeof MEDICAL_SOURCE_TIERS;
+ export const MEDICAL_SOURCE_TIERS: Record<number, string> = {
+   1: 'Official international organizations (WHO, UNICEF)',
+   2: 'National statistical offices and research institutions',
+   3: 'Peer-reviewed research (requires corroboration)',
+ };

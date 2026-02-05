@@ -1,270 +1,168 @@
  /**
-  * PACKET FAMILY A: NORMALITY & EMOTIONS
+  * FAMILY A: NORMALITY & FEELINGS
   * 
-  * 4 packets for normalizing emotional experiences.
-  * All follow locked schema with mandatory components.
+  * "Is this normal?" packets - lowest risk, highest frequency.
   */
  
  import type { YouthAnswerPacket } from '../types';
  
- /**
-  * A1: General Normality Check
-  */
- export const PACKET_NORMALITY_GENERAL: YouthAnswerPacket = {
-   id: 'answer:youth:normality_general:v1',
-   version: 1,
-   status: 'stable',
-   intent: {
-     domain: 'normality',
+ export const FAMILY_A_PACKETS: Record<string, YouthAnswerPacket> = {
+   // === ANXIETY ===
+   ANXIETY_COMMON: {
+     id: 'youth:answer:anxiety_common:v1',
      question_class: 'normality',
-     question_patterns: [
-       'Is this normal?', 'Am I normal?', 'Is something wrong with me?',
-       'Är det här normalt?', 'Är jag normal?', 'Är det något fel på mig?',
-     ],
-     blocked_patterns: [],
+     risk_level: 'low',
+     answer_type: 'RISK_PREVALENCE',
+     text: 'Feeling anxious sometimes is common during the teenage years. Many young people experience similar feelings. This does not automatically mean something is wrong with you.',
+     sections: {
+       normalize: true,
+       limits: true,
+       when_to_seek_help: true,
+     },
+     confidence: { coverage: 'high', tier: 1 },
    },
-   audience: {
-     age_range: [12, 19],
-     tone: 'reassuring',
-     language_level: 'simple',
+   
+   ANXIETY_BEFORE_TESTS: {
+     id: 'youth:answer:anxiety_tests:v1',
+     question_class: 'normality',
+     risk_level: 'low',
+     answer_type: 'RISK_PREVALENCE',
+     text: 'Feeling nervous before tests or exams is very common. Most students experience some level of test anxiety. A moderate amount can even help you perform better.',
+     sections: {
+       normalize: true,
+       limits: true,
+       when_to_seek_help: true,
+     },
+     confidence: { coverage: 'high', tier: 1 },
    },
-   medical_scope: {
-     diagnosis: 'forbidden',
-     treatment: 'forbidden',
-     education: 'allowed',
-     normalization: 'required',
-     help_guidance: 'required',
+   
+   ANXIETY_SOCIAL: {
+     id: 'youth:answer:anxiety_social:v1',
+     question_class: 'normality',
+     risk_level: 'low',
+     answer_type: 'RISK_PREVALENCE',
+     text: 'Feeling nervous in social situations is common, especially during adolescence. Many young people feel self-conscious around others. These feelings often become easier to manage over time.',
+     sections: {
+       normalize: true,
+       limits: true,
+       when_to_seek_help: true,
+     },
+     confidence: { coverage: 'high', tier: 1 },
    },
-   risk_classification: {
-     base_risk: 'low',
-     escalation_triggers: ['always', 'never normal', 'completely broken'],
-     crisis_keywords: ['want to die', 'hurt myself'],
+   
+   // === SADNESS ===
+   SADNESS_COMMON: {
+     id: 'youth:answer:sadness_common:v1',
+     question_class: 'normality',
+     risk_level: 'low',
+     answer_type: 'RISK_PREVALENCE',
+     text: 'Feeling sad sometimes is a normal human experience. During adolescence, emotions can feel more intense than before. Most people go through periods of sadness that pass with time.',
+     sections: {
+       normalize: true,
+       limits: true,
+       when_to_seek_help: true,
+     },
+     confidence: { coverage: 'high', tier: 1 },
    },
-   content: {
-     normalize: true,
-     explain_variation: true,
-     red_flags_required: false,
-     help_guidance_required: true,
+   
+   SADNESS_AFTER_LOSS: {
+     id: 'youth:answer:sadness_loss:v1',
+     question_class: 'normality',
+     risk_level: 'low',
+     answer_type: 'DESCRIPTIVE',
+     text: 'Feeling sad after losing something or someone important is natural and healthy. Grief is a normal response to loss. There is no "right" timeline for these feelings.',
+     sections: {
+       normalize: true,
+       limits: true,
+       when_to_seek_help: true,
+     },
+     confidence: { coverage: 'high', tier: 1 },
    },
-   output: {
-     template: `Many people wonder if what they experience is normal. The truth is, there is a wide range of what is considered normal, especially during the teenage years.
- 
- What this does NOT mean:
- - This is not a diagnosis
- - Wondering about yourself does not mean something is wrong
- 
- When to talk to someone:
- - If these thoughts make it hard to do daily activities
- - If they last for a long time without getting better
- - If you feel very worried or distressed`,
-     sections: ['what_is_common', 'variation_is_normal', 'what_this_is_not', 'when_to_seek_help'],
-     mandatory_disclaimers: ['This is general information, not a diagnosis.'],
+   
+   // === MOOD CHANGES ===
+   MOOD_SWINGS: {
+     id: 'youth:answer:mood_swings:v1',
+     question_class: 'normality',
+     risk_level: 'low',
+     answer_type: 'DESCRIPTIVE',
+     text: 'Mood changes are very common during adolescence. Hormonal changes and brain development can make emotions feel more intense and variable. This typically stabilizes as you get older.',
+     sections: {
+       normalize: true,
+       limits: true,
+       when_to_seek_help: true,
+     },
+     confidence: { coverage: 'high', tier: 1 },
    },
-   safety: {
-     crisis_escalation: true,
-     age_gate: false,
-     parental_guidance_note: false,
+   
+   FEELING_EMPTY: {
+     id: 'youth:answer:feeling_empty:v1',
+     question_class: 'normality',
+     risk_level: 'low',
+     answer_type: 'DESCRIPTIVE',
+     text: 'Sometimes feeling empty or numb is a common experience. It can happen during times of stress or change. If this feeling persists for a long time, talking to someone you trust can help.',
+     sections: {
+       normalize: true,
+       limits: true,
+       when_to_seek_help: true,
+     },
+     confidence: { coverage: 'medium', tier: 2 },
    },
- };
- 
- /**
-  * A2: Anxiety Common
-  */
- export const PACKET_ANXIETY_COMMON: YouthAnswerPacket = {
-   id: 'answer:youth:anxiety_common:v1',
-   version: 1,
-   status: 'stable',
-   intent: {
-     domain: 'psyche',
-     question_class: 'psyche_emotions',
-     question_patterns: [
-       'Is anxiety normal?', 'Why do I feel anxious?', 'Is it normal to worry?',
-       'Är ångest normalt?', 'Varför känner jag ångest?', 'Är det normalt att oroa sig?',
-     ],
-     blocked_patterns: [],
+   
+   // === WORRY ===
+   WORRY_FUTURE: {
+     id: 'youth:answer:worry_future:v1',
+     question_class: 'normality',
+     risk_level: 'low',
+     answer_type: 'RISK_PREVALENCE',
+     text: 'Worrying about the future is very common among young people. Concerns about school, career, and life decisions are normal parts of growing up. Most people share these concerns.',
+     sections: {
+       normalize: true,
+       limits: true,
+       when_to_seek_help: true,
+     },
+     confidence: { coverage: 'high', tier: 1 },
    },
-   audience: {
-     age_range: [12, 19],
-     tone: 'reassuring',
-     language_level: 'simple',
+   
+   WORRY_HEALTH: {
+     id: 'youth:answer:worry_health:v1',
+     question_class: 'normality',
+     risk_level: 'low',
+     answer_type: 'DESCRIPTIVE',
+     text: 'Occasional worry about health is common. If health concerns become frequent or distressing, speaking with a healthcare provider can provide reassurance and accurate information.',
+     sections: {
+       normalize: true,
+       limits: true,
+       when_to_seek_help: true,
+     },
+     confidence: { coverage: 'medium', tier: 2 },
    },
-   medical_scope: {
-     diagnosis: 'forbidden',
-     treatment: 'forbidden',
-     education: 'allowed',
-     normalization: 'required',
-     help_guidance: 'required',
+   
+   // === ANGER ===
+   ANGER_COMMON: {
+     id: 'youth:answer:anger_common:v1',
+     question_class: 'normality',
+     risk_level: 'low',
+     answer_type: 'DESCRIPTIVE',
+     text: 'Feeling angry sometimes is normal. Anger is a natural emotion that everyone experiences. Learning healthy ways to express and manage anger is an important life skill.',
+     sections: {
+       normalize: true,
+       limits: true,
+       when_to_seek_help: true,
+     },
+     confidence: { coverage: 'high', tier: 1 },
    },
-   risk_classification: {
-     base_risk: 'low',
-     escalation_triggers: ['constant anxiety', 'panic every day', 'cannot function'],
-     crisis_keywords: ['panic attack now', 'cannot breathe'],
-   },
-   content: {
-     normalize: true,
-     explain_variation: true,
-     red_flags_required: false,
-     help_guidance_required: true,
-   },
-   output: {
-     template: `Feeling anxious sometimes is a normal part of life. Anxiety is your body's natural response to stress or uncertainty. Many young people experience anxiety, especially during school, exams, or social situations.
- 
- Why it happens:
- - Your brain is still developing emotional regulation
- - New situations can trigger protective responses
- - Hormonal changes affect how you process stress
- 
- What this is NOT:
- - Feeling anxious sometimes does not mean you have an anxiety disorder
- - It does not mean you are weak or broken
- 
- When to seek help:
- - Anxiety stops you from doing things you need or want to do
- - Physical symptoms are frequent or severe
- - It lasts for weeks without improvement`,
-     sections: ['what_is_common', 'why_it_happens', 'what_this_is_not', 'when_to_seek_help'],
-     mandatory_disclaimers: ['This is general information, not a diagnosis.'],
-   },
-   safety: {
-     crisis_escalation: true,
-     age_gate: false,
-     parental_guidance_note: false,
-   },
- };
- 
- /**
-  * A3: Sadness Common
-  */
- export const PACKET_SADNESS_COMMON: YouthAnswerPacket = {
-   id: 'answer:youth:sadness_common:v1',
-   version: 1,
-   status: 'stable',
-   intent: {
-     domain: 'psyche',
-     question_class: 'psyche_emotions',
-     question_patterns: [
-       'Is it normal to feel sad?', 'Why am I sad?', 'Why do I cry for no reason?',
-       'Är det normalt att vara ledsen?', 'Varför är jag ledsen?', 'Varför gråter jag?',
-     ],
-     blocked_patterns: [],
-   },
-   audience: {
-     age_range: [12, 19],
-     tone: 'supportive',
-     language_level: 'simple',
-   },
-   medical_scope: {
-     diagnosis: 'forbidden',
-     treatment: 'forbidden',
-     education: 'allowed',
-     normalization: 'required',
-     help_guidance: 'required',
-   },
-   risk_classification: {
-     base_risk: 'low',
-     escalation_triggers: ['always sad', 'never happy', 'weeks of sadness'],
-     crisis_keywords: ['want to die', 'no point'],
-   },
-   content: {
-     normalize: true,
-     explain_variation: true,
-     red_flags_required: true,
-     help_guidance_required: true,
-   },
-   output: {
-     template: `Feeling sad sometimes is a normal human emotion. Everyone experiences sadness, and it often serves a purpose – helping us process difficult experiences or signal that something needs attention.
- 
- Why sadness happens:
- - Response to loss, disappointment, or change
- - Hormonal fluctuations during adolescence
- - Sometimes without an obvious reason (also normal)
- 
- What this is NOT:
- - Occasional sadness is not the same as depression
- - Crying does not mean you are broken
- 
- When to talk to someone:
- - Sadness lasts for more than two weeks most days
- - You lose interest in things you usually enjoy
- - It affects sleep, eating, or daily activities`,
-     sections: ['what_is_common', 'why_it_happens', 'what_this_is_not', 'when_to_seek_help'],
-     mandatory_disclaimers: ['This is general information, not a diagnosis.'],
-   },
-   safety: {
-     crisis_escalation: true,
-     age_gate: false,
-     parental_guidance_note: false,
+   
+   FRUSTRATION_NORMAL: {
+     id: 'youth:answer:frustration:v1',
+     question_class: 'normality',
+     risk_level: 'low',
+     answer_type: 'DESCRIPTIVE',
+     text: 'Feeling frustrated is a common experience, especially when things do not go as planned. Frustration often signals that something matters to you. It usually passes with time.',
+     sections: {
+       normalize: true,
+       limits: true,
+       when_to_seek_help: false,
+     },
+     confidence: { coverage: 'high', tier: 1 },
    },
  };
- 
- /**
-  * A4: Emotional Variation
-  */
- export const PACKET_EMOTIONAL_VARIATION: YouthAnswerPacket = {
-   id: 'answer:youth:emotional_variation:v1',
-   version: 1,
-   status: 'stable',
-   intent: {
-     domain: 'psyche',
-     question_class: 'psyche_emotions',
-     question_patterns: [
-       'Why do my emotions change so fast?', 'Is it normal to have mood swings?',
-       'Varför ändras mina känslor så snabbt?', 'Är humörsvängningar normalt?',
-     ],
-     blocked_patterns: [],
-   },
-   audience: {
-     age_range: [12, 19],
-     tone: 'reassuring',
-     language_level: 'simple',
-   },
-   medical_scope: {
-     diagnosis: 'forbidden',
-     treatment: 'forbidden',
-     education: 'allowed',
-     normalization: 'required',
-     help_guidance: 'required',
-   },
-   risk_classification: {
-     base_risk: 'low',
-     escalation_triggers: ['out of control', 'dangerous mood swings'],
-     crisis_keywords: [],
-   },
-   content: {
-     normalize: true,
-     explain_variation: true,
-     red_flags_required: false,
-     help_guidance_required: false,
-   },
-   output: {
-     template: `Rapid changes in emotions are very common during the teenage years. Your brain is literally rewiring itself, and emotional intensity is part of that process.
- 
- Why it happens:
- - Prefrontal cortex (decision-making) is still developing
- - Hormonal changes affect emotional processing
- - You are experiencing many things for the first time
- 
- What this is NOT:
- - Mood swings during adolescence are not a sign of mental illness
- - Strong emotions do not mean you are unstable
- 
- This usually becomes more stable as you get older.`,
-     sections: ['what_is_common', 'why_it_happens', 'what_this_is_not'],
-     mandatory_disclaimers: ['This is general information, not a diagnosis.'],
-   },
-   safety: {
-     crisis_escalation: false,
-     age_gate: false,
-     parental_guidance_note: false,
-   },
- };
- 
- /**
-  * FAMILY A EXPORTS
-  */
- export const FAMILY_A_PACKETS = [
-   PACKET_NORMALITY_GENERAL,
-   PACKET_ANXIETY_COMMON,
-   PACKET_SADNESS_COMMON,
-   PACKET_EMOTIONAL_VARIATION,
- ] as const;
