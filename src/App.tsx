@@ -130,11 +130,10 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               
-              {/* Fullskärmskartan - utan layout */}
-              <Route path="/gdm" element={<GDMPage />} />
-              
               {/* Routes med global layout (sidebar + breadcrumbs) */}
               <Route element={<AppLayout />}>
+                {/* GDM - Global Diagnostic Map */}
+                <Route path="/gdm" element={<GDMPage />} />
                 <Route path="/public" element={<PublicDashboard />} />
                 <Route path="/regional" element={<RegionalView />} />
                 <Route path="/decisions" element={<DecisionTimeline />} />
