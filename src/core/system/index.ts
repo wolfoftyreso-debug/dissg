@@ -8,6 +8,31 @@
 export * from './ontology';
 export * from './charter';
 export * from './legitimacy';
+
+// Agent Spec - specific exports to avoid conflicts
+export {
+  classifyQuery,
+  translateToDecisionForm,
+  checkGravityGates,
+  handleAgentQuery,
+  createFailSafeResponse,
+  buildAgentResponse,
+  validateAgentResponse,
+  createComplianceHeader,
+  AGENT_PERMISSIONS,
+  CANONICAL_RESPONSES,
+  GATE_DESCRIPTIONS,
+  type QueryClass,
+  type ClassifiedQuery,
+  type DecisionTranslation,
+  type GravityGates,
+  type GateType,
+  type AgentPermissions,
+  type ComplianceHeader,
+  type AgentResponse,
+  type AgentHandlerInput,
+  type AgentHandlerOutput,
+} from './agent-spec';
 export * from './write-model';
 export * from './read-model';
 export * from './infra';
