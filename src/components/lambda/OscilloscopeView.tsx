@@ -3,14 +3,15 @@
  * 
  * Main visualization component for Oscilloscope Mode.
  * Displays real-time signal traces without interpretation.
+ * 
+ * DESIGN: Light, clinical, strict diagnostic instrument.
+ * No decorative elements. Maximum clarity.
  */
 
 import { useRef, useEffect, useState } from 'react';
-import { Activity, AlertTriangle, Radio, Waves } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -68,12 +69,12 @@ export function OscilloscopeView({
     const plotWidth = width - padding.left - padding.right;
     const plotHeight = height - padding.top - padding.bottom;
     
-    // Clear canvas
-    ctx.fillStyle = 'hsl(var(--background))';
+     // Clear canvas - Light clinical background
+     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, width, height);
     
-    // Draw grid
-    ctx.strokeStyle = OSCILLOSCOPE_UI_CONFIG.grid.minor_color;
+     // Draw grid - Very subtle
+     ctx.strokeStyle = 'hsl(210, 15%, 92%)';
     ctx.lineWidth = 0.5;
     
     // Minor grid lines
@@ -93,7 +94,7 @@ export function OscilloscopeView({
     }
     
     // Major grid lines
-    ctx.strokeStyle = OSCILLOSCOPE_UI_CONFIG.grid.major_color;
+     ctx.strokeStyle = 'hsl(210, 15%, 85%)';
     ctx.lineWidth = 1;
     
     for (let i = 0; i <= OSCILLOSCOPE_UI_CONFIG.grid.major_divisions; i++) {
@@ -170,13 +171,7 @@ export function OscilloscopeView({
       
       ctx.stroke();
       
-      // Draw glow effect
-      if (OSCILLOSCOPE_UI_CONFIG.trace.glow_enabled) {
-        ctx.shadowColor = color;
-        ctx.shadowBlur = OSCILLOSCOPE_UI_CONFIG.trace.glow_blur;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      }
+       // NO glow effect - strict clinical appearance
     });
     
   }, [config, traces, dimensions]);
@@ -199,16 +194,16 @@ export function OscilloscopeView({
   }, []);
   
   return (
-    <Card className={cn('bg-background/95 backdrop-blur', className)}>
-      <CardHeader className="pb-2">
+     <Card className={cn('bg-white border border-border shadow-none', className)}>
+       <CardHeader className="pb-2 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Activity className="h-5 w-5 text-primary" />
+             <span className="font-mono text-muted-foreground">[~]</span>
             <div>
               <CardTitle className="text-lg">
                 {language === 'sv' ? 'Oscilloskop-läge' : 'Oscilloscope Mode'}
               </CardTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">
+               <p className="text-[10px] text-muted-foreground mt-0.5 font-mono">
                 {OSCILLOSCOPE_PRINCIPLES[language].join(' • ')}
               </p>
             </div>
@@ -218,10 +213,10 @@ export function OscilloscopeView({
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div 
-                className="w-3 h-3 rounded-full animate-pulse"
+                 className="w-2 h-2 rounded-full"
                 style={{ backgroundColor: getStatusColor(systemStatus.overall_health) }}
               />
-              <span className="text-sm font-medium">
+               <span className="text-xs font-mono">
                 {getStatusLabel(systemStatus.overall_health, language)}
               </span>
             </div>
@@ -230,7 +225,7 @@ export function OscilloscopeView({
               value={config.time_base} 
               onValueChange={(v) => onTimeBaseChange?.(v as TimeBase)}
             >
-              <SelectTrigger className="w-[120px] h-8">
+               <SelectTrigger className="w-[100px] h-7 text-xs font-mono border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -244,18 +239,19 @@ export function OscilloscopeView({
           </div>
         </div>
         
-        {/* Warnings bar */}
+         {/* Warnings bar - Strict text-only format */}
         {warnings.length > 0 && (
-          <div className="flex gap-2 mt-2 flex-wrap">
+           <div className="flex gap-4 mt-3 flex-wrap border-t border-dashed border-border pt-2">
             {warnings.map((warning, idx) => (
-              <Badge 
+               <span 
                 key={idx}
-                variant={warning.status === 'critical' ? 'destructive' : 'secondary'}
-                className="flex items-center gap-1"
+                 className={cn(
+                   "text-[10px] font-mono",
+                   warning.status === 'critical' ? 'text-status-critical' : 'text-status-warning'
+                 )}
               >
-                <AlertTriangle className="h-3 w-3" />
-                {language === 'sv' ? warning.message_sv : warning.message_en}
-              </Badge>
+                 [{warning.status === 'critical' ? '!' : '?'}] {language === 'sv' ? warning.message_sv : warning.message_en}
+               </span>
             ))}
           </div>
         )}
@@ -263,7 +259,7 @@ export function OscilloscopeView({
       
       <CardContent>
         {/* Oscilloscope display */}
-        <div className="relative rounded-lg overflow-hidden border bg-black/95">
+         <div className="relative overflow-hidden border border-border bg-white">
           <canvas
             ref={canvasRef}
             width={dimensions.width}
@@ -271,21 +267,21 @@ export function OscilloscopeView({
             className="w-full"
           />
           
-          {/* Channel legend */}
-          <div className="absolute bottom-2 left-2 flex gap-2">
+           {/* Channel legend - Strict text format */}
+           <div className="absolute bottom-2 left-2 flex gap-4 bg-white/90 px-2 py-1 border border-border">
             {config.channels.map((channel, idx) => (
               <Button
                 key={channel.id}
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  'h-6 px-2 text-xs',
+                   'h-5 px-1 text-[10px] font-mono rounded-none',
                   !channel.visible && 'opacity-40'
                 )}
                 onClick={() => onChannelToggle?.(channel.id)}
               >
                 <div 
-                  className="w-3 h-0.5 mr-1.5 rounded"
+                   className="w-3 h-0.5 mr-1.5"
                   style={{ backgroundColor: channel.color || OSCILLOSCOPE_UI_CONFIG.channel_colors[idx] }}
                 />
                 {channel.label}
@@ -294,21 +290,16 @@ export function OscilloscopeView({
           </div>
           
           {/* Clarity score */}
-          <div className="absolute top-2 right-2 flex items-center gap-2 text-xs text-muted-foreground">
-            <Radio className="h-3 w-3" />
-            <span>
-              {language === 'sv' ? 'Signalklarhet' : 'Signal clarity'}: {systemStatus.clarity_score.toFixed(0)}%
-            </span>
+           <div className="absolute top-2 right-2 flex items-center gap-2 text-[10px] font-mono text-muted-foreground bg-white/90 px-2 py-1 border border-border">
+             <span>[~]</span>
+             <span>{language === 'sv' ? 'Signalklarhet' : 'Signal clarity'}: {systemStatus.clarity_score.toFixed(0)}%</span>
           </div>
         </div>
         
         {/* Bottom info bar */}
-        <div className="flex items-center justify-between mt-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <Waves className="h-3 w-3" />
-              <span>{systemStatus.active_channels} {language === 'sv' ? 'kanaler' : 'channels'}</span>
-            </div>
+         <div className="flex items-center justify-between mt-3 pt-3 border-t border-border text-[10px] font-mono text-muted-foreground">
+           <div className="flex items-center gap-6">
+             <span>[≡] {systemStatus.active_channels} {language === 'sv' ? 'kanaler' : 'channels'}</span>
             <span>
               {language === 'sv' ? 'Brus' : 'Noise'}: {systemStatus.noise_level}
             </span>
