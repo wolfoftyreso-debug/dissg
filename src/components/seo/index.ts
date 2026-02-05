@@ -1,22 +1,25 @@
 /**
  * SEO Components Index
  * 
- * Block 45: Canonical Fact Page — AI + Google Dominance
- * Block 48: Auto Internal Link Engine
- * Block 49: Indicator Page — Definition, method, usage
- * Block 50: Debate Page — Neutral, data-first contested topics
+ * SEO & STRUCTURED DATA SPEC v1
+ * Canonical Decision Pages (CDP) + Query Compiler Outputs
  * 
- * Components optimized for search engines and AI agents.
- * 
- * CRITICAL RULES:
- * ❌ No images, graphs, CTAs, forms, value words
- * ✅ Text, structure, links, sources
+ * PRINCIPLES (ABSOLUTE):
+ * - No clickbait
+ * - No "best of"
+ * - No recommendation
+ * - All structured data points to decision structure, not conclusion
+ * - Same page = human + machine, never two truths
  */
 
+// Page Templates
 export { FactPageTemplate, type FactPageData } from './FactPageTemplate';
 export { IndicatorPageTemplate, type IndicatorPageData } from './IndicatorPageTemplate';
 export { DebatePageTemplate, type DebatePageData } from './DebatePageTemplate';
 export { SemanticLinkSection, InlineSemanticLinks } from './SemanticLinkSection';
+export { CDPPageTemplate, type CDPPageData } from './CDPPageTemplate';
+export { UYPPageTemplate } from './UYPPageTemplate';
+export { SEOSpecViewer } from './SEOSpecViewer';
 
 // Machine-readable metadata for AI grounding
 export { MachineReadableHead } from './MachineReadableHead';
@@ -32,3 +35,6 @@ export {
   ROBOTS_CONFIG,
   SEVEN_DAY_CHECKLIST,
 } from '@/config/seoFactStructureConfig';
+
+// Re-export core SEO utilities
+export * from '@/core/seo';
