@@ -85,6 +85,7 @@ import FaultCodesPage from "./pages/FaultCodes";
 import DiagnosticsPage from "./pages/Diagnostics";
 import AIGovernancePage from "./pages/AIGovernance";
 import SelfTestPage from "./pages/SelfTest";
+ import SelfAuditPage from "./pages/SelfAudit";
 import GEDIPage from "./pages/GEDI";
 import Lambda1Page from "./pages/Lambda1";
 import GDMPage from "./pages/GDM";
@@ -195,6 +196,7 @@ const App = () => (
                 <Route path="/diagnostics" element={<DiagnosticsPage />} />
                 <Route path="/ai-governance" element={<AIGovernancePage />} />
                 <Route path="/self-test" element={<SelfTestPage />} />
+                 <Route path="/self-audit" element={<SelfAuditPage />} />
                 <Route path="/gedi" element={<GEDIPage />} />
                 <Route path="/lambda1" element={<Lambda1Page />} />
                 <Route path="/ggd" element={<GGDPage />} />
