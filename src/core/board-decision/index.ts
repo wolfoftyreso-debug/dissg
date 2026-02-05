@@ -324,6 +324,48 @@ export {
   PUBLIC_PORTAL_MASTERPROMPT,
 } from './public-portal';
 
+// Anti-Corruption & Degradation Layer
+export {
+  // Types
+  type DriftSignal,
+  type DriftType,
+  type SilentErosionAlert,
+  type GoodIntentionsViolation,
+  type TemplateDecaySignal,
+  type RotationContext,
+  type HeroModeViolation,
+  type SystemHealthMetrics,
+  // Drift Detection
+  analyzeDecisionDrift,
+  DRIFT_DETECTION_MASTERPROMPT,
+  // Silent Erosion
+  generateSilentErosionAlert,
+  formatAlertForDisplay,
+  shouldShowAlert,
+  SILENT_EROSION_MASTERPROMPT,
+  // Good Intentions Filter
+  checkGoodIntentions,
+  validateStructureProvided,
+  generateStructurePrompt,
+  GOOD_INTENTIONS_FILTER_MASTERPROMPT,
+  // Template Decay
+  checkTemplateDecay,
+  canApproveDocument,
+  TEMPLATE_DECAY_MASTERPROMPT,
+  // No Hero Mode
+  checkHeroMode,
+  reduceToStructure,
+  generateReductionPrompt,
+  NO_HERO_MODE_RATIONALE,
+  NO_HERO_MODE_MASTERPROMPT,
+  // System Health
+  calculateSystemHealth,
+  formatHealthReport,
+  SYSTEM_HEALTH_MASTERPROMPT,
+  // Master
+  ANTI_CORRUPTION_MASTERPROMPT,
+} from './anti-corruption';
+
 /**
  * BDPE SUMMARY
  */
