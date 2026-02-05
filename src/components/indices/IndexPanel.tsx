@@ -8,7 +8,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { Settings } from 'lucide-react';
+
 
 interface IndexItem {
   code: string;
@@ -64,10 +64,10 @@ export function IndexPanel({ title, items, className, onSettings }: IndexPanelPr
       <div className="flex items-center justify-between px-3 py-2 border-b bg-muted/30">
         <h3 className="font-semibold text-sm text-foreground">{title}</h3>
         <button 
-          className="p-1 rounded hover:bg-muted/50 transition-colors"
+          className="p-1 rounded hover:bg-muted/50 transition-colors font-mono text-xs text-muted-foreground"
           onClick={onSettings}
         >
-          <Settings className="h-3.5 w-3.5 text-muted-foreground" />
+          [...]
         </button>
       </div>
 

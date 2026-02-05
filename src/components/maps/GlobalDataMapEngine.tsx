@@ -11,15 +11,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  Globe,
-  Info,
-  AlertTriangle,
-  TrendingUp,
-  TrendingDown,
-  EyeOff,
-  X
-} from 'lucide-react';
-import {
   LineChart,
   Line,
   XAxis,
@@ -103,7 +94,7 @@ const CountryTile: React.FC<{
       
       {/* Uncertainty warning */}
       {data.uncertainty > 20 && (
-        <AlertTriangle className="absolute top-1 right-1 h-3 w-3 text-amber-500" />
+        <span className="absolute top-1 right-1 font-mono text-[9px] text-amber-500">[!]</span>
       )}
     </button>
   );
@@ -189,9 +180,9 @@ const CountryDetailPanel: React.FC<{
             </div>
             <button 
               onClick={onClose}
-              className="p-1 rounded hover:bg-muted/50 text-muted-foreground"
+              className="p-1 rounded hover:bg-muted/50 text-muted-foreground font-mono text-sm"
             >
-              <X className="h-4 w-4" />
+              [x]
             </button>
           </div>
         </div>
@@ -200,11 +191,9 @@ const CountryDetailPanel: React.FC<{
       <CardContent className="space-y-4">
         {/* Global comparison */}
         <div className="flex items-center gap-2 p-2.5 bg-muted/30 rounded-lg">
-          {isAboveGlobal ? (
-            <TrendingUp className="h-4 w-4 text-blue-500 shrink-0" />
-          ) : (
-            <TrendingDown className="h-4 w-4 text-purple-500 shrink-0" />
-          )}
+          <span className="font-mono text-sm shrink-0">
+            {isAboveGlobal ? '[↑]' : '[↓]'}
+          </span>
           <span className="text-sm">
             <strong>{Math.abs(Number(diffFromGlobal))}%</strong> {isAboveGlobal ? 'över' : 'under'} globalt snitt
           </span>
@@ -275,13 +264,13 @@ const CountryDetailPanel: React.FC<{
         {/* Disclaimers */}
         <div className="border-t pt-3">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-            <EyeOff className="h-3 w-3" />
+            <span className="font-mono">[~]</span>
             <span className="font-medium">Denna karta visar inte:</span>
           </div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1">
             {MAP_DISCLAIMERS.doesNotShow.sv.map((item, i) => (
               <div key={i} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                <X className="h-3 w-3 text-red-400 shrink-0" />
+                <span className="font-mono text-destructive shrink-0">[x]</span>
                 <span>{item}</span>
               </div>
             ))}
@@ -354,7 +343,7 @@ const GlobalDataMapEngine: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Globe className="h-5 w-5 text-primary" />
+              <span className="font-mono text-sm text-primary">[MAP]</span>
               <div>
                 <h1 className="text-lg font-semibold">Global Data Map</h1>
                 <p className="text-xs text-muted-foreground hidden sm:block">
@@ -443,8 +432,8 @@ const GlobalDataMapEngine: React.FC = () => {
             <div className="p-4 space-y-6 max-w-4xl">
               {/* Info banner */}
               <Alert className="bg-primary/5 border-primary/20 py-2">
-                <Info className="h-4 w-4" />
-                <AlertDescription className="text-xs">
+                <span className="font-mono text-xs mr-2">[i]</span>
+                <AlertDescription className="text-xs inline">
                   {MAP_CORE_MESSAGE.sv}
                 </AlertDescription>
               </Alert>

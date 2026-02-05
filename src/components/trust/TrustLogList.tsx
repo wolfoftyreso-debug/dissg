@@ -3,6 +3,7 @@
  * 
  * Displays the public trust log with filtering.
  * Part of Block 55.
+ * NO ICONS - text markers only per no-icons-doctrine.
  */
 
 import React, { useState } from 'react';
@@ -12,7 +13,6 @@ import { TrustLogEntry } from './TrustLogEntry';
 import { CHANGE_TYPES, ChangeType } from '@/config/trustLogConfig';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Filter } from 'lucide-react';
 
 interface TrustLogListProps {
   scope?: string;
@@ -43,7 +43,7 @@ export function TrustLogList({
     <div className={cn('space-y-6', className)}>
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Shield className="h-5 w-5 text-primary" />
+        <span className="font-mono text-sm text-muted-foreground">[LOGG]</span>
         <h2 className="text-lg font-semibold">Trust Log</h2>
         {stats && (
           <Badge variant="secondary" className="text-xs">
@@ -80,7 +80,7 @@ export function TrustLogList({
 
       {/* Filters */}
       <div className="flex items-center gap-2 flex-wrap">
-        <Filter className="h-4 w-4 text-muted-foreground" />
+        <span className="font-mono text-xs text-muted-foreground">[FILTER]</span>
         <button
           onClick={() => setSelectedType(undefined)}
           className={cn(
@@ -122,7 +122,7 @@ export function TrustLogList({
           ))
         ) : (
           <div className="text-center py-12 text-muted-foreground">
-            <Shield className="h-8 w-8 mx-auto mb-3 opacity-50" />
+            <span className="font-mono text-2xl block mb-3">[~]</span>
             <p>Inga ändringar loggade ännu.</p>
             <p className="text-xs mt-1">
               Alla framtida ändringar kommer visas här.
