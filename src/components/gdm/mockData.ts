@@ -158,20 +158,26 @@ export function getDiagnosticPanelData(geoCode: string): DiagnosticPanelData | n
 // LAMBDA COLOR SCALE
 // =============================================================================
 
+// =============================================================================
+// LAMBDA COLOR SCALE - MYNDIGHETSPALETT
+// Dämpade, kliniska färger för professionellt utseende
+// =============================================================================
+
 export function getLambdaColor(lambda: number): string {
-  if (lambda < 0.85) return '#dc2626';      // red - critical
-  if (lambda < 0.95) return '#f97316';      // orange - structural weak
-  if (lambda <= 1.05) return '#3b82f6';     // blue - optimal
-  if (lambda <= 1.15) return '#a855f7';     // purple - overheat
-  return '#be123c';                          // rose - critical high
+  // Myndighets-grå/blå palett - klinisk, inte spel-lik
+  if (lambda < 0.80) return '#64748b';      // slate-500 - kritisk (dämpat)
+  if (lambda < 0.90) return '#78716c';      // stone-500 - strukturellt svag
+  if (lambda <= 1.05) return '#1e40af';     // blue-800 - optimal (myndighetsblå)
+  if (lambda <= 1.15) return '#475569';     // slate-600 - överhettning
+  return '#57534e';                          // stone-600 - kritisk hög
 }
 
 export function getSystemStatus(lambda: number): { status: string; color: string; label: { sv: string; en: string } } {
   if (lambda >= 0.95 && lambda <= 1.05) {
-    return { status: 'BALANCED', color: '#3b82f6', label: { sv: '🟢 Balanserat', en: '🟢 Balanced' } };
+    return { status: 'BALANCED', color: '#1e40af', label: { sv: 'Balanserat', en: 'Balanced' } };
   }
   if (lambda >= 0.85 && lambda <= 1.15) {
-    return { status: 'STRAINED', color: '#f97316', label: { sv: '🟡 Ansträngt', en: '🟡 Strained' } };
+    return { status: 'STRAINED', color: '#78716c', label: { sv: 'Avvikelse', en: 'Deviation' } };
   }
-  return { status: 'FAULT_DETECTED', color: '#dc2626', label: { sv: '🔴 Fel detekterat', en: '🔴 Fault Detected' } };
+  return { status: 'FAULT_DETECTED', color: '#64748b', label: { sv: 'Kritisk avvikelse', en: 'Critical Deviation' } };
 }

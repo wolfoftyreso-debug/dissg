@@ -55,44 +55,54 @@
     --radius: 0.25rem;
 
     /* 
-     * ENDAST TRE SIGNALFÄRGER
-     * Grön = stabil/förbättring
-     * Gul = avvikelse  
-     * Röd = negativ trend / varning
+     * ENDAST TRE SIGNALNYANSER - Dämpade, kliniska
+     * Grå-grön = stabil
+     * Grå-gul = avvikelse  
+     * Grå-röd = varning
      */
-    --status-positive: 145 55% 38%;
+    --status-positive: 160 30% 35%;
     --status-positive-foreground: 0 0% 100%;
-    --status-warning: 40 95% 48%;
-    --status-warning-foreground: 40 95% 12%;
-    --status-critical: 0 75% 48%;
+    --status-warning: 35 45% 42%;
+    --status-warning-foreground: 35 50% 10%;
+    --status-critical: 0 35% 42%;
     --status-critical-foreground: 0 0% 100%;
-    --status-neutral: 210 10% 55%;
+    --status-neutral: 210 12% 50%;
 
-    /* Trend - Samma som status */
-    --trend-up: 145 55% 38%;
-    --trend-down: 0 75% 48%;
-    --trend-stable: 210 10% 55%;
+    /* Trend - Samma dämpade palett */
+    --trend-up: 160 30% 35%;
+    --trend-down: 0 35% 42%;
+    --trend-stable: 210 12% 50%;
 
     /* DEL XXI: Semantiska trendfärger */
-    --trend-positive: 145 55% 38%;
-    --trend-warning: 40 95% 48%;
-    --trend-negative: 0 75% 48%;
-    --trend-neutral: 210 10% 55%;
+    --trend-positive: 160 30% 35%;
+    --trend-warning: 35 45% 42%;
+    --trend-negative: 0 35% 42%;
+    --trend-neutral: 210 12% 50%;
 
     /* Konfidensnivåer */
-    --confidence-high: 145 55% 38%;
-    --confidence-medium: 40 95% 48%;
-    --confidence-low: 0 75% 48%;
+    --confidence-high: 160 30% 35%;
+    --confidence-medium: 35 45% 42%;
+    --confidence-low: 0 35% 42%;
 
-    /* Datalager A/B/C */
-    --layer-a: 210 65% 45%;
-    --layer-b: 40 95% 48%;
-    --layer-c: 0 75% 48%;
+    /* Datalager A/B/C - Myndighetsblå skala */
+    --layer-a: 210 50% 35%;
+    --layer-b: 210 35% 50%;
+    --layer-c: 210 20% 65%;
+
+    /* GDM Specifika - Myndighetspalett */
+    --gdm-panel-bg: 215 28% 10%;
+    --gdm-panel-border: 215 20% 25%;
+    --gdm-text-primary: 210 15% 75%;
+    --gdm-text-secondary: 210 10% 55%;
+    --gdm-accent: 210 50% 35%;
+    --gdm-marker-optimal: 210 50% 35%;
+    --gdm-marker-weak: 210 15% 45%;
+    --gdm-marker-critical: 210 10% 40%;
 
     /* Simuleringsläge (tydligt avgränsat) */
-    --simulation-bg: 280 60% 97%;
-    --simulation-border: 280 60% 70%;
-    --simulation-text: 280 60% 30%;
+    --simulation-bg: 280 10% 97%;
+    --simulation-border: 280 15% 70%;
+    --simulation-text: 280 15% 30%;
 
     /* Typography - System font stack för snabbhet */
     --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;

@@ -2,12 +2,13 @@
  * Time Slider
  * 
  * Controls the time dimension of the map.
+ * MYNDIGHETSDESIGN: Strikt, klinisk, inga spel-liknande effekter.
+ * NO ICONS per no-icons-doctrine.
  */
 
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
 interface TimeSliderProps {
   year: number;
@@ -27,50 +28,51 @@ export function TimeSlider({
   onPlayPause,
 }: TimeSliderProps) {
   return (
-    <div 
-      className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-auto"
-    >
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-auto">
       <div 
-        className="px-6 py-4 rounded-lg backdrop-blur-md border flex items-center gap-4"
-        style={{ background: 'rgba(0,0,0,0.7)', borderColor: 'rgba(255,255,255,0.1)' }}
+        className="px-6 py-3 rounded-sm backdrop-blur-sm border flex items-center gap-4"
+        style={{ 
+          background: 'rgba(15,23,42,0.92)', 
+          borderColor: 'rgba(71,85,105,0.5)' 
+        }}
       >
-        {/* Playback controls */}
+        {/* Playback controls - Text markers */}
         <div className="flex items-center gap-1">
           <Button 
             variant="ghost" 
-            size="icon" 
-            className="h-8 w-8"
+            size="sm" 
+            className="h-7 w-7 font-mono text-[10px] text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
             onClick={() => onChange(minYear)}
           >
-            <SkipBack className="h-4 w-4" />
+            [«]
           </Button>
           {onPlayPause && (
             <Button 
               variant="ghost" 
-              size="icon" 
-              className="h-8 w-8"
+              size="sm" 
+              className="h-7 w-7 font-mono text-[10px] text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
               onClick={onPlayPause}
             >
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              {isPlaying ? '[||]' : '[>]'}
             </Button>
           )}
           <Button 
             variant="ghost" 
-            size="icon" 
-            className="h-8 w-8"
+            size="sm" 
+            className="h-7 w-7 font-mono text-[10px] text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
             onClick={() => onChange(maxYear)}
           >
-            <SkipForward className="h-4 w-4" />
+            [»]
           </Button>
         </div>
 
-        {/* Year display */}
-        <div className="w-16 text-center">
-          <div className="font-mono text-2xl font-bold text-white">{year}</div>
+        {/* Year display - Klinisk typografi */}
+        <div className="w-14 text-center">
+          <div className="font-mono text-xl font-semibold text-slate-200 tracking-tight">{year}</div>
         </div>
 
         {/* Slider */}
-        <div className="w-64">
+        <div className="w-56">
           <Slider
             value={[year]}
             min={minYear}
@@ -79,7 +81,7 @@ export function TimeSlider({
             onValueChange={(v) => onChange(v[0])}
             className="w-full"
           />
-          <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+          <div className="flex justify-between text-[9px] text-slate-500 mt-1 font-mono">
             <span>{minYear}</span>
             <span>{maxYear}</span>
           </div>

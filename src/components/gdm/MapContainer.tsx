@@ -78,59 +78,63 @@ export function MapContainer({
       const color = getLambdaColor(lambdaData.lambda);
       const isSelected = selectedCountry === country.code;
 
-      // Create marker element
+      // Create marker element - Myndighetsdesign: fyrkantiga, dämpade
       const el = document.createElement('div');
       el.className = 'gdm-country-marker';
       el.style.cssText = `
-        width: ${isSelected ? '56px' : '48px'};
-        height: ${isSelected ? '56px' : '48px'};
-        background: ${color};
-        border-radius: 50%;
+        width: ${isSelected ? '52px' : '44px'};
+        height: ${isSelected ? '32px' : '28px'};
+        background: ${theme === 'dark' ? 'rgba(30, 41, 59, 0.95)' : 'rgba(248, 250, 252, 0.95)'};
+        border-radius: 2px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        border: ${isSelected ? '3px solid white' : '2px solid rgba(255,255,255,0.3)'};
-        transition: all 0.2s ease;
-        font-family: 'JetBrains Mono', monospace;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        border: 1px solid ${isSelected ? color : 'rgba(100,116,139,0.4)'};
+        border-left: 3px solid ${color};
+        transition: all 0.15s ease;
+        font-family: 'Inter', system-ui, sans-serif;
       `;
 
-      // Lambda value
+      // Lambda value - Klinisk typografi
       const lambdaEl = document.createElement('div');
       lambdaEl.style.cssText = `
-        font-size: 12px;
-        font-weight: bold;
-        color: white;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        font-size: 11px;
+        font-weight: 600;
+        color: ${color};
+        letter-spacing: -0.02em;
       `;
       lambdaEl.textContent = lambdaData.lambda.toFixed(2);
       el.appendChild(lambdaEl);
 
-      // Country code
+      // Country code - Diskret
       const codeEl = document.createElement('div');
       codeEl.style.cssText = `
-        font-size: 9px;
-        color: rgba(255,255,255,0.8);
-        margin-top: 1px;
+        font-size: 8px;
+        font-weight: 500;
+        color: ${theme === 'dark' ? 'rgba(148,163,184,0.8)' : 'rgba(100,116,139,0.9)'};
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
       `;
       codeEl.textContent = country.code;
       el.appendChild(codeEl);
 
-      // Active GEDI indicator
+      // Active GEDI indicator - Diskret liten markör
       if (lambdaData.activeGEDICodes.length > 0) {
         const gediEl = document.createElement('div');
         gediEl.style.cssText = `
           position: absolute;
-          top: -4px;
-          right: -4px;
-          width: 16px;
-          height: 16px;
-          background: #dc2626;
-          border-radius: 50%;
-          border: 2px solid white;
-          font-size: 8px;
+          top: -2px;
+          right: -2px;
+          width: 12px;
+          height: 12px;
+          background: ${theme === 'dark' ? '#475569' : '#64748b'};
+          border-radius: 1px;
+          border: 1px solid ${theme === 'dark' ? '#334155' : '#cbd5e1'};
+          font-size: 7px;
+          font-weight: 600;
           color: white;
           display: flex;
           align-items: center;
