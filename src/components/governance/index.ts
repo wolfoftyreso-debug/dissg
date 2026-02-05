@@ -19,6 +19,9 @@ export { StewardOathViewer } from './StewardOathViewer';
 // Founders Exit Protocol
 export { FoundersExitProtocolViewer } from './FoundersExitProtocolViewer';
 
+// Public Trust Declaration
+export { PublicTrustDeclarationViewer } from './PublicTrustDeclarationViewer';
+
 // Re-export configuration
 export {
   IMMUTABLE_PRINCIPLES,
