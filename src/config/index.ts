@@ -2,16 +2,38 @@
   * CONFIGURATION INDEX
   * 
   * Central export for all system configuration modules.
+  * This is the system's machine-readable constitution.
   */
  
- // Development & Compliance
- export * from './developmentPriorities';
+ // ═══════════════════════════════════════════════════════════════════════════
+ // SECTION 1: SYSTEM ROLE (LOCKED)
+ // ═══════════════════════════════════════════════════════════════════════════
+ 
+ export {
+   SYSTEM_ROLE_DEFINITION,
+   DEVELOPMENT_PRIORITY_ORDER,
+   DEPLOYMENT_PRINCIPLES,
+   INDEXING_PRINCIPLES,
+   validateFeatureAgainstSystemRole,
+   type ImprovementDomain,
+ } from './developmentPriorities';
+ 
+ // ═══════════════════════════════════════════════════════════════════════════
+ // SECTION 2: COMPLIANCE & VALIDATION
+ // ═══════════════════════════════════════════════════════════════════════════
+ 
  export * from './masterpromptCompliance';
  
- // UX & Controllers
+ // ═══════════════════════════════════════════════════════════════════════════
+ // SECTION 3: UX PRINCIPLES
+ // ═══════════════════════════════════════════════════════════════════════════
+ 
  export * from './uxPrinciples';
  
- // Ontological Framework
+ // ═══════════════════════════════════════════════════════════════════════════
+ // SECTION 4: ONTOLOGICAL SOVEREIGNTY
+ // ═══════════════════════════════════════════════════════════════════════════
+ 
  export {
    ONTOLOGICAL_AXIOMS,
    TRUTH_AUTHORITY_CONFIG,
@@ -27,7 +49,10 @@
    type SchemaGovernance,
  } from './ontologicalSovereignty';
  
- // Machine Consumption
+ // ═══════════════════════════════════════════════════════════════════════════
+ // SECTION 5: MACHINE CONSUMPTION LAYER
+ // ═══════════════════════════════════════════════════════════════════════════
+ 
  export {
    CONSUMER_PROFILES,
    MACHINE_ENDPOINTS,
@@ -42,7 +67,10 @@
    type SourceReference,
  } from './machineConsumption';
  
- // Untouchable Architecture
+ // ═══════════════════════════════════════════════════════════════════════════
+ // SECTION 6: UNTOUCHABLE ARCHITECTURE
+ // ═══════════════════════════════════════════════════════════════════════════
+ 
  export {
    IMMUTABILITY_RULES,
    SEPARATION_RULES,
