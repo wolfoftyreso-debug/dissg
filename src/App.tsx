@@ -106,6 +106,9 @@ import DecisionDemo from "./pages/DecisionDemo";
 import IndexBoards from "./pages/IndexBoards";
 import QuestionFirst from "./pages/QuestionFirst";
 import GDGSpec from "./pages/GDGSpec";
+import Methodology from "./pages/Methodology";
+import WhatWeDoNot from "./pages/WhatWeDoNot";
+import Validator from "./pages/Validator";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -219,6 +222,9 @@ const App = () => (
                 <Route path="/index-boards" element={<IndexBoards />} />
                 <Route path="/ask" element={<QuestionFirst />} />
                 <Route path="/gdg" element={<GDGSpec />} />
+                <Route path="/methodology" element={<Methodology />} />
+                <Route path="/what-we-do-not" element={<WhatWeDoNot />} />
+                <Route path="/validator" element={<Validator />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
