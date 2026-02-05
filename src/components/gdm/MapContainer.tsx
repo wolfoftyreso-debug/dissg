@@ -165,7 +165,7 @@ export function MapContainer({
 
       markersRef.current.push(marker);
     });
-  }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear]);
+  }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear, theme]);
 
   // Fly to selected country
   useEffect(() => {
