@@ -197,6 +197,46 @@ export {
   INSTITUTIONAL_STANDARD_MASTERPROMPT,
 } from './institutional-standard';
 
+// Crisis-Mode Decision Engine
+export {
+  // Types
+  type CrisisSeverity,
+  type CrisisTimeHorizon,
+  type CrisisContextSnapshot,
+  type CompressedDPD,
+  type CrisisDecision,
+  type CrisisExtensionRequest,
+  type PostCrisisAudit,
+  type CrisisFrictionCheckpoint,
+  // Crisis Context
+  declareCrisis,
+  escalateCrisis,
+  resolveCrisis,
+  calculateCrisisDuration,
+  CRISIS_CONTEXT_MASTERPROMPT,
+  // Compressed DPD
+  createCompressedDPD,
+  validateCompressedDPD,
+  prepareForFullDocumentation,
+  COMPRESSED_DPD_MASTERPROMPT,
+  // Time-bound Decisions
+  createCrisisDecision,
+  generateCrisisFrictionCheckpoints,
+  acknowledgeFrictionCheckpoint,
+  allCheckpointsAcknowledged,
+  lockCrisisDecision,
+  isDecisionExpired,
+  requestExtension,
+  approveExtension,
+  TIME_BOUND_DECISIONS_MASTERPROMPT,
+  // Post-Crisis Audit
+  generatePostCrisisAudit,
+  generateKnownAtTimeReport,
+  POST_CRISIS_AUDIT_MASTERPROMPT,
+  // Master
+  CRISIS_MODE_MASTERPROMPT,
+} from './crisis-mode';
+
 /**
  * BDPE SUMMARY
  */
