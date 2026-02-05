@@ -28,6 +28,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { ClickableSourceCitation } from '@/components/ui/ClickableSourceCitation';
+ import { TermExplainer, TermLegend } from '@/components/data';
 
 // Mock indicator data for the graph sandbox
 const AVAILABLE_INDICATORS = [
@@ -334,14 +335,16 @@ export default function CountryExplorer() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {[
-                    { name: 'Human Development Index (HDI)', value: 0.85 + Math.random() * 0.1, rank: Math.floor(Math.random() * 30) + 1 },
-                    { name: 'Global Master Index (GMI)', value: 72 + Math.random() * 15, rank: Math.floor(Math.random() * 50) + 1 },
-                    { name: 'Gini-koefficient', value: 25 + Math.random() * 15, rank: Math.floor(Math.random() * 40) + 1 },
-                    { name: 'Environmental Performance', value: 55 + Math.random() * 30, rank: Math.floor(Math.random() * 60) + 1 },
-                  ].map((index, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded border hover:bg-muted/50 transition-colors">
+                     { name: 'HDI', fullName: 'Human Development Index', value: 0.85 + Math.random() * 0.1, rank: Math.floor(Math.random() * 30) + 1 },
+                     { name: 'Gini', fullName: 'Gini-koefficient', value: 25 + Math.random() * 15, rank: Math.floor(Math.random() * 40) + 1 },
+                     { name: 'BNP/capita', fullName: 'BNP per capita', value: 45000 + Math.random() * 20000, rank: Math.floor(Math.random() * 50) + 1 },
+                     { name: 'CO₂/capita', fullName: 'CO₂ per capita', value: 4 + Math.random() * 8, rank: Math.floor(Math.random() * 60) + 1 },
+                   ].map((index) => (
+                     <div key={index.name} className="flex items-center justify-between p-3 rounded border hover:bg-muted/50 transition-colors cursor-pointer">
                       <div>
-                        <p className="font-medium text-sm">{index.name}</p>
+                         <TermExplainer term={index.name} className="font-medium text-sm">
+                           {index.fullName}
+                         </TermExplainer>
                         <p className="text-xs text-muted-foreground">Rank #{index.rank} globalt</p>
                       </div>
                       <div className="text-right">
@@ -382,7 +385,7 @@ export default function CountryExplorer() {
                       <YAxis yAxisId="left" orientation="left" tick={{ fontSize: 10 }} />
                       <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} />
                       <Tooltip />
-                      <Legend />
+                       <Legend content={<TermLegend />} />
                       <Bar yAxisId="left" dataKey="hdi" name="HDI" fill="hsl(var(--chart-1))" />
                       <Bar yAxisId="right" dataKey="gdp" name="BNP/capita" fill="hsl(var(--chart-2))" />
                     </BarChart>

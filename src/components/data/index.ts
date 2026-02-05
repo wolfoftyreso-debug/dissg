@@ -45,6 +45,13 @@ export {
   IndicatorsDrilldown, 
   TablesDrilldown 
 } from './StatDrilldown';
+ 
+ // Term explanations for technical terms
+ export { 
+   TermExplainer, 
+   TermLegend, 
+   TERM_DEFINITIONS 
+ } from './TermExplainer';
 
 // Utility: Create a simple data point with basic depth
 export function createDataPoint(params: {
