@@ -4,31 +4,31 @@
  
  // Types
  export type {
-   AnswerPacket,
+  AnswerPacketV2,
    AnswerDomain,
    IntentType,
-   AnswerTemplate,
-   TemporalRequirement,
-   ComparisonLimit,
-   SourceRequirement,
-   RefreshPolicy,
-   DeeplinkTemplate,
-   AnswerPacketRegistry,
+  IntentMatch,
+  GeneratedAnswer,
+  LLMContract,
  } from './types';
  
- export { ANSWER_DOMAINS, INTENT_TYPES } from './types';
+export { ANSWER_DOMAINS, INTENT_TYPES, LLM_CONTRACT } from './types';
  
- // Invariants
- export {
-   validateAnswerPacket,
-   hasSufficientCoverage,
-   isDataFresh,
- } from './invariants';
+// Invariants  
+export { validateAnswerPacket } from './invariants';
  
  // Registry
  export {
    ANSWER_PACKETS,
+  ALL_PACKETS,
    getPacket,
    getPacketsByDomain,
    getPacketCount,
  } from './packets';
+
+// Generator
+export { matchIntent, validateInputs } from './generator/intent-matcher';
+export { generateAnswer } from './generator/answer-generator';
+
+// Live testing
+export { runLiveCase, runAllLiveCases } from './tests/live-case';
