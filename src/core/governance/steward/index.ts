@@ -54,6 +54,21 @@ export {
 // Morality
 export { SYSTEM_MORALITY, STEWARD_FINAL_WORDS } from './morality';
 
+// Oath
+export {
+  CORE_COMMITMENT,
+  POSITIVE_DUTIES,
+  NEGATIVE_DUTIES,
+  AUTHORITY,
+  CHANGE_DISCIPLINE,
+  AI_ACKNOWLEDGMENT,
+  SUCCESSION_COMMITMENT,
+  RESIGNATION_CLAUSE,
+  FINAL_STATEMENT,
+  STEWARD_OATH_COMPLETE,
+  type OathSignature,
+} from './oath';
+
 // ============================================================================
 // FINAL STATUS
 // ============================================================================

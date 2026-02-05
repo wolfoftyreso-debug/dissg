@@ -12,8 +12,9 @@ export { AIGuardrailsPanel } from './AIGuardrailsPanel';
 export { ExitSafeMode, ExitSafeWarningBanner } from './ExitSafeMode';
 export { FinalPosition } from './FinalPosition';
 
-// Steward Handbook
+// Steward Handbook & Oath
 export { StewardHandbookViewer } from './StewardHandbookViewer';
+export { StewardOathViewer } from './StewardOathViewer';
 
 // Re-export configuration
 export {
