@@ -1,226 +1,280 @@
- /**
-  * TRUTH ENGINE - MINIMAL VIABLE CORE (MCTE)
-  * 
-  * The smallest runnable system that can:
-  * 1. Store ONE truth correctly
-  * 2. Reject everything else
-  * 
-  * Components:
-  * - Core: Ontology, IDs, Invariants
-  * - Store: Append-only
-  * - Query: Read-only
-  * - Schemas: Population (first truth)
-  */
- 
- // Core
- export {
-   BASE_CLASSES,
-   type BaseClass,
-   type CoreObject,
-   type Entity,
-   type Source,
-   type Schema,
-   type Measure,
-   type TemporalEnvelope,
-   type SourceEnvelope,
-   type UncertaintyEnvelope,
-   isMeasure,
-   isSource,
-   isSchema,
-   isEntity,
-   isValidBaseClass,
- } from './core/ontology';
- 
- export {
-   generateId,
-   generateSourceId,
-   generateSchemaId,
-   generateEntityId,
-   generateMeasureId,
-   parseId,
-   isValidId,
- } from './core/ids';
- 
- export {
-   CORE_INVARIANTS,
-   ENTITY_INVARIANTS,
-   runInvariants,
-   enforceInvariants,
-   assertEntityExists,
-   validateMeasureWithRegistry,
-   type Invariant,
-   type InvariantResult,
- } from './core/invariants';
- 
- // Store
- export {
-   create,
-   read,
-   readAll,
-   exists,
-   getWriteLog,
-   getStats,
-   update,
-   deleteObject,
-   _clearForTesting,
-   type WriteResult,
- } from './store/append-only';
- 
- // Query
- export {
-   executeQuery,
-   getById,
-   getSchema,
-   getSource,
-   getEntity,
-   explainValue,
-   type QueryRequest,
-   type QueryResult,
- } from './query/read';
- 
- // Schemas (First Truth)
- export {
-   POPULATION_SCHEMA,
-   SCB_SOURCE,
-   SWEDEN_ENTITY,
-   SWEDEN_POPULATION_2023,
-   SEED_DATA,
- } from './schemas/population';
- 
- // Tests
- export {
-   runAllTests,
- } from './tests/invariant-tests';
- 
- // First Truth (Step 8)
- export {
-   SCB_SOURCE as FIRST_TRUTH_SOURCE,
-   SWEDEN_ENTITY as FIRST_TRUTH_ENTITY,
-   POPULATION_SCHEMA as FIRST_TRUTH_SCHEMA,
-   POPULATION_SWEDEN_2023 as FIRST_TRUTH_MEASURE,
-   validateRecord,
-   insertFirstTruth,
-   runSabotageTests,
-   runStep8,
-   type SabotageTestResult,
- } from './first-truth';
- 
- // Entities (Step 9)
- export {
-   COUNTRY_SCHEMA_V1,
-   SWEDEN,
-   SWEDEN_ENTITY_SOURCE,
-   SWEDEN_TEMPORAL,
-   entityExists,
-   getEntity as getEntityFromRegistry,
-   registerEntity,
-   getAllEntities,
-   getRegistryStats,
- } from './entities';
- 
- export {
-   runEntitySabotageTests,
-   runStep9,
-   type EntityTestResult,
- } from './tests/entity-tests';
- 
- /**
-  * INITIALIZE TRUTH ENGINE
-  * 
-  * Seeds the store with the first truth.
-  */
- import { create as storeCreate } from './store/append-only';
- import { 
-   SEED_DATA, 
-   POPULATION_SCHEMA as _POPULATION_SCHEMA,
-   SCB_SOURCE as _SCB_SOURCE,
-   SWEDEN_ENTITY as _SWEDEN_ENTITY,
-   SWEDEN_POPULATION_2023 as _SWEDEN_POPULATION_2023,
- } from './schemas/population';
- 
- export function initializeTruthEngine(): {
-   success: boolean;
-   objectsCreated: number;
-   errors: string[];
- } {
-   const errors: string[] = [];
-   let created = 0;
-   
-   // Write schemas
-   for (const schema of SEED_DATA.schemas) {
-     const result = storeCreate(schema, 'truth-engine:init');
-     if (result.success) created++;
-     else if (result.error && !result.error.includes('already exists')) {
-       errors.push(result.error);
-     }
-   }
-   
-   // Write sources
-   for (const source of SEED_DATA.sources) {
-     const result = storeCreate(source, 'truth-engine:init');
-     if (result.success) created++;
-     else if (result.error && !result.error.includes('already exists')) {
-       errors.push(result.error);
-     }
-   }
-   
-   // Write entities
-   for (const entity of SEED_DATA.entities) {
-     const result = storeCreate(entity, 'truth-engine:init');
-     if (result.success) created++;
-     else if (result.error && !result.error.includes('already exists')) {
-       errors.push(result.error);
-     }
-   }
-   
-   // Write measures
-   for (const measure of SEED_DATA.measures) {
-     const result = storeCreate(measure, 'truth-engine:init');
-     if (result.success) created++;
-     else if (result.error && !result.error.includes('already exists')) {
-       errors.push(result.error);
-     }
-   }
-   
-   return {
-     success: errors.length === 0,
-     objectsCreated: created,
-     errors,
-   };
- }
- 
- /**
-  * THE FIRST TRUTH - Explain it
-  */
- export function explainFirstTruth(): string {
-   return `
- ═══════════════════════════════════════════════════════════════
- TRUTH ENGINE - FIRST TRUTH
- ═══════════════════════════════════════════════════════════════
- 
- VALUE: 10,551,707 persons
- 
- WHAT IT MEANS:
- ${_POPULATION_SCHEMA.definition}
- 
- SOURCE: ${_SCB_SOURCE.organization}
- Reliability: ${(_SCB_SOURCE.reliability_score * 100).toFixed(0)}%
- Methodology: ${_SCB_SOURCE.methodology_url}
- 
- ENTITY: ${_SWEDEN_ENTITY.name} (${_SWEDEN_ENTITY.identifiers.iso3166_1_alpha2})
- Valid from: ${_SWEDEN_ENTITY.identifiers.valid_from} (Gustav Vasa)
- 
- TIME:
- - Observed: ${_SWEDEN_POPULATION_2023.temporal.observed_at}
- - Valid from: ${_SWEDEN_POPULATION_2023.temporal.valid_from}
- - Valid to: ${_SWEDEN_POPULATION_2023.temporal.valid_to || 'Present (most recent)'}
- 
- UNCERTAINTY:
- - Coverage: ${(_SWEDEN_POPULATION_2023.uncertainty.coverage * 100).toFixed(1)}%
- - Note: ${_SWEDEN_POPULATION_2023.uncertainty.methodology_note}
- 
- ═══════════════════════════════════════════════════════════════
- This is what a truth looks like when properly specified.
- ═══════════════════════════════════════════════════════════════
- `.trim();
- }
+/**
+ * TRUTH ENGINE — COMPLETE PUBLIC API
+ * 
+ * This is the complete ST-OS implementation.
+ * 
+ * Architecture:
+ * ─────────────────────────────────────────────
+ * 
+ * ┌─────────────────────────────────────────┐
+ * │           TRUTH ENGINE                   │
+ * ├─────────────────────────────────────────┤
+ * │  /engine      Semantic Execution        │
+ * │  /contracts   Output Contracts          │
+ * │  /ontology    Truth Nodes               │
+ * │  /artifacts   Civilizational Memory     │
+ * │  /execution   SEE + Prompts             │
+ * │  /cognition   HCAL                      │
+ * │  /memory      CML                       │
+ * │  /semantic-os ST-OS Core                │
+ * │  /core        Base Ontology + IDs       │
+ * │  /store       Append-only Store         │
+ * │  /query       Read-only Query           │
+ * └─────────────────────────────────────────┘
+ * 
+ * PRINCIPLES (HARDLOCK):
+ * 1. All intelligence is data + structure, never free text
+ * 2. LLM = renderer + navigator, never source
+ * 3. All output must be machine-validatable
+ * 4. All truth is read-only
+ * 5. All complexity is separated
+ */
+
+// ═══════════════════════════════════════════════════════════════
+// ST-OS EXECUTION LAYER (NEW)
+// Re-export with namespaces to avoid conflicts
+// ═══════════════════════════════════════════════════════════════
+
+// Engine — The heart of ST-OS
+export * as SemanticEngine from './engine';
+
+// Contracts — Output contracts
+export * as Contracts from './contracts';
+
+// Ontology — Truth Nodes
+export * as Ontology from './ontology';
+
+// Artifacts — Civilizational Memory
+export * as Artifacts from './artifacts';
+
+// Execution — SEE + Prompts
+export * as Execution from './execution';
+
+// Cognition — HCAL
+export * as Cognition from './cognition';
+
+// Memory — CML
+export * as Memory from './memory';
+
+// Semantic OS — Core
+export * as SemanticOS from './semantic-os';
+
+// Semantic Universe — STU
+export * as SemanticUniverse from './semantic-universe';
+
+// ═══════════════════════════════════════════════════════════════
+// ORIGINAL MCTE (MINIMAL VIABLE CORE)
+// ═══════════════════════════════════════════════════════════════
+
+// Core
+export {
+  BASE_CLASSES,
+  type BaseClass,
+  type CoreObject,
+  type Entity,
+  type Source,
+  type Schema,
+  type Measure,
+  type TemporalEnvelope,
+  type SourceEnvelope,
+  type UncertaintyEnvelope,
+  isMeasure,
+  isSource,
+  isSchema,
+  isEntity,
+  isValidBaseClass,
+} from './core/ontology';
+
+export {
+  generateId,
+  generateSourceId,
+  generateSchemaId,
+  generateEntityId,
+  generateMeasureId,
+  parseId,
+  isValidId,
+} from './core/ids';
+
+export {
+  CORE_INVARIANTS,
+  ENTITY_INVARIANTS,
+  runInvariants,
+  enforceInvariants,
+  assertEntityExists,
+  validateMeasureWithRegistry,
+  type Invariant,
+  type InvariantResult,
+} from './core/invariants';
+
+// Store
+export {
+  create,
+  read,
+  readAll,
+  exists,
+  getWriteLog,
+  getStats,
+  update,
+  deleteObject,
+  _clearForTesting,
+  type WriteResult,
+} from './store/append-only';
+
+// Query
+export {
+  executeQuery,
+  getById,
+  getSchema,
+  getSource,
+  getEntity,
+  explainValue,
+  type QueryRequest,
+  type QueryResult,
+} from './query/read';
+
+// Schemas (First Truth)
+export {
+  POPULATION_SCHEMA,
+  SCB_SOURCE,
+  SWEDEN_ENTITY,
+  SWEDEN_POPULATION_2023,
+  SEED_DATA,
+} from './schemas/population';
+
+// Tests
+export {
+  runAllTests,
+} from './tests/invariant-tests';
+
+// First Truth (Step 8)
+export {
+  SCB_SOURCE as FIRST_TRUTH_SOURCE,
+  SWEDEN_ENTITY as FIRST_TRUTH_ENTITY,
+  POPULATION_SCHEMA as FIRST_TRUTH_SCHEMA,
+  POPULATION_SWEDEN_2023 as FIRST_TRUTH_MEASURE,
+  validateRecord,
+  insertFirstTruth,
+  runSabotageTests,
+  runStep8,
+  type SabotageTestResult,
+} from './first-truth';
+
+// Entities (Step 9)
+export {
+  COUNTRY_SCHEMA_V1,
+  SWEDEN,
+  SWEDEN_ENTITY_SOURCE,
+  SWEDEN_TEMPORAL,
+  entityExists,
+  getEntity as getEntityFromRegistry,
+  registerEntity,
+  getAllEntities,
+  getRegistryStats,
+} from './entities';
+
+export {
+  runEntitySabotageTests,
+  runStep9,
+  type EntityTestResult,
+} from './tests/entity-tests';
+
+/**
+ * INITIALIZE TRUTH ENGINE
+ * 
+ * Seeds the store with the first truth.
+ */
+import { create as storeCreate } from './store/append-only';
+import { 
+  SEED_DATA, 
+  POPULATION_SCHEMA as _POPULATION_SCHEMA,
+  SCB_SOURCE as _SCB_SOURCE,
+  SWEDEN_ENTITY as _SWEDEN_ENTITY,
+  SWEDEN_POPULATION_2023 as _SWEDEN_POPULATION_2023,
+} from './schemas/population';
+
+export function initializeTruthEngine(): {
+  success: boolean;
+  objectsCreated: number;
+  errors: string[];
+} {
+  const errors: string[] = [];
+  let created = 0;
+  
+  // Write schemas
+  for (const schema of SEED_DATA.schemas) {
+    const result = storeCreate(schema, 'truth-engine:init');
+    if (result.success) created++;
+    else if (result.error && !result.error.includes('already exists')) {
+      errors.push(result.error);
+    }
+  }
+  
+  // Write sources
+  for (const source of SEED_DATA.sources) {
+    const result = storeCreate(source, 'truth-engine:init');
+    if (result.success) created++;
+    else if (result.error && !result.error.includes('already exists')) {
+      errors.push(result.error);
+    }
+  }
+  
+  // Write entities
+  for (const entity of SEED_DATA.entities) {
+    const result = storeCreate(entity, 'truth-engine:init');
+    if (result.success) created++;
+    else if (result.error && !result.error.includes('already exists')) {
+      errors.push(result.error);
+    }
+  }
+  
+  // Write measures
+  for (const measure of SEED_DATA.measures) {
+    const result = storeCreate(measure, 'truth-engine:init');
+    if (result.success) created++;
+    else if (result.error && !result.error.includes('already exists')) {
+      errors.push(result.error);
+    }
+  }
+  
+  return {
+    success: errors.length === 0,
+    objectsCreated: created,
+    errors,
+  };
+}
+
+/**
+ * THE FIRST TRUTH - Explain it
+ */
+export function explainFirstTruth(): string {
+  return `
+═══════════════════════════════════════════════════════════════
+TRUTH ENGINE - FIRST TRUTH
+═══════════════════════════════════════════════════════════════
+
+VALUE: 10,551,707 persons
+
+WHAT IT MEANS:
+${_POPULATION_SCHEMA.definition}
+
+SOURCE: ${_SCB_SOURCE.organization}
+Reliability: ${(_SCB_SOURCE.reliability_score * 100).toFixed(0)}%
+Methodology: ${_SCB_SOURCE.methodology_url}
+
+ENTITY: ${_SWEDEN_ENTITY.name} (${_SWEDEN_ENTITY.identifiers.iso3166_1_alpha2})
+Valid from: ${_SWEDEN_ENTITY.identifiers.valid_from} (Gustav Vasa)
+
+TIME:
+- Observed: ${_SWEDEN_POPULATION_2023.temporal.observed_at}
+- Valid from: ${_SWEDEN_POPULATION_2023.temporal.valid_from}
+- Valid to: ${_SWEDEN_POPULATION_2023.temporal.valid_to || 'Present (most recent)'}
+
+UNCERTAINTY:
+- Coverage: ${(_SWEDEN_POPULATION_2023.uncertainty.coverage * 100).toFixed(1)}%
+- Note: ${_SWEDEN_POPULATION_2023.uncertainty.methodology_note}
+
+═══════════════════════════════════════════════════════════════
+This is what a truth looks like when properly specified.
+═══════════════════════════════════════════════════════════════
+`.trim();
+}
