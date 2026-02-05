@@ -1,0 +1,50 @@
+ # TRUTH ENGINE - FIRST SCHEMA
+ # 
+ # This is the first formal truth in the system.
+ # If this schema is unclear → the entire system fails.
+ 
+ id: core:schema:population_resident:v1
+ base_class: schema
+ 
+ name: Population (Resident Definition)
+ 
+ definition: >
+   Total number of persons registered as residents in a geographic area
+   at a specific point in time. Includes all persons with a registered
+   address regardless of citizenship. Excludes temporary visitors and
+   undocumented persons.
+ 
+ unit: persons
+ dimension: count
+ version: 1
+ supersedes: null
+ 
+ temporal:
+   observed_at: required
+   valid_from: required
+   valid_to: optional
+ 
+ source_required: true
+ 
+ # Validation rules
+ validation:
+   value:
+     type: integer
+     min: 0
+   coverage:
+     type: float
+     min: 0.0
+     max: 1.0
+ 
+ # Example: Sweden 2023
+ example:
+   entity: Sweden (SE)
+   value: 10551707
+   unit: persons
+   observed_at: "2023-12-31T00:00:00Z"
+   valid_from: "2023-12-31T00:00:00Z"
+   source: Statistics Sweden (SCB)
+   coverage: 0.99
+   methodology_note: >
+     Based on population register. Excludes persons not registered
+     in Sweden. Registration lag may affect accuracy by ~0.1%.
