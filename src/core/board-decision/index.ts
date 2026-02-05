@@ -69,6 +69,50 @@ export {
   DPD_EXAMPLES,
 } from './examples';
 
+// Workflow (End-to-End Automation)
+export {
+  // Types
+  type WorkflowRole,
+  type RolePermissions,
+  type MeetingPack,
+  type BoardProtocol,
+  type DecisionContextSnapshot,
+  type ScheduledReview,
+  type WorkflowState,
+  type WorkflowStage,
+  type AuditEntry,
+  ROLE_PERMISSIONS,
+  // Meeting Pack
+  generateMeetingPack,
+  lockMeetingPack,
+  validateMeetingPack,
+  MEETING_PACK_MASTERPROMPT,
+  // Protocol
+  createProtocol,
+  addProtocolItem,
+  recordVote,
+  signProtocol,
+  lockProtocol,
+  validateProtocol,
+  PROTOCOL_GENERATOR_MASTERPROMPT,
+  // Context Snapshot
+  createContextSnapshot,
+  verifySnapshotIntegrity,
+  scheduleReview,
+  compareSnapshotToCurrentState,
+  // Orchestrator
+  initializeWorkflow,
+  attachDPD,
+  generateWorkflowAgenda,
+  generateWorkflowMeetingPack,
+  startMeeting,
+  finalizeProtocol,
+  exportAuditTrail,
+  ORCHESTRATOR_MASTERPROMPT,
+  // Utils
+  generateChecksum,
+} from './workflow';
+
 // Masterprompt
 export {
   BOARD_DECISION_MASTERPROMPT,

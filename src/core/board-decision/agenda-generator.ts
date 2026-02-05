@@ -26,6 +26,7 @@ export interface BoardAgenda {
   agenda_id: string;
   dpd_id: string;
   meeting_type: string;
+  meeting_date: string;
   generated_at: string;
   total_time_minutes: number;
   items: AgendaItem[];
@@ -36,7 +37,8 @@ export interface BoardAgenda {
  */
 export interface AgendaInput {
   dpd_id: string;
-  meeting_type: 'board_meeting' | 'extraordinary_meeting' | 'annual_meeting';
+  meeting_date: string;
+  meeting_type?: 'board_meeting' | 'extraordinary_meeting' | 'annual_meeting';
   time_budget_minutes: number;
 }
 
@@ -98,7 +100,7 @@ const AGENDA_TEMPLATE: Array<{
  * Generates board agenda from DPD
  */
 export function generateAgenda(input: AgendaInput): BoardAgenda {
-  const { dpd_id, meeting_type, time_budget_minutes } = input;
+  const { dpd_id, meeting_date, meeting_type = 'board_meeting', time_budget_minutes } = input;
   
   const items: AgendaItem[] = AGENDA_TEMPLATE.map((template, index) => ({
     order: index + 1,
@@ -123,6 +125,7 @@ export function generateAgenda(input: AgendaInput): BoardAgenda {
     agenda_id: `agenda_${dpd_id}_${Date.now()}`,
     dpd_id,
     meeting_type,
+    meeting_date,
     generated_at: new Date().toISOString(),
     total_time_minutes: time_budget_minutes,
     items,
