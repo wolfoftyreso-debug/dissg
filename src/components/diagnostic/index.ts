@@ -8,6 +8,7 @@ export { DiagnosticView } from './DiagnosticView';
 export { DiagnosticScopeSelector } from './DiagnosticScopeSelector';
 export { AIGovernancePanel } from './AIGovernancePanel';
 export { SelfTestDashboard } from './SelfTestDashboard';
+ export { SelfAuditDashboard } from './SelfAuditDashboard';
 export { GEDIDashboard } from './GEDIDashboard';
 
 // Types
