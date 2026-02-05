@@ -25,3 +25,7 @@ export { GravityIndicator } from './GravityIndicator';
 // Responsibility Scaling
 export { ResponsibilityGate } from './ResponsibilityGate';
 export { ResponsibilityFlow } from './ResponsibilityFlow';
+
+// Legitimacy Layer
+export { LegitimacyDisplay, LegitimacyBadge } from './LegitimacyDisplay';
+export { CivilizationalRecord } from './CivilizationalRecord';
