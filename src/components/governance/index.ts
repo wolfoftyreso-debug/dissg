@@ -16,6 +16,9 @@ export { FinalPosition } from './FinalPosition';
 export { StewardHandbookViewer } from './StewardHandbookViewer';
 export { StewardOathViewer } from './StewardOathViewer';
 
+// Founders Exit Protocol
+export { FoundersExitProtocolViewer } from './FoundersExitProtocolViewer';
+
 // Re-export configuration
 export {
   IMMUTABLE_PRINCIPLES,
