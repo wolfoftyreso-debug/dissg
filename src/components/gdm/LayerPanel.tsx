@@ -3,13 +3,15 @@
  * 
  * Checkbox-based layer control with compatibility warnings.
  * MYNDIGHETSDESIGN: Strikt, klinisk, inga spel-liknande effekter.
- * NO ICONS per no-icons-doctrine.
+ * NO ICONS per no-icons-doctrine - ASCII text markers only.
+ * 
+ * @semantic fieldset/legend for grouped controls
+ * @a11y Proper labeling and role attributes
  */
 
 import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MAP_LAYERS, type MapLayerId } from './types';
 
 interface LayerPanelProps {
@@ -28,7 +30,10 @@ export function LayerPanel({ activeLayers, onToggleLayer, isPro }: LayerPanelPro
     if (layer?.incompatibleWith) {
       layer.incompatibleWith.forEach(incomp => {
         if (activeLayers.includes(incomp)) {
-          incompatibleWarnings.push(`${layer.name.sv} + ${MAP_LAYERS[incomp].name.sv}`);
+          const warning = `${layer.name.sv} + ${MAP_LAYERS[incomp].name.sv}`;
+          if (!incompatibleWarnings.includes(warning)) {
+            incompatibleWarnings.push(warning);
+          }
         }
       });
     }
@@ -40,91 +45,110 @@ export function LayerPanel({ activeLayers, onToggleLayer, isPro }: LayerPanelPro
     .filter(l => !l.isComparable);
 
   return (
-    <div className="absolute top-4 right-16 z-10 w-64 pointer-events-auto">
+    <aside 
+      className="w-64 pointer-events-auto"
+      aria-label="Lagerval"
+    >
       <div 
         className="p-4 rounded-sm backdrop-blur-sm border"
         style={{ 
-          background: 'rgba(15,23,42,0.95)', 
-          borderColor: 'rgba(71,85,105,0.5)' 
+          background: 'hsl(222.2 84% 4.9% / 0.95)', 
+          borderColor: 'hsl(215 20.2% 35% / 0.5)' 
         }}
       >
-        <div className="text-[10px] text-slate-400 font-medium tracking-wider uppercase mb-3">
-          KARTLAGER
-        </div>
+        <fieldset>
+          <legend className="text-[10px] text-slate-400 font-medium tracking-wider uppercase mb-3">
+            KARTLAGER
+          </legend>
 
-        <div className="space-y-0.5">
-          {layers.map(layer => {
-            const isActive = activeLayers.includes(layer.id);
-            const isLocked = layer.proOnly && !isPro;
+          <div className="space-y-0.5" role="group" aria-label="Tillgängliga kartlager">
+            {layers.map(layer => {
+              const isActive = activeLayers.includes(layer.id);
+              const isLocked = layer.proOnly && !isPro;
 
-            return (
-              <div 
-                key={layer.id}
-                className={`flex items-center gap-3 p-2.5 rounded-sm transition-colors ${
-                  isActive 
-                    ? 'bg-blue-900/30 border-l-2 border-l-blue-600' 
-                    : 'hover:bg-slate-800/50'
-                } ${isLocked ? 'opacity-40' : ''}`}
-              >
-                <Checkbox
-                  id={layer.id}
-                  checked={isActive}
-                  disabled={isLocked}
-                  onCheckedChange={() => onToggleLayer(layer.id)}
-                  className="border-slate-500 data-[state=checked]:bg-blue-700 data-[state=checked]:border-blue-700"
-                />
-                <label 
-                  htmlFor={layer.id}
-                  className="flex-1 text-xs cursor-pointer flex items-center gap-2"
+              return (
+                <div 
+                  key={layer.id}
+                  className={`flex items-center gap-3 p-2.5 rounded-sm transition-colors ${
+                    isActive 
+                      ? 'bg-blue-900/30 border-l-2 border-l-blue-600' 
+                      : 'hover:bg-slate-800/50'
+                  } ${isLocked ? 'opacity-40' : ''}`}
                 >
-                  <span className={`${isActive ? 'text-slate-100 font-medium' : 'text-slate-300'}`}>
-                    {layer.name.sv}
-                  </span>
-                  {isLocked && (
-                    <span className="font-mono text-[9px] text-slate-500">[PRO]</span>
-                  )}
-                </label>
-                {!layer.isComparable && isActive && (
-                  <Badge 
-                    variant="outline" 
-                    className="text-[9px] text-slate-400 border-slate-600 rounded-sm px-1"
+                  <Checkbox
+                    id={`layer-${layer.id}`}
+                    checked={isActive}
+                    disabled={isLocked}
+                    onCheckedChange={() => onToggleLayer(layer.id)}
+                    aria-describedby={isLocked ? `layer-${layer.id}-locked` : undefined}
+                    className="border-slate-500 data-[state=checked]:bg-blue-700 data-[state=checked]:border-blue-700"
+                  />
+                  <label 
+                    htmlFor={`layer-${layer.id}`}
+                    className="flex-1 text-xs cursor-pointer flex items-center gap-2"
                   >
-                    [!]
-                  </Badge>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                    <span className={`${isActive ? 'text-slate-100 font-medium' : 'text-slate-300'}`}>
+                      {layer.name.sv}
+                    </span>
+                    {isLocked && (
+                      <span 
+                        id={`layer-${layer.id}-locked`}
+                        className="font-mono text-[9px] text-slate-500"
+                        aria-label="Kräver PRO-licens"
+                      >
+                        [PRO]
+                      </span>
+                    )}
+                  </label>
+                  {!layer.isComparable && isActive && (
+                    <Badge 
+                      variant="outline" 
+                      className="text-[9px] text-slate-400 border-slate-600 rounded-sm px-1"
+                      aria-label="Kontextberoende - ej jämförbar"
+                    >
+                      [!]
+                    </Badge>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </fieldset>
 
         {/* Warnings */}
         {incompatibleWarnings.length > 0 && (
-          <Alert className="mt-3 bg-slate-800/60 border-slate-600 py-2 rounded-sm">
+          <div 
+            role="alert"
+            className="mt-3 p-2 bg-slate-800/60 border border-slate-600 rounded-sm"
+          >
             <span className="font-mono text-[9px] text-slate-400 mr-1">[X]</span>
-            <AlertDescription className="text-[10px] text-slate-400 inline">
+            <span className="text-[10px] text-slate-400">
               Ej jämförbara: {incompatibleWarnings.join(', ')}
-            </AlertDescription>
-          </Alert>
+            </span>
+          </div>
         )}
 
         {nonComparableLayers.length > 0 && incompatibleWarnings.length === 0 && (
-          <Alert className="mt-3 bg-slate-800/60 border-slate-600 py-2 rounded-sm">
+          <div 
+            role="status"
+            className="mt-3 p-2 bg-slate-800/60 border border-slate-600 rounded-sm"
+          >
             <span className="font-mono text-[9px] text-slate-400 mr-1">[!]</span>
-            <AlertDescription className="text-[10px] text-slate-400 inline">
+            <span className="text-[10px] text-slate-400">
               Kontextberoende data – jämför med försiktighet
-            </AlertDescription>
-          </Alert>
+            </span>
+          </div>
         )}
 
         {!isPro && (
-          <div className="mt-3 pt-3 border-t border-slate-700/50 text-center">
-            <div className="text-[9px] text-slate-500 uppercase tracking-wider">
+          <footer className="mt-3 pt-3 border-t border-slate-700/50 text-center">
+            <p className="text-[9px] text-slate-500 uppercase tracking-wider">
               Vissa lager kräver PRO
-            </div>
-          </div>
+            </p>
+          </footer>
         )}
       </div>
-    </div>
+    </aside>
   );
 }
 
