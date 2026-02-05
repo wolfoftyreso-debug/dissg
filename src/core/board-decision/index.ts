@@ -61,7 +61,13 @@ export {
 } from './reality-check';
 
 // Examples
-export { BRF_ROOF_RENOVATION_DPD } from './examples/brf-roof-renovation';
+export { 
+  BRF_ROOF_RENOVATION_DPD,
+  INVESTMENT_PORTFOLIO_DPD,
+  CORPORATE_MA_DPD,
+  MUNICIPAL_INFRASTRUCTURE_DPD,
+  DPD_EXAMPLES,
+} from './examples';
 
 // Masterprompt
 export {
