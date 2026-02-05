@@ -237,6 +237,51 @@ export {
   CRISIS_MODE_MASTERPROMPT,
 } from './crisis-mode';
 
+// Cultural Embedding & Generational Transfer
+export {
+  // Types
+  type DecisionLiteracy,
+  type SkillLevel,
+  type LearningModeSession,
+  type MentalModelSpread,
+  type GenerationHandover,
+  type CulturalDecaySignal,
+  type OrganizationalCultureState,
+  // Decision Literacy
+  DECISION_LITERACY_SKILLS,
+  createDecisionLiteracyProfile,
+  recordLiteracyExposure,
+  assessOverallLiteracy,
+  DECISION_LITERACY_MASTERPROMPT,
+  // Learning Mode
+  createLearningSession,
+  recordMaterialReview,
+  getLearningProgress,
+  validateLearningModeAction,
+  LEARNING_MODE_MASTERPROMPT,
+  // Mental Model Spread
+  createMentalModelTracking,
+  recordAdoptionSignal,
+  recordMemberDeparture,
+  assessCultureState,
+  calculateSpreadVelocity,
+  MENTAL_MODEL_SPREAD_MASTERPROMPT,
+  // Generation Handover
+  createGenerationHandover,
+  recordGeneration,
+  closeGeneration,
+  generateWhatTheyKnewReport,
+  generateAntiHubrisPerspective,
+  GENERATION_HANDOVER_MASTERPROMPT,
+  // Cultural Decay Detection
+  detectDecaySignal,
+  checkForDecayPatterns,
+  generateSocialFrictionResponse,
+  CULTURAL_DECAY_DETECTION_MASTERPROMPT,
+  // Master
+  CULTURAL_EMBEDDING_MASTERPROMPT,
+} from './cultural-embedding';
+
 /**
  * BDPE SUMMARY
  */
