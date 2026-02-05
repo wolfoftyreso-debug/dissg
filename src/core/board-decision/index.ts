@@ -366,6 +366,70 @@ export {
   ANTI_CORRUPTION_MASTERPROMPT,
 } from './anti-corruption';
 
+// The Irreversibility Layer
+export {
+  // Types
+  type IrreversibleConstraint,
+  type EpistemicGate,
+  type AICapabilityContract,
+  type TimeLockEnvelope,
+  type NarrativeExitBlock,
+  type FailureMode,
+  type AbuseTestResult,
+  // Irreversible Constraints
+  IRREVERSIBLE_CONSTRAINTS,
+  validateIrreversibleConstraints,
+  canDisableConstraint,
+  attemptDisableConstraint,
+  IRREVERSIBLE_CONSTRAINTS_MASTERPROMPT,
+  // Epistemic Gates
+  EPISTEMIC_GATES,
+  canProceedToDecision,
+  passGate,
+  canSkipGate,
+  getRequiredGates,
+  formatGateForUI,
+  EPISTEMIC_GATES_MASTERPROMPT,
+  // AI Contract
+  AI_CAPABILITY_CONTRACT,
+  validateAIOperation,
+  isAICapabilityAllowed,
+  getAllowedAIOperations,
+  getForbiddenAIOperations,
+  validateAIOutput,
+  AI_CONTRACT_MASTERPROMPT,
+  // Time Lock
+  createTimeLockEnvelope,
+  attemptModify,
+  attemptDelete,
+  supersede,
+  getInterpretationContext,
+  validateTimeLockIntegrity,
+  TIME_LOCK_MASTERPROMPT,
+  // Narrative Block
+  NARRATIVE_BLOCKS,
+  isNarrativeBlocked,
+  getAlternativeOutput,
+  validateNoNarrative,
+  transformNarrativeRequest,
+  NO_NARRATIVE_MASTERPROMPT,
+  // Failure Modes
+  FAILURE_MODE_SPEC,
+  isFailureModeAllowed,
+  handleDegradation,
+  validateFailureResponse,
+  getCorrectFailureDirection,
+  FAILURE_MODES_MASTERPROMPT,
+  // Abuse Test
+  ABUSE_TEST_QUESTION,
+  runAbuseTest,
+  validateAgainstAbuseTest,
+  generateAbuseTestReport,
+  ABUSE_TEST_MASTERPROMPT,
+  // Master
+  IRREVERSIBILITY_LAYER_MASTERPROMPT,
+} from './irreversibility';
+
 /**
  * BDPE SUMMARY
  */
