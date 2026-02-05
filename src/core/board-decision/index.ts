@@ -121,6 +121,49 @@ export {
   REQUIRED_PHRASES,
 } from './masterprompt';
 
+// Legibility Layer
+export {
+  // Types
+  type DecisionLegibilityScore,
+  type LegibilityGap,
+  type DecisionSummary,
+  type TimelineEvent,
+  type TimelineEventType,
+  type DecisionTimeline,
+  type CollectiveMemoryPattern,
+  type CollectiveMemoryResult,
+  type LegibilityAudit,
+  type MythIndicator,
+  // Scorer
+  calculateLegibilityScore,
+  LEGIBILITY_SCORER_MASTERPROMPT,
+  // Summary
+  generateDecisionSummary,
+  validateSummaryImmutability,
+  SUMMARY_GENERATOR_MASTERPROMPT,
+  // Timeline
+  createTimeline,
+  addTimelineEvent,
+  buildTimelineFromDPD,
+  lockDecisionInTimeline,
+  recordOutcomeInTimeline,
+  validateTimelineIntegrity,
+  TIMELINE_BUILDER_MASTERPROMPT,
+  // Collective Memory
+  addToCollectiveMemory,
+  queryHowDidWeDecide,
+  queryWhatDidWeMiss,
+  queryRecurringUncertainties,
+  COLLECTIVE_MEMORY_MASTERPROMPT,
+  // Myth Detector
+  detectMythIndicators,
+  sanitizeMythLanguage,
+  validateMythFree,
+  MYTH_DETECTOR_MASTERPROMPT,
+  // Master
+  LEGIBILITY_LAYER_MASTERPROMPT,
+} from './legibility';
+
 /**
  * BDPE SUMMARY
  */
