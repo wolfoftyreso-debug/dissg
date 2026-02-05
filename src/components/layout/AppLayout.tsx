@@ -27,7 +27,7 @@ interface AppLayoutProps {
 }
 
 // Routes som ska exkluderas från standard-layout (t.ex. fullskärmskartor)
-const FULLSCREEN_ROUTES = ['/gdm'];
+const FULLSCREEN_ROUTES: string[] = [];
 
 // Route mappning med typade värden
 const ROUTE_BREADCRUMB_MAP: Record<string, { name: string }> = {
