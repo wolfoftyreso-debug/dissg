@@ -5,3 +5,4 @@
  */
 
 export * from './health-truth-nodes';
+export * from './production-indexes';
