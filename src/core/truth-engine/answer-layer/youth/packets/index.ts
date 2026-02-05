@@ -509,3 +509,16 @@
  export function getPacketById(packetId: string): YouthAnswerPacket | null {
    return ALL_YOUTH_PACKETS.find(p => p.id === packetId) || null;
  }
+ 
+ // Re-export packet families
+ export { FAMILY_A_PACKETS } from './family-a-normality';
+ export { FAMILY_B_PACKETS } from './family-b-stress';
+ export { FAMILY_C_PACKETS } from './family-c-body';
+ export { FAMILY_D_PACKETS } from './family-d-social';
+ export { FAMILY_E_PACKETS } from './family-e-medium-risk';
+ export { 
+   PACKET_CRISIS_SUPPORT, 
+   generateCrisisFallbackResponse, 
+   getCrisisResourcesForRegion, 
+   CRISIS_RESOURCES 
+ } from './crisis-fallback';
