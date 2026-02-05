@@ -10,8 +10,41 @@ export * from './charter';
 export * from './legitimacy';
 export * from './write-model';
 export * from './read-model';
-export * from './compiler';
 export * from './infra';
+
+// Compiler - specific exports to avoid conflicts with legitimacy
+export {
+  compileQueryToDecision,
+  compileQueryBatch,
+  validateOutputSafety,
+  normalizeIntent,
+  resolveEntity,
+  selectBlueprint,
+  getBlueprint,
+  getAllBlueprints,
+  createDraftDecision,
+  buildContextSkeleton,
+  seedAlternatives,
+  seedUncertainties,
+  compileQuery,
+  type CompilerInput,
+  type CompilerOutput,
+  type BatchResult,
+  type RawQuery,
+  type QueryMetadata,
+  type NormalizedIntent,
+  type IntentClass,
+  type ResolvedEntity,
+  type EntityType,
+  type DecisionBlueprint,
+  type DraftDecision,
+  type ContextSkeleton,
+  type AlternativeSeed,
+  type UncertaintySeed,
+  type UncertaintyType,
+  type PipelineStep,
+  type CompiledIntent,
+} from './compiler';
 
 // Event Sourcing (specific exports to avoid conflicts)
 export { 
