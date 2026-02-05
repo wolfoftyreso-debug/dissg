@@ -12,3 +12,8 @@ export { DrillDown } from './DrillDown';
 export { VegaChart } from './VegaChart';
 export { LiveDecisionGraph } from './LiveDecisionGraph';
 export { QuestionFirstUI } from './QuestionFirstUI';
+
+// Everyday Decision Intelligence
+export { ScopeSelector } from './ScopeSelector';
+export { QuestionResolver } from './QuestionResolver';
+export { EverydayDecisionView } from './EverydayDecisionView';
