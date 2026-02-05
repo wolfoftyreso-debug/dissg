@@ -79,6 +79,36 @@ export {
 
 export type { DecisionBlueprint } from './factory';
 
+// Decision Type Registry (10 canonical types)
+export {
+  DECISION_TYPE_REGISTRY,
+  REGISTRY_PRINCIPLES,
+  getDecisionType,
+  listDecisionTypes,
+  getDecisionTypesByCategory,
+  getDecisionTypesByDomain,
+  detectDecisionType,
+} from './registry';
+
+export type { DecisionType, QuestionPatternV2 } from './registry';
+
+// Precompute & Cache
+export {
+  PrecomputeCache,
+  precomputeCache,
+  generateCacheKey,
+  PRECOMPUTE_PRIORITIES,
+  INDEX_WARM_CONFIG,
+  DEFAULT_CACHE_CONFIG,
+  CACHE_PRINCIPLES,
+} from './cache';
+
+export type {
+  CacheConfig,
+  PrecomputePriority,
+  IndexWarmConfig,
+} from './cache';
+
 // Decision Examples
 export {
   INVESTMENT_FACILITY_GRAPH,
