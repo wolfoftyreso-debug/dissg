@@ -11,13 +11,11 @@ import { useNavigate } from 'react-router-dom';
 import { MachineReadableHead } from '@/components/seo';
 import { useGeo } from '@/contexts/GeoContext';
 import {
-  LandingHeader,
   HeroSection,
   InsightCalculator,
   NewsSection,
   FeaturesSection,
   AppPromoSection,
-  LandingFooter,
 } from '@/components/landing';
 
 const Index = () => {
@@ -29,16 +27,13 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex flex-col bg-background">
       {/* Machine-readable metadata */}
       <MachineReadableHead
         entityType={scope.level as any}
         entityCode={scope.code}
         dataTimestamp={new Date().toISOString()}
       />
-
-      {/* ODIS-style Header */}
-      <LandingHeader onStartDiagnosis={handleStartDiagnosis} />
 
       {/* Main content */}
       <main className="flex-1">
@@ -57,9 +52,6 @@ const Index = () => {
         {/* App Promotion */}
         <AppPromoSection />
       </main>
-
-      {/* Footer */}
-      <LandingFooter />
     </div>
   );
 };
