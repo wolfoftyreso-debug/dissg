@@ -3,11 +3,13 @@
  * 
  * The oscilloscope for civilization.
  * Main entry point combining all GDM components.
+ * 
+ * MYNDIGHETSDESIGN: Strikt, klinisk, inga spel-liknande effekter.
+ * NO ICONS per no-icons-doctrine (text markers only).
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Sun, Moon, Maximize2, Minimize2, Settings } from 'lucide-react';
 import { MapContainer } from './MapContainer';
 import { GlobalStatusBar } from './GlobalStatusBar';
 import { LayerPanel } from './LayerPanel';
@@ -31,7 +33,7 @@ export function GlobalDiagnosticMap() {
       type: 'deviation',
       geoCode: 'US',
       severity: 'warning',
-      message: { sv: '🟡 USA visar avvikelse i HEALTH-axeln', en: '🟡 USA shows deviation in HEALTH axis' },
+      message: { sv: 'USA visar avvikelse i HEALTH-axeln', en: 'USA shows deviation in HEALTH axis' },
       action: { label: 'Undersök', onClick: () => {} },
     },
   ]);
@@ -75,7 +77,6 @@ export function GlobalDiagnosticMap() {
 
   // GEDI selection
   const handleSelectGEDI = useCallback((code: string) => {
-    // Would open GEDI guided diagnostic flow
     console.log('Open GEDI flow:', code);
   }, []);
 
@@ -84,6 +85,11 @@ export function GlobalDiagnosticMap() {
       className={`relative w-full h-screen overflow-hidden ${
         isFullscreen ? 'fixed inset-0 z-50' : ''
       }`}
+      style={{ 
+        background: theme === 'dark' 
+          ? 'hsl(222.2 84% 4.9%)' 
+          : 'hsl(0 0% 98%)' 
+      }}
     >
       {/* Map */}
       <MapContainer
@@ -135,39 +141,43 @@ export function GlobalDiagnosticMap() {
         </div>
       )}
 
-      {/* Control buttons (bottom-right) */}
+      {/* Control buttons (bottom-right) - Text markers only */}
       <div className="absolute bottom-4 right-4 z-10 flex gap-2 pointer-events-auto">
         <Button
           variant="secondary"
-          size="icon"
+          size="sm"
           onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-          className="backdrop-blur-md"
+          className="backdrop-blur-md font-mono text-[10px] h-8 px-3 bg-slate-800/90 border border-slate-600/50 text-slate-300 hover:bg-slate-700/90 hover:text-slate-100"
         >
-          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {theme === 'dark' ? '[☀]' : '[☾]'}
         </Button>
         <Button
           variant="secondary"
-          size="icon"
+          size="sm"
           onClick={() => setShowLayerPanel(!showLayerPanel)}
-          className="backdrop-blur-md"
+          className="backdrop-blur-md font-mono text-[10px] h-8 px-3 bg-slate-800/90 border border-slate-600/50 text-slate-300 hover:bg-slate-700/90 hover:text-slate-100"
         >
-          <Settings className="h-4 w-4" />
+          [⚙]
         </Button>
         <Button
           variant="secondary"
-          size="icon"
+          size="sm"
           onClick={() => setIsFullscreen(!isFullscreen)}
-          className="backdrop-blur-md"
+          className="backdrop-blur-md font-mono text-[10px] h-8 px-3 bg-slate-800/90 border border-slate-600/50 text-slate-300 hover:bg-slate-700/90 hover:text-slate-100"
         >
-          {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+          {isFullscreen ? '[⊟]' : '[⊞]'}
         </Button>
         <Button
           variant={isPro ? "default" : "outline"}
           size="sm"
           onClick={() => setIsPro(!isPro)}
-          className="backdrop-blur-md font-mono"
+          className={`backdrop-blur-md font-mono text-[10px] h-8 px-4 border ${
+            isPro 
+              ? 'bg-blue-900/90 border-blue-700/50 text-blue-100 hover:bg-blue-800/90' 
+              : 'bg-slate-800/90 border-slate-600/50 text-slate-400 hover:bg-slate-700/90'
+          }`}
         >
-          {isPro ? 'PRO' : 'FREE'}
+          PRO
         </Button>
       </div>
 
@@ -178,14 +188,6 @@ export function GlobalDiagnosticMap() {
           Ett diagnosinstrument för att visualisera och analysera samhällsdata globalt.
           Visar Lambda-systembalans, GEDI-felkoder och strukturella mönster.
         </p>
-        <ul>
-          <li>Kartan är alltid sanningen</li>
-          <li>Inget visas utan kontext</li>
-          <li>Allt är klickbart</li>
-          <li>Allt går att fördjupa</li>
-          <li>Inga dekorativa element</li>
-          <li>Färg = tillstånd, inte känsla</li>
-        </ul>
       </div>
     </div>
   );

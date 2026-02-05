@@ -44,7 +44,7 @@ export function LayerPanel({ activeLayers, onToggleLayer, isPro }: LayerPanelPro
       <div 
         className="p-4 rounded-sm backdrop-blur-sm border"
         style={{ 
-          background: 'rgba(15,23,42,0.92)', 
+          background: 'rgba(15,23,42,0.95)', 
           borderColor: 'rgba(71,85,105,0.5)' 
         }}
       >
@@ -52,7 +52,7 @@ export function LayerPanel({ activeLayers, onToggleLayer, isPro }: LayerPanelPro
           KARTLAGER
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {layers.map(layer => {
             const isActive = activeLayers.includes(layer.id);
             const isLocked = layer.proOnly && !isPro;
@@ -60,9 +60,9 @@ export function LayerPanel({ activeLayers, onToggleLayer, isPro }: LayerPanelPro
             return (
               <div 
                 key={layer.id}
-                className={`flex items-center gap-2 p-2 rounded-sm transition-colors ${
+                className={`flex items-center gap-3 p-2.5 rounded-sm transition-colors ${
                   isActive 
-                    ? 'bg-slate-700/50 border-l-2 border-l-slate-400' 
+                    ? 'bg-blue-900/30 border-l-2 border-l-blue-600' 
                     : 'hover:bg-slate-800/50'
                 } ${isLocked ? 'opacity-40' : ''}`}
               >
@@ -71,13 +71,15 @@ export function LayerPanel({ activeLayers, onToggleLayer, isPro }: LayerPanelPro
                   checked={isActive}
                   disabled={isLocked}
                   onCheckedChange={() => onToggleLayer(layer.id)}
-                  className="border-slate-500 data-[state=checked]:bg-slate-500 data-[state=checked]:border-slate-500"
+                  className="border-slate-500 data-[state=checked]:bg-blue-700 data-[state=checked]:border-blue-700"
                 />
                 <label 
                   htmlFor={layer.id}
                   className="flex-1 text-xs cursor-pointer flex items-center gap-2"
                 >
-                  <span className="text-slate-300">{layer.name.sv}</span>
+                  <span className={`${isActive ? 'text-slate-100 font-medium' : 'text-slate-300'}`}>
+                    {layer.name.sv}
+                  </span>
                   {isLocked && (
                     <span className="font-mono text-[9px] text-slate-500">[PRO]</span>
                   )}
@@ -85,7 +87,7 @@ export function LayerPanel({ activeLayers, onToggleLayer, isPro }: LayerPanelPro
                 {!layer.isComparable && isActive && (
                   <Badge 
                     variant="outline" 
-                    className="text-[9px] text-slate-400 border-slate-600 rounded-sm"
+                    className="text-[9px] text-slate-400 border-slate-600 rounded-sm px-1"
                   >
                     [!]
                   </Badge>
@@ -95,7 +97,7 @@ export function LayerPanel({ activeLayers, onToggleLayer, isPro }: LayerPanelPro
           })}
         </div>
 
-        {/* Warnings - Diskret styling */}
+        {/* Warnings */}
         {incompatibleWarnings.length > 0 && (
           <Alert className="mt-3 bg-slate-800/60 border-slate-600 py-2 rounded-sm">
             <span className="font-mono text-[9px] text-slate-400 mr-1">[X]</span>
