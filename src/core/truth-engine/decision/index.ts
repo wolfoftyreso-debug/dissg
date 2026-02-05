@@ -10,7 +10,29 @@
  * And we own all the answers.
  */
 
-// Decision Graph Types
+// Decision Graph Schema v1
+export type {
+  DecisionGraphSchemaV1,
+  DecisionNodeSchema,
+  DecisionScope,
+  DecisionDomain,
+  AnswerTypeV1,
+  NodeStatusV1,
+  ResolvedAnswerSchema,
+  AssumptionSchema,
+  SignalSchema,
+  OutputOptions,
+  GovernanceRules,
+} from './schema/decision-graph-schema';
+
+export {
+  SCHEMA_CI_RULES,
+  CURRENT_SCHEMA_VERSION,
+  validateDecisionGraph,
+  createEmptyGraph,
+} from './schema/decision-graph-schema';
+
+// Decision Graph Types (legacy compatibility)
 export type {
   DecisionGraph,
   DecisionNode,
@@ -48,6 +70,49 @@ export {
   TEMPLATE_PRINCIPLES,
 } from './templates/decision-templates';
 
+// Decision Factory
+export {
+  DecisionGraphFactory,
+  DECISION_BLUEPRINTS,
+  FACTORY_PRINCIPLES,
+} from './factory';
+
+export type { DecisionBlueprint } from './factory';
+
+// Decision Examples
+export {
+  INVESTMENT_FACILITY_GRAPH,
+  INVESTMENT_CHART_SPECS,
+  HEALTHCARE_CAPACITY_GRAPH,
+  HEALTHCARE_CHART_SPECS,
+  POLICY_SCHOOL_REFORM_GRAPH,
+  POLICY_CHART_SPECS,
+  ALL_EXAMPLE_GRAPHS,
+} from './examples';
+
+// Visualization
+export {
+  generateSpec,
+  generateSpecFromAnswerType,
+  VISUALIZATION_PRINCIPLES,
+  CHART_CONFIGS,
+} from './visualization';
+
+export type { VegaLiteSpec, ChartType } from './visualization';
+
+// AI Constraints
+export {
+  AI_ALLOWED_ACTIONS,
+  AI_FORBIDDEN_ACTIONS,
+  AI_DECISION_SYSTEM_PROMPT,
+  AI_FORBIDDEN_PHRASES,
+  AI_REQUIRED_PHRASES,
+  validateAIOutput,
+  AI_ROLE_DEFINITION,
+} from './ai/ai-constraints';
+
+export type { AIAllowedAction, AIForbiddenAction } from './ai/ai-constraints';
+
 // Decision API Types
 export type {
   ResolveDecisionRequest,
@@ -72,10 +137,8 @@ export {
  * DECISION SUBSTRATE PRINCIPLES
  */
 export const DECISION_SUBSTRATE_PRINCIPLES = {
-  // Core insight
   core_insight: 'Decisions are structured question trees against reality',
   
-  // What we own
   we_own: {
     language_for_decisions: true,
     question_structure: true,
@@ -84,17 +147,14 @@ export const DECISION_SUBSTRATE_PRINCIPLES = {
     uncertainty: true,
   },
   
-  // What others build
   others_build: {
     apps: true,
     ai_agents: true,
     interfaces: true,
   },
   
-  // But they must
   they_must: 'Get reality from us',
   
-  // AI role (strictly limited)
   ai_role: {
     allowed: [
       'Formulate question trees',
@@ -109,7 +169,6 @@ export const DECISION_SUBSTRATE_PRINCIPLES = {
     ],
   },
   
-  // Responsibility
   responsibility: 'Always lies with user/organization, never with AI, never with us',
 } as const;
 
@@ -137,7 +196,6 @@ export const WHAT_WE_OWN = {
   indices: true,
   uncertainty: true,
   
-  // Infrastructure + intellectual dominance
   not_media: true,
   not_recommendations: true,
   pure_decision_substrate: true,
