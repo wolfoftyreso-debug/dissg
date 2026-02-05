@@ -22,7 +22,26 @@ export type OscilloscopeViewMode =
   | 'spectral'       // Frequency domain view
   | 'correlation';   // Cross-signal correlation
 
-export type TimeBase = '1h' | '1d' | '1w' | '1m' | '3m' | '1y' | '5y' | '10y' | 'max';
+ // Extended time base - from real-time to century
+ export type TimeBase = 
+   | 'live'    // Real-time (senaste minuter)
+   | '1h'      // 1 timme
+   | '1d'      // 1 dag
+   | '1w'      // 1 vecka
+   | '1m'      // 1 månad
+   | '3m'      // 1 kvartal
+   | '1y'      // 1 år
+   | '5y'      // 5 år
+   | '10y'     // 1 decennium
+   | '25y'     // 25 år (generation)
+   | '50y'     // Halvsekel
+   | '100y'    // 1 sekel
+   | 'max';    // All tillgänglig data
+ 
+ // All time base options for UI
+ export const TIME_BASE_OPTIONS: TimeBase[] = [
+   'live', '1h', '1d', '1w', '1m', '3m', '1y', '5y', '10y', '25y', '50y', '100y', 'max'
+ ];
 
 export interface OscilloscopeChannel {
   id: string;
@@ -248,6 +267,7 @@ export function getStatusLabel(
  */
 export function formatTimeBase(timeBase: TimeBase, language: 'sv' | 'en'): string {
   const formats = {
+     'live': { sv: 'Nu', en: 'Live' },
     '1h': { sv: '1 timme', en: '1 hour' },
     '1d': { sv: '1 dag', en: '1 day' },
     '1w': { sv: '1 vecka', en: '1 week' },
@@ -255,7 +275,10 @@ export function formatTimeBase(timeBase: TimeBase, language: 'sv' | 'en'): strin
     '3m': { sv: '3 månader', en: '3 months' },
     '1y': { sv: '1 år', en: '1 year' },
     '5y': { sv: '5 år', en: '5 years' },
-    '10y': { sv: '10 år', en: '10 years' },
+     '10y': { sv: '1 decennium', en: '1 decade' },
+     '25y': { sv: '25 år', en: '25 years' },
+     '50y': { sv: 'Halvsekel', en: 'Half century' },
+     '100y': { sv: '1 sekel', en: '1 century' },
     'max': { sv: 'Max', en: 'Max' },
   };
   return formats[timeBase][language];

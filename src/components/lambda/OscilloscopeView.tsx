@@ -30,12 +30,15 @@ import {
   formatTimeBase,
   OSCILLOSCOPE_PRINCIPLES,
   OSCILLOSCOPE_UI_CONFIG,
+   TIME_BASE_OPTIONS,
 } from '@/lib/lambda/oscilloscope-mode';
 
  // Helper to generate time axis labels based on time base
  function getTimeLabels(timeBase: TimeBase): string[] {
    const now = new Date();
    switch (timeBase) {
+     case 'live':
+       return ['-5m', '-4m', '-3m', '-2m', '-1m', 'Nu'];
      case '1h':
        return ['-60m', '-45m', '-30m', '-15m', 'Nu'];
      case '1d':
@@ -65,8 +68,20 @@ import {
        const year = now.getFullYear();
        return [`${year - 10}`, `${year - 7}`, `${year - 5}`, `${year - 2}`, `${year}`];
      }
+     case '25y': {
+       const year = now.getFullYear();
+       return [`${year - 25}`, `${year - 20}`, `${year - 15}`, `${year - 10}`, `${year - 5}`, `${year}`];
+     }
+     case '50y': {
+       const year = now.getFullYear();
+       return [`${year - 50}`, `${year - 40}`, `${year - 30}`, `${year - 20}`, `${year - 10}`, `${year}`];
+     }
+     case '100y': {
+       const year = now.getFullYear();
+       return [`${year - 100}`, `${year - 75}`, `${year - 50}`, `${year - 25}`, `${year}`];
+     }
      case 'max':
-       return ['1990', '2000', '2010', '2020', 'Nu'];
+       return ['1900', '1925', '1950', '1975', '2000', 'Nu'];
      default:
        return ['', '', '', '', 'Nu'];
    }
@@ -349,7 +364,7 @@ export function OscilloscopeView({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(['1h', '1d', '1w', '1m', '3m', '1y', '5y', '10y', 'max'] as TimeBase[]).map(tb => (
+                 {TIME_BASE_OPTIONS.map(tb => (
                   <SelectItem key={tb} value={tb}>
                     {formatTimeBase(tb, language)}
                   </SelectItem>
