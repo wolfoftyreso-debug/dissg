@@ -82,13 +82,14 @@ export function GlobalDiagnosticMap() {
 
   return (
     <div 
-      className={`relative w-full h-screen overflow-hidden ${
+      className={`relative w-full h-full overflow-hidden ${
         isFullscreen ? 'fixed inset-0 z-50' : ''
       }`}
       style={{ 
         background: theme === 'dark' 
           ? 'hsl(222.2 84% 4.9%)' 
-          : 'hsl(0 0% 98%)' 
+          : 'hsl(0 0% 98%)',
+        minHeight: 'calc(100vh - 56px)',
       }}
     >
       {/* Map */}
