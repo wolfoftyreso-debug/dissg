@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DecisionPreparationDocument",
+  "type": "object",
+  "required": ["meta", "context", "alternatives", "evidence", "consequences", "uncertainty", "disclaimers"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["dpd_id", "generated_at", "scope"],
+      "properties": {
+        "dpd_id": { "type": "string" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "scope": {
+          "type": "object",
+          "required": ["geo", "population_affected", "time_horizon"],
+          "properties": {
+            "geo": { "type": "string" },
+            "population_affected": { "type": "integer", "minimum": 1 },
+            "time_horizon": { "type": "string" }
+          }
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "required": ["organization_type", "decision_statement", "irreversibility"],
+      "properties": {
+        "organization_type": { 
+          "type": "string", 
+          "enum": ["housing_association", "investment_board", "corporate_board", "foundation", "public_committee", "municipal_board"] 
+        },
+        "decision_statement": { "type": "string" },
+        "irreversibility": { "type": "string", "enum": ["low", "medium", "high", "permanent"] },
+        "constraints": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "alternatives": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "assumptions"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "assumptions": { "type": "array", "items": { "type": "string" } },
+          "requires": { "type": "array", "items": { "type": "string" } },
+          "blocks": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["truth_nodes", "indexes"],
+      "properties": {
+        "truth_nodes": { "type": "array", "items": { "type": "string" } },
+        "indexes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "consequences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["alternative_id", "dimensions"],
+        "properties": {
+          "alternative_id": { "type": "string" },
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["dimension", "visibility", "uncertainty"],
+              "properties": {
+                "dimension": { 
+                  "type": "string", 
+                  "enum": ["economy", "liquidity", "risk_over_time", "reversibility", "operational", "regulatory", "reputational"] 
+                },
+                "visibility": { "type": "boolean" },
+                "uncertainty": { "type": "string", "enum": ["low", "medium", "high", "unknown"] },
+                "time_dependency": { "type": "string" },
+                "notes": { "type": ["string", "null"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "uncertainty": {
+      "type": "object",
+      "required": ["known", "uncertain", "unknown"],
+      "properties": {
+        "known": { "type": "array", "items": { "type": "string" } },
+        "uncertain": { "type": "array", "items": { "type": "string" } },
+        "unknown": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "disclaimers": {
+      "type": "array",
+      "minItems": 3,
+      "items": { "type": "string" }
+    }
+  }
+}
