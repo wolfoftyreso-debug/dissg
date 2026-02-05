@@ -17,3 +17,7 @@ export { QuestionFirstUI } from './QuestionFirstUI';
 export { ScopeSelector } from './ScopeSelector';
 export { QuestionResolver } from './QuestionResolver';
 export { EverydayDecisionView } from './EverydayDecisionView';
+
+// Question Shaping
+export { QuestionShaper } from './QuestionShaper';
+export { GravityIndicator } from './GravityIndicator';
