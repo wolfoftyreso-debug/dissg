@@ -136,3 +136,13 @@
    'Break down to actual code in chosen language',
    'Simulate how this system looks in 50 years',
  ] as const;
+ 
+ /**
+  * INTEGRATION WITH STRESS TEST CASES
+  * 
+  * The Super-AI Simulation can be combined with concrete stress cases
+  * like Global Inequality to verify the system end-to-end.
+  * 
+  * See: src/core/stress-test-cases/global-inequality
+  */
+ export { runFullInequalityStressTest } from '../stress-test-cases/global-inequality';

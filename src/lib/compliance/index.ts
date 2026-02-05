@@ -21,5 +21,4 @@ export {
   getAPIComplianceStatement,
   validateContentLegality
 } from './legal-classifier';
-export * from './misuse-detector';
-export * from './misuse-detector';
+ export * from './misuse-detector';
