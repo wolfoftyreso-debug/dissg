@@ -376,22 +376,23 @@ const PublicDashboard = () => {
               <div className="max-w-xl mx-auto space-y-4">
                 <Card>
                   <CardContent className="p-4">
-                    <h3 className="font-medium mb-2">Vad är GDIS?</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Global Diagnostic Information System (GDIS) är ett civilisatoriskt diagnostiksystem 
-                      som behandlar länder som fordon i en fordonsflotta och indikatorer som sensorer.
-                    </p>
+                    <h3 className="font-medium mb-2 font-mono text-xs text-muted-foreground">NOTATION</h3>
+                    <div className="text-sm text-muted-foreground font-mono space-y-1">
+                      <div>[OK] Stabil</div>
+                      <div>[-] Varning</div>
+                      <div>[X] Kritisk</div>
+                      <div>[i] Informativ</div>
+                    </div>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4">
-                    <h3 className="font-medium mb-2">Hur läser jag trädvyn?</h3>
-                    <p className="text-sm text-muted-foreground">
-                      [OK] = Indikatorn är stabil/positiv<br/>
-                      [-] = Varning, kräver uppmärksamhet<br/>
-                      [X] = Kritisk, kräver åtgärd<br/>
-                      [i] = Informativ, neutral status
-                    </p>
+                    <h3 className="font-medium mb-2 font-mono text-xs text-muted-foreground">NAVIGATION</h3>
+                    <div className="text-sm text-muted-foreground space-y-1">
+                      <div>Klicka på nod för att expandera</div>
+                      <div>Högerklicka för alternativ</div>
+                      <div>Dubbelklicka för fullvy</div>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
