@@ -164,6 +164,39 @@ export {
   LEGIBILITY_LAYER_MASTERPROMPT,
 } from './legibility';
 
+// Institutional Standard Mode
+export {
+  // Types
+  type DS1Standard,
+  type DS1ComplianceResult,
+  type DecisionHygieneScore,
+  type ExternalReviewAccess,
+  type PublicInterfaceView,
+  type AdoptionMetrics,
+  type StandardDeviationReport,
+  // DS-1 Standard
+  DS1_STANDARD,
+  checkDS1Compliance,
+  generateComplianceStatement,
+  DS1_STANDARD_MASTERPROMPT,
+  // Hygiene Score
+  calculateDecisionHygieneScore,
+  HYGIENE_SCORE_MASTERPROMPT,
+  // External Review
+  grantExternalReviewAccess,
+  validateExternalAccess,
+  generatePublicView,
+  EXTERNAL_REVIEW_MASTERPROMPT,
+  // Deviation Tracking
+  recordDeviation,
+  addDeviation,
+  validateDeviationReport,
+  summarizeDeviations,
+  DEVIATION_TRACKING_MASTERPROMPT,
+  // Master
+  INSTITUTIONAL_STANDARD_MASTERPROMPT,
+} from './institutional-standard';
+
 /**
  * BDPE SUMMARY
  */
