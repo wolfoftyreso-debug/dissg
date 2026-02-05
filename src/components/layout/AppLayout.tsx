@@ -46,6 +46,7 @@ const ROUTE_BREADCRUMB_MAP: Record<string, { name: string }> = {
   '/fault-codes': { name: 'Felkoder' },
   '/wages': { name: 'Lönestatistik' },
   '/democratic-health': { name: 'Demokratisk hälsa' },
+  '/education': { name: 'Utbildning' },
 };
 
 // Generera route-specifika breadcrumb items
