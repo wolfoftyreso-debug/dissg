@@ -43,12 +43,31 @@
  // Anti-patterns
  export {
    ANTI_PATTERNS,
+  AMBIGUOUS_TERMS,
+  UX_MOTIVATION_PATTERNS,
    detectAntiPattern,
    getBlockingAntiPatterns,
    getAutoDetectableAntiPatterns,
    type AntiPattern,
  } from './anti-patterns';
  
+// Ontology Guardian
+export {
+  runGuardianCheck,
+  requestOverride,
+  approveOverride,
+  rejectOverride,
+  getGuardianStats,
+  getOverrideLog,
+  setGuardianEnabled,
+  expireOldOverrides,
+  type GuardianOperation,
+  type GuardianVerdict,
+  type ViolationRecord,
+  type OverrideRequest,
+  type OverrideLog,
+} from './ontology-guardian';
+
  /**
   * GRAPH MODEL SUMMARY
   * 
@@ -73,5 +92,7 @@
   * - All relations are typed and constrained
   * - Traversal has explicit limits
   * - Anti-patterns are blocked, not warned
+  * - Ontology Guardian enforces compliance
+  * - Overrides are painful, public, and traceable
   */
  export const GRAPH_MODEL_VERSION = '1.0.0' as const;
