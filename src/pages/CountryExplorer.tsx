@@ -28,7 +28,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { ClickableSourceCitation } from '@/components/ui/ClickableSourceCitation';
- import { TermExplainer, TermLegend } from '@/components/data';
+ import { TermLegend, ClickableIndexCard } from '@/components/data';
 
 // Mock indicator data for the graph sandbox
 const AVAILABLE_INDICATORS = [
@@ -334,23 +334,19 @@ export default function CountryExplorer() {
                   <CardTitle className="text-sm font-mono">[NYCKELINDEX]</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {[
-                     { name: 'HDI', fullName: 'Human Development Index', value: 0.85 + Math.random() * 0.1, rank: Math.floor(Math.random() * 30) + 1 },
-                     { name: 'Gini', fullName: 'Gini-koefficient', value: 25 + Math.random() * 15, rank: Math.floor(Math.random() * 40) + 1 },
-                     { name: 'BNP/capita', fullName: 'BNP per capita', value: 45000 + Math.random() * 20000, rank: Math.floor(Math.random() * 50) + 1 },
-                     { name: 'CO₂/capita', fullName: 'CO₂ per capita', value: 4 + Math.random() * 8, rank: Math.floor(Math.random() * 60) + 1 },
+                   {[
+                     { code: 'HDI', value: 0.85 + Math.random() * 0.1, rank: Math.floor(Math.random() * 30) + 1 },
+                     { code: 'GMI', value: 72 + Math.random() * 15, rank: Math.floor(Math.random() * 50) + 1 },
+                     { code: 'Gini', value: 25 + Math.random() * 15, rank: Math.floor(Math.random() * 40) + 1 },
+                     { code: 'EPI', value: 55 + Math.random() * 30, rank: Math.floor(Math.random() * 60) + 1 },
                    ].map((index) => (
-                     <div key={index.name} className="flex items-center justify-between p-3 rounded border hover:bg-muted/50 transition-colors cursor-pointer">
-                      <div>
-                         <TermExplainer term={index.name} className="font-medium text-sm">
-                           {index.fullName}
-                         </TermExplainer>
-                        <p className="text-xs text-muted-foreground">Rank #{index.rank} globalt</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold font-mono">{index.value.toFixed(2)}</p>
-                      </div>
-                    </div>
+                     <ClickableIndexCard
+                       key={index.code}
+                       indexCode={index.code}
+                       value={index.value}
+                       rank={index.rank}
+                       countryCode={countryCode}
+                     />
                   ))}
                   
                   <ClickableSourceCitation sourceKey="undp-worldbank-who" />

@@ -52,6 +52,12 @@ export {
    TermLegend, 
    TERM_DEFINITIONS 
  } from './TermExplainer';
+ 
+ // Clickable index cards with infinite depth
+ export { 
+   ClickableIndexCard, 
+   INDEX_DEPTH_DATA 
+ } from './ClickableIndexCard';
 
 // Utility: Create a simple data point with basic depth
 export function createDataPoint(params: {
