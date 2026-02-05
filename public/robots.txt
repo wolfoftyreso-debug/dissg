@@ -1,14 +1,11 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# DISSG – Diagnostic Infrastructure for Societal Governance
+# https://dissg.global
 
 User-agent: *
 Allow: /
+
+# Sitemaps
+Sitemap: https://dissg.global/sitemap.xml
+
+# Crawl-delay (optional, respectful)
+Crawl-delay: 1
