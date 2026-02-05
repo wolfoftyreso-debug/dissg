@@ -1,31 +1,37 @@
  /**
   * SELF-TEST RUNNER
   * 
-  * Continuous and batch testing infrastructure.
-  * Deterministic yes/no answers only.
+  * Continuous validation engine.
+  * Runs the 5 mandatory tests + principle checks.
   */
  
- import { SYSTEM_FAULT_CODES, type SystemFaultCodeDefinition, type SystemDomain } from './system-fault-codes';
+ import { SYSTEM_FAULT_CODES } from './system-fault-codes';
  
- export type TestType = 'structural' | 'semantic' | 'machine-readability' | 'aggregability' | 'security';
+ export type TestType = 
+   | 'principle_check'
+   | 'ontological_density'
+   | 'semantic_overlap'
+   | 'aggregability'
+   | 'ai_confusion'
+   | 'historical_integrity';
+ 
  export type TestStatus = 'pass' | 'fail' | 'warning' | 'skipped';
  
  export interface TestResult {
    testId: string;
    testType: TestType;
    status: TestStatus;
-   faultCode?: string;
-   details: string;
-   timestamp: Date;
-   deterministicAnswer: boolean; // Must always be true
-   evidence?: Record<string, unknown>;
+   faultCodes: string[];
+   details: Record<string, unknown>;
+   executedAt: string;
+   durationMs: number;
  }
  
- export interface TestCheckResult {
-   passed: boolean;
-   faultCode?: string;
-   details: string;
-   evidence?: Record<string, unknown>;
+ export interface TestSuite {
+   id: string;
+   name: string;
+   description: string;
+   tests: TestDefinition[];
  }
  
  export interface TestDefinition {
@@ -33,215 +39,312 @@
    type: TestType;
    name: string;
    description: string;
-   check: () => TestCheckResult;
+   faultCodesOnFail: string[];
+   check: () => Promise<TestCheckResult>;
  }
  
- export interface TestSuite {
-   name: string;
-   description: string;
-   tests: TestDefinition[];
+ export interface TestCheckResult {
+   passed: boolean;
+   warnings: string[];
+   errors: string[];
+   data?: Record<string, unknown>;
  }
  
- // Diagnostic test questions (from masterprompt)
+ // ============================================================
+ // DIAGNOSTIC QUESTIONS (the system's conscience)
+ // ============================================================
+ 
  export interface DiagnosticTestQuestions {
-   // Structural Integrity
-   hasObjectsWithoutSchema: boolean;
-   hasNonReversibleRelations: boolean;
-   hasFieldsWithoutSemanticDefinition: boolean;
-   hasUndeclaredConcepts: boolean;
-   hasTimeSeriesWithoutTemporalAxis: boolean;
-   
-   // Semantic Stability
-   hasMultiMeaningConcepts: boolean;
-   hasSemanticDrift: boolean;
-   
-   // Machine Readability (0-100 scores)
-   machineReadabilityScores: Record<string, number>;
-   
-   // Aggregability
-   directlyAggregable: string[];
-   requiresTransformation: string[];
-   impossibleToAggregate: string[];
+   question: string;
+   testType: TestType;
+   mustBeYes: boolean;
+   faultCodeOnFail: string;
  }
  
- // Test results storage
+ export const SYSTEM_DIAGNOSTIC_QUESTIONS: DiagnosticTestQuestions[] = [
+   // Principle 1: Machines are primary users
+   {
+     question: 'Can an unknown AI model use the system without documentation?',
+     testType: 'principle_check',
+     mustBeYes: true,
+     faultCodeOnFail: 'SYS-MRP-001',
+   },
+   
+   // Principle 2: Explicit uncertainty
+   {
+     question: 'Is there data that appears clean but is actually uncertain?',
+     testType: 'principle_check',
+     mustBeYes: false, // Must be NO
+     faultCodeOnFail: 'DAT-UNC-001',
+   },
+   
+   // Principle 3: Temporal axis
+   {
+     question: 'Can every data point be reproduced exactly as it appeared at a historical moment?',
+     testType: 'principle_check',
+     mustBeYes: true,
+     faultCodeOnFail: 'DAT-TMP-002',
+   },
+   
+   // Structural discipline
+   {
+     question: 'Is there any object that is only understood if you already know what it is?',
+     testType: 'principle_check',
+     mustBeYes: false,
+     faultCodeOnFail: 'MOD-NRM-002',
+   },
+   {
+     question: 'Is there something that lies under something else without a formal relation?',
+     testType: 'principle_check',
+     mustBeYes: false,
+     faultCodeOnFail: 'MOD-HIR-001',
+   },
+   {
+     question: 'Is there a numeric value that cannot be unambiguously converted to another unit?',
+     testType: 'principle_check',
+     mustBeYes: false,
+     faultCodeOnFail: 'MOD-UNT-001',
+   },
+   
+   // Semantic warfare
+   {
+     question: 'Has data been discarded because it was contradictory?',
+     testType: 'principle_check',
+     mustBeYes: false,
+     faultCodeOnFail: 'DAT-UNC-002',
+   },
+   {
+     question: 'Are there two data points with the same value but different definitions treated as the same?',
+     testType: 'principle_check',
+     mustBeYes: false,
+     faultCodeOnFail: 'DAT-SEM-001',
+   },
+   {
+     question: 'Has a schema been changed without receiving a new ID?',
+     testType: 'principle_check',
+     mustBeYes: false,
+     faultCodeOnFail: 'DAT-SEM-002',
+   },
+   
+   // Future robustness
+   {
+     question: 'Can the system describe the same reality even if all current institutions disappear?',
+     testType: 'principle_check',
+     mustBeYes: true,
+     faultCodeOnFail: 'SYS-MRP-001',
+   },
+   {
+     question: 'Can the system understand, validate, and develop itself without you?',
+     testType: 'principle_check',
+     mustBeYes: true,
+     faultCodeOnFail: 'SYS-MRP-001',
+   },
+ ];
+ 
+ // ============================================================
+ // TEST EXECUTION ENGINE
+ // ============================================================
+ 
+ interface SystemFault {
+   faultCode: string;
+   detectedAt: string;
+   testId: string;
+   details: Record<string, unknown>;
+   resolved: boolean;
+   resolvedAt?: string;
+ }
+ 
+ const activeSystemFaults: SystemFault[] = [];
  const testResults: TestResult[] = [];
- const activeSystemFaults: Map<string, { fault: SystemFaultCodeDefinition; detectedAt: Date; resolved: boolean }> = new Map();
  
- /**
-  * Run a single test and record result
-  */
- export function runTest(test: TestDefinition): TestResult {
-   const checkResult = test.check();
+ export async function runTest(test: TestDefinition): Promise<TestResult> {
+   const startTime = performance.now();
    
-   const result: TestResult = {
-     testId: test.id,
-     testType: test.type,
-     status: checkResult.passed ? 'pass' : 'fail',
-     faultCode: checkResult.faultCode,
-     details: checkResult.details,
-     timestamp: new Date(),
-     deterministicAnswer: true, // Always deterministic
-     evidence: checkResult.evidence,
-   };
-   
-   testResults.push(result);
-   
-   // Register fault if test failed
-   if (!checkResult.passed && checkResult.faultCode) {
-     const faultDef = SYSTEM_FAULT_CODES[checkResult.faultCode];
-     if (faultDef) {
-       activeSystemFaults.set(checkResult.faultCode, {
-         fault: faultDef,
-         detectedAt: new Date(),
-         resolved: false,
-       });
+   try {
+     const result = await test.check();
+     const endTime = performance.now();
+     
+     const testResult: TestResult = {
+       testId: test.id,
+       testType: test.type,
+       status: result.passed ? (result.warnings.length > 0 ? 'warning' : 'pass') : 'fail',
+       faultCodes: result.passed ? [] : test.faultCodesOnFail,
+       details: {
+         warnings: result.warnings,
+         errors: result.errors,
+         ...result.data,
+       },
+       executedAt: new Date().toISOString(),
+       durationMs: endTime - startTime,
+     };
+     
+     testResults.push(testResult);
+     
+     // Register faults if failed
+     if (!result.passed) {
+       for (const faultCode of test.faultCodesOnFail) {
+         registerSystemFault(faultCode, test.id, testResult.details);
+       }
      }
+     
+     return testResult;
+   } catch (error) {
+     const endTime = performance.now();
+     
+     const testResult: TestResult = {
+       testId: test.id,
+       testType: test.type,
+       status: 'fail',
+       faultCodes: ['SYS-MRP-001'], // Test execution failure
+       details: { error: error instanceof Error ? error.message : 'Unknown error' },
+       executedAt: new Date().toISOString(),
+       durationMs: endTime - startTime,
+     };
+     
+     testResults.push(testResult);
+     return testResult;
    }
+ }
+ 
+ export async function runTestSuite(suite: TestSuite): Promise<TestResult[]> {
+   const results: TestResult[] = [];
    
-   return result;
- }
- 
- /**
-  * Run entire test suite
-  */
- export function runTestSuite(suite: TestSuite): TestResult[] {
-   return suite.tests.map(test => runTest(test));
- }
- 
- /**
-  * Mark a fault as resolved
-  */
- export function resolveSystemFault(faultCode: string): boolean {
-   const fault = activeSystemFaults.get(faultCode);
-   if (fault) {
-     fault.resolved = true;
-     return true;
-   }
-   return false;
- }
- 
- /**
-  * Get all active (unresolved) faults
-  */
- export function getActiveSystemFaults(): Array<{ code: string; fault: SystemFaultCodeDefinition; detectedAt: Date }> {
-   return Array.from(activeSystemFaults.entries())
-     .filter(([_, data]) => !data.resolved)
-     .map(([code, data]) => ({
-       code,
-       fault: data.fault,
-       detectedAt: data.detectedAt,
-     }));
- }
- 
- /**
-  * Get all faults (including resolved)
-  */
- export function getAllSystemFaults(): Array<{ code: string; fault: SystemFaultCodeDefinition; detectedAt: Date; resolved: boolean }> {
-   return Array.from(activeSystemFaults.entries())
-     .map(([code, data]) => ({
-       code,
-       fault: data.fault,
-       detectedAt: data.detectedAt,
-       resolved: data.resolved,
-     }));
- }
- 
- /**
-  * Get test results
-  */
- export function getTestResults(options?: { type?: TestType; since?: Date }): TestResult[] {
-   let results = [...testResults];
-   
-   if (options?.type) {
-     results = results.filter(r => r.testType === options.type);
-   }
-   
-   if (options?.since) {
-     results = results.filter(r => r.timestamp >= options.since);
+   for (const test of suite.tests) {
+     const result = await runTest(test);
+     results.push(result);
    }
    
    return results;
  }
  
- /**
-  * Clear test results (for testing purposes only)
-  */
+ function registerSystemFault(
+   faultCode: string, 
+   testId: string, 
+   details: Record<string, unknown>
+ ): void {
+   const existingFault = activeSystemFaults.find(
+     f => f.faultCode === faultCode && !f.resolved
+   );
+   
+   if (!existingFault) {
+     activeSystemFaults.push({
+       faultCode,
+       detectedAt: new Date().toISOString(),
+       testId,
+       details,
+       resolved: false,
+     });
+   }
+ }
+ 
+ export function resolveSystemFault(faultCode: string): boolean {
+   const fault = activeSystemFaults.find(
+     f => f.faultCode === faultCode && !f.resolved
+   );
+   
+   if (fault) {
+     fault.resolved = true;
+     fault.resolvedAt = new Date().toISOString();
+     return true;
+   }
+   
+   return false;
+ }
+ 
+ export function getActiveSystemFaults(): SystemFault[] {
+   return activeSystemFaults.filter(f => !f.resolved);
+ }
+ 
+ export function getAllSystemFaults(): SystemFault[] {
+   return [...activeSystemFaults];
+ }
+ 
+ export function getTestResults(): TestResult[] {
+   return [...testResults];
+ }
+ 
  export function clearTestResults(): void {
    testResults.length = 0;
  }
  
- /**
-  * Clear resolved faults
-  */
  export function clearResolvedFaults(): void {
-   for (const [code, data] of activeSystemFaults.entries()) {
-     if (data.resolved) {
-       activeSystemFaults.delete(code);
-     }
-   }
+   const activeFaults = activeSystemFaults.filter(f => !f.resolved);
+   activeSystemFaults.length = 0;
+   activeSystemFaults.push(...activeFaults);
  }
  
- /**
-  * System health state based on active faults
-  */
+ // ============================================================
+ // SYSTEM HEALTH EVALUATION
+ // ============================================================
+ 
  export interface SystemHealthState {
-   status: 'healthy' | 'degraded' | 'critical';
+   healthy: boolean;
    criticalFaults: number;
+   errorFaults: number;
    warningFaults: number;
-   infoFaults: number;
-   blockedDomains: SystemDomain[];
-   lastCheck: Date;
+   lastChecked: string;
+   canOperate: boolean;
  }
  
  export function evaluateSystemHealth(): SystemHealthState {
    const activeFaults = getActiveSystemFaults();
    
-   const criticalFaults = activeFaults.filter(f => f.fault.severity === 'critical');
-   const warningFaults = activeFaults.filter(f => f.fault.severity === 'warning');
-   const infoFaults = activeFaults.filter(f => f.fault.severity === 'info');
+   let criticalFaults = 0;
+   let errorFaults = 0;
+   let warningFaults = 0;
    
-   const blockedDomains = [...new Set(
-     criticalFaults
-       .filter(f => f.fault.blockingLevel === 'full')
-       .map(f => f.fault.domain)
-   )];
-   
-   let status: 'healthy' | 'degraded' | 'critical' = 'healthy';
-   if (criticalFaults.length > 0) {
-     status = 'critical';
-   } else if (warningFaults.length > 0) {
-     status = 'degraded';
+   for (const fault of activeFaults) {
+     const faultDef = SYSTEM_FAULT_CODES[fault.faultCode];
+     if (faultDef) {
+       switch (faultDef.severity) {
+         case 'CRITICAL':
+           criticalFaults++;
+           break;
+         case 'ERROR':
+           errorFaults++;
+           break;
+         case 'WARNING':
+           warningFaults++;
+           break;
+       }
+     }
    }
    
    return {
-     status,
-     criticalFaults: criticalFaults.length,
-     warningFaults: warningFaults.length,
-     infoFaults: infoFaults.length,
-     blockedDomains,
-     lastCheck: new Date(),
+     healthy: criticalFaults === 0 && errorFaults === 0,
+     criticalFaults,
+     errorFaults,
+     warningFaults,
+     lastChecked: new Date().toISOString(),
+     canOperate: criticalFaults === 0,
    };
  }
  
- /**
-  * Evaluate the diagnostic test questions
-  * Returns deterministic yes/no for each question
-  */
- export function evaluateTestQuestions(): DiagnosticTestQuestions {
-   // These would be populated by actual system checks
-   // For now, returning structure with defaults
+ // ============================================================
+ // DIAGNOSTIC QUESTION EVALUATOR
+ // ============================================================
+ 
+ export function evaluateTestQuestions(
+   answers: Map<string, boolean>
+ ): { passed: boolean; faults: string[] } {
+   const faults: string[] = [];
+   
+   for (const question of SYSTEM_DIAGNOSTIC_QUESTIONS) {
+     const answer = answers.get(question.question);
+     
+     if (answer === undefined) {
+       continue; // Question not answered
+     }
+     
+     const expectedAnswer = question.mustBeYes;
+     
+     if (answer !== expectedAnswer) {
+       faults.push(question.faultCodeOnFail);
+     }
+   }
+   
    return {
-     hasObjectsWithoutSchema: false,
-     hasNonReversibleRelations: false,
-     hasFieldsWithoutSemanticDefinition: false,
-     hasUndeclaredConcepts: false,
-     hasTimeSeriesWithoutTemporalAxis: false,
-     hasMultiMeaningConcepts: false,
-     hasSemanticDrift: false,
-     machineReadabilityScores: {},
-     directlyAggregable: [],
-     requiresTransformation: [],
-     impossibleToAggregate: [],
+     passed: faults.length === 0,
+     faults,
    };
  }
