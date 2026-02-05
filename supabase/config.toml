@@ -71,3 +71,12 @@ verify_jwt = false
 
 [functions.cqais]
 verify_jwt = false
+
+[functions.answer]
+verify_jwt = false
+
+[functions.trust]
+verify_jwt = false
+
+[functions.decision]
+verify_jwt = false
