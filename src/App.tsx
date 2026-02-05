@@ -105,6 +105,7 @@ import EducationPage from "./pages/EducationPage";
 import DecisionDemo from "./pages/DecisionDemo";
 import IndexBoards from "./pages/IndexBoards";
 import QuestionFirst from "./pages/QuestionFirst";
+import GDGSpec from "./pages/GDGSpec";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -217,6 +218,7 @@ const App = () => (
                 <Route path="/decision" element={<DecisionDemo />} />
                 <Route path="/index-boards" element={<IndexBoards />} />
                 <Route path="/ask" element={<QuestionFirst />} />
+                <Route path="/gdg" element={<GDGSpec />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
