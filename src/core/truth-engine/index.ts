@@ -89,6 +89,19 @@
    runAllTests,
  } from './tests/invariant-tests';
  
+ // First Truth (Step 8)
+ export {
+   SCB_SOURCE as FIRST_TRUTH_SOURCE,
+   SWEDEN_ENTITY as FIRST_TRUTH_ENTITY,
+   POPULATION_SCHEMA as FIRST_TRUTH_SCHEMA,
+   POPULATION_SWEDEN_2023 as FIRST_TRUTH_MEASURE,
+   validateRecord,
+   insertFirstTruth,
+   runSabotageTests,
+   runStep8,
+   type SabotageTestResult,
+ } from './first-truth';
+ 
  /**
   * INITIALIZE TRUTH ENGINE
   * 
