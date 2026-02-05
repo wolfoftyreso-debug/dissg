@@ -11,6 +11,7 @@ import { IndexWorldMap } from './IndexWorldMap';
 import { IndexPanel } from './IndexPanel';
 import { IndexDetailView } from './IndexDetailView';
 import type { IndexDefinition } from '@/lib/lambda';
+import { FileText, Bell, Star, AlertTriangle } from 'lucide-react';
 
 interface IndexExplorerProps {
   className?: string;
@@ -145,19 +146,66 @@ export function IndexExplorer({ className }: IndexExplorerProps) {
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        <div className="p-4 space-y-4">
-          {/* World Map Section */}
-          <IndexWorldMap />
+        {activeTab === 'today' && (
+          <div className="p-4 space-y-4">
+            {/* World Map Section */}
+            <IndexWorldMap />
 
-          {/* Index Panels Grid - 5 columns on xl */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-            <IndexPanel title="Nordiska index" items={NORDIC_INDICES} />
-            <IndexPanel title="Världsindex" items={WORLD_INDICES} />
-            <IndexPanel title="Europeiska index" items={EUROPEAN_INDICES} />
-            <IndexPanel title="Domänindex" items={DOMAIN_INDICES} />
-            <IndexPanel title="Sektorindex" items={SECTOR_INDICES} />
+            {/* Index Panels Grid - 5 columns on xl */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+              <IndexPanel title="Nordiska index" items={NORDIC_INDICES} />
+              <IndexPanel title="Världsindex" items={WORLD_INDICES} />
+              <IndexPanel title="Europeiska index" items={EUROPEAN_INDICES} />
+              <IndexPanel title="Domänindex" items={DOMAIN_INDICES} />
+              <IndexPanel title="Sektorindex" items={SECTOR_INDICES} />
+            </div>
           </div>
-        </div>
+        )}
+
+        {activeTab === 'watchlist' && (
+          <div className="p-6">
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Star className="h-12 w-12 text-muted-foreground/30 mb-4" />
+              <h2 className="text-lg font-medium text-foreground mb-2">Mina bevakningar</h2>
+              <p className="text-sm text-muted-foreground max-w-md mb-6">
+                Lägg till index i din bevakningslista för att snabbt följa de länder och domäner du är mest intresserad av.
+              </p>
+              <Button variant="outline" size="sm">
+                + Lägg till bevakning
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'notes' && (
+          <div className="p-6">
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <FileText className="h-12 w-12 text-muted-foreground/30 mb-4" />
+              <h2 className="text-lg font-medium text-foreground mb-2">Anteckningar</h2>
+              <p className="text-sm text-muted-foreground max-w-md mb-6">
+                Spara dina egna anteckningar om specifika index, trender eller observationer du vill komma ihåg.
+              </p>
+              <Button variant="outline" size="sm">
+                + Ny anteckning
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'alerts' && (
+          <div className="p-6">
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Bell className="h-12 w-12 text-muted-foreground/30 mb-4" />
+              <h2 className="text-lg font-medium text-foreground mb-2">Larm</h2>
+              <p className="text-sm text-muted-foreground max-w-md mb-6">
+                Ställ in larm för att få notiser när ett index passerar en viss nivå eller förändras kraftigt.
+              </p>
+              <Button variant="outline" size="sm">
+                + Skapa larm
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
