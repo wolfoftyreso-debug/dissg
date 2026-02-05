@@ -35,8 +35,8 @@
    detectCrisis,
    generateCrisisResponse,
    safetyGate,
-   type CrisisDetectionResult,
  } from './crisis-detector';
+ export type { CrisisDetectionResult as LegacyCrisisResult } from './crisis-detector';
  
  // Medical API Layer
  export {
@@ -71,6 +71,26 @@
  // Answer Packets
  export { ALL_YOUTH_PACKETS, getPacketById } from './packets';
  export { MEDIUM_RISK_PACKETS } from './packets/medium-risk-packets';
+ export { 
+   FAMILY_A_PACKETS, 
+   FAMILY_B_PACKETS, 
+   FAMILY_C_PACKETS, 
+   FAMILY_D_PACKETS, 
+   FAMILY_E_PACKETS,
+   PACKET_CRISIS_SUPPORT,
+   generateCrisisFallbackResponse,
+   getCrisisResourcesForRegion,
+   CRISIS_RESOURCES,
+ } from './packets';
+ 
+ // Crisis Detection Engine (3-level)
+ export {
+   detectCrisisLevel,
+   quickCrisisCheck,
+   RISK_THRESHOLDS,
+   CRISIS_REGEX_PATTERNS,
+ } from './detection/crisis-detection-engine';
+ export type { CrisisDetectionResult, DetectionMode, SessionContext } from './detection/crisis-detection-engine';
  
  // Administration
  export * from './admin';
