@@ -14,6 +14,7 @@ export type {
   DecisionInput,
   DecisionAlternative,
   ConsequenceDimension,
+  ConsequenceDimensionType,
   RelevantDataPoint,
   KnowledgeStatus,
   IrreversibilityLevel,
@@ -26,6 +27,18 @@ export { dpdGenerator } from './dpd-generator';
 
 // Post-Decision Lock
 export { postDecisionLock } from './post-decision-lock';
+
+// Protocol Binding
+export { 
+  createProtocolBinding, 
+  validateDecisionAgainstDPD,
+  BRF_PROTOCOL_BINDING_EXAMPLE,
+  type ProtocolBinding,
+  type VotingRecord,
+} from './protocol-binding';
+
+// Examples
+export { BRF_ROOF_RENOVATION_DPD } from './examples/brf-roof-renovation';
 
 // Masterprompt
 export {

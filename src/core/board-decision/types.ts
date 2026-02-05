@@ -46,8 +46,17 @@ export interface DecisionAlternative {
 /**
  * CONSEQUENCE DIMENSION
  */
+export type ConsequenceDimensionType = 
+  | 'economy' 
+  | 'liquidity' 
+  | 'risk_over_time' 
+  | 'reversibility' 
+  | 'operational' 
+  | 'regulatory' 
+  | 'reputational';
+
 export interface ConsequenceDimension {
-  dimension: string;
+  dimension: ConsequenceDimensionType | string;
   visible_effect: boolean;
   uncertainty: 'low' | 'medium' | 'high' | 'unknown';
   time_dependency: string;
