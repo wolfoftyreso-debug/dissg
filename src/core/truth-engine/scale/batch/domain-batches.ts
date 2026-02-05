@@ -46,10 +46,10 @@ export interface BatchError {
  * DOMAIN BATCH DEFINITIONS
  */
 
-// Batch 1: Health (≈300 noder)
+// Batch 1: Health (≈300 noder) - uses 'medicine' domain
 export const BATCH_HEALTH: BatchConfig = {
   batch_id: 'BATCH:health:v1',
-  domain: 'health',
+  domain: 'medicine',
   target_nodes: 300,
   parallelism: 4,
   priority: 'high',
@@ -57,7 +57,7 @@ export const BATCH_HEALTH: BatchConfig = {
     {
       template_id: 'anxiety_prevalence',
       answer_type: 'RISK_PREVALENCE',
-      domain: 'health',
+      domain: 'medicine',
       text_template: 'Anxiety prevalence is {{anxiety_rate}}.',
       required_measures: ['anxiety_rate'],
       limitations_template: ['Self-reported data'],
@@ -66,7 +66,7 @@ export const BATCH_HEALTH: BatchConfig = {
     {
       template_id: 'stress_levels',
       answer_type: 'DESCRIPTIVE_STAT',
-      domain: 'health',
+      domain: 'medicine',
       text_template: 'Stress levels are {{stress_level}}.',
       required_measures: ['stress_level'],
       limitations_template: ['Self-reported data'],
@@ -115,10 +115,10 @@ export const BATCH_ECONOMY: BatchConfig = {
   ],
 };
 
-// Batch 4: Demographics (≈200 noder)
+// Batch 4: Demographics (≈200 noder) - uses 'society' domain
 export const BATCH_DEMOGRAPHICS: BatchConfig = {
   batch_id: 'BATCH:demographics:v1',
-  domain: 'demographics',
+  domain: 'society',
   target_nodes: 200,
   parallelism: 4,
   priority: 'normal',
@@ -126,7 +126,7 @@ export const BATCH_DEMOGRAPHICS: BatchConfig = {
     {
       template_id: 'age_structure',
       answer_type: 'DISTRIBUTION_STRUCTURE',
-      domain: 'demographics',
+      domain: 'society',
       text_template: 'Age structure shows {{age_dist}}.',
       required_measures: ['age_dist'],
       limitations_template: ['Census data'],
@@ -235,31 +235,6 @@ export class BatchRunner {
   getAllResults(): BatchResult[] {
     return [...this.results.values()];
   }
-}
-
-/**
- * QUICK PRODUCTION RUN
- */
-export async function runMassProduction(): Promise<{
-  success: boolean;
-  nodes_produced: number;
-  duration_ms: number;
-  report: string;
-}> {
-  const startTime = performance.now();
-  const runner = new BatchRunner();
-  
-  await runner.runAllBatches();
-  const summary = runner.getSummary();
-
-  const report = `MASS PRODUCTION: ${summary.total_nodes} nodes in ${summary.total_duration_ms.toFixed(0)}ms`;
-
-  return {
-    success: summary.successful_batches === summary.total_batches,
-    nodes_produced: summary.total_nodes,
-    duration_ms: performance.now() - startTime,
-    report,
-  };
 }
 
 /**
