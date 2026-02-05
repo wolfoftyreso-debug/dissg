@@ -21,3 +21,7 @@ export { EverydayDecisionView } from './EverydayDecisionView';
 // Question Shaping
 export { QuestionShaper } from './QuestionShaper';
 export { GravityIndicator } from './GravityIndicator';
+
+// Responsibility Scaling
+export { ResponsibilityGate } from './ResponsibilityGate';
+export { ResponsibilityFlow } from './ResponsibilityFlow';
