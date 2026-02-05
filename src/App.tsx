@@ -103,6 +103,8 @@ import BudgetPage from "./pages/BudgetPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import EducationPage from "./pages/EducationPage";
 import DecisionDemo from "./pages/DecisionDemo";
+import IndexBoards from "./pages/IndexBoards";
+import QuestionFirst from "./pages/QuestionFirst";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -213,6 +215,8 @@ const App = () => (
                 <Route path="/portfolio" element={<PortfolioPage />} />
                 <Route path="/education" element={<EducationPage />} />
                 <Route path="/decision" element={<DecisionDemo />} />
+                <Route path="/index-boards" element={<IndexBoards />} />
+                <Route path="/ask" element={<QuestionFirst />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
