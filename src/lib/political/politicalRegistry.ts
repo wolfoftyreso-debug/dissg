@@ -297,8 +297,566 @@ export const GOVERNMENT_REGISTRY: Record<string, GovernmentPeriod[]> = {
   'DE': GOVERNMENT_PERIODS_DE,
   'US': GOVERNMENT_PERIODS_US,
 };
-
-// Helper functions
+ 
+ // UK governments
+ export const GOVERNMENT_PERIODS_GB: GovernmentPeriod[] = [
+   {
+     id: 'gb-2024-starmer',
+     countryCode: 'GB',
+     startDate: '2024-07-05',
+     endDate: null,
+     leaderName: 'Keir Starmer',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'Labour',
+     bloc: 'left',
+     coalitionParties: ['Labour'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'gb-2022-sunak',
+     countryCode: 'GB',
+     startDate: '2022-10-25',
+     endDate: '2024-07-05',
+     leaderName: 'Rishi Sunak',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'Conservative',
+     bloc: 'right',
+     coalitionParties: ['Conservative'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'gb-2019-johnson',
+     countryCode: 'GB',
+     startDate: '2019-07-24',
+     endDate: '2022-10-25',
+     leaderName: 'Boris Johnson',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'Conservative',
+     bloc: 'right',
+     coalitionParties: ['Conservative'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'gb-2010-cameron',
+     countryCode: 'GB',
+     startDate: '2010-05-11',
+     endDate: '2019-07-24',
+     leaderName: 'David Cameron',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'Conservative',
+     bloc: 'right',
+     coalitionParties: ['Conservative', 'Liberal Democrats'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'gb-1997-blair',
+     countryCode: 'GB',
+     startDate: '1997-05-02',
+     endDate: '2010-05-11',
+     leaderName: 'Tony Blair',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'Labour',
+     bloc: 'left',
+     coalitionParties: ['Labour'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+ ];
+ 
+ // French governments
+ export const GOVERNMENT_PERIODS_FR: GovernmentPeriod[] = [
+   {
+     id: 'fr-2017-macron',
+     countryCode: 'FR',
+     startDate: '2017-05-14',
+     endDate: null,
+     leaderName: 'Emmanuel Macron',
+     leaderTitle: 'Président',
+     leaderParty: 'Renaissance',
+     bloc: 'center',
+     coalitionParties: ['Renaissance', 'MoDem'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+   {
+     id: 'fr-2012-hollande',
+     countryCode: 'FR',
+     startDate: '2012-05-15',
+     endDate: '2017-05-14',
+     leaderName: 'François Hollande',
+     leaderTitle: 'Président',
+     leaderParty: 'Parti Socialiste',
+     bloc: 'left',
+     coalitionParties: ['PS', 'EELV'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'fr-2007-sarkozy',
+     countryCode: 'FR',
+     startDate: '2007-05-16',
+     endDate: '2012-05-15',
+     leaderName: 'Nicolas Sarkozy',
+     leaderTitle: 'Président',
+     leaderParty: 'UMP',
+     bloc: 'right',
+     coalitionParties: ['UMP'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+ ];
+ 
+ // Norwegian governments
+ export const GOVERNMENT_PERIODS_NO: GovernmentPeriod[] = [
+   {
+     id: 'no-2021-store',
+     countryCode: 'NO',
+     startDate: '2021-10-14',
+     endDate: null,
+     leaderName: 'Jonas Gahr Støre',
+     leaderTitle: 'Statsminister',
+     leaderParty: 'Arbeiderpartiet',
+     bloc: 'left',
+     coalitionParties: ['Arbeiderpartiet', 'Senterpartiet'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+   {
+     id: 'no-2013-solberg',
+     countryCode: 'NO',
+     startDate: '2013-10-16',
+     endDate: '2021-10-14',
+     leaderName: 'Erna Solberg',
+     leaderTitle: 'Statsminister',
+     leaderParty: 'Høyre',
+     bloc: 'right',
+     coalitionParties: ['Høyre', 'Fremskrittspartiet'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+   {
+     id: 'no-2005-stoltenberg',
+     countryCode: 'NO',
+     startDate: '2005-10-17',
+     endDate: '2013-10-16',
+     leaderName: 'Jens Stoltenberg',
+     leaderTitle: 'Statsminister',
+     leaderParty: 'Arbeiderpartiet',
+     bloc: 'left',
+     coalitionParties: ['Arbeiderpartiet', 'SV', 'Sp'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+ ];
+ 
+ // Danish governments
+ export const GOVERNMENT_PERIODS_DK: GovernmentPeriod[] = [
+   {
+     id: 'dk-2022-frederiksen',
+     countryCode: 'DK',
+     startDate: '2022-12-15',
+     endDate: null,
+     leaderName: 'Mette Frederiksen',
+     leaderTitle: 'Statsminister',
+     leaderParty: 'Socialdemokratiet',
+     bloc: 'coalition',
+     coalitionParties: ['Socialdemokratiet', 'Venstre', 'Moderaterne'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'dk-2019-frederiksen-1',
+     countryCode: 'DK',
+     startDate: '2019-06-27',
+     endDate: '2022-12-15',
+     leaderName: 'Mette Frederiksen',
+     leaderTitle: 'Statsminister',
+     leaderParty: 'Socialdemokratiet',
+     bloc: 'left',
+     coalitionParties: ['Socialdemokratiet'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+   {
+     id: 'dk-2015-rasmussen',
+     countryCode: 'DK',
+     startDate: '2015-06-28',
+     endDate: '2019-06-27',
+     leaderName: 'Lars Løkke Rasmussen',
+     leaderTitle: 'Statsminister',
+     leaderParty: 'Venstre',
+     bloc: 'right',
+     coalitionParties: ['Venstre', 'Liberal Alliance', 'Konservative'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+ ];
+ 
+ // Finnish governments
+ export const GOVERNMENT_PERIODS_FI: GovernmentPeriod[] = [
+   {
+     id: 'fi-2023-orpo',
+     countryCode: 'FI',
+     startDate: '2023-06-20',
+     endDate: null,
+     leaderName: 'Petteri Orpo',
+     leaderTitle: 'Pääministeri',
+     leaderParty: 'Kokoomus',
+     bloc: 'right',
+     coalitionParties: ['Kokoomus', 'Perussuomalaiset', 'RKP'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'fi-2019-marin',
+     countryCode: 'FI',
+     startDate: '2019-12-10',
+     endDate: '2023-06-20',
+     leaderName: 'Sanna Marin',
+     leaderTitle: 'Pääministeri',
+     leaderParty: 'SDP',
+     bloc: 'left',
+     coalitionParties: ['SDP', 'Keskusta', 'Vihreät', 'Vasemmistoliitto'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+ ];
+ 
+ // Japanese governments
+ export const GOVERNMENT_PERIODS_JP: GovernmentPeriod[] = [
+   {
+     id: 'jp-2024-ishiba',
+     countryCode: 'JP',
+     startDate: '2024-10-01',
+     endDate: null,
+     leaderName: 'Shigeru Ishiba',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'LDP',
+     bloc: 'right',
+     coalitionParties: ['LDP', 'Komeito'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+   {
+     id: 'jp-2021-kishida',
+     countryCode: 'JP',
+     startDate: '2021-10-04',
+     endDate: '2024-10-01',
+     leaderName: 'Fumio Kishida',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'LDP',
+     bloc: 'right',
+     coalitionParties: ['LDP', 'Komeito'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'jp-2012-abe',
+     countryCode: 'JP',
+     startDate: '2012-12-26',
+     endDate: '2021-10-04',
+     leaderName: 'Shinzō Abe',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'LDP',
+     bloc: 'right',
+     coalitionParties: ['LDP', 'Komeito'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+ ];
+ 
+ // Australian governments
+ export const GOVERNMENT_PERIODS_AU: GovernmentPeriod[] = [
+   {
+     id: 'au-2022-albanese',
+     countryCode: 'AU',
+     startDate: '2022-05-23',
+     endDate: null,
+     leaderName: 'Anthony Albanese',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'Labor',
+     bloc: 'left',
+     coalitionParties: ['Labor'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'au-2018-morrison',
+     countryCode: 'AU',
+     startDate: '2018-08-24',
+     endDate: '2022-05-23',
+     leaderName: 'Scott Morrison',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'Liberal',
+     bloc: 'right',
+     coalitionParties: ['Liberal Party', 'National Party'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+ ];
+ 
+ // Canadian governments
+ export const GOVERNMENT_PERIODS_CA: GovernmentPeriod[] = [
+   {
+     id: 'ca-2015-trudeau',
+     countryCode: 'CA',
+     startDate: '2015-11-04',
+     endDate: null,
+     leaderName: 'Justin Trudeau',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'Liberal',
+     bloc: 'left',
+     coalitionParties: ['Liberal Party'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+   {
+     id: 'ca-2006-harper',
+     countryCode: 'CA',
+     startDate: '2006-02-06',
+     endDate: '2015-11-04',
+     leaderName: 'Stephen Harper',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'Conservative',
+     bloc: 'right',
+     coalitionParties: ['Conservative Party'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+ ];
+ 
+ // Italian governments
+ export const GOVERNMENT_PERIODS_IT: GovernmentPeriod[] = [
+   {
+     id: 'it-2022-meloni',
+     countryCode: 'IT',
+     startDate: '2022-10-22',
+     endDate: null,
+     leaderName: 'Giorgia Meloni',
+     leaderTitle: 'Presidente del Consiglio',
+     leaderParty: "Fratelli d'Italia",
+     bloc: 'right',
+     coalitionParties: ['FdI', 'Lega', 'Forza Italia'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'it-2021-draghi',
+     countryCode: 'IT',
+     startDate: '2021-02-13',
+     endDate: '2022-10-22',
+     leaderName: 'Mario Draghi',
+     leaderTitle: 'Presidente del Consiglio',
+     leaderParty: 'Indipendente',
+     bloc: 'coalition',
+     coalitionParties: ['PD', 'M5S', 'Lega', 'FI'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+ ];
+ 
+ // Spanish governments
+ export const GOVERNMENT_PERIODS_ES: GovernmentPeriod[] = [
+   {
+     id: 'es-2018-sanchez',
+     countryCode: 'ES',
+     startDate: '2018-06-02',
+     endDate: null,
+     leaderName: 'Pedro Sánchez',
+     leaderTitle: 'Presidente del Gobierno',
+     leaderParty: 'PSOE',
+     bloc: 'left',
+     coalitionParties: ['PSOE', 'Sumar'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+   {
+     id: 'es-2011-rajoy',
+     countryCode: 'ES',
+     startDate: '2011-12-21',
+     endDate: '2018-06-02',
+     leaderName: 'Mariano Rajoy',
+     leaderTitle: 'Presidente del Gobierno',
+     leaderParty: 'PP',
+     bloc: 'right',
+     coalitionParties: ['Partido Popular'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+ ];
+ 
+ // Polish governments
+ export const GOVERNMENT_PERIODS_PL: GovernmentPeriod[] = [
+   {
+     id: 'pl-2023-tusk',
+     countryCode: 'PL',
+     startDate: '2023-12-13',
+     endDate: null,
+     leaderName: 'Donald Tusk',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'PO',
+     bloc: 'center',
+     coalitionParties: ['PO', 'PSL', 'Nowa Lewica'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'pl-2017-morawiecki',
+     countryCode: 'PL',
+     startDate: '2017-12-11',
+     endDate: '2023-12-13',
+     leaderName: 'Mateusz Morawiecki',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'PiS',
+     bloc: 'right',
+     coalitionParties: ['PiS'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+ ];
+ 
+ // Brazilian governments
+ export const GOVERNMENT_PERIODS_BR: GovernmentPeriod[] = [
+   {
+     id: 'br-2023-lula',
+     countryCode: 'BR',
+     startDate: '2023-01-01',
+     endDate: null,
+     leaderName: 'Lula da Silva',
+     leaderTitle: 'Presidente',
+     leaderParty: 'PT',
+     bloc: 'left',
+     coalitionParties: ['PT', 'PSB'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+   {
+     id: 'br-2019-bolsonaro',
+     countryCode: 'BR',
+     startDate: '2019-01-01',
+     endDate: '2023-01-01',
+     leaderName: 'Jair Bolsonaro',
+     leaderTitle: 'Presidente',
+     leaderParty: 'PL',
+     bloc: 'right',
+     coalitionParties: ['PL', 'PP'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+ ];
+ 
+ // Indian governments
+ export const GOVERNMENT_PERIODS_IN: GovernmentPeriod[] = [
+   {
+     id: 'in-2014-modi',
+     countryCode: 'IN',
+     startDate: '2014-05-26',
+     endDate: null,
+     leaderName: 'Narendra Modi',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'BJP',
+     bloc: 'right',
+     coalitionParties: ['BJP', 'NDA'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+   {
+     id: 'in-2004-singh',
+     countryCode: 'IN',
+     startDate: '2004-05-22',
+     endDate: '2014-05-26',
+     leaderName: 'Manmohan Singh',
+     leaderTitle: 'Prime Minister',
+     leaderParty: 'INC',
+     bloc: 'left',
+     coalitionParties: ['INC', 'UPA'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+ ];
+ 
+ // South Korean governments
+ export const GOVERNMENT_PERIODS_KR: GovernmentPeriod[] = [
+   {
+     id: 'kr-2022-yoon',
+     countryCode: 'KR',
+     startDate: '2022-05-10',
+     endDate: null,
+     leaderName: 'Yoon Suk-yeol',
+     leaderTitle: 'President',
+     leaderParty: 'PPP',
+     bloc: 'right',
+     coalitionParties: ['People Power Party'],
+     parliamentaryMajority: false,
+     minorityGovernment: true,
+   },
+   {
+     id: 'kr-2017-moon',
+     countryCode: 'KR',
+     startDate: '2017-05-10',
+     endDate: '2022-05-10',
+     leaderName: 'Moon Jae-in',
+     leaderTitle: 'President',
+     leaderParty: 'Democratic Party',
+     bloc: 'left',
+     coalitionParties: ['Democratic Party'],
+     parliamentaryMajority: true,
+     minorityGovernment: false,
+   },
+ ];
+ 
+ // Extend the combined registry with all countries
+ GOVERNMENT_REGISTRY['GB'] = GOVERNMENT_PERIODS_GB;
+ GOVERNMENT_REGISTRY['FR'] = GOVERNMENT_PERIODS_FR;
+ GOVERNMENT_REGISTRY['NO'] = GOVERNMENT_PERIODS_NO;
+ GOVERNMENT_REGISTRY['DK'] = GOVERNMENT_PERIODS_DK;
+ GOVERNMENT_REGISTRY['FI'] = GOVERNMENT_PERIODS_FI;
+ GOVERNMENT_REGISTRY['JP'] = GOVERNMENT_PERIODS_JP;
+ GOVERNMENT_REGISTRY['AU'] = GOVERNMENT_PERIODS_AU;
+ GOVERNMENT_REGISTRY['CA'] = GOVERNMENT_PERIODS_CA;
+ GOVERNMENT_REGISTRY['IT'] = GOVERNMENT_PERIODS_IT;
+ GOVERNMENT_REGISTRY['ES'] = GOVERNMENT_PERIODS_ES;
+ GOVERNMENT_REGISTRY['PL'] = GOVERNMENT_PERIODS_PL;
+ GOVERNMENT_REGISTRY['BR'] = GOVERNMENT_PERIODS_BR;
+ GOVERNMENT_REGISTRY['IN'] = GOVERNMENT_PERIODS_IN;
+ GOVERNMENT_REGISTRY['KR'] = GOVERNMENT_PERIODS_KR;
+ 
+ // Country metadata for budget explorer
+ export interface CountryMeta {
+   code: string;
+   name: string;
+   nameLocal: string;
+   leaderTitle: string;
+   population: number;
+   currency: string;
+   currencySymbol: string;
+ }
+ 
+ export const COUNTRY_META: Record<string, CountryMeta> = {
+   'SE': { code: 'SE', name: 'Sweden', nameLocal: 'Sverige', leaderTitle: 'Statsminister', population: 10.5, currency: 'SEK', currencySymbol: 'kr' },
+   'DE': { code: 'DE', name: 'Germany', nameLocal: 'Deutschland', leaderTitle: 'Bundeskanzler', population: 84.4, currency: 'EUR', currencySymbol: '€' },
+   'US': { code: 'US', name: 'United States', nameLocal: 'USA', leaderTitle: 'President', population: 331.9, currency: 'USD', currencySymbol: '$' },
+   'GB': { code: 'GB', name: 'United Kingdom', nameLocal: 'Storbritannien', leaderTitle: 'Prime Minister', population: 67.3, currency: 'GBP', currencySymbol: '£' },
+   'FR': { code: 'FR', name: 'France', nameLocal: 'Frankrike', leaderTitle: 'Président', population: 67.8, currency: 'EUR', currencySymbol: '€' },
+   'NO': { code: 'NO', name: 'Norway', nameLocal: 'Norge', leaderTitle: 'Statsminister', population: 5.5, currency: 'NOK', currencySymbol: 'kr' },
+   'DK': { code: 'DK', name: 'Denmark', nameLocal: 'Danmark', leaderTitle: 'Statsminister', population: 5.9, currency: 'DKK', currencySymbol: 'kr' },
+   'FI': { code: 'FI', name: 'Finland', nameLocal: 'Finland', leaderTitle: 'Pääministeri', population: 5.5, currency: 'EUR', currencySymbol: '€' },
+   'JP': { code: 'JP', name: 'Japan', nameLocal: 'Japan', leaderTitle: 'Prime Minister', population: 125.1, currency: 'JPY', currencySymbol: '¥' },
+   'AU': { code: 'AU', name: 'Australia', nameLocal: 'Australien', leaderTitle: 'Prime Minister', population: 26.0, currency: 'AUD', currencySymbol: '$' },
+   'CA': { code: 'CA', name: 'Canada', nameLocal: 'Kanada', leaderTitle: 'Prime Minister', population: 40.1, currency: 'CAD', currencySymbol: '$' },
+   'IT': { code: 'IT', name: 'Italy', nameLocal: 'Italien', leaderTitle: 'Presidente del Consiglio', population: 58.9, currency: 'EUR', currencySymbol: '€' },
+   'ES': { code: 'ES', name: 'Spain', nameLocal: 'Spanien', leaderTitle: 'Presidente del Gobierno', population: 47.4, currency: 'EUR', currencySymbol: '€' },
+   'PL': { code: 'PL', name: 'Poland', nameLocal: 'Polen', leaderTitle: 'Prime Minister', population: 37.8, currency: 'PLN', currencySymbol: 'zł' },
+   'BR': { code: 'BR', name: 'Brazil', nameLocal: 'Brasilien', leaderTitle: 'Presidente', population: 214.3, currency: 'BRL', currencySymbol: 'R$' },
+   'IN': { code: 'IN', name: 'India', nameLocal: 'Indien', leaderTitle: 'Prime Minister', population: 1417.2, currency: 'INR', currencySymbol: '₹' },
+   'KR': { code: 'KR', name: 'South Korea', nameLocal: 'Sydkorea', leaderTitle: 'President', population: 51.7, currency: 'KRW', currencySymbol: '₩' },
+ };
+ 
+ // Helper functions
 export function getGovernmentAtDate(countryCode: string, date: Date): GovernmentPeriod | null {
   const periods = GOVERNMENT_REGISTRY[countryCode];
   if (!periods) return null;

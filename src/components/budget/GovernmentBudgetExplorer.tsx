@@ -1,7 +1,8 @@
 /**
  * Government Budget Explorer
  * 
- * Simple, visual budget comparison that a 15-year-old can understand.
+  * Global budget comparison for all countries with government data.
+  * Simple, visual budget comparison that a 15-year-old can understand.
  * Every element is clickable for deeper exploration.
  */
 
@@ -9,12 +10,19 @@ import React, { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  GOVERNMENT_PERIODS_SE, 
+  GOVERNMENT_REGISTRY,
   type GovernmentPeriod, 
-  BLOC_COLORS 
+  BLOC_COLORS,
+  COUNTRY_META,
 } from '@/lib/political/politicalRegistry';
-import { ChevronRight, TrendingUp, TrendingDown, Info, AlertTriangle } from 'lucide-react';
+import { ChevronRight, TrendingUp, TrendingDown, Info, AlertTriangle, Globe } from 'lucide-react';
+
+// Available countries with government data
+const AVAILABLE_COUNTRIES = Object.keys(GOVERNMENT_REGISTRY).filter(
+  code => GOVERNMENT_REGISTRY[code] && GOVERNMENT_REGISTRY[code].length > 0
+);
 
 // Budget categories with simple explanations
 interface BudgetCategory {
@@ -146,10 +154,12 @@ const PercentBar: React.FC<{
 const MoneyExplainer: React.FC<{
   amount: number; // in billions
   label: string;
+  population: number;
+  currencySymbol: string;
   onClick?: () => void;
-}> = ({ amount, label, onClick }) => {
+}> = ({ amount, label, population, currencySymbol, onClick }) => {
   // Convert to relatable examples
-  const perPerson = Math.round((amount * 1000000000) / 10500000); // Sweden ~10.5M people
+  const perPerson = Math.round((amount * 1000000000) / (population * 1000000));
   const perMonth = Math.round(perPerson / 12);
   
   return (
@@ -158,10 +168,10 @@ const MoneyExplainer: React.FC<{
       className="w-full p-4 border rounded-lg text-left hover:bg-muted/50 transition-colors"
     >
       <p className="text-xs text-muted-foreground uppercase tracking-wide">{label}</p>
-      <p className="text-2xl font-bold mt-1">{amount.toLocaleString('sv-SE')} mdr kr</p>
+      <p className="text-2xl font-bold mt-1">{amount.toLocaleString('sv-SE')} mdr {currencySymbol}</p>
       <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-        <p>= <span className="text-foreground font-medium">{perPerson.toLocaleString('sv-SE')} kr</span> per person i Sverige</p>
-        <p>= <span className="text-foreground font-medium">{perMonth.toLocaleString('sv-SE')} kr</span> per person per månad</p>
+        <p>= <span className="text-foreground font-medium">{perPerson.toLocaleString('sv-SE')} {currencySymbol}</span> per person</p>
+        <p>= <span className="text-foreground font-medium">{perMonth.toLocaleString('sv-SE')} {currencySymbol}</span> per person/månad</p>
       </div>
     </button>
   );
@@ -305,19 +315,52 @@ const CategoryDetailDialog: React.FC<{
 
 // Main component
 export const GovernmentBudgetExplorer: React.FC = () => {
-  const [selectedGov1, setSelectedGov1] = useState<GovernmentPeriod>(GOVERNMENT_PERIODS_SE[0]);
-  const [selectedGov2, setSelectedGov2] = useState<GovernmentPeriod>(GOVERNMENT_PERIODS_SE[3]);
+  const [selectedCountry, setSelectedCountry] = useState<string>('SE');
   const [selectedCategory, setSelectedCategory] = useState<BudgetCategory | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailContext, setDetailContext] = useState<'gov1' | 'gov2'>('gov1');
   
+  // Get governments for selected country
+  const countryGovernments = useMemo(() => 
+    GOVERNMENT_REGISTRY[selectedCountry] || [], 
+    [selectedCountry]
+  );
+  
+  // Get country metadata
+  const countryMeta = useMemo(() => 
+    COUNTRY_META[selectedCountry] || { 
+      code: selectedCountry, 
+      name: selectedCountry, 
+      nameLocal: selectedCountry, 
+      leaderTitle: 'Leader', 
+      population: 10, 
+      currency: 'USD', 
+      currencySymbol: '$' 
+    }, 
+    [selectedCountry]
+  );
+  
+  const [selectedGov1, setSelectedGov1] = useState<GovernmentPeriod | null>(null);
+  const [selectedGov2, setSelectedGov2] = useState<GovernmentPeriod | null>(null);
+  
+  // Update selections when country changes
+  React.useEffect(() => {
+    if (countryGovernments.length > 0) {
+      setSelectedGov1(countryGovernments[0]);
+      setSelectedGov2(countryGovernments[Math.min(2, countryGovernments.length - 1)]);
+    } else {
+      setSelectedGov1(null);
+      setSelectedGov2(null);
+    }
+  }, [selectedCountry, countryGovernments]);
+  
   const budget1 = useMemo(() => 
-    generateMockBudget(selectedGov1, parseInt(selectedGov1.startDate.split('-')[0])), 
+    selectedGov1 ? generateMockBudget(selectedGov1, parseInt(selectedGov1.startDate.split('-')[0])) : null, 
     [selectedGov1]
   );
   
   const budget2 = useMemo(() => 
-    generateMockBudget(selectedGov2, parseInt(selectedGov2.startDate.split('-')[0])), 
+    selectedGov2 ? generateMockBudget(selectedGov2, parseInt(selectedGov2.startDate.split('-')[0])) : null, 
     [selectedGov2]
   );
   
@@ -337,24 +380,63 @@ export const GovernmentBudgetExplorer: React.FC = () => {
         government={detailContext === 'gov1' ? selectedGov1 : selectedGov2}
       />
       
+      {/* Country Selector */}
+      <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg border">
+        <Globe className="w-5 h-5 text-muted-foreground" />
+        <div className="flex-1">
+          <label className="text-sm font-medium text-muted-foreground">Välj land att analysera</label>
+          <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+            <SelectTrigger className="mt-1 w-full max-w-xs">
+              <SelectValue placeholder="Välj land..." />
+            </SelectTrigger>
+            <SelectContent>
+              {AVAILABLE_COUNTRIES.map(code => {
+                const meta = COUNTRY_META[code];
+                return (
+                  <SelectItem key={code} value={code}>
+                    <span className="flex items-center gap-2">
+                      <span className="font-mono text-xs text-muted-foreground">[{code}]</span>
+                      <span>{meta?.nameLocal || code}</span>
+                    </span>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="text-right text-sm">
+          <p className="font-medium">{countryMeta.nameLocal}</p>
+          <p className="text-muted-foreground">{countryMeta.population.toFixed(1)}M inv · {countryMeta.currency}</p>
+        </div>
+      </div>
+      
       {/* Header with explanation */}
       <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
         <CardContent className="p-6">
           <h1 className="text-2xl font-bold mb-2">🏛️ Vad gör regeringen med pengarna?</h1>
           <p className="text-muted-foreground">
-            Varje år bestämmer regeringen hur Sverige ska använda sina pengar. 
+            Varje år bestämmer regeringen hur {countryMeta.nameLocal} ska använda sina pengar. 
             Här kan du jämföra vad olika regeringar har satsat på. 
             <strong className="text-foreground"> Klicka på allt för att lära dig mer!</strong>
           </p>
         </CardContent>
       </Card>
       
+      {countryGovernments.length === 0 ? (
+        <Card className="bg-muted/30">
+          <CardContent className="p-8 text-center">
+            <p className="text-muted-foreground">Ingen regeringsdata tillgänglig för {countryMeta.nameLocal} ännu.</p>
+            <p className="text-sm text-muted-foreground mt-2">Data läggs till löpande för fler länder.</p>
+          </CardContent>
+        </Card>
+      ) : selectedGov1 && selectedGov2 && budget1 && budget2 ? (
+      <>
       {/* Government selectors */}
       <div className="grid grid-cols-2 gap-6">
         <div>
           <h2 className="text-sm font-medium text-muted-foreground mb-3">Välj första regeringen</h2>
           <div className="space-y-2">
-            {GOVERNMENT_PERIODS_SE.slice(0, 5).map(gov => (
+            {countryGovernments.slice(0, 5).map(gov => (
               <GovernmentCard
                 key={gov.id}
                 government={gov}
@@ -368,7 +450,7 @@ export const GovernmentBudgetExplorer: React.FC = () => {
         <div>
           <h2 className="text-sm font-medium text-muted-foreground mb-3">Välj andra regeringen att jämföra</h2>
           <div className="space-y-2">
-            {GOVERNMENT_PERIODS_SE.slice(0, 5).map(gov => (
+            {countryGovernments.slice(0, 5).map(gov => (
               <GovernmentCard
                 key={gov.id}
                 government={gov}
@@ -385,10 +467,14 @@ export const GovernmentBudgetExplorer: React.FC = () => {
         <MoneyExplainer 
           amount={budget1.totalBudget} 
           label={`Total budget (${selectedGov1.leaderName})`}
+          population={countryMeta.population}
+          currencySymbol={countryMeta.currencySymbol}
         />
         <MoneyExplainer 
           amount={budget2.totalBudget} 
           label={`Total budget (${selectedGov2.leaderName})`}
+          population={countryMeta.population}
+          currencySymbol={countryMeta.currencySymbol}
         />
       </div>
       
@@ -552,6 +638,8 @@ export const GovernmentBudgetExplorer: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      </>
+      ) : null}
     </div>
   );
 };
