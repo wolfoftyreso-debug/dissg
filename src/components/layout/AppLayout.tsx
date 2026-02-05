@@ -13,12 +13,13 @@
  * - Mobile-first med collapsible sidebar
  */
 
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect, useMemo } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { DiagnosticSidebar } from './DiagnosticSidebar';
 import { UniversalBreadcrumb } from '@/components/navigation/UniversalBreadcrumb';
 import { useIsMobile } from '@/hooks/use-mobile';
+ import { UserMenu } from '@/components/auth/UserMenu';
 import type { BreadcrumbItem } from '@/lib/link-registry';
 
 interface AppLayoutProps {
@@ -88,11 +89,24 @@ function getRouteBreadcrumbContext(pathname: string): BreadcrumbItem[] {
   return [];
 }
 
+ // Formatera datum på svenska
+ function formatSwedishDate(): string {
+   const today = new Date();
+   return today.toLocaleDateString('sv-SE', {
+     year: 'numeric',
+     month: 'long',
+     day: 'numeric',
+   });
+ }
+ 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+   
+   // Memorera datum så det inte uppdateras vid varje render
+   const dateStr = useMemo(() => formatSwedishDate(), []);
 
   // Auto-collapse on mobile
   useEffect(() => {
@@ -152,28 +166,53 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Breadcrumb header */}
-        <header className="shrink-0 border-b border-border">
-          <div className="flex items-center">
-            {/* Mobile menu trigger */}
-            {isMobile && (
-              <button
-                onClick={() => setMobileMenuOpen(true)}
-                className="p-3 font-mono text-xs text-muted-foreground hover:text-foreground border-r border-border"
-                aria-label="Öppna meny"
-              >
-                [≡]
-              </button>
-            )}
-            
-            {/* Universal Breadcrumb */}
-            <div className="flex-1 min-w-0">
-              <UniversalBreadcrumb
-                contextItems={routeContext}
-                showDataTier={true}
-                className="border-none"
-              />
-            </div>
+         {/* Global Header */}
+         <header className="shrink-0 border-b border-border bg-card">
+           <div className="flex items-center h-12">
+             {/* Left section: Mobile menu trigger + System name */}
+             <div className="flex items-center">
+               {/* Mobile hamburger menu */}
+               {isMobile && (
+                 <button
+                   onClick={() => setMobileMenuOpen(true)}
+                   className="p-3 font-mono text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 border-r border-border h-12 flex items-center"
+                   aria-label="Öppna meny"
+                 >
+                   [≡]
+                 </button>
+               )}
+               
+               {/* System name */}
+               <div className="px-3 border-r border-border h-12 flex items-center">
+                 <span className="text-sm font-semibold text-foreground tracking-tight font-mono">
+                   DISSG
+                 </span>
+               </div>
+             </div>
+             
+             {/* Center: Breadcrumb navigation */}
+             <div className="flex-1 min-w-0 h-12 flex items-center">
+               <UniversalBreadcrumb
+                 contextItems={routeContext}
+                 showDataTier={!isMobile}
+                 className="border-none"
+               />
+             </div>
+             
+             {/* Right section: Date, notifications, user */}
+             <div className="flex items-center gap-2 px-3">
+               {/* Date - only on desktop */}
+               {!isMobile && (
+                 <div className="text-xs text-muted-foreground font-mono px-2">
+                   {dateStr} · CET
+                 </div>
+               )}
+               
+               {/* User menu */}
+               <div className="border-l border-border pl-3 h-8 flex items-center">
+                 <UserMenu />
+               </div>
+             </div>
           </div>
         </header>
 
