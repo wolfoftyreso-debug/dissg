@@ -3,6 +3,9 @@
  * 
  * MYNDIGHETSDESIGN: Strikt, klinisk map display.
  * Shows λ values and GEDI counts per country.
+ * 
+ * @semantic Proper ARIA for interactive map markers
+ * @a11y Keyboard navigation and screen reader support
  */
 
 import React, { useRef, useEffect, useState } from 'react';
@@ -87,6 +90,11 @@ export function MapContainer({
       // Create myndighets-style marker
       const el = document.createElement('div');
       el.className = 'gdm-lambda-marker';
+      el.setAttribute('role', 'button');
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('aria-label', `${country.name.sv}: Lambda ${lambdaData.lambda.toFixed(2)}${hasActiveGEDI ? `, ${lambdaData.activeGEDICodes.length} aktiva GEDI-koder` : ''}`);
+      el.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+      
       el.style.cssText = `
         display: flex;
         flex-direction: column;
@@ -103,8 +111,8 @@ export function MapContainer({
         align-items: center;
         gap: 4px;
         padding: 3px 6px;
-        background: ${isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.98)'};
-        border: 1px solid ${isSelected ? color : (isDark ? 'rgba(71, 85, 105, 0.6)' : 'rgba(203, 213, 225, 0.9)')};
+        background: ${isDark ? 'hsl(222.2 84% 4.9% / 0.95)' : 'hsl(0 0% 100% / 0.98)'};
+        border: 1px solid ${isSelected ? color : (isDark ? 'hsl(215 20.2% 35% / 0.6)' : 'hsl(214.3 31.8% 91.4% / 0.9)')};
         border-radius: 2px;
         font-family: 'SF Mono', 'Fira Code', 'Consolas', ui-monospace, monospace;
         font-size: 11px;
@@ -130,10 +138,11 @@ export function MapContainer({
         const gediCount = document.createElement('span');
         gediCount.style.cssText = `
           font-size: 9px;
-          color: ${isDark ? '#94a3b8' : '#64748b'};
+          color: ${isDark ? 'hsl(215 20.2% 65.1%)' : 'hsl(215 16.3% 46.9%)'};
           margin-left: 2px;
         `;
         gediCount.textContent = `[${lambdaData.activeGEDICodes.length}]`;
+        gediCount.setAttribute('aria-hidden', 'true');
         lambdaBox.appendChild(gediCount);
       }
 
@@ -144,21 +153,30 @@ export function MapContainer({
       codeLabel.style.cssText = `
         margin-top: 2px;
         padding: 1px 4px;
-        background: ${isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)'};
+        background: ${isDark ? 'hsl(222.2 84% 4.9% / 0.9)' : 'hsl(0 0% 100% / 0.95)'};
         border-radius: 1px;
         font-family: 'SF Mono', 'Fira Code', 'Consolas', ui-monospace, monospace;
         font-size: 9px;
         font-weight: 600;
-        color: ${isDark ? '#94a3b8' : '#64748b'};
+        color: ${isDark ? 'hsl(215 20.2% 65.1%)' : 'hsl(215 16.3% 46.9%)'};
         letter-spacing: 0.02em;
       `;
       codeLabel.textContent = country.code;
+      codeLabel.setAttribute('aria-hidden', 'true');
       el.appendChild(codeLabel);
 
       // Click handler
-      el.addEventListener('click', (e) => {
+      const handleSelect = (e: Event) => {
         e.stopPropagation();
         onSelectCountry(country.code);
+      };
+      
+      el.addEventListener('click', handleSelect);
+      el.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleSelect(e);
+        }
       });
 
       // Hover effects
@@ -168,6 +186,17 @@ export function MapContainer({
       });
       
       el.addEventListener('mouseleave', () => {
+        el.style.transform = 'scale(1)';
+        el.style.zIndex = isSelected ? '100' : '10';
+      });
+
+      // Focus effects
+      el.addEventListener('focus', () => {
+        el.style.transform = 'scale(1.1)';
+        el.style.zIndex = '150';
+      });
+      
+      el.addEventListener('blur', () => {
         el.style.transform = 'scale(1)';
         el.style.zIndex = isSelected ? '100' : '10';
       });
@@ -199,7 +228,10 @@ export function MapContainer({
 
   if (!MAPBOX_TOKEN) {
     return (
-      <div className="h-full flex items-center justify-center bg-background">
+      <div 
+        className="h-full flex items-center justify-center bg-background"
+        role="alert"
+      >
         <div className="text-center p-8 font-mono">
           <div className="text-lg font-semibold">[!] MAPBOX_TOKEN SAKNAS</div>
           <div className="text-sm text-muted-foreground mt-2">
@@ -211,18 +243,38 @@ export function MapContainer({
   }
 
   return (
-    <div className="relative w-full h-full">
+    <div 
+      className="relative w-full h-full"
+      role="application"
+      aria-label="Interaktiv världskarta med Lambda-värden"
+    >
       <div 
         ref={mapContainer} 
         className="w-full h-full"
         style={{ minHeight: '100%' }}
+        aria-hidden="true"
       />
+      
+      {/* Screen reader description */}
+      <div className="sr-only">
+        <p>
+          Interaktiv karta som visar Lambda-systembalans för olika länder.
+          Använd Tab för att navigera mellan länder, Enter för att välja.
+        </p>
+      </div>
       
       {/* Loading overlay */}
       {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-50">
+        <div 
+          className="absolute inset-0 flex items-center justify-center bg-background/80 z-50"
+          role="status"
+          aria-live="polite"
+        >
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <div 
+              className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"
+              aria-hidden="true"
+            />
             <span className="text-sm font-mono text-muted-foreground">Laddar karta...</span>
           </div>
         </div>

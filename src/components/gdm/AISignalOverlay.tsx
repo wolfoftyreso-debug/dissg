@@ -3,7 +3,10 @@
  * 
  * Discrete AI-assisted signals (not a chatbot).
  * MYNDIGHETSDESIGN: Strikt, klinisk, inga spel-liknande effekter.
- * NO ICONS per no-icons-doctrine.
+ * NO ICONS per no-icons-doctrine - ASCII text markers only.
+ * 
+ * @semantic proper list structure for signals
+ * @a11y aria-live region for dynamic updates
  */
 
 import React from 'react';
@@ -20,17 +23,37 @@ interface AISignalOverlayProps {
 const getSeverityStyle = (severity: AISignal['severity']) => {
   switch (severity) {
     case 'critical':
-      return { bg: 'rgba(30,58,138,0.25)', border: 'rgba(59,130,246,0.5)', marker: '[!]', dot: '#3b82f6' };
+      return { 
+        bg: 'hsl(221.2 83.2% 53.3% / 0.25)', 
+        border: 'hsl(221.2 83.2% 53.3% / 0.5)', 
+        marker: '[!]', 
+        dot: 'hsl(221.2 83.2% 53.3%)' 
+      };
     case 'warning':
-      return { bg: 'rgba(30,58,138,0.18)', border: 'rgba(59,130,246,0.4)', marker: '[~]', dot: '#60a5fa' };
+      return { 
+        bg: 'hsl(221.2 83.2% 53.3% / 0.18)', 
+        border: 'hsl(221.2 83.2% 53.3% / 0.4)', 
+        marker: '[~]', 
+        dot: 'hsl(217.2 91.2% 59.8%)' 
+      };
     case 'info':
-      return { bg: 'rgba(71,85,105,0.15)', border: 'rgba(100,116,139,0.4)', marker: '[i]', dot: '#94a3b8' };
+      return { 
+        bg: 'hsl(215 20.2% 35% / 0.15)', 
+        border: 'hsl(215 20.2% 45% / 0.4)', 
+        marker: '[i]', 
+        dot: 'hsl(215 20.2% 65.1%)' 
+      };
     default:
-      return { bg: 'rgba(71,85,105,0.12)', border: 'rgba(100,116,139,0.3)', marker: '[?]', dot: '#64748b' };
+      return { 
+        bg: 'hsl(215 20.2% 35% / 0.12)', 
+        border: 'hsl(215 20.2% 45% / 0.3)', 
+        marker: '[?]', 
+        dot: 'hsl(215 16.3% 46.9%)' 
+      };
   }
 };
 
-// Text markers for signal types
+// ASCII text markers for signal types
 const getTypeMarker = (type: AISignal['type']) => {
   switch (type) {
     case 'deviation': return '[DEV]';
@@ -44,64 +67,83 @@ export function AISignalOverlay({ signals, onDismiss, onAction }: AISignalOverla
   if (signals.length === 0) return null;
 
   return (
-    <div className="absolute bottom-24 left-4 z-10 pointer-events-auto space-y-2 max-w-sm">
-      {signals.map((signal, index) => {
-        const style = getSeverityStyle(signal.severity);
-        
-        return (
-          <div
-            key={index}
-            className="p-3 rounded-sm backdrop-blur-sm border animate-in slide-in-from-left-5"
-            style={{ 
-              background: style.bg,
-              borderColor: style.border,
-            }}
-          >
-            <div className="flex items-start gap-3">
-              {/* Indicator dot */}
-              <div 
-                className="w-2 h-2 rounded-full mt-1.5 shrink-0 animate-pulse"
-                style={{ backgroundColor: style.dot }}
-              />
-              
-              <div className="flex-1 min-w-0">
-                {/* Type marker */}
-                <div className="font-mono text-[9px] text-slate-500 mb-1">
-                  {style.marker} {getTypeMarker(signal.type)}
-                </div>
+    <section 
+      aria-label="AI-genererade signaler"
+      aria-live="polite"
+      aria-atomic="false"
+      className="pointer-events-auto space-y-2 max-w-sm"
+    >
+      <h2 className="sr-only">Aktiva AI-signaler ({signals.length})</h2>
+      
+      <ul className="space-y-2">
+        {signals.map((signal, index) => {
+          const style = getSeverityStyle(signal.severity);
+          
+          return (
+            <li
+              key={index}
+              className="p-3 rounded-sm backdrop-blur-sm border animate-in slide-in-from-left-5"
+              style={{ 
+                background: style.bg,
+                borderColor: style.border,
+              }}
+              role="alert"
+              aria-labelledby={`signal-${index}-type`}
+            >
+              <article className="flex items-start gap-3">
+                {/* Indicator dot */}
+                <div 
+                  className="w-2 h-2 rounded-full mt-1.5 shrink-0"
+                  style={{ backgroundColor: style.dot }}
+                  aria-hidden="true"
+                />
                 
-                {/* Message */}
-                <div className="text-xs text-slate-200 leading-relaxed">
-                  {signal.message.sv}
-                </div>
-                
-                {/* Action button */}
-                {signal.action && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="mt-2 h-6 text-[10px] text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 px-2 font-mono"
-                    onClick={() => onAction(signal)}
+                <div className="flex-1 min-w-0">
+                  {/* Type marker */}
+                  <header 
+                    id={`signal-${index}-type`}
+                    className="font-mono text-[9px] text-slate-500 mb-1"
                   >
-                    {signal.action.label} [→]
-                  </Button>
-                )}
-              </div>
-              
-              {/* Dismiss button */}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-5 w-5 font-mono text-[10px] text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 p-0 shrink-0"
-                onClick={() => onDismiss(index)}
-              >
-                [x]
-              </Button>
-            </div>
-          </div>
-        );
-      })}
-    </div>
+                    <span aria-label={`Severity: ${signal.severity}`}>{style.marker}</span>
+                    {' '}
+                    <span aria-label={`Type: ${signal.type}`}>{getTypeMarker(signal.type)}</span>
+                  </header>
+                  
+                  {/* Message */}
+                  <p className="text-xs text-slate-200 leading-relaxed">
+                    {signal.message.sv}
+                  </p>
+                  
+                  {/* Action button */}
+                  {signal.action && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="mt-2 h-6 text-[10px] text-slate-400 hover:text-slate-100 hover:bg-slate-700/50 px-2 font-mono"
+                      onClick={() => onAction(signal)}
+                      aria-label={`${signal.action.label} - undersök ${signal.geoCode}`}
+                    >
+                      {signal.action.label} [GO]
+                    </Button>
+                  )}
+                </div>
+                
+                {/* Dismiss button */}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-5 w-8 font-mono text-[10px] text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 p-0 shrink-0"
+                  onClick={() => onDismiss(index)}
+                  aria-label="Stäng signal"
+                >
+                  [X]
+                </Button>
+              </article>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
