@@ -32,6 +32,60 @@ import {
   OSCILLOSCOPE_UI_CONFIG,
 } from '@/lib/lambda/oscilloscope-mode';
 
+ // Helper to generate time axis labels based on time base
+ function getTimeLabels(timeBase: TimeBase): string[] {
+   const now = new Date();
+   switch (timeBase) {
+     case '1h':
+       return ['-60m', '-45m', '-30m', '-15m', 'Nu'];
+     case '1d':
+       return ['-24h', '-18h', '-12h', '-6h', 'Nu'];
+     case '1w':
+       return ['-7d', '-5d', '-3d', '-1d', 'Nu'];
+     case '1m':
+       return ['-4v', '-3v', '-2v', '-1v', 'Nu'];
+     case '3m':
+       return ['-3m', '-2m', '-1m', 'Nu'];
+     case '1y': {
+       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
+       const currentMonth = now.getMonth();
+       return [
+         months[(currentMonth - 11 + 12) % 12],
+         months[(currentMonth - 8 + 12) % 12],
+         months[(currentMonth - 5 + 12) % 12],
+         months[(currentMonth - 2 + 12) % 12],
+         months[currentMonth],
+       ];
+     }
+     case '5y': {
+       const year = now.getFullYear();
+       return [`${year - 4}`, `${year - 3}`, `${year - 2}`, `${year - 1}`, `${year}`];
+     }
+     case '10y': {
+       const year = now.getFullYear();
+       return [`${year - 10}`, `${year - 7}`, `${year - 5}`, `${year - 2}`, `${year}`];
+     }
+     case 'max':
+       return ['1990', '2000', '2010', '2020', 'Nu'];
+     default:
+       return ['', '', '', '', 'Nu'];
+   }
+ }
+ 
+ // Benchmark reference lines
+ interface BenchmarkLine {
+   value: number; // 0-1 normalized
+   label: string;
+   style: 'solid' | 'dashed';
+   color: string;
+ }
+ 
+ const DEFAULT_BENCHMARKS: BenchmarkLine[] = [
+   { value: 0.5, label: 'Medel', style: 'dashed', color: 'hsl(210, 15%, 70%)' },
+   { value: 0.75, label: '+1σ', style: 'dashed', color: 'hsl(160, 30%, 50%)' },
+   { value: 0.25, label: '-1σ', style: 'dashed', color: 'hsl(0, 35%, 50%)' },
+ ];
+ 
 interface OscilloscopeViewProps {
   config: OscilloscopeConfig;
   traces: SignalTrace[];
@@ -65,7 +119,7 @@ export function OscilloscopeView({
     if (!ctx) return;
     
     const { width, height } = dimensions;
-    const padding = { top: 20, right: 60, bottom: 40, left: 60 };
+     const padding = { top: 30, right: 70, bottom: 50, left: 80 };
     const plotWidth = width - padding.left - padding.right;
     const plotHeight = height - padding.top - padding.bottom;
     
@@ -73,6 +127,10 @@ export function OscilloscopeView({
      ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, width, height);
     
+     // Draw plot area background - subtle off-white
+     ctx.fillStyle = 'hsl(210, 20%, 98%)';
+     ctx.fillRect(padding.left, padding.top, plotWidth, plotHeight);
+ 
      // Draw grid - Very subtle
      ctx.strokeStyle = 'hsl(210, 15%, 92%)';
     ctx.lineWidth = 0.5;
@@ -110,6 +168,52 @@ export function OscilloscopeView({
       ctx.lineTo(width - padding.right, y);
       ctx.stroke();
     }
+     
+     // Draw benchmark reference lines
+     DEFAULT_BENCHMARKS.forEach(benchmark => {
+       const y = padding.top + (1 - benchmark.value) * plotHeight;
+       ctx.strokeStyle = benchmark.color;
+       ctx.lineWidth = 1;
+       if (benchmark.style === 'dashed') {
+         ctx.setLineDash([4, 4]);
+       } else {
+         ctx.setLineDash([]);
+       }
+       ctx.beginPath();
+       ctx.moveTo(padding.left, y);
+       ctx.lineTo(width - padding.right, y);
+       ctx.stroke();
+       ctx.setLineDash([]);
+       
+       // Benchmark label on right
+       ctx.fillStyle = benchmark.color;
+       ctx.font = '10px monospace';
+       ctx.textAlign = 'left';
+       ctx.fillText(benchmark.label, width - padding.right + 8, y + 3);
+     });
+     
+     // Draw Y-axis labels (percentage scale)
+     ctx.fillStyle = 'hsl(210, 15%, 45%)';
+     ctx.font = '10px monospace';
+     ctx.textAlign = 'right';
+     const yLabels = ['100%', '75%', '50%', '25%', '0%'];
+     yLabels.forEach((label, i) => {
+       const y = padding.top + (i / (yLabels.length - 1)) * plotHeight;
+       ctx.fillText(label, padding.left - 8, y + 3);
+     });
+     
+     // Draw X-axis time labels
+     const timeLabels = getTimeLabels(config.time_base);
+     ctx.textAlign = 'center';
+     timeLabels.forEach((label, i) => {
+       const x = padding.left + (i / (timeLabels.length - 1)) * plotWidth;
+       ctx.fillText(label, x, height - padding.bottom + 20);
+     });
+     
+     // Draw axis border
+     ctx.strokeStyle = 'hsl(210, 15%, 75%)';
+     ctx.lineWidth = 1;
+     ctx.strokeRect(padding.left, padding.top, plotWidth, plotHeight);
     
     // Draw traces
     traces.forEach((trace, traceIdx) => {
@@ -118,21 +222,26 @@ export function OscilloscopeView({
       
       const color = channel.color || OSCILLOSCOPE_UI_CONFIG.channel_colors[traceIdx % OSCILLOSCOPE_UI_CONFIG.channel_colors.length];
       
-      // Find value range
-      const minVal = Math.min(...trace.values);
-      const maxVal = Math.max(...trace.values);
-      const range = maxVal - minVal || 1;
+       // Use normalized 0-1 range for consistent display
+       const minVal = 0;
+       const maxVal = 1;
+       const range = 1;
+       
+       // Normalize trace values to 0-1 range
+       const traceMin = Math.min(...trace.values);
+       const traceMax = Math.max(...trace.values);
+       const traceRange = traceMax - traceMin || 1;
+       const normalizedValues = trace.values.map(v => (v - traceMin) / traceRange);
       
       // Draw noise floor (fill)
       if (config.show_noise_floor && trace.noise_floor.length > 0) {
         ctx.fillStyle = color.replace(')', `, ${OSCILLOSCOPE_UI_CONFIG.noise_floor.fill_opacity})`).replace('rgb', 'rgba');
         ctx.beginPath();
         
-        trace.values.forEach((val, i) => {
-          const x = padding.left + (i / (trace.values.length - 1)) * plotWidth;
+         normalizedValues.forEach((val, i) => {
+           const x = padding.left + (i / (normalizedValues.length - 1)) * plotWidth;
           const noise = trace.noise_floor[i] || 0;
           const yTop = padding.top + ((maxVal - (val + noise * range)) / range) * plotHeight;
-          const yBottom = padding.top + ((maxVal - (val - noise * range)) / range) * plotHeight;
           
           if (i === 0) {
             ctx.moveTo(x, yTop);
@@ -142,10 +251,10 @@ export function OscilloscopeView({
         });
         
         // Draw back along bottom
-        for (let i = trace.values.length - 1; i >= 0; i--) {
-          const x = padding.left + (i / (trace.values.length - 1)) * plotWidth;
+         for (let i = normalizedValues.length - 1; i >= 0; i--) {
+           const x = padding.left + (i / (normalizedValues.length - 1)) * plotWidth;
           const noise = trace.noise_floor[i] || 0;
-          const yBottom = padding.top + ((maxVal - (trace.values[i] - noise * range)) / range) * plotHeight;
+           const yBottom = padding.top + ((maxVal - (normalizedValues[i] - noise * range)) / range) * plotHeight;
           ctx.lineTo(x, yBottom);
         }
         
@@ -153,13 +262,13 @@ export function OscilloscopeView({
         ctx.fill();
       }
       
-      // Draw trace line
+       // Draw trace line with thicker stroke for visibility
       ctx.strokeStyle = color;
-      ctx.lineWidth = OSCILLOSCOPE_UI_CONFIG.trace.line_width;
+       ctx.lineWidth = 2;
       ctx.beginPath();
       
-      trace.values.forEach((val, i) => {
-        const x = padding.left + (i / (trace.values.length - 1)) * plotWidth;
+       normalizedValues.forEach((val, i) => {
+         const x = padding.left + (i / (normalizedValues.length - 1)) * plotWidth;
         const y = padding.top + ((maxVal - val) / range) * plotHeight;
         
         if (i === 0) {
@@ -172,6 +281,17 @@ export function OscilloscopeView({
       ctx.stroke();
       
        // NO glow effect - strict clinical appearance
+       
+       // Draw current value label at end of trace
+       const lastValue = normalizedValues[normalizedValues.length - 1];
+       const lastX = padding.left + plotWidth;
+       const lastY = padding.top + ((maxVal - lastValue) / range) * plotHeight;
+       
+       // Value indicator dot
+       ctx.fillStyle = color;
+       ctx.beginPath();
+       ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+       ctx.fill();
     });
     
   }, [config, traces, dimensions]);
@@ -294,6 +414,16 @@ export function OscilloscopeView({
              <span>[~]</span>
              <span>{language === 'sv' ? 'Signalklarhet' : 'Signal clarity'}: {systemStatus.clarity_score.toFixed(0)}%</span>
           </div>
+           
+           {/* Y-axis label */}
+           <div className="absolute top-1/2 left-1 -translate-y-1/2 -rotate-90 text-[9px] font-mono text-muted-foreground whitespace-nowrap">
+             Normaliserat index (0-100%)
+           </div>
+           
+           {/* X-axis label */}
+           <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] font-mono text-muted-foreground">
+             Tidsaxel [{formatTimeBase(config.time_base, language)}]
+           </div>
         </div>
         
         {/* Bottom info bar */}
