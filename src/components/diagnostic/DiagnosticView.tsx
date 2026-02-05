@@ -666,7 +666,7 @@ export function DiagnosticView() {
   const allStepsComplete = session.completedSteps === session.totalSteps;
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className="flex flex-col bg-background h-full min-h-0">
       {/* System Identity Header with back button */}
       <div className="bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2 p-2 border-b border-border/50">
@@ -694,14 +694,14 @@ export function DiagnosticView() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden flex">
+      <div className="flex-1 overflow-hidden flex flex-col md:flex-row min-h-0">
         {/* Left: Measure Blocks */}
-        <div className="w-1/2 border-r border-border">
+        <div className="w-full md:w-1/2 border-b md:border-b-0 md:border-r border-border flex flex-col min-h-0">
           <div className="p-3 border-b border-border">
             <div className="font-mono text-xs text-muted-foreground">HUVUDMÄTBLOCK</div>
           </div>
-          <ScrollArea className="h-[calc(100%-40px)]">
-            <div className="p-4 grid grid-cols-2 gap-3">
+          <ScrollArea className="flex-1 min-h-0">
+            <div className="p-3 grid grid-cols-2 gap-2">
               {session.measureBlocks.map((block) => (
                 <MeasureBlockDisplay
                   key={block.code}
@@ -715,7 +715,7 @@ export function DiagnosticView() {
         </div>
 
         {/* Right: Guided Fault Finding + Cause Analysis */}
-        <div className="w-1/2 flex flex-col">
+        <div className="w-full md:w-1/2 flex flex-col min-h-0">
           <div className="flex-1 border-b border-border overflow-auto">
             <div className="p-3 border-b border-border">
               <div className="font-mono text-xs text-muted-foreground">

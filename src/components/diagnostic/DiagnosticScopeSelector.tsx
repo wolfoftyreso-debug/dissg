@@ -459,7 +459,7 @@ export function DiagnosticScopeSelector({ onSelectScope }: DiagnosticScopeSelect
   const [selectedLevel, setSelectedLevel] = useState<DiagnosticScopeLevel | null>(null);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-8">
+    <div className="bg-background flex items-center justify-center p-4 md:p-8">
       <div className="w-full max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
