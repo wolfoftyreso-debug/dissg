@@ -3,6 +3,11 @@
   * 
   * OBD for the OBD system itself.
   * Continuous and batch testing infrastructure.
+  * 
+  * SYSTEM PRINCIPLES (LOCKED):
+  * 1. Machines are primary users
+  * 2. All uncertainty must be explicit
+  * 3. Temporal axis is sacred
   */
  
  // System fault codes
@@ -30,6 +35,7 @@
    clearResolvedFaults,
    evaluateSystemHealth,
    evaluateTestQuestions,
+   SYSTEM_DIAGNOSTIC_QUESTIONS,
    type TestType,
    type TestStatus,
    type TestResult,
@@ -61,3 +67,10 @@
    validateFeatureAgainstSystemRole,
    type ImprovementDomain,
  } from '@/config/developmentPriorities';
+ 
+ // Re-export constitution
+ export {
+   SYSTEM_CONSTITUTION,
+   validateConstitutionalCompliance,
+   type ConstitutionArticle,
+ } from '@/core/constitution';

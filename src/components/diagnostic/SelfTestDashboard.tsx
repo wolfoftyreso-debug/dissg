@@ -14,7 +14,7 @@
  import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
  import {
    SYSTEM_DOMAIN_LABELS,
-   SEVERITY_REACTIONS,
+   SYSTEM_FAULT_CODES,
    getActiveSystemFaults,
    getTestResults,
    evaluateSystemHealth,
@@ -32,6 +32,14 @@
  // =============================================================================
  
  function SystemHealthOverview({ health }: { health: SystemHealthState }) {
+   const getStatus = () => {
+     if (health.criticalFaults > 0) return 'critical';
+     if (health.errorFaults > 0) return 'degraded';
+     return 'healthy';
+   };
+ 
+   const status = getStatus();
+ 
    const statusColors = {
      healthy: 'bg-green-500',
      degraded: 'bg-yellow-500',
@@ -44,14 +52,13 @@
      critical: 'KRITISK',
    };
  
-   const totalFaults = health.criticalFaults + health.warningFaults + health.infoFaults;
-   const isLambdaEnabled = health.blockedDomains.length === 0;
+   const totalFaults = health.criticalFaults + health.errorFaults + health.warningFaults;
  
    return (
      <div className={`p-4 rounded border ${
-       health.status === 'healthy' 
+       status === 'healthy' 
          ? 'bg-green-500/10 border-green-500/50' 
-         : health.status === 'critical'
+         : status === 'critical'
            ? 'bg-red-500/10 border-red-500'
            : 'bg-orange-500/10 border-orange-500/50'
      }`}>
@@ -59,11 +66,11 @@
          <div>
            <div className="font-mono text-sm font-semibold">SYSTEMHÄLSA</div>
            <div className="text-xs text-muted-foreground">
-             Senaste test: {health.lastCheck.toLocaleString('sv-SE')}
+             Senaste test: {new Date(health.lastChecked).toLocaleString('sv-SE')}
            </div>
          </div>
-         <Badge className={`${statusColors[health.status]} text-white font-mono`}>
-           {statusLabels[health.status]}
+         <Badge className={`${statusColors[status]} text-white font-mono`}>
+           {statusLabels[status]}
          </Badge>
        </div>
  
@@ -81,24 +88,19 @@
            <div className="font-mono text-2xl text-yellow-500">{health.warningFaults}</div>
          </div>
          <div>
-           <div className="text-muted-foreground">Lambda</div>
-           <Badge variant={isLambdaEnabled ? 'secondary' : 'destructive'} className="font-mono">
-             {isLambdaEnabled ? 'AKTIV' : 'INAKTIVERAD'}
+           <div className="text-muted-foreground">Kan operera</div>
+           <Badge variant={health.canOperate ? 'secondary' : 'destructive'} className="font-mono">
+             {health.canOperate ? 'JA' : 'NEJ'}
            </Badge>
          </div>
        </div>
  
        <Separator className="my-4" />
  
-       <div className="grid grid-cols-3 md:grid-cols-7 gap-2">
+       <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
          {(Object.keys(SYSTEM_DOMAIN_LABELS) as SystemDomain[]).map((domain) => {
-           const isBlocked = health.blockedDomains.includes(domain);
-           const color = isBlocked
-             ? 'bg-red-500/20 border-red-500/50'
-             : 'bg-green-500/20 border-green-500/50';
-           
            return (
-             <div key={domain} className={`p-2 rounded border text-center ${color}`}>
+             <div key={domain} className="p-2 rounded border text-center bg-muted/20 border-muted">
                <div className="font-mono text-xs font-semibold">{domain}</div>
                <div className="text-[10px] text-muted-foreground">
                  {SYSTEM_DOMAIN_LABELS[domain]}
@@ -128,41 +130,37 @@
  
    return (
      <div className="space-y-2">
-       {faults.map((faultEntry) => {
-         const { fault, detectedAt, code } = faultEntry;
-         const reaction = SEVERITY_REACTIONS[fault.severity];
-         const severityColor = fault.severity === 'critical'
+       {faults.map((faultEntry, index) => {
+         const faultDef = SYSTEM_FAULT_CODES[faultEntry.faultCode];
+         if (!faultDef) return null;
+ 
+         const severityColor = faultDef.severity === 'CRITICAL'
            ? 'border-red-500 bg-red-500/10'
-           : fault.severity === 'warning'
+           : faultDef.severity === 'WARNING'
              ? 'border-yellow-500 bg-yellow-500/10'
              : 'border-muted';
  
          return (
-           <div key={`${code}-${detectedAt.toISOString()}`} className={`p-3 rounded border ${severityColor}`}>
+           <div key={`${faultEntry.faultCode}-${index}`} className={`p-3 rounded border ${severityColor}`}>
              <div className="flex justify-between items-start">
                <div>
-                 <div className="font-mono font-semibold">{code}</div>
-                 <div className="text-sm">{fault.title}</div>
+                 <div className="font-mono font-semibold">{faultEntry.faultCode}</div>
+                 <div className="text-sm">{faultDef.title}</div>
                </div>
-               <Badge variant={fault.severity === 'critical' ? 'destructive' : 'secondary'} className="text-[10px]">
-                 {fault.severity.toUpperCase()}
+               <Badge variant={faultDef.severity === 'CRITICAL' ? 'destructive' : 'secondary'} className="text-[10px]">
+                 {faultDef.severity}
                </Badge>
              </div>
              <div className="text-xs text-muted-foreground mt-1">
-               {fault.description}
+               {faultDef.description}
              </div>
              <div className="text-xs text-muted-foreground mt-1">
-               Triggad: {detectedAt.toLocaleString('sv-SE')}
+               Triggad: {new Date(faultEntry.detectedAt).toLocaleString('sv-SE')}
              </div>
              <div className="text-xs mt-2">
-               <span className="text-muted-foreground">Åtgärd: </span>
-               {reaction}
+               <span className="text-muted-foreground">Auto-block: </span>
+               {faultDef.autoBlock ? 'Ja' : 'Nej'}
              </div>
-             {fault.autoRemediation && (
-               <Badge variant="outline" className="mt-2 text-[10px]">
-                 Auto-remediation tillgänglig
-               </Badge>
-             )}
            </div>
          );
        })}
@@ -209,12 +207,12 @@
              </div>
              
              <div className="mt-2 text-xs text-muted-foreground">
-               {result.details}
+               Tid: {result.durationMs.toFixed(2)}ms
              </div>
              
              <div className="flex justify-between text-xs text-muted-foreground mt-2">
                <span>{result.testType}</span>
-               <span>{result.timestamp.toLocaleTimeString('sv-SE')}</span>
+               <span>{new Date(result.executedAt).toLocaleTimeString('sv-SE')}</span>
              </div>
            </div>
          );
@@ -235,10 +233,6 @@
        </div>
      );
    }
- 
-   const totalTests = certification.suiteResults.reduce((sum, s) => sum + s.total, 0);
-   const passedTests = certification.suiteResults.reduce((sum, s) => sum + s.passed, 0);
-   const failedTests = certification.suiteResults.reduce((sum, s) => sum + s.failed, 0);
  
    return (
      <div className="space-y-4">
@@ -261,15 +255,15 @@
          <div className="grid grid-cols-3 gap-4 mt-4 text-xs">
            <div>
              <div className="text-muted-foreground">Totalt</div>
-             <div className="font-mono text-xl">{totalTests}</div>
+             <div className="font-mono text-xl">{certification.totalTests}</div>
            </div>
            <div>
              <div className="text-muted-foreground">Godkända</div>
-             <div className="font-mono text-xl text-green-500">{passedTests}</div>
+             <div className="font-mono text-xl text-green-500">{certification.passedTests}</div>
            </div>
            <div>
              <div className="text-muted-foreground">Underkända</div>
-             <div className="font-mono text-xl text-red-500">{failedTests}</div>
+             <div className="font-mono text-xl text-red-500">{certification.failedTests}</div>
            </div>
          </div>
  
@@ -286,19 +280,24 @@
        </div>
  
        <div className="space-y-2">
-         {certification.suiteResults.map((suite) => (
-           <div key={suite.suite} className="flex justify-between items-center p-2 rounded border">
-             <div>
-               <div className="font-semibold text-sm">{suite.suite}</div>
-               <div className="text-xs text-muted-foreground">
-                 {suite.passed}/{suite.total} tester
+         {certification.suiteResults.map((suite) => {
+           const passedCount = suite.testResults.filter(r => r.status === 'pass' || r.status === 'warning').length;
+           const totalCount = suite.testResults.length;
+           
+           return (
+             <div key={suite.suiteId} className="flex justify-between items-center p-2 rounded border">
+               <div>
+                 <div className="font-semibold text-sm">{suite.suiteName}</div>
+                 <div className="text-xs text-muted-foreground">
+                   {passedCount}/{totalCount} tester
+                 </div>
                </div>
+               <Badge variant={suite.passed ? 'secondary' : 'destructive'} className="font-mono text-[10px]">
+                 {suite.passed ? 'OK' : 'FEL'}
+               </Badge>
              </div>
-             <Badge variant={suite.failed === 0 ? 'secondary' : 'destructive'} className="font-mono text-[10px]">
-               {suite.failed === 0 ? 'OK' : 'FEL'}
-             </Badge>
-           </div>
-         ))}
+           );
+         })}
        </div>
      </div>
    );
@@ -325,7 +324,7 @@
      const totalSuites = ALL_TEST_SUITES.length;
      
      for (let i = 0; i < totalSuites; i++) {
-       runTestSuite(ALL_TEST_SUITES[i]);
+       await runTestSuite(ALL_TEST_SUITES[i]);
        setProgress(((i + 1) / totalSuites) * 100);
      }
  
@@ -333,7 +332,7 @@
      setIsRunning(false);
    }, [refreshHealth]);
  
-   const runCertification = useCallback(() => {
+   const runCertification = useCallback(async () => {
      setIsRunning(true);
      setProgress(0);
      
@@ -342,7 +341,7 @@
        setProgress(p => Math.min(p + 10, 90));
      }, 200);
  
-     const result = runBatchCertification();
+     const result = await runBatchCertification();
      
      clearInterval(interval);
      setProgress(100);
