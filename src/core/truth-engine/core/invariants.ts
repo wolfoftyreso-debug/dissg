@@ -5,12 +5,8 @@
   * Violation = rejection. No exceptions.
   */
  
- import type { 
-   CoreObject, 
-   Measure, 
-   Schema
- } from './ontology';
- import { BASE_CLASSES, isMeasure, isSchema } from './ontology';
+ import type { CoreObject, Measure, Schema, Entity } from './ontology';
+ import { BASE_CLASSES, isMeasure, isSchema, isEntity } from './ontology';
  
  /**
   * INVARIANT DEFINITION
@@ -164,6 +160,87 @@
  ];
  
  /**
+  * ENTITY INVARIANTS (Step 9)
+  * 
+  * ❌ No values without entities
+  * ❌ No entities without time
+  * ❌ No entities without source
+  */
+ export const ENTITY_INVARIANTS: Invariant[] = [
+   // LAW 6: Measures must reference valid entity
+   {
+     id: 'INV-006',
+     name: 'Entity Reference Requirement',
+     description: 'Measures must reference a valid entity',
+     severity: 'CRITICAL',
+     check: (obj: CoreObject): InvariantResult => {
+       if (!isMeasure(obj)) {
+         return { passed: true, invariant_id: 'INV-006', message: 'Not a measure' };
+       }
+       
+       const measure = obj as Measure;
+       const hasEntityRef = !!measure.entity_id && measure.entity_id.length > 0;
+       
+       return {
+         passed: hasEntityRef,
+         invariant_id: 'INV-006',
+         message: hasEntityRef 
+           ? `Entity reference: ${measure.entity_id}`
+           : 'VIOLATION: Measure lacks entity_id reference',
+       };
+     },
+   },
+   
+   // LAW 7: Entities must have temporal bounds
+   {
+     id: 'INV-007',
+     name: 'Entity Temporal Bounds',
+     description: 'Entities must have valid_from in identifiers',
+     severity: 'CRITICAL',
+     check: (obj: CoreObject): InvariantResult => {
+       if (!isEntity(obj)) {
+         return { passed: true, invariant_id: 'INV-007', message: 'Not an entity' };
+       }
+       
+       const entity = obj as Entity;
+       const hasValidFrom = !!entity.identifiers?.valid_from;
+       
+       return {
+         passed: hasValidFrom,
+         invariant_id: 'INV-007',
+         message: hasValidFrom 
+           ? `Entity valid from: ${entity.identifiers.valid_from}`
+           : 'VIOLATION: Entity lacks valid_from temporal bound',
+       };
+     },
+   },
+   
+   // LAW 8: Entities must have source
+   {
+     id: 'INV-008',
+     name: 'Entity Source Requirement',
+     description: 'Entities must reference a source',
+     severity: 'CRITICAL',
+     check: (obj: CoreObject): InvariantResult => {
+       if (!isEntity(obj)) {
+         return { passed: true, invariant_id: 'INV-008', message: 'Not an entity' };
+       }
+       
+       const entity = obj as Entity;
+       const hasSource = !!entity.identifiers?.source_id;
+       
+       return {
+         passed: hasSource,
+         invariant_id: 'INV-008',
+         message: hasSource 
+           ? `Entity source: ${entity.identifiers.source_id}`
+           : 'VIOLATION: Entity lacks source_id reference',
+       };
+     },
+   },
+ ];
+ 
+ /**
   * RUN ALL INVARIANTS
   */
  export function runInvariants(obj: CoreObject): {
@@ -171,7 +248,7 @@
    results: InvariantResult[];
    violations: InvariantResult[];
  } {
-   const results = CORE_INVARIANTS.map(inv => inv.check(obj));
+   const results = [...CORE_INVARIANTS, ...ENTITY_INVARIANTS].map(inv => inv.check(obj));
    const violations = results.filter(r => !r.passed);
    
    return {
@@ -191,4 +268,52 @@
      const messages = violations.map(v => v.message).join('; ');
      throw new Error(`INVARIANT VIOLATION: ${messages}`);
    }
+ }
+ 
+ /**
+  * ENTITY REGISTRY VALIDATION
+  * 
+  * Step 9.3: assert_entity_exists
+  * If entity_id is not in registry, reject.
+  */
+ export function assertEntityExists(
+   entityId: string, 
+   registryCheck: (id: string) => boolean
+ ): InvariantResult {
+   const exists = registryCheck(entityId);
+   
+   return {
+     passed: exists,
+     invariant_id: 'INV-009',
+     message: exists 
+       ? `Entity exists: ${entityId}`
+       : `VIOLATION: Unknown entity_id: ${entityId} - Fantasy worlds are not allowed`,
+   };
+ }
+ 
+ /**
+  * VALIDATE MEASURE WITH ENTITY REGISTRY
+  */
+ export function validateMeasureWithRegistry(
+   measure: Measure,
+   entityExistsCheck: (id: string) => boolean
+ ): {
+   passed: boolean;
+   results: InvariantResult[];
+   violations: InvariantResult[];
+ } {
+   // Run standard invariants
+   const standardResult = runInvariants(measure);
+   
+   // Check entity registry
+   const entityResult = assertEntityExists(measure.entity_id, entityExistsCheck);
+   
+   const allResults = [...standardResult.results, entityResult];
+   const violations = allResults.filter(r => !r.passed);
+   
+   return {
+     passed: violations.length === 0,
+     results: allResults,
+     violations,
+   };
  }
