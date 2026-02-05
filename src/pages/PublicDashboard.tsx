@@ -327,7 +327,15 @@ const PublicDashboard = () => {
                   const warning = catKPIs.filter(k => k.status === 'warning').length;
                   
                   return (
-                    <Card key={cat.id} className="hover:shadow-md transition-shadow">
+                    <Card 
+                      key={cat.id} 
+                      className="hover:shadow-md transition-shadow cursor-pointer hover:border-primary/50"
+                      onClick={() => {
+                        // Select the category node and switch to diagnosis view
+                        setSelectedNodeId(cat.id);
+                        setActiveTab('diagnosis');
+                      }}
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-2">
                           <Badge variant="outline" className="font-mono">{cat.code}</Badge>
