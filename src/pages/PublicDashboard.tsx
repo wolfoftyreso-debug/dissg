@@ -1,11 +1,13 @@
 /**
  * PUBLIC DASHBOARD - ODIS STRUCTURE
  * 
- * Global Diagnostic Information System - Public Entry Point
+  * Global Diagnostic Information System - Public Entry Point  
+  * GLOBAL FIRST: Startar alltid på global nivå. Inget land favoriseras.
  * Strukturmässigt lik VW ODIS / Volvo VIDA diagnostiksystem.
  */
 
 import { useState, useMemo } from 'react';
+ import { useGeo } from '@/contexts/GeoContext';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { mockKPIs } from '@/data/mockKPIs';
 import { CATEGORIES, KPI } from '@/types/kpi';
@@ -143,6 +145,7 @@ const PublicDashboard = () => {
   const [selectedKPI, setSelectedKPI] = useState<KPI | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const navigate = useNavigate();
+    const { scope } = useGeo();
   
   const { data: dbKPIs, isLoading } = useKPIOverview();
   
@@ -205,10 +208,37 @@ const PublicDashboard = () => {
   const criticalCount = kpis.filter(k => k.status === 'critical').length;
   const warningCount = kpis.filter(k => k.status === 'warning').length;
 
+   // Dynamic scope-based display
+   const getScopeLabel = () => {
+     switch (scope.level) {
+       case 'global':
+         return 'GLOBAL';
+       case 'region':
+         return scope.name.toUpperCase();
+       case 'country':
+         return scope.code;
+       default:
+         return 'GLOBAL';
+     }
+   };
+   
+   const getDiagnosisTitle = () => {
+     switch (scope.level) {
+       case 'global':
+         return 'Global civilisatorisk diagnostik';
+       case 'region':
+         return `${scope.name} - Regional diagnostik`;
+       case 'country':
+         return `${scope.name_local || scope.name} - Nationell diagnostik`;
+       default:
+         return 'Global diagnostik';
+     }
+   };
+ 
   const leftInfo = [
-    { label: 'Country', value: 'SE' },
-    { label: 'Scope', value: 'PUBLIC' },
-    { label: 'Level', value: 'NATIONAL' },
+     { label: 'Scope', value: getScopeLabel() },
+     { label: 'View', value: 'PUBLIC' },
+     { label: 'Level', value: scope.level.toUpperCase() },
   ];
 
   const rightInfo = [
@@ -278,7 +308,7 @@ const PublicDashboard = () => {
               {/* Tree view */}
               <div className="flex-1 overflow-hidden">
                 <ODISTreeView
-                  title="Nationell diagnostik - Sverige"
+                   title={getDiagnosisTitle()}
                   subtitle="Indikatorer (sorterade efter status/prioritet)"
                   nodes={treeNodes}
                   onNodeClick={handleNodeClick}
