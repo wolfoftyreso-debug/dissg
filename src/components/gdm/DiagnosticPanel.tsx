@@ -3,6 +3,7 @@
  * 
  * Shows detailed diagnostics when a country is selected.
  * Follows ODIS/VIDA guided diagnostic flow.
+ * MYNDIGHETSDESIGN: Strikt, klinisk, dämpade färger.
  */
 
 import React, { useState } from 'react';
@@ -32,32 +33,32 @@ interface DiagnosticPanelProps {
   isPro: boolean;
 }
 
-// Lambda gauge mini
+// Lambda gauge mini - Myndighetsdesign
 function LambdaGaugeMini({ lambda, trend }: { lambda: number; trend: string }) {
   const color = getLambdaColor(lambda);
   const trendMarker = trend === 'improving' ? '[↑]' : trend === 'declining' ? '[↓]' : '[→]';
   
   return (
-    <div className="flex items-center gap-4">
-      <div 
-        className="w-20 h-20 rounded-full flex items-center justify-center flex-col"
-        style={{ 
-          background: `conic-gradient(${color} ${((lambda - 0.7) / 0.6) * 360}deg, rgba(255,255,255,0.1) 0deg)`,
-          border: `3px solid ${color}`,
-        }}
-      >
-        <div className="text-xl font-mono font-bold text-white">{lambda.toFixed(2)}</div>
-        <div className="text-[10px] text-muted-foreground">λ</div>
+    <div className="flex items-center gap-4 p-3 bg-slate-800/40 rounded-sm border border-slate-700/50">
+      <div className="text-center">
+        <div 
+          className="text-2xl font-mono font-semibold"
+          style={{ color }}
+        >
+          {lambda.toFixed(3)}
+        </div>
+        <div className="text-[9px] text-slate-500 uppercase tracking-wider">Lambda</div>
       </div>
       
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1.5">
         <Badge 
-          className="font-mono"
-          style={{ backgroundColor: color, color: 'white' }}
+          variant="outline"
+          className="font-mono text-[10px] rounded-sm border-slate-600 text-slate-300 bg-slate-800/50"
+          style={{ borderLeftColor: color, borderLeftWidth: '2px' }}
         >
           {getSystemStatus(lambda).label.sv}
         </Badge>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
+        <div className="flex items-center gap-1 text-[10px] text-slate-500 font-mono">
           <span>{trendMarker}</span>
           <span>
             {trend === 'improving' ? 'Förbättras' : 
@@ -69,7 +70,7 @@ function LambdaGaugeMini({ lambda, trend }: { lambda: number; trend: string }) {
   );
 }
 
-// GEDI Code Card - with clear clickability
+// GEDI Code Card - Myndighetsdesign
 function GEDICodeCard({ 
   gedi, 
   onClick 
@@ -77,59 +78,57 @@ function GEDICodeCard({
   gedi: GEDICodeSummary; 
   onClick: () => void;
 }) {
-  const severityColors: Record<string, { bg: string; border: string; text: string }> = {
-    INFO: { bg: 'bg-blue-500/20', border: 'border-blue-500', text: 'text-blue-400' },
-    WARN: { bg: 'bg-amber-500/20', border: 'border-amber-500', text: 'text-amber-400' },
-    MAJOR: { bg: 'bg-orange-500/20', border: 'border-orange-500', text: 'text-orange-400' },
-    CRITICAL: { bg: 'bg-red-500/20', border: 'border-red-500', text: 'text-red-400' },
+  // Dämpade severity-färger
+  const severityStyles: Record<string, { marker: string; borderColor: string }> = {
+    INFO: { marker: '[i]', borderColor: '#64748b' },
+    WARN: { marker: '[~]', borderColor: '#78716c' },
+    MAJOR: { marker: '[!]', borderColor: '#6b7280' },
+    CRITICAL: { marker: '[!!]', borderColor: '#57534e' },
   };
   
-  const colors = severityColors[gedi.severity] || severityColors.WARN;
+  const style = severityStyles[gedi.severity] || severityStyles.WARN;
   
   return (
     <button
       onClick={onClick}
-      className={`
-        w-full p-4 rounded-lg border-2 text-left transition-all cursor-pointer
-        ${colors.bg} ${colors.border}
-        hover:scale-[1.02] hover:shadow-lg hover:brightness-110
-        active:scale-[0.98]
-        focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-      `}
+      className="w-full p-3 rounded-sm text-left transition-all cursor-pointer bg-slate-800/30 border border-slate-700/50 hover:bg-slate-700/40 hover:border-slate-600 focus:outline-none focus:ring-1 focus:ring-slate-500"
+      style={{ borderLeftWidth: '3px', borderLeftColor: style.borderColor }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
+          <span className="font-mono text-[10px] text-slate-500">{style.marker}</span>
           <Badge 
-            className={`font-mono text-xs px-2 py-1 ${colors.text} bg-background/80 border ${colors.border}`}
+            variant="outline"
+            className="font-mono text-[10px] px-1.5 py-0 text-slate-400 border-slate-600 bg-slate-800/50 rounded-sm"
           >
             {gedi.code}
           </Badge>
-          <span className={`text-xs font-mono ${colors.text}`}>
-            {gedi.status === 'ACTIVE' ? '● Aktiv' : '○ Historisk'}
+          <span className="text-[10px] font-mono text-slate-500">
+            {gedi.status === 'ACTIVE' ? 'Aktiv' : 'Historisk'}
           </span>
         </div>
-        <span className="font-mono text-muted-foreground">[→]</span>
+        <span className="font-mono text-[10px] text-slate-500">[→]</span>
       </div>
-      <div className="mt-2 text-sm font-semibold text-foreground">{gedi.name}</div>
-      <div className="text-xs text-muted-foreground mt-1">{gedi.description}</div>
+      <div className="mt-1.5 text-xs font-medium text-slate-300">{gedi.name}</div>
+      <div className="text-[10px] text-slate-500 mt-0.5">{gedi.description}</div>
     </button>
   );
 }
 
-// Probable Cause Card
+// Probable Cause Card - Myndighetsdesign
 function CauseCard({ cause }: { cause: ProbableCause }) {
   return (
-    <div className="p-3 rounded-lg border border-muted bg-muted/20">
+    <div className="p-3 rounded-sm border border-slate-700/50 bg-slate-800/30">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">{cause.label.sv}</span>
-        <Badge variant="secondary" className="font-mono">
+        <span className="text-xs font-medium text-slate-300">{cause.label.sv}</span>
+        <Badge variant="outline" className="font-mono text-[10px] text-slate-400 border-slate-600 rounded-sm">
           {cause.probability}%
         </Badge>
       </div>
-      <Progress value={cause.probability} className="h-1 mt-2" />
+      <Progress value={cause.probability} className="h-0.5 mt-2 bg-slate-700" />
       <div className="flex flex-wrap gap-1 mt-2">
         {cause.indicators.map(ind => (
-          <Badge key={ind} variant="outline" className="text-[10px] font-mono">
+          <Badge key={ind} variant="outline" className="text-[9px] font-mono text-slate-500 border-slate-700 rounded-sm">
             {ind}
           </Badge>
         ))}
@@ -138,36 +137,36 @@ function CauseCard({ cause }: { cause: ProbableCause }) {
   );
 }
 
-// Lever Card
+// Lever Card - Myndighetsdesign
 function LeverCard({ lever, isPro }: { lever: Lever; isPro: boolean }) {
   const difficultyLabels = {
-    low: { text: 'Enkel', color: 'text-green-400 border-green-500 bg-green-500/20' },
-    medium: { text: 'Medel', color: 'text-amber-400 border-amber-500 bg-amber-500/20' },
-    high: { text: 'Svår', color: 'text-red-400 border-red-500 bg-red-500/20' },
+    low: { text: 'Enkel', marker: '[L]' },
+    medium: { text: 'Medel', marker: '[M]' },
+    high: { text: 'Svår', marker: '[H]' },
   };
   
   const diff = difficultyLabels[lever.difficulty];
   
   return (
-    <div className={`p-3 rounded-lg border border-muted ${isPro ? 'bg-muted/20' : 'bg-muted/10 opacity-60'}`}>
+    <div className={`p-3 rounded-sm border border-slate-700/50 ${isPro ? 'bg-slate-800/30' : 'bg-slate-800/15 opacity-50'}`}>
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">{lever.label.sv}</span>
+        <span className="text-xs font-medium text-slate-300">{lever.label.sv}</span>
         <div className="flex items-center gap-2">
-          <Badge className={`font-mono text-[10px] border ${diff.color}`}>
-            {diff.text}
+          <Badge variant="outline" className="font-mono text-[9px] text-slate-500 border-slate-700 rounded-sm">
+            {diff.marker} {diff.text}
           </Badge>
-          <Badge variant="secondary" className="font-mono">
+          <Badge variant="outline" className="font-mono text-[10px] text-slate-400 border-slate-600 rounded-sm">
             +{(lever.impact * 100).toFixed(1)}%
           </Badge>
         </div>
       </div>
-      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground font-mono">
+      <div className="flex items-center gap-2 mt-1.5 text-[10px] text-slate-500 font-mono">
         <span>[→]</span>
         <span>Påverkar: {lever.axis}</span>
       </div>
       {!isPro && (
-        <div className="mt-2 text-xs text-amber-500 font-mono">
-          [LÅS] PRO krävs för simulering
+        <div className="mt-2 text-[10px] text-slate-500 font-mono">
+          [PRO] Krävs för simulering
         </div>
       )}
     </div>
@@ -180,8 +179,8 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
   
   if (!data) {
     return (
-      <div className="h-full flex items-center justify-center text-muted-foreground">
-        Data ej tillgänglig
+      <div className="h-full flex items-center justify-center text-slate-500 font-mono text-sm">
+        [~] Data ej tillgänglig
       </div>
     );
   }
@@ -190,72 +189,90 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
   const visibleCauses = showAllCauses ? topCauses : topCauses.slice(0, 3);
 
   return (
-    <div className="h-full flex flex-col bg-background/95 backdrop-blur-md border-l">
+    <div 
+      className="h-full flex flex-col border-l"
+      style={{ 
+        background: 'rgba(15,23,42,0.95)', 
+        borderColor: 'rgba(71,85,105,0.5)' 
+      }}
+    >
       {/* Header */}
-      <div className="p-4 border-b flex items-center justify-between">
+      <div className="p-4 border-b border-slate-700/50 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
             <ClickableCountryName
               countryCode={geo.code}
               countryName={geo.name.sv}
               variant="default"
-              className="text-2xl"
+              className="text-xl font-semibold text-slate-200"
             />
-            <Badge variant="outline" className="font-mono">{geo.code}</Badge>
+            <Badge variant="outline" className="font-mono text-[10px] text-slate-400 border-slate-600 rounded-sm">
+              {geo.code}
+            </Badge>
           </div>
-          <div className="text-xs text-muted-foreground mt-1">
-            Pop: {geo.population?.toLocaleString()} • Konfidens: {lambda.confidence}%
+          <div className="text-[10px] text-slate-500 mt-1 font-mono">
+            Pop: {geo.population?.toLocaleString()} | Konf: {lambda.confidence}%
           </div>
         </div>
-        <Button variant="ghost" size="sm" onClick={onClose} className="font-mono text-xs">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={onClose} 
+          className="font-mono text-[10px] text-slate-500 hover:text-slate-300 hover:bg-slate-700/50"
+        >
           [x]
         </Button>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-6">
+        <div className="p-4 space-y-5">
           {/* Lambda Gauge */}
-          <div>
-            <LambdaGaugeMini lambda={lambda.lambda} trend={lambda.trend} />
-          </div>
+          <LambdaGaugeMini lambda={lambda.lambda} trend={lambda.trend} />
 
           {/* Historical Chart */}
           <div>
-            <div className="text-xs text-muted-foreground mb-2 font-mono">
+            <div className="text-[9px] text-slate-500 mb-2 font-mono uppercase tracking-wider">
               HISTORIK (25 år)
             </div>
-            <div className="h-32">
+            <div className="h-28 bg-slate-800/30 rounded-sm p-2 border border-slate-700/30">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={historicalLambda}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(71,85,105,0.3)" />
                   <XAxis 
                     dataKey="year" 
-                    tick={{ fontSize: 9 }} 
+                    tick={{ fontSize: 8, fill: '#64748b' }} 
                     tickFormatter={(v) => v % 5 === 0 ? v : ''}
+                    axisLine={{ stroke: '#475569' }}
                   />
                   <YAxis 
                     domain={[0.6, 1.2]} 
-                    tick={{ fontSize: 9 }}
+                    tick={{ fontSize: 8, fill: '#64748b' }}
                     tickFormatter={(v) => v.toFixed(1)}
+                    axisLine={{ stroke: '#475569' }}
                   />
                   <Tooltip 
-                    contentStyle={{ fontSize: 11, background: 'rgba(0,0,0,0.8)', border: 'none' }}
+                    contentStyle={{ 
+                      fontSize: 10, 
+                      background: 'rgba(15,23,42,0.95)', 
+                      border: '1px solid rgba(71,85,105,0.5)',
+                      borderRadius: '2px'
+                    }}
                     formatter={(v: number) => [v.toFixed(3), 'λ']}
                   />
                   <Line 
                     type="monotone" 
                     dataKey="value" 
                     stroke={getLambdaColor(lambda.lambda)} 
-                    strokeWidth={2}
+                    strokeWidth={1.5}
                     dot={false}
                   />
                   {/* Reference line at 1.0 */}
                   <Line 
                     type="monotone" 
                     dataKey={() => 1.0} 
-                    stroke="rgba(255,255,255,0.3)" 
+                    stroke="rgba(100,116,139,0.4)" 
                     strokeWidth={1}
-                    strokeDasharray="5 5"
+                    strokeDasharray="4 4"
                     dot={false}
                   />
                 </LineChart>
@@ -263,19 +280,19 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
             </div>
           </div>
 
-          <Separator />
+          <Separator className="bg-slate-700/30" />
 
           {/* GEDI Codes */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="font-mono text-amber-500">[!]</span>
-              <span className="text-xs text-muted-foreground font-mono">
-                SYSTEM DIAGNOSTICS ({gediCodes.length} aktiva)
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-mono text-[10px] text-slate-500">[DIAG]</span>
+              <span className="text-[9px] text-slate-500 font-mono uppercase tracking-wider">
+                Systemdiagnostik ({gediCodes.length})
               </span>
             </div>
             
             {gediCodes.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {gediCodes.map(gedi => (
                   <GEDICodeCard 
                     key={gedi.code} 
@@ -285,20 +302,20 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
                 ))}
               </div>
             ) : (
-              <div className="p-4 text-center text-sm text-muted-foreground bg-muted/20 rounded-lg font-mono">
+              <div className="p-3 text-center text-[10px] text-slate-500 bg-slate-800/30 rounded-sm font-mono border border-slate-700/30">
                 [OK] Inga aktiva GEDI-koder
               </div>
             )}
           </div>
 
-          <Separator />
+          <Separator className="bg-slate-700/30" />
 
           {/* Probable Causes */}
           <div>
-            <div className="text-xs text-muted-foreground font-mono mb-3">
-              SANNOLIKA ORSAKER (rankade)
+            <div className="text-[9px] text-slate-500 font-mono mb-2 uppercase tracking-wider">
+              Sannolika orsaker
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {visibleCauses.map(cause => (
                 <CauseCard key={cause.id} cause={cause} />
               ))}
@@ -307,7 +324,7 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="w-full mt-2"
+                className="w-full mt-2 text-[10px] text-slate-500 hover:text-slate-300 hover:bg-slate-700/50"
                 onClick={() => setShowAllCauses(!showAllCauses)}
               >
                 {showAllCauses ? 'Visa färre' : `Visa alla (${topCauses.length})`}
@@ -315,20 +332,20 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
             )}
           </div>
 
-          <Separator />
+          <Separator className="bg-slate-700/30" />
 
           {/* Top Levers */}
           <div>
-            <div className="text-xs text-muted-foreground font-mono mb-3">
-              TOP HÄVSTÄNGER (vad påverkar mest)
+            <div className="text-[9px] text-slate-500 font-mono mb-2 uppercase tracking-wider">
+              Hävstänger
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {topLevers.map(lever => (
                 <LeverCard key={lever.id} lever={lever} isPro={isPro} />
               ))}
               {topLevers.length === 0 && (
-                <div className="p-4 text-center text-sm text-muted-foreground bg-muted/20 rounded-lg">
-                  Inga hävstänger identifierade
+                <div className="p-3 text-center text-[10px] text-slate-500 bg-slate-800/30 rounded-sm border border-slate-700/30">
+                  [~] Inga hävstänger identifierade
                 </div>
               )}
             </div>
@@ -337,8 +354,8 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-3 border-t text-xs text-muted-foreground text-center">
-        Klicka på GEDI-kod för guidad analys →
+      <div className="p-3 border-t border-slate-700/30 text-[9px] text-slate-500 text-center font-mono">
+        Klicka GEDI-kod för guidad analys [→]
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
  * Global Status Bar
  * 
  * Shows global Lambda value and system status overlay on map.
+ * MYNDIGHETSDESIGN: Strikt, klinisk, inga spel-liknande effekter.
  */
 
 import React from 'react';
@@ -20,44 +21,52 @@ export function GlobalStatusBar({ timeYear }: GlobalStatusBarProps) {
   return (
     <div className="absolute top-4 left-4 z-10 pointer-events-none">
       <div 
-        className="p-4 rounded-lg backdrop-blur-md border pointer-events-auto"
+        className="p-4 rounded-sm backdrop-blur-sm border pointer-events-auto"
         style={{ 
-          background: 'rgba(0,0,0,0.7)',
-          borderColor: color,
+          background: 'rgba(15,23,42,0.92)',
+          borderColor: 'rgba(71,85,105,0.5)',
         }}
       >
-        {/* Lambda value */}
+        {/* Lambda value - Klinisk typografi */}
         <div className="text-center">
-          <div className="text-xs text-muted-foreground font-mono mb-1">
+          <div className="text-[10px] text-slate-400 font-medium tracking-wider uppercase mb-2">
             GLOBAL LAMBDA
           </div>
           <div 
-            className="text-4xl font-mono font-bold"
-            style={{ color }}
+            className="text-3xl font-semibold tracking-tight"
+            style={{ color: '#94a3b8' }}
           >
-            λ = {globalLambda?.lambda.toFixed(3) || '—'}
+            λ = <span style={{ color }}>{globalLambda?.lambda.toFixed(3) || '—'}</span>
           </div>
         </div>
 
-        {/* System status */}
-        <div className="mt-3 flex items-center justify-center gap-2">
+        {/* System status - Diskret badge utan emoji */}
+        <div className="mt-3 flex items-center justify-center">
           <Badge 
-            className="font-mono text-xs"
-            style={{ backgroundColor: status.color, color: 'white' }}
+            className="font-medium text-[10px] tracking-wide uppercase rounded-sm"
+            style={{ 
+              backgroundColor: 'rgba(71,85,105,0.4)', 
+              color: '#94a3b8',
+              border: `1px solid ${status.color}`,
+            }}
           >
             {status.label.sv}
           </Badge>
         </div>
 
-        {/* Active GEDI codes */}
+        {/* Active GEDI codes - Diskret styling */}
         {globalLambda?.activeGEDICodes.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-muted">
-            <div className="text-xs text-muted-foreground mb-1">
+          <div className="mt-3 pt-3 border-t border-slate-700/50">
+            <div className="text-[9px] text-slate-500 mb-1.5 uppercase tracking-wider">
               Aktiva GEDI-koder
             </div>
             <div className="flex flex-wrap gap-1">
               {globalLambda.activeGEDICodes.map(code => (
-                <Badge key={code} variant="destructive" className="text-xs font-mono">
+                <Badge 
+                  key={code} 
+                  variant="outline" 
+                  className="text-[9px] font-mono rounded-sm border-slate-600 text-slate-400 bg-slate-800/50"
+                >
                   {code}
                 </Badge>
               ))}
@@ -65,10 +74,10 @@ export function GlobalStatusBar({ timeYear }: GlobalStatusBarProps) {
           </div>
         )}
 
-        {/* Year indicator */}
-        <div className="mt-3 pt-3 border-t border-muted text-center">
-          <div className="text-xs text-muted-foreground">Period</div>
-          <div className="font-mono text-lg">{timeYear}</div>
+        {/* Year indicator - Minimal */}
+        <div className="mt-3 pt-3 border-t border-slate-700/50 text-center">
+          <div className="text-[9px] text-slate-500 uppercase tracking-wider">Period</div>
+          <div className="font-mono text-base text-slate-300">{timeYear}</div>
         </div>
       </div>
     </div>

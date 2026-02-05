@@ -2,13 +2,14 @@
  * Layer Selection Panel
  * 
  * Checkbox-based layer control with compatibility warnings.
+ * MYNDIGHETSDESIGN: Strikt, klinisk, inga spel-liknande effekter.
+ * NO ICONS per no-icons-doctrine.
  */
 
 import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, Lock } from 'lucide-react';
 import { MAP_LAYERS, type MapLayerId } from './types';
 
 interface LayerPanelProps {
@@ -39,18 +40,19 @@ export function LayerPanel({ activeLayers, onToggleLayer, isPro }: LayerPanelPro
     .filter(l => !l.isComparable);
 
   return (
-    <div 
-      className="absolute top-4 right-16 z-10 w-64 pointer-events-auto"
-    >
+    <div className="absolute top-4 right-16 z-10 w-64 pointer-events-auto">
       <div 
-        className="p-4 rounded-lg backdrop-blur-md border"
-        style={{ background: 'rgba(0,0,0,0.7)', borderColor: 'rgba(255,255,255,0.1)' }}
+        className="p-4 rounded-sm backdrop-blur-sm border"
+        style={{ 
+          background: 'rgba(15,23,42,0.92)', 
+          borderColor: 'rgba(71,85,105,0.5)' 
+        }}
       >
-        <div className="text-xs text-muted-foreground font-mono mb-3">
+        <div className="text-[10px] text-slate-400 font-medium tracking-wider uppercase mb-3">
           KARTLAGER
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           {layers.map(layer => {
             const isActive = activeLayers.includes(layer.id);
             const isLocked = layer.proOnly && !isPro;
@@ -58,28 +60,34 @@ export function LayerPanel({ activeLayers, onToggleLayer, isPro }: LayerPanelPro
             return (
               <div 
                 key={layer.id}
-                className={`flex items-center gap-2 p-2 rounded transition-colors ${
-                  isActive ? 'bg-primary/20' : 'hover:bg-muted/20'
-                } ${isLocked ? 'opacity-50' : ''}`}
+                className={`flex items-center gap-2 p-2 rounded-sm transition-colors ${
+                  isActive 
+                    ? 'bg-slate-700/50 border-l-2 border-l-slate-400' 
+                    : 'hover:bg-slate-800/50'
+                } ${isLocked ? 'opacity-40' : ''}`}
               >
                 <Checkbox
                   id={layer.id}
                   checked={isActive}
                   disabled={isLocked}
                   onCheckedChange={() => onToggleLayer(layer.id)}
-                  className="border-muted-foreground"
+                  className="border-slate-500 data-[state=checked]:bg-slate-500 data-[state=checked]:border-slate-500"
                 />
                 <label 
                   htmlFor={layer.id}
-                  className="flex-1 text-sm cursor-pointer flex items-center gap-2"
+                  className="flex-1 text-xs cursor-pointer flex items-center gap-2"
                 >
-                  <span>{layer.icon}</span>
-                  <span className="text-white">{layer.name.sv}</span>
-                  {isLocked && <Lock className="h-3 w-3 text-muted-foreground" />}
+                  <span className="text-slate-300">{layer.name.sv}</span>
+                  {isLocked && (
+                    <span className="font-mono text-[9px] text-slate-500">[PRO]</span>
+                  )}
                 </label>
                 {!layer.isComparable && isActive && (
-                  <Badge variant="outline" className="text-[10px] text-amber-400 border-amber-400">
-                    ⚠️
+                  <Badge 
+                    variant="outline" 
+                    className="text-[9px] text-slate-400 border-slate-600 rounded-sm"
+                  >
+                    [!]
                   </Badge>
                 )}
               </div>
@@ -87,29 +95,29 @@ export function LayerPanel({ activeLayers, onToggleLayer, isPro }: LayerPanelPro
           })}
         </div>
 
-        {/* Warnings */}
+        {/* Warnings - Diskret styling */}
         {incompatibleWarnings.length > 0 && (
-          <Alert className="mt-3 bg-red-500/20 border-red-500 py-2">
-            <AlertTriangle className="h-3 w-3" />
-            <AlertDescription className="text-xs">
+          <Alert className="mt-3 bg-slate-800/60 border-slate-600 py-2 rounded-sm">
+            <span className="font-mono text-[9px] text-slate-400 mr-1">[X]</span>
+            <AlertDescription className="text-[10px] text-slate-400 inline">
               Ej jämförbara: {incompatibleWarnings.join(', ')}
             </AlertDescription>
           </Alert>
         )}
 
         {nonComparableLayers.length > 0 && incompatibleWarnings.length === 0 && (
-          <Alert className="mt-3 bg-amber-500/20 border-amber-500 py-2">
-            <AlertTriangle className="h-3 w-3" />
-            <AlertDescription className="text-xs">
+          <Alert className="mt-3 bg-slate-800/60 border-slate-600 py-2 rounded-sm">
+            <span className="font-mono text-[9px] text-slate-400 mr-1">[!]</span>
+            <AlertDescription className="text-[10px] text-slate-400 inline">
               Kontextberoende data – jämför med försiktighet
             </AlertDescription>
           </Alert>
         )}
 
         {!isPro && (
-          <div className="mt-3 pt-3 border-t border-muted text-center">
-            <div className="text-xs text-muted-foreground">
-              Några lager kräver PRO
+          <div className="mt-3 pt-3 border-t border-slate-700/50 text-center">
+            <div className="text-[9px] text-slate-500 uppercase tracking-wider">
+              Vissa lager kräver PRO
             </div>
           </div>
         )}
