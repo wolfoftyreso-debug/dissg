@@ -1,11 +1,13 @@
 /**
  * OSCILLOSCOPE VIEW PAGE - Pedagogisk version
  * 
- * En "pulstagare" för samhället - som en hjärtmonitor fast för hela Sverige.
+  * En "pulstagare" för civilisationen - som en hjärtmonitor fast för hela världen.
+  * GLOBAL FIRST: Startar alltid på global nivå, drill-down till kontinenter/länder.
  * Designad så en 15-åring kan förstå och använda den.
  */
 
 import React, { useState, useEffect } from 'react';
+ import { useGeo } from '@/contexts/GeoContext';
 import { OscilloscopeView } from '@/components/lambda';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -66,41 +68,41 @@ const SIGNAL_PRESETS: Array<{
   {
     id: 'economic',
     name: 'Pengasignaler',
-    simpleExplanation: 'Visar hur det går för Sveriges ekonomi - tjänar folk pengar, har de jobb?',
+     simpleExplanation: 'Visar hur det går för världsekonomin - produktion, handel, sysselsättning.',
     channels: [
-      createChannel('gdp', 'Hur rika vi blir (BNP)', 'hsl(142, 76%, 45%)'),
-      createChannel('employment', 'Hur många som har jobb', 'hsl(217, 91%, 60%)'),
-      createChannel('inflation', 'Hur dyrt allt blir', 'hsl(24, 95%, 53%)'),
+       createChannel('gdp', 'Global BNP-tillväxt', 'hsl(142, 76%, 45%)'),
+       createChannel('employment', 'Global sysselsättning', 'hsl(217, 91%, 60%)'),
+       createChannel('inflation', 'Global inflation', 'hsl(24, 95%, 53%)'),
     ],
   },
   {
     id: 'demographic',
     name: 'Befolkningssignaler',
-    simpleExplanation: 'Visar hur Sveriges befolkning förändras - föds barn, flyttar folk hit?',
+     simpleExplanation: 'Visar hur världens befolkning förändras - födelsetal, medelålder, migration.',
     channels: [
-      createChannel('population', 'Antal människor', 'hsl(263, 70%, 50%)'),
-      createChannel('birth_rate', 'Hur många barn föds', 'hsl(330, 81%, 60%)'),
-      createChannel('migration', 'Flytt till/från Sverige', 'hsl(172, 66%, 50%)'),
+       createChannel('population', 'Världsbefolkning', 'hsl(263, 70%, 50%)'),
+       createChannel('birth_rate', 'Globalt födelsetal', 'hsl(330, 81%, 60%)'),
+       createChannel('median_age', 'Medianålder', 'hsl(172, 66%, 50%)'),
     ],
   },
   {
     id: 'health',
     name: 'Hälsosignaler',
-    simpleExplanation: 'Visar hur friska svenskarna är - lever vi länge, mår vi bra?',
+     simpleExplanation: 'Visar hur frisk mänskligheten är - livslängd, barnadödlighet, sjukdomar.',
     channels: [
-      createChannel('life_exp', 'Hur länge vi lever', 'hsl(142, 76%, 45%)'),
-      createChannel('healthcare_load', 'Tryck på sjukvården', 'hsl(0, 84%, 60%)'),
-      createChannel('mental_health', 'Psykisk hälsa', 'hsl(270, 70%, 60%)'),
+       createChannel('life_exp', 'Global medellivslängd', 'hsl(142, 76%, 45%)'),
+       createChannel('infant_mortality', 'Barnadödlighet', 'hsl(0, 84%, 60%)'),
+       createChannel('disease_burden', 'Sjukdomsbörda', 'hsl(270, 70%, 60%)'),
     ],
   },
   {
     id: 'education',
-    name: 'Skolsignaler',
-    simpleExplanation: 'Visar hur det går i skolan - lär sig eleverna, hoppar någon av?',
+     name: 'Utbildningssignaler',
+     simpleExplanation: 'Visar global utbildningsnivå - läskunnighet, skolår, jämställdhet.',
     channels: [
-      createChannel('literacy', 'PISA-resultat', 'hsl(217, 91%, 60%)'),
-      createChannel('enrollment', 'Antal i skolan', 'hsl(142, 76%, 45%)'),
-      createChannel('dropout', 'Som hoppar av', 'hsl(0, 84%, 60%)'),
+       createChannel('literacy', 'Global läskunnighet', 'hsl(217, 91%, 60%)'),
+       createChannel('mean_schooling', 'Genomsnittliga skolår', 'hsl(142, 76%, 45%)'),
+       createChannel('gender_parity', 'Jämställdhet i utbildning', 'hsl(330, 81%, 60%)'),
     ],
   },
 ];
@@ -114,8 +116,8 @@ const WelcomeCard: React.FC<{ onDismiss: () => void }> = ({ onDismiss }) => (
         <div className="flex-1">
           <h2 className="text-xl font-bold mb-2">Vad är detta?</h2>
           <p className="text-muted-foreground mb-4">
-            Tänk dig en <strong className="text-foreground">hjärtmonitor på sjukhus</strong> - den visar 
-            hjärtats slag som en våglinje. Den här sidan gör samma sak, fast för <strong className="text-foreground">hela Sverige</strong>!
+             Tänk dig en <strong className="text-foreground">hjärtmonitor på sjukhus</strong> - den visar 
+             hjärtats slag som en våglinje. Den här sidan gör samma sak, fast för <strong className="text-foreground">hela mänskligheten</strong>!
           </p>
           <div className="grid sm:grid-cols-3 gap-4 mb-4">
             <div className="p-3 rounded-lg bg-background/80">
@@ -282,12 +284,40 @@ const SignalStatusCard: React.FC<{
 };
 
 export default function OscilloscopeViewPage() {
+   const { scope } = useGeo();
   const [showWelcome, setShowWelcome] = useState(true);
   const [activePreset, setActivePreset] = useState(SIGNAL_PRESETS[0]);
   const [timeBase, setTimeBase] = useState<TimeBase>('1y');
   const [traces, setTraces] = useState<SignalTrace[]>([]);
   const [isLive, setIsLive] = useState(false);
   
+   // Dynamic title based on geographic scope
+   const getScopeTitle = () => {
+     switch (scope.level) {
+       case 'global':
+         return 'Global Pulstagare';
+       case 'region':
+         return `${scope.name} Pulstagare`;
+       case 'country':
+         return `${scope.name_local || scope.name} Pulstagare`;
+       default:
+         return 'Civilisationens Pulstagare';
+     }
+   };
+   
+   const getScopeDescription = () => {
+     switch (scope.level) {
+       case 'global':
+         return 'Se hur det går för mänskligheten i realtid. Klicka på en världsdel för att fördjupa.';
+       case 'region':
+         return `Se hur det går för ${scope.name} i realtid. Klicka på ett land för att fördjupa.`;
+       case 'country':
+         return `Se hur det går för ${scope.name_local || scope.name} i realtid.`;
+       default:
+         return 'Se hur det går i realtid.';
+     }
+   };
+   
   const config: OscilloscopeConfig = {
     channels: activePreset.channels,
     time_base: timeBase,
@@ -351,9 +381,9 @@ export default function OscilloscopeViewPage() {
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Sveriges Pulstagare</h1>
+             <h1 className="text-3xl font-bold mb-2">{getScopeTitle()}</h1>
             <p className="text-muted-foreground max-w-xl">
-              Se hur det går för Sverige i realtid. Linjerna visar mätningar som uppdateras hela tiden.
+               {getScopeDescription()}
             </p>
           </div>
           

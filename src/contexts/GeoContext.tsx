@@ -106,15 +106,14 @@ function detectUserCountry(): string {
 export function GeoProvider({ children }: { children: ReactNode }) {
   const [detectedCountry] = useState(() => detectUserCountry());
   
-  const [scope, setScope] = useState<GeoScope>(() => {
-    const country = COUNTRIES[detectedCountry] || COUNTRIES['SE'];
-    return {
-      level: 'country',
-      code: detectedCountry,
-      name: country.name,
-      name_local: country.name_local,
-    };
-  });
+   // GLOBAL FIRST PRINCIPLE: Always start at global level
+   // Users drill down to continent → country → region
+   // No country is favored - the system is jurisdictionally neutral
+   const [scope, setScope] = useState<GeoScope>({
+     level: 'global',
+     code: 'GLOBAL',
+     name: 'Global',
+   });
 
   // Build breadcrumbs based on current scope
   const breadcrumbs: GeoScope[] = [];
