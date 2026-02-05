@@ -43,8 +43,11 @@
  
  export {
    CORE_INVARIANTS,
+   ENTITY_INVARIANTS,
    runInvariants,
    enforceInvariants,
+   assertEntityExists,
+   validateMeasureWithRegistry,
    type Invariant,
    type InvariantResult,
  } from './core/invariants';
@@ -101,6 +104,25 @@
    runStep8,
    type SabotageTestResult,
  } from './first-truth';
+ 
+ // Entities (Step 9)
+ export {
+   COUNTRY_SCHEMA_V1,
+   SWEDEN,
+   SWEDEN_ENTITY_SOURCE,
+   SWEDEN_TEMPORAL,
+   entityExists,
+   getEntity as getEntityFromRegistry,
+   registerEntity,
+   getAllEntities,
+   getRegistryStats,
+ } from './entities';
+ 
+ export {
+   runEntitySabotageTests,
+   runStep9,
+   type EntityTestResult,
+ } from './tests/entity-tests';
  
  /**
   * INITIALIZE TRUTH ENGINE
@@ -186,6 +208,7 @@
  Methodology: ${_SCB_SOURCE.methodology_url}
  
  ENTITY: ${_SWEDEN_ENTITY.name} (${_SWEDEN_ENTITY.identifiers.iso3166_1_alpha2})
+ Valid from: ${_SWEDEN_ENTITY.identifiers.valid_from} (Gustav Vasa)
  
  TIME:
  - Observed: ${_SWEDEN_POPULATION_2023.temporal.observed_at}

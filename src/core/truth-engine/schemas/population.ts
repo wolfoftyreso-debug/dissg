@@ -44,6 +44,8 @@
  
  /**
   * ENTITY: Sweden
+  * 
+  * Step 9: Now includes temporal bounds and source (REQUIRED)
   */
  export const SWEDEN_ENTITY: Entity = {
    id: generateEntityId('country', { iso3166_1_alpha2: 'SE', name: 'Sweden' }),
@@ -59,6 +61,10 @@
      iso3166_1_numeric: '752',
      name_en: 'Sweden',
      name_sv: 'Sverige',
+     // Step 9: Temporal bounds and source (REQUIRED)
+     valid_from: '1523-06-06',  // Gustav Vasa
+     valid_to: null,            // Still exists
+     source_id: 'source:v1:SCB:Geographic Registry',
    },
  };
  
