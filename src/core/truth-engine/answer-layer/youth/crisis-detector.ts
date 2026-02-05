@@ -54,40 +54,35 @@
      country_code: 'SE',
      phone: '116 111',
      url: 'https://www.bris.se',
-     hours: '24/7',
-     languages: ['sv'],
+    available: '24/7',
    },
    {
      name: 'Childline (UK)',
      country_code: 'GB',
      phone: '0800 1111',
      url: 'https://www.childline.org.uk',
-     hours: '24/7',
-     languages: ['en'],
+    available: '24/7',
    },
    {
      name: 'Crisis Text Line (US)',
      country_code: 'US',
      phone: null,
      url: 'https://www.crisistextline.org',
-     hours: '24/7',
-     languages: ['en', 'es'],
+    available: '24/7',
    },
    {
      name: 'Kids Help Phone (Canada)',
      country_code: 'CA',
      phone: '1-800-668-6868',
      url: 'https://kidshelpphone.ca',
-     hours: '24/7',
-     languages: ['en', 'fr'],
+    available: '24/7',
    },
    {
      name: 'Kinder- und Jugendtelefon (Germany)',
      country_code: 'DE',
      phone: '116 111',
      url: 'https://www.nummergegenkummer.de',
-     hours: 'limited',
-     languages: ['de'],
+    available: 'limited hours',
    },
  ];
  
@@ -170,13 +165,17 @@
    const chatResources = resources.filter(r => r.url !== null);
    
    return {
-     mode: 'crisis_support',
-     triggered_by: detection.triggered_keywords.join(', ') || 'pattern match',
-     priority: 'immediate',
-     response: {
+    triggered: true,
+    reason: detection.triggered_keywords.join(', ') || 'pattern match',
+    redirect_to: 'human_support',
+    resources: resources as CrisisResource[],
+    mode: 'crisis_support',
+    triggered_by: detection.triggered_keywords.join(', ') || 'pattern match',
+    priority: 'immediate',
+    response: {
        message: `It sounds like you might be going through something really difficult right now. You're not alone, and there are people who want to help.`,
-       hotlines,
-       chat_resources: chatResources,
+      hotlines: hotlines as CrisisResource[],
+      chat_resources: chatResources as CrisisResource[],
        safety_message: `If you're in immediate danger, please contact emergency services or tell a trusted adult right away. Your safety matters.`,
      },
      analytics_disabled: true,  // Do NOT log crisis queries for analytics

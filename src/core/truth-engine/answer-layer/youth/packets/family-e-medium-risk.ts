@@ -12,7 +12,7 @@
   */
  export const PACKET_PANIC_SYMPTOMS: YouthAnswerPacket = {
    id: 'answer:youth:panic_symptoms:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'psyche',
@@ -82,7 +82,7 @@
   */
  export const PACKET_NUMBNESS: YouthAnswerPacket = {
    id: 'answer:youth:numbness:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'psyche',
@@ -150,7 +150,7 @@
   */
  export const PACKET_FREQUENT_CRYING: YouthAnswerPacket = {
    id: 'answer:youth:frequent_crying:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'psyche',
@@ -216,7 +216,7 @@
   */
  export const PACKET_HEALTH_ANXIETY: YouthAnswerPacket = {
    id: 'answer:youth:health_anxiety:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'psyche',
