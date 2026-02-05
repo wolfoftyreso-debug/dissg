@@ -87,6 +87,13 @@ const SECONDARY_NAVIGATION: NavItem[] = [
     description: 'Budgetjämförelse',
   },
   {
+    path: '/education',
+    label: 'Utbildning',
+    shortLabel: 'EDU',
+    marker: '[E]',
+    description: 'Skola och utbildningsdata',
+  },
+  {
     path: '/help',
     label: 'Hjälp',
     shortLabel: '?',

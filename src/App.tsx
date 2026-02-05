@@ -100,6 +100,7 @@ import Help from "./pages/Help";
 import DemocraticHealth from "./pages/DemocraticHealth";
 import BudgetPage from "./pages/BudgetPage";
 import PortfolioPage from "./pages/PortfolioPage";
+import EducationPage from "./pages/EducationPage";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -207,6 +208,7 @@ const App = () => (
                 <Route path="/democratic-health" element={<DemocraticHealth />} />
                 <Route path="/budget" element={<BudgetPage />} />
                 <Route path="/portfolio" element={<PortfolioPage />} />
+                <Route path="/education" element={<EducationPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
