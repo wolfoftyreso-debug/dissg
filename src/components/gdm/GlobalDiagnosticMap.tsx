@@ -103,8 +103,8 @@ export function GlobalDiagnosticMap() {
       {/* Global Status (top-left) */}
       <GlobalStatusBar timeYear={timeYear} />
 
-      {/* Layer Panel (top-right) */}
-      {showLayerPanel && (
+      {/* Layer Panel (top-right) - Hide when diagnostic panel is open */}
+      {showLayerPanel && !selectedCountry && (
         <LayerPanel
           activeLayers={activeLayers}
           onToggleLayer={handleToggleLayer}
@@ -129,9 +129,9 @@ export function GlobalDiagnosticMap() {
         onAction={handleSignalAction}
       />
 
-      {/* Diagnostic Side Panel */}
+      {/* Diagnostic Side Panel - Only visible when country is selected */}
       {selectedCountry && (
-        <div className="absolute top-0 right-0 h-full w-96 z-20">
+        <div className="absolute top-0 right-0 h-full w-96 z-40 pointer-events-auto">
           <DiagnosticPanel
             countryCode={selectedCountry}
             onClose={() => setSelectedCountry(null)}
