@@ -282,6 +282,48 @@ export {
   CULTURAL_EMBEDDING_MASTERPROMPT,
 } from './cultural-embedding';
 
+// Public Read-Only Portal
+export {
+  // Types
+  type PublicDecisionView,
+  type TransparencyDelay,
+  type PublicAPIResponse,
+  type MediaSafeWrapper,
+  type PublicAccessLog,
+  type AntiPopulismGuard,
+  // Public Decision View
+  generatePublicDecisionView,
+  wrapMediaSafe,
+  formatPublicDecisionDisplay,
+  validatePublicViewCompleteness,
+  PUBLIC_DECISION_VIEW_MASTERPROMPT,
+  // Transparency Delay
+  VALID_DELAY_REASONS,
+  createTransparencyDelay,
+  isDelayExpired,
+  getDisclosureStatus,
+  formatDelayForPublic,
+  TRANSPARENCY_DELAY_MASTERPROMPT,
+  // Public API
+  PUBLIC_API_VERSION,
+  PUBLIC_API_ENDPOINTS,
+  createAPIResponse,
+  validateAPIRequest,
+  calculateRateLimit,
+  formatDecisionForAPI,
+  PUBLIC_API_MASTERPROMPT,
+  // Anti-Populism
+  NEVER_ANSWERS,
+  FORBIDDEN_SIMPLIFICATIONS,
+  createAntiPopulismGuard,
+  checkQueryViolation,
+  generateAntiPopulismResponse,
+  validateOutputForPopulism,
+  ANTI_POPULISM_MASTERPROMPT,
+  // Master
+  PUBLIC_PORTAL_MASTERPROMPT,
+} from './public-portal';
+
 /**
  * BDPE SUMMARY
  */
