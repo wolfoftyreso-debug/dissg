@@ -37,6 +37,29 @@ export {
   type VotingRecord,
 } from './protocol-binding';
 
+// Agenda Generator
+export {
+  generateAgenda,
+  validateAgendaCoverage,
+  AGENDA_GENERATOR_MASTERPROMPT,
+  type AgendaItem,
+  type BoardAgenda,
+  type AgendaInput,
+} from './agenda-generator';
+
+// Reality Check
+export {
+  performRealityCheck,
+  extractExpectedRanges,
+  REALITY_CHECK_MASTERPROMPT,
+  type ExpectedRange,
+  type ObservedOutcome,
+  type Deviation,
+  type LearningPoint,
+  type RealityCheckResult,
+  type RealityCheckInput,
+} from './reality-check';
+
 // Examples
 export { BRF_ROOF_RENOVATION_DPD } from './examples/brf-roof-renovation';
 
