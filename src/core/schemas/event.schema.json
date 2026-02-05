@@ -1,0 +1,143 @@
+ {
+   "$schema": "http://json-schema.org/draft-07/schema#",
+   "$id": "https://dissg.io/schemas/v1/event.json",
+   "title": "Event",
+   "description": "A change over time. Base object type 4 of 6.",
+   "type": "object",
+   "required": [
+     "id",
+     "type",
+     "event_type",
+     "occurred_at",
+     "affected_entity_ids",
+     "description",
+     "created_at",
+     "valid_from",
+     "source_id",
+     "schema_version"
+   ],
+   "additionalProperties": false,
+   "properties": {
+     "id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Global, eternal, immutable identifier (UUIDv7)"
+     },
+     "type": {
+       "type": "string",
+       "const": "EVENT",
+       "description": "Base object type discriminator"
+     },
+     "event_type": {
+       "type": "string",
+       "description": "Formally defined event category",
+       "enum": [
+         "policy_enacted",
+         "policy_repealed",
+         "policy_amended",
+         "election_held",
+         "government_formed",
+         "government_dissolved",
+         "methodology_changed",
+         "definition_changed",
+         "data_revision",
+         "boundary_changed",
+         "entity_created",
+         "entity_merged",
+         "entity_dissolved",
+         "crisis_declared",
+         "crisis_ended",
+         "measurement_started",
+         "measurement_ended"
+       ]
+     },
+     "event_definition_id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Reference to formal event definition in ontology"
+     },
+     "occurred_at": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When the event occurred in reality"
+     },
+     "occurred_precision": {
+       "type": "string",
+       "enum": ["exact", "day", "week", "month", "quarter", "year", "decade"],
+       "default": "exact",
+       "description": "Temporal precision of occurred_at"
+     },
+     "duration_hours": {
+       "type": ["number", "null"],
+       "minimum": 0,
+       "description": "Duration of event in hours (null if instantaneous)"
+     },
+     "affected_entity_ids": {
+       "type": "array",
+       "items": {
+         "type": "string",
+         "format": "uuid"
+       },
+       "minItems": 1,
+       "description": "Entities affected by this event"
+     },
+     "description": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 2000,
+       "description": "Factual description of the event (no normative language)"
+     },
+     "impact_assessment": {
+       "type": ["object", "null"],
+       "description": "Structured impact data",
+       "properties": {
+         "severity": {
+           "type": "string",
+           "enum": ["negligible", "minor", "moderate", "major", "critical"]
+         },
+         "scope": {
+           "type": "string",
+           "enum": ["local", "regional", "national", "international", "global"]
+         },
+         "reversibility": {
+           "type": "string",
+           "enum": ["reversible", "partially_reversible", "irreversible", "unknown"]
+         },
+         "affected_indicators": {
+           "type": "array",
+           "items": { "type": "string", "format": "uuid" }
+         }
+       }
+     },
+     "preceding_event_ids": {
+       "type": "array",
+       "items": { "type": "string", "format": "uuid" },
+       "description": "Events that directly led to this event"
+     },
+     "following_event_ids": {
+       "type": "array",
+       "items": { "type": "string", "format": "uuid" },
+       "description": "Events that directly resulted from this event"
+     },
+     "created_at": {
+       "type": "string",
+       "format": "date-time"
+     },
+     "valid_from": {
+       "type": "string",
+       "format": "date-time"
+     },
+     "valid_to": {
+       "type": ["string", "null"],
+       "format": "date-time"
+     },
+     "source_id": {
+       "type": "string",
+       "format": "uuid"
+     },
+     "schema_version": {
+       "type": "string",
+       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+     }
+   }
+ }

@@ -1,0 +1,146 @@
+ {
+   "$schema": "http://json-schema.org/draft-07/schema#",
+   "$id": "https://dissg.io/schemas/v1/measure.json",
+   "title": "Measure",
+   "description": "A quantifiable observation. Base object type 5 of 6.",
+   "type": "object",
+   "required": [
+     "id",
+     "type",
+     "entity_id",
+     "indicator_id",
+     "value",
+     "unit",
+     "measurement_date",
+     "created_at",
+     "valid_from",
+     "source_id",
+     "schema_version"
+   ],
+   "additionalProperties": false,
+   "properties": {
+     "id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Global, eternal, immutable identifier (UUIDv7)"
+     },
+     "type": {
+       "type": "string",
+       "const": "MEASURE",
+       "description": "Base object type discriminator"
+     },
+     "entity_id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "The entity being measured"
+     },
+     "indicator_id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Reference to indicator definition (what is being measured)"
+     },
+     "value": {
+       "type": "number",
+       "description": "The measured value"
+     },
+     "value_lower_bound": {
+       "type": ["number", "null"],
+       "description": "Lower confidence bound (if uncertainty quantified)"
+     },
+     "value_upper_bound": {
+       "type": ["number", "null"],
+       "description": "Upper confidence bound (if uncertainty quantified)"
+     },
+     "unit": {
+       "type": "string",
+       "minLength": 1,
+       "description": "Unit of measurement (SI preferred)"
+     },
+     "unit_definition_id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Reference to formal unit definition"
+     },
+     "measurement_date": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When the measurement was taken/represents"
+     },
+     "measurement_precision": {
+       "type": "string",
+       "enum": ["instant", "hour", "day", "week", "month", "quarter", "year"],
+       "default": "day",
+       "description": "Temporal granularity of measurement"
+     },
+     "aggregation_period": {
+       "type": ["object", "null"],
+       "description": "If value is aggregated, the period it covers",
+       "properties": {
+         "start": { "type": "string", "format": "date-time" },
+         "end": { "type": "string", "format": "date-time" },
+         "method": {
+           "type": "string",
+           "enum": ["sum", "average", "median", "min", "max", "first", "last", "count"]
+         }
+       },
+       "required": ["start", "end", "method"]
+     },
+     "methodology": {
+       "type": "string",
+       "description": "How the measurement was obtained"
+     },
+     "methodology_version": {
+       "type": ["string", "null"],
+       "pattern": "^[0-9]+\\.[0-9]+$",
+       "description": "Version of methodology used"
+     },
+     "confidence": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1,
+       "description": "Confidence in measurement accuracy (0-1)"
+     },
+     "quality_flags": {
+       "type": "array",
+       "items": {
+         "type": "string",
+         "enum": [
+           "provisional",
+           "revised",
+           "estimated",
+           "interpolated",
+           "extrapolated",
+           "imputed",
+           "break_in_series",
+           "definition_changed"
+         ]
+       },
+       "description": "Data quality indicators"
+     },
+     "supersedes_id": {
+       "type": ["string", "null"],
+       "format": "uuid",
+       "description": "If this is a revision, the ID of the measure it replaces"
+     },
+     "created_at": {
+       "type": "string",
+       "format": "date-time"
+     },
+     "valid_from": {
+       "type": "string",
+       "format": "date-time"
+     },
+     "valid_to": {
+       "type": ["string", "null"],
+       "format": "date-time"
+     },
+     "source_id": {
+       "type": "string",
+       "format": "uuid"
+     },
+     "schema_version": {
+       "type": "string",
+       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+     }
+   }
+ }

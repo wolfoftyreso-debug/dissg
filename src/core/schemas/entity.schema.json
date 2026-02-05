@@ -1,0 +1,102 @@
+ {
+   "$schema": "http://json-schema.org/draft-07/schema#",
+   "$id": "https://dissg.io/schemas/v1/entity.json",
+   "title": "Entity",
+   "description": "Something that exists in the world. Base object type 1 of 6.",
+   "type": "object",
+   "required": [
+     "id",
+     "type",
+     "entity_type",
+     "canonical_name",
+     "created_at",
+     "valid_from",
+     "source_id",
+     "schema_version"
+   ],
+   "additionalProperties": false,
+   "properties": {
+     "id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Global, eternal, immutable identifier (UUIDv7)",
+       "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+     },
+     "type": {
+       "type": "string",
+       "const": "ENTITY",
+       "description": "Base object type discriminator"
+     },
+     "entity_type": {
+       "type": "string",
+       "description": "Formally defined entity category",
+       "enum": [
+         "country",
+         "region",
+         "municipality",
+         "indicator",
+         "organization",
+         "policy",
+         "person_role",
+         "document",
+         "dataset"
+       ]
+     },
+     "canonical_name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 500,
+       "description": "Primary name in system default language (English)"
+     },
+     "names": {
+       "type": "object",
+       "description": "Localized names by ISO 639-1 language code",
+       "additionalProperties": {
+         "type": "string"
+       },
+       "propertyNames": {
+         "pattern": "^[a-z]{2}$"
+       }
+     },
+     "codes": {
+       "type": "object",
+       "description": "External identifier codes (ISO, NUTS, etc.)",
+       "properties": {
+         "iso_alpha2": { "type": "string", "pattern": "^[A-Z]{2}$" },
+         "iso_alpha3": { "type": "string", "pattern": "^[A-Z]{3}$" },
+         "iso_numeric": { "type": "string", "pattern": "^[0-9]{3}$" },
+         "nuts": { "type": "string", "pattern": "^[A-Z]{2}[0-9A-Z]{0,3}$" },
+         "fips": { "type": "string" },
+         "geonames_id": { "type": "integer" }
+       },
+       "additionalProperties": {
+         "type": "string"
+       }
+     },
+     "created_at": {
+       "type": "string",
+       "format": "date-time",
+       "description": "UTC timestamp when record was created in system"
+     },
+     "valid_from": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When this entity data became valid in reality"
+     },
+     "valid_to": {
+       "type": ["string", "null"],
+       "format": "date-time",
+       "description": "When this entity data ceased to be valid (null = still valid)"
+     },
+     "source_id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Reference to SOURCE object that provided this data"
+     },
+     "schema_version": {
+       "type": "string",
+       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+       "description": "Semantic version of this schema (major.minor.patch)"
+     }
+   }
+ }
