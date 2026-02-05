@@ -1,0 +1,155 @@
+ {
+   "$schema": "http://json-schema.org/draft-07/schema#",
+   "$id": "https://dissg.io/schemas/v1/source.json",
+   "title": "Source",
+   "description": "Where data comes from. Base object type 6 of 6.",
+   "type": "object",
+   "required": [
+     "id",
+     "type",
+     "source_type",
+     "organization",
+     "reliability_score",
+     "coverage",
+     "created_at",
+     "valid_from",
+     "schema_version"
+   ],
+   "additionalProperties": false,
+   "properties": {
+     "id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Global, eternal, immutable identifier (UUIDv7)"
+     },
+     "type": {
+       "type": "string",
+       "const": "SOURCE",
+       "description": "Base object type discriminator"
+     },
+     "source_type": {
+       "type": "string",
+       "enum": ["official", "academic", "ngo", "derived", "aggregator"],
+       "description": "Category of source"
+     },
+     "organization": {
+       "type": "string",
+       "description": "Name of the publishing organization"
+     },
+     "organization_entity_id": {
+       "type": ["string", "null"],
+       "format": "uuid",
+       "description": "Reference to ENTITY if organization exists in system"
+     },
+     "reliability_score": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1,
+       "description": "Overall reliability rating (0-1)"
+     },
+     "reliability_components": {
+       "type": "object",
+       "description": "Breakdown of reliability factors",
+       "properties": {
+         "methodology_transparency": { "type": "number", "minimum": 0, "maximum": 1 },
+         "historical_accuracy": { "type": "number", "minimum": 0, "maximum": 1 },
+         "update_consistency": { "type": "number", "minimum": 0, "maximum": 1 },
+         "revision_frequency": { "type": "number", "minimum": 0, "maximum": 1 },
+         "peer_review": { "type": "number", "minimum": 0, "maximum": 1 }
+       }
+     },
+     "url": {
+       "type": ["string", "null"],
+       "format": "uri",
+       "description": "Primary URL for the source"
+     },
+     "api_endpoint": {
+       "type": ["string", "null"],
+       "format": "uri",
+       "description": "API endpoint if data is machine-accessible"
+     },
+     "license": {
+       "type": "object",
+       "description": "Data license information",
+       "properties": {
+         "type": {
+           "type": "string",
+           "enum": ["public_domain", "cc0", "cc_by", "cc_by_sa", "cc_by_nc", "proprietary", "government", "unknown"]
+         },
+         "url": { "type": ["string", "null"], "format": "uri" },
+         "attribution_required": { "type": "boolean" },
+         "commercial_use_allowed": { "type": "boolean" }
+       }
+     },
+     "update_frequency": {
+       "type": "string",
+       "enum": ["real_time", "hourly", "daily", "weekly", "monthly", "quarterly", "annually", "irregular", "one_time"],
+       "description": "How often source data is updated"
+     },
+     "last_verified": {
+       "type": "string",
+       "format": "date-time",
+       "description": "When we last verified source accessibility"
+     },
+     "last_fetched": {
+       "type": ["string", "null"],
+       "format": "date-time",
+       "description": "When we last successfully fetched data"
+     },
+     "coverage": {
+       "type": "object",
+       "required": ["geographic", "temporal", "thematic"],
+       "properties": {
+         "geographic": {
+           "type": "array",
+           "items": { "type": "string" },
+           "description": "Geographic areas covered (ISO codes or 'global')"
+         },
+         "temporal": {
+           "type": "object",
+           "required": ["from"],
+           "properties": {
+             "from": { "type": "string", "format": "date-time" },
+             "to": { "type": ["string", "null"], "format": "date-time" }
+           }
+         },
+         "thematic": {
+           "type": "array",
+           "items": { "type": "string" },
+           "description": "Subject areas covered"
+         }
+       }
+     },
+     "methodology_document_url": {
+       "type": ["string", "null"],
+       "format": "uri",
+       "description": "Link to methodology documentation"
+     },
+     "known_limitations": {
+       "type": "array",
+       "items": { "type": "string" },
+       "description": "Documented limitations of this source"
+     },
+     "source_id": {
+       "type": ["string", "null"],
+       "format": "uuid",
+       "description": "Meta-source (null for primary sources)"
+     },
+     "created_at": {
+       "type": "string",
+       "format": "date-time"
+     },
+     "valid_from": {
+       "type": "string",
+       "format": "date-time"
+     },
+     "valid_to": {
+       "type": ["string", "null"],
+       "format": "date-time"
+     },
+     "schema_version": {
+       "type": "string",
+       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+     }
+   }
+ }

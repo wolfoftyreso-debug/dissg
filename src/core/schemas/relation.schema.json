@@ -1,0 +1,117 @@
+ {
+   "$schema": "http://json-schema.org/draft-07/schema#",
+   "$id": "https://dissg.io/schemas/v1/relation.json",
+   "title": "Relation",
+   "description": "A connection between entities. Base object type 3 of 6.",
+   "type": "object",
+   "required": [
+     "id",
+     "type",
+     "relation_type",
+     "from_entity_id",
+     "to_entity_id",
+     "created_at",
+     "valid_from",
+     "source_id",
+     "schema_version"
+   ],
+   "additionalProperties": false,
+   "properties": {
+     "id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Global, eternal, immutable identifier (UUIDv7)"
+     },
+     "type": {
+       "type": "string",
+       "const": "RELATION",
+       "description": "Base object type discriminator"
+     },
+     "relation_type": {
+       "type": "string",
+       "description": "Formally defined relation category",
+       "enum": [
+         "contains",
+         "part_of",
+         "parent_of",
+         "child_of",
+         "adjacent_to",
+         "correlates_with",
+         "precedes",
+         "follows",
+         "causes",
+         "caused_by",
+         "measures",
+         "measured_by",
+         "governs",
+         "governed_by",
+         "supersedes",
+         "superseded_by",
+         "references",
+         "referenced_by"
+       ]
+     },
+     "relation_definition_id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Reference to formal relation definition in ontology"
+     },
+     "from_entity_id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Source entity of the relation"
+     },
+     "to_entity_id": {
+       "type": "string",
+       "format": "uuid",
+       "description": "Target entity of the relation"
+     },
+     "bidirectional": {
+       "type": "boolean",
+       "default": false,
+       "description": "Whether relation can be traversed in both directions"
+     },
+     "inverse_relation_type": {
+       "type": ["string", "null"],
+       "description": "The relation type when traversed in reverse (e.g., contains -> part_of)"
+     },
+     "strength": {
+       "type": ["number", "null"],
+       "minimum": 0,
+       "maximum": 1,
+       "description": "Relation strength/weight (0-1, null if not applicable)"
+     },
+     "confidence": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 1,
+       "default": 1,
+       "description": "Confidence in the relation's existence"
+     },
+     "properties": {
+       "type": "object",
+       "description": "Additional relation metadata",
+       "additionalProperties": true
+     },
+     "created_at": {
+       "type": "string",
+       "format": "date-time"
+     },
+     "valid_from": {
+       "type": "string",
+       "format": "date-time"
+     },
+     "valid_to": {
+       "type": ["string", "null"],
+       "format": "date-time"
+     },
+     "source_id": {
+       "type": "string",
+       "format": "uuid"
+     },
+     "schema_version": {
+       "type": "string",
+       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+     }
+   }
+ }
