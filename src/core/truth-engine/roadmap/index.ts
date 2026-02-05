@@ -1,7 +1,7 @@
 /**
  * ROADMAP — PUBLIC API
  * 
- * 16-week build plan for Semantic Truth OS.
+ * 16-week build plan + Execution order for Semantic Truth OS.
  */
 
 export {
@@ -32,3 +32,36 @@ export {
   type TestCriteria,
   type TeamRole,
 } from './build-plan';
+
+export {
+  // Execution Order
+  EXECUTION_ORDER,
+  LOCKED_PRINCIPLES,
+  FINAL_RESULT,
+  
+  // Steps
+  STEP_0_PRINCIPLES,
+  STEP_1_SKELETON,
+  STEP_2_CONTRACTS,
+  STEP_3_SEE,
+  STEP_4_GRAPH,
+  STEP_5_MEMORY,
+  STEP_6_HEALTH,
+  STEP_7_HEALTHCARE,
+  STEP_8_ECONOMY,
+  STEP_9_SIGNALS,
+  STEP_10_DEMOGRAPHICS,
+  STEP_11_EXPLORER,
+  STEP_12_SDK,
+  STEP_13_LOCK,
+  
+  // Functions
+  getStepById,
+  getBlockingSteps,
+  getStepProgress,
+  validateExecutionOrder,
+  
+  // Types
+  type ExecutionStep,
+  type Task,
+} from './execution-order';
