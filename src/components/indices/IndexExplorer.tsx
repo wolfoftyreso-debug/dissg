@@ -10,52 +10,51 @@ import { cn } from '@/lib/utils';
 import { IndexWorldMap } from './IndexWorldMap';
 import { IndexPanel } from './IndexPanel';
 import { IndexDetailView } from './IndexDetailView';
-import { ChevronDown } from 'lucide-react';
 import type { IndexDefinition } from '@/lib/lambda';
 
 interface IndexExplorerProps {
   className?: string;
 }
 
-// Mock data - matching Avanza style with flags and professional naming
+// Mock data - text markers instead of emoji flags per no-icons-doctrine
 const NORDIC_INDICES = [
-  { code: 'SWE_RI', name: 'Sweden Reality Index', flag: '🇸🇪', change: 0.31, value: 72.45, time: '17:29' },
-  { code: 'NOR_RI', name: 'Norway Reality Index', flag: '🇳🇴', change: 0.28, value: 74.12, time: '17:29' },
-  { code: 'DEN_RI', name: 'Denmark Reality Index', flag: '🇩🇰', change: -0.15, value: 73.88, time: '17:33' },
-  { code: 'FIN_RI', name: 'Finland Reality Index', flag: '🇫🇮', change: 0.42, value: 71.56, time: '17:30' },
-  { code: 'ISL_RI', name: 'Iceland Reality Index', flag: '🇮🇸', change: -0.08, value: 75.23, time: '17:30' },
+  { code: 'SWE_RI', name: 'Sweden Reality Index', flag: 'SE', change: 0.31, value: 72.45, time: '17:29' },
+  { code: 'NOR_RI', name: 'Norway Reality Index', flag: 'NO', change: 0.28, value: 74.12, time: '17:29' },
+  { code: 'DEN_RI', name: 'Denmark Reality Index', flag: 'DK', change: -0.15, value: 73.88, time: '17:33' },
+  { code: 'FIN_RI', name: 'Finland Reality Index', flag: 'FI', change: 0.42, value: 71.56, time: '17:30' },
+  { code: 'ISL_RI', name: 'Iceland Reality Index', flag: 'IS', change: -0.08, value: 75.23, time: '17:30' },
 ];
 
 const WORLD_INDICES = [
-  { code: 'USA_RI', name: 'US Reality Index', flag: '🇺🇸', change: -0.67, value: 65.34, time: '22:04' },
-  { code: 'CHN_RI', name: 'China Reality Index', flag: '🇨🇳', change: -0.89, value: 58.92, time: '23:15' },
-  { code: 'JPN_RI', name: 'Japan Reality Index', flag: '🇯🇵', change: -0.34, value: 68.45, time: '22:04' },
-  { code: 'GBR_RI', name: 'UK Reality Index', flag: '🇬🇧', change: 0.21, value: 66.78, time: '18:00' },
-  { code: 'AUS_RI', name: 'Australia Reality Index', flag: '🇦🇺', change: 0.89, value: 70.12, time: '08:30' },
+  { code: 'USA_RI', name: 'US Reality Index', flag: 'US', change: -0.67, value: 65.34, time: '22:04' },
+  { code: 'CHN_RI', name: 'China Reality Index', flag: 'CN', change: -0.89, value: 58.92, time: '23:15' },
+  { code: 'JPN_RI', name: 'Japan Reality Index', flag: 'JP', change: -0.34, value: 68.45, time: '22:04' },
+  { code: 'GBR_RI', name: 'UK Reality Index', flag: 'GB', change: 0.21, value: 66.78, time: '18:00' },
+  { code: 'AUS_RI', name: 'Australia Reality Index', flag: 'AU', change: 0.89, value: 70.12, time: '08:30' },
 ];
 
 const EUROPEAN_INDICES = [
-  { code: 'DEU_RI', name: 'Germany Reality Index', flag: '🇩🇪', change: -0.52, value: 69.23, time: '18:00' },
-  { code: 'FRA_RI', name: 'France Reality Index', flag: '🇫🇷', change: 0.18, value: 67.45, time: '17:35' },
-  { code: 'NLD_RI', name: 'Netherlands Reality Index', flag: '🇳🇱', change: 0.34, value: 72.56, time: '18:15' },
-  { code: 'CHE_RI', name: 'Switzerland Reality Index', flag: '🇨🇭', change: 0.56, value: 76.89, time: '17:45' },
-  { code: 'ESP_RI', name: 'Spain Reality Index', flag: '🇪🇸', change: -0.23, value: 64.12, time: '18:00' },
+  { code: 'DEU_RI', name: 'Germany Reality Index', flag: 'DE', change: -0.52, value: 69.23, time: '18:00' },
+  { code: 'FRA_RI', name: 'France Reality Index', flag: 'FR', change: 0.18, value: 67.45, time: '17:35' },
+  { code: 'NLD_RI', name: 'Netherlands Reality Index', flag: 'NL', change: 0.34, value: 72.56, time: '18:15' },
+  { code: 'CHE_RI', name: 'Switzerland Reality Index', flag: 'CH', change: 0.56, value: 76.89, time: '17:45' },
+  { code: 'ESP_RI', name: 'Spain Reality Index', flag: 'ES', change: -0.23, value: 64.12, time: '18:00' },
 ];
 
 const DOMAIN_INDICES = [
-  { code: 'HEALTH_IDX', name: 'Hälsoindex', flag: '🏥', change: -0.45, value: 68.34, time: '00:30' },
-  { code: 'ECON_IDX', name: 'Ekonomiindex', flag: '📈', change: 0.82, value: 71.23, time: '00:30' },
-  { code: 'EDU_IDX', name: 'Utbildningsindex', flag: '🎓', change: 0.12, value: 74.56, time: '00:30' },
-  { code: 'ENV_IDX', name: 'Miljöindex', flag: '🌿', change: -0.67, value: 62.89, time: '00:30' },
-  { code: 'SOC_IDX', name: 'Socialindex', flag: '👥', change: 0.28, value: 69.45, time: '00:30' },
+  { code: 'HEALTH_IDX', name: 'Hälsoindex', flag: '[H]', change: -0.45, value: 68.34, time: '00:30' },
+  { code: 'ECON_IDX', name: 'Ekonomiindex', flag: '[E]', change: 0.82, value: 71.23, time: '00:30' },
+  { code: 'EDU_IDX', name: 'Utbildningsindex', flag: '[U]', change: 0.12, value: 74.56, time: '00:30' },
+  { code: 'ENV_IDX', name: 'Miljöindex', flag: '[M]', change: -0.67, value: 62.89, time: '00:30' },
+  { code: 'SOC_IDX', name: 'Socialindex', flag: '[S]', change: 0.28, value: 69.45, time: '00:30' },
 ];
 
 const SECTOR_INDICES = [
-  { code: 'HOUSING_IDX', name: 'Bostadsindex', flag: '🏠', change: -1.23, value: 54.67, time: '00:26' },
-  { code: 'LABOR_IDX', name: 'Arbetsmarknadsindex', flag: '💼', change: 0.45, value: 67.89, time: '00:26' },
-  { code: 'CRIME_IDX', name: 'Trygghetsindex', flag: '🛡️', change: -0.89, value: 58.34, time: '00:26' },
-  { code: 'TRUST_IDX', name: 'Tillitsindex', flag: '🤝', change: -0.34, value: 71.23, time: '00:26' },
-  { code: 'DEMO_IDX', name: 'Demografiindex', flag: '👶', change: -0.56, value: 63.45, time: '00:26' },
+  { code: 'HOUSING_IDX', name: 'Bostadsindex', flag: '[B]', change: -1.23, value: 54.67, time: '00:26' },
+  { code: 'LABOR_IDX', name: 'Arbetsmarknadsindex', flag: '[A]', change: 0.45, value: 67.89, time: '00:26' },
+  { code: 'CRIME_IDX', name: 'Trygghetsindex', flag: '[T]', change: -0.89, value: 58.34, time: '00:26' },
+  { code: 'TRUST_IDX', name: 'Tillitsindex', flag: '[F]', change: -0.34, value: 71.23, time: '00:26' },
+  { code: 'DEMO_IDX', name: 'Demografiindex', flag: '[D]', change: -0.56, value: 63.45, time: '00:26' },
 ];
 
 type TabType = 'today' | 'watchlist' | 'notes' | 'alerts';
@@ -119,7 +118,7 @@ export function IndexExplorer({ className }: IndexExplorerProps) {
             <div className="flex items-center gap-2 pb-2">
               <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5 font-normal">
                 Index idag
-                <ChevronDown className="h-3 w-3" />
+                <span className="font-mono text-[10px]">[v]</span>
               </Button>
               <Button variant="outline" size="sm" className="h-8 text-xs font-normal">
                 + Lägg till

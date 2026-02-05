@@ -13,7 +13,6 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Globe, Map, Building2, BarChart3, Home, FileText, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbLevel } from '@/config/extremeClaritySystem';
 
@@ -30,13 +29,14 @@ interface SystemBreadcrumbsProps {
   className?: string;
 }
 
-const LEVEL_ICONS: Record<BreadcrumbLevel, React.ReactNode> = {
-  world: <Globe className="h-3 w-3" />,
-  region: <Map className="h-3 w-3" />,
-  country: <Building2 className="h-3 w-3" />,
-  indicator: <BarChart3 className="h-3 w-3" />,
-  method: <FileText className="h-3 w-3" />,
-  data: <Database className="h-3 w-3" />,
+// Text markers instead of icons - per no-icons-doctrine
+const LEVEL_MARKERS: Record<BreadcrumbLevel, string> = {
+  world: '[W]',
+  region: '[R]',
+  country: '[C]',
+  indicator: '[I]',
+  method: '[M]',
+  data: '[D]',
 };
 
 const LEVEL_LABELS: Record<BreadcrumbLevel, string> = {
@@ -62,26 +62,26 @@ export const SystemBreadcrumbs: React.FC<SystemBreadcrumbsProps> = ({
       {/* Home link */}
       <Link 
         to="/" 
-        className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+        className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors font-mono text-xs"
         aria-label="Hem"
       >
-        <Home className="h-3 w-3" />
+        [H]
       </Link>
 
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
-        const icon = item.icon || LEVEL_ICONS[item.level];
+        const marker = LEVEL_MARKERS[item.level] || '[?]';
 
         return (
           <React.Fragment key={index}>
-            <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
+            <span className="font-mono text-xs text-muted-foreground/50">/</span>
             
             {isLast ? (
               <span 
                 className="flex items-center gap-1 font-medium text-foreground"
                 aria-current="page"
               >
-                {icon}
+                <span className="font-mono text-xs text-muted-foreground">{marker}</span>
                 <span>{item.labelSv}</span>
               </span>
             ) : (
@@ -89,7 +89,7 @@ export const SystemBreadcrumbs: React.FC<SystemBreadcrumbsProps> = ({
                 to={item.href || '#'}
                 className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
               >
-                {icon}
+                <span className="font-mono text-xs">{marker}</span>
                 <span>{item.labelSv}</span>
               </Link>
             )}
@@ -136,26 +136,26 @@ export const SystemHierarchyPath: React.FC<{
   className?: string;
 }> = ({ world = 'Global', region, country, indicator, method, data, className }) => {
   const parts = [
-    { key: 'world' as BreadcrumbLevel, value: world, icon: LEVEL_ICONS.world },
-    { key: 'region' as BreadcrumbLevel, value: region, icon: LEVEL_ICONS.region },
-    { key: 'country' as BreadcrumbLevel, value: country, icon: LEVEL_ICONS.country },
-    { key: 'indicator' as BreadcrumbLevel, value: indicator, icon: LEVEL_ICONS.indicator },
-    { key: 'method' as BreadcrumbLevel, value: method, icon: LEVEL_ICONS.method },
-    { key: 'data' as BreadcrumbLevel, value: data, icon: LEVEL_ICONS.data },
+    { key: 'world' as BreadcrumbLevel, value: world, marker: LEVEL_MARKERS.world },
+    { key: 'region' as BreadcrumbLevel, value: region, marker: LEVEL_MARKERS.region },
+    { key: 'country' as BreadcrumbLevel, value: country, marker: LEVEL_MARKERS.country },
+    { key: 'indicator' as BreadcrumbLevel, value: indicator, marker: LEVEL_MARKERS.indicator },
+    { key: 'method' as BreadcrumbLevel, value: method, marker: LEVEL_MARKERS.method },
+    { key: 'data' as BreadcrumbLevel, value: data, marker: LEVEL_MARKERS.data },
   ].filter(p => p.value);
 
   return (
     <div className={cn("flex items-center flex-wrap gap-1", className)}>
       {parts.map((part, index) => (
         <React.Fragment key={part.key}>
-          {index > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground/30" />}
+          {index > 0 && <span className="font-mono text-xs text-muted-foreground/30">/</span>}
           <span className={cn(
             "flex items-center gap-1 text-xs px-2 py-0.5 rounded-sm",
             index === parts.length - 1 
               ? "bg-primary/10 text-primary font-medium" 
               : "bg-muted text-muted-foreground"
           )}>
-            {part.icon}
+            <span className="font-mono text-[10px]">{part.marker}</span>
             <span>{part.value}</span>
           </span>
         </React.Fragment>

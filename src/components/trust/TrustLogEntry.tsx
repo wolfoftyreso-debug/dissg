@@ -3,6 +3,7 @@
  * 
  * Displays a single trust log entry with full transparency.
  * Part of Block 55.
+ * NO ICONS - text markers only per no-icons-doctrine.
  */
 
 import React from 'react';
@@ -13,10 +14,6 @@ import {
   REVIEW_STATUSES,
   GOVERNANCE_ROLES,
 } from '@/config/trustLogConfig';
-import { 
-  Database, Settings, FileText, Layout, Bug, Trash2,
-  CheckCircle, Clock, AlertTriangle, CheckSquare
-} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface TrustLogEntryProps {
@@ -25,20 +22,21 @@ interface TrustLogEntryProps {
   className?: string;
 }
 
-const CHANGE_TYPE_ICONS = {
-  data_update: Database,
-  method_update: Settings,
-  text_simplification: FileText,
-  structure_change: Layout,
-  bug_fix: Bug,
-  deprecation: Trash2,
+// Text markers instead of icons
+const CHANGE_TYPE_MARKERS: Record<string, string> = {
+  data_update: '[D]',
+  method_update: '[M]',
+  text_simplification: '[T]',
+  structure_change: '[S]',
+  bug_fix: '[B]',
+  deprecation: '[X]',
 };
 
-const REVIEW_STATUS_ICONS = {
-  pending: Clock,
-  verified: CheckCircle,
-  disputed: AlertTriangle,
-  resolved: CheckSquare,
+const REVIEW_STATUS_MARKERS: Record<string, string> = {
+  pending: '[...]',
+  verified: '[OK]',
+  disputed: '[!]',
+  resolved: '[V]',
 };
 
 export function TrustLogEntry({
@@ -48,8 +46,8 @@ export function TrustLogEntry({
 }: TrustLogEntryProps) {
   const changeTypeInfo = CHANGE_TYPES[entry.change_type];
   const reviewStatusInfo = REVIEW_STATUSES[entry.review_status];
-  const ChangeIcon = CHANGE_TYPE_ICONS[entry.change_type];
-  const StatusIcon = REVIEW_STATUS_ICONS[entry.review_status];
+  const changeMarker = CHANGE_TYPE_MARKERS[entry.change_type] || '[?]';
+  const statusMarker = REVIEW_STATUS_MARKERS[entry.review_status] || '[?]';
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('sv-SE', {
@@ -69,7 +67,7 @@ export function TrustLogEntry({
       {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
-          <ChangeIcon className="h-4 w-4 text-muted-foreground" />
+          <span className="font-mono text-xs text-muted-foreground">{changeMarker}</span>
           <span className="font-mono text-xs text-muted-foreground">
             {entry.log_id}
           </span>
@@ -77,13 +75,12 @@ export function TrustLogEntry({
         <Badge 
           variant="outline"
           className={cn(
-            'text-xs',
+            'text-xs font-mono',
             reviewStatusInfo.color,
             reviewStatusInfo.bgColor
           )}
         >
-          <StatusIcon className="h-3 w-3 mr-1" />
-          {reviewStatusInfo.label}
+          {statusMarker} {reviewStatusInfo.label}
         </Badge>
       </div>
 
@@ -110,20 +107,20 @@ export function TrustLogEntry({
           {/* Impact indicators */}
           <div className="flex gap-4 text-xs mb-3">
             <span className={cn(
-              'px-2 py-0.5 rounded',
+              'px-2 py-0.5 rounded font-mono',
               entry.data_changed 
                 ? 'bg-status-warning/10 text-status-warning' 
                 : 'bg-muted text-muted-foreground'
             )}>
-              Data: {entry.data_changed ? 'Ändrad' : 'Oförändrad'}
+              Data: {entry.data_changed ? '[Y]' : '[N]'}
             </span>
             <span className={cn(
-              'px-2 py-0.5 rounded',
+              'px-2 py-0.5 rounded font-mono',
               entry.method_changed 
                 ? 'bg-status-warning/10 text-status-warning' 
                 : 'bg-muted text-muted-foreground'
             )}>
-              Metod: {entry.method_changed ? 'Ändrad' : 'Oförändrad'}
+              Metod: {entry.method_changed ? '[Y]' : '[N]'}
             </span>
           </div>
 

@@ -61,10 +61,10 @@ export interface MapIndicator {
 }
 
 export const INDICATOR_CATEGORIES: { id: IndicatorCategory; label: string; labelSv: string; icon: string }[] = [
-  { id: 'economy', label: 'Economy', labelSv: 'Ekonomi', icon: '💰' },
-  { id: 'religion', label: 'Religion', labelSv: 'Religion', icon: '🕊️' },
-  { id: 'lgbtq', label: 'LGBTQ+ Rights & Openness', labelSv: 'HBTQ+ Rättigheter & Öppenhet', icon: '🏳️‍🌈' },
-  { id: 'culture', label: 'Cultural Structures', labelSv: 'Kulturella strukturer', icon: '🏛️' }
+  { id: 'economy', label: 'Economy', labelSv: 'Ekonomi', icon: '[E]' },
+  { id: 'religion', label: 'Religion', labelSv: 'Religion', icon: '[R]' },
+  { id: 'lgbtq', label: 'LGBTQ+ Rights & Openness', labelSv: 'HBTQ+ Rättigheter & Öppenhet', icon: '[Q]' },
+  { id: 'culture', label: 'Cultural Structures', labelSv: 'Kulturella strukturer', icon: '[K]' }
 ];
 
 export const MAP_INDICATORS: MapIndicator[] = [

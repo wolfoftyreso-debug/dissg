@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { X } from 'lucide-react';
+
 import {
   LineChart,
   Line,
@@ -207,8 +207,8 @@ export function DiagnosticPanel({ countryCode, onClose, onSelectGEDI, isPro }: D
             Pop: {geo.population?.toLocaleString()} • Konfidens: {lambda.confidence}%
           </div>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="h-4 w-4" />
+        <Button variant="ghost" size="sm" onClick={onClose} className="font-mono text-xs">
+          [x]
         </Button>
       </div>
 
