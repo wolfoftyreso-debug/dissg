@@ -11,7 +11,7 @@
   */
  export const PACKET_LONELINESS: YouthAnswerPacket = {
    id: 'answer:youth:loneliness:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'social',
@@ -77,7 +77,7 @@
   */
  export const PACKET_NOT_FITTING_IN_DETAILED: YouthAnswerPacket = {
    id: 'answer:youth:not_fitting_in:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'social',
@@ -142,7 +142,7 @@
   */
  export const PACKET_IDENTITY_UNCERTAINTY: YouthAnswerPacket = {
    id: 'answer:youth:identity_uncertainty:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'identity',
@@ -203,7 +203,7 @@
   */
  export const PACKET_COMPARISON_SOCIAL_MEDIA: YouthAnswerPacket = {
    id: 'answer:youth:comparison_social_media:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'social',

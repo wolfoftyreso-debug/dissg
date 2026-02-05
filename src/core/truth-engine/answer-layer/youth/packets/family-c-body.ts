@@ -11,7 +11,7 @@
   */
  export const PACKET_BODY_IMAGE: YouthAnswerPacket = {
    id: 'answer:youth:body_image:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'body',
@@ -76,7 +76,7 @@
   */
  export const PACKET_PUBERTY_CHANGES: YouthAnswerPacket = {
    id: 'answer:youth:puberty_changes:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'body',
@@ -140,7 +140,7 @@
   */
  export const PACKET_FATIGUE_COMMON: YouthAnswerPacket = {
    id: 'answer:youth:fatigue_common:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'body',
@@ -206,7 +206,7 @@
   */
  export const PACKET_PHYSICAL_SYMPTOMS_STRESS: YouthAnswerPacket = {
    id: 'answer:youth:physical_symptoms_stress:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'body',

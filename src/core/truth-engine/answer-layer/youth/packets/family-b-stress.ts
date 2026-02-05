@@ -11,7 +11,7 @@
   */
  export const PACKET_SCHOOL_STRESS_DETAILED: YouthAnswerPacket = {
    id: 'answer:youth:school_stress:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'psyche',
@@ -76,7 +76,7 @@
   */
  export const PACKET_SLEEP_PROBLEMS: YouthAnswerPacket = {
    id: 'answer:youth:sleep_problems:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'body',
@@ -142,7 +142,7 @@
   */
  export const PACKET_MOTIVATION_LOSS: YouthAnswerPacket = {
    id: 'answer:youth:motivation_loss:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'psyche',
@@ -208,7 +208,7 @@
   */
  export const PACKET_OVERWHELM_DETAILED: YouthAnswerPacket = {
    id: 'answer:youth:overwhelm:v1',
-   version: 1,
+  version: '1',
    status: 'stable',
    intent: {
      domain: 'psyche',

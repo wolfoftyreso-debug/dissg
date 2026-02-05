@@ -95,6 +95,21 @@
      title_sv: 'Var du kan läsa mer',
      template: () => `If you want to learn more or talk to someone, there are resources available.`,
    },
+  normalize: {
+    title_en: 'This Is Normal',
+    title_sv: 'Det här är normalt',
+    template: () => `What you're experiencing is common and normal for your age.`,
+  },
+  limits: {
+    title_en: 'Understanding Limits',
+    title_sv: 'Förstå gränser',
+    template: () => `While this experience is normal, there are limits to what we can address here.`,
+  },
+  crisis_resources: {
+    title_en: 'Crisis Resources',
+    title_sv: 'Krisresurser',
+    template: () => `If you need immediate help, please reach out to these resources.`,
+  },
  };
  
  interface AnswerContext {
@@ -210,7 +225,8 @@
    // Always include help guidance for moderate/high risk
    if (matchedQuestion.requires_help_guidance || 
        matchedQuestion.risk_level === 'high' || 
-       matchedQuestion.risk_level === 'moderate') {
+      matchedQuestion.risk_level === 'moderate' ||
+      matchedQuestion.risk_level === 'medium') {
      sections.push({
        id: YOUTH_ANSWER_SECTIONS.WHEN_TO_SEEK_HELP,
        title: SECTION_TEMPLATES.when_to_seek_help[language === 'sv' ? 'title_sv' : 'title_en'],
