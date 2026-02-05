@@ -345,13 +345,13 @@ export const OSCILLOSCOPE_UI_CONFIG = {
  */
 export const OSCILLOSCOPE_PRINCIPLES = {
   sv: [
-    'Mäter verkliga signaler',
-    'Visar dem utan tolkning',
-    'Gör det omöjligt att ljuga',
+    'Råsignalvisning',
+    'Utan aggregering eller tolkning',
+    'Fullständig spårbarhet',
   ],
   en: [
-    'Measures real signals',
-    'Displays without interpretation',
-    'Makes lying impossible',
+    'Raw signal display',
+    'Without aggregation or interpretation',
+    'Full traceability',
   ],
 };
