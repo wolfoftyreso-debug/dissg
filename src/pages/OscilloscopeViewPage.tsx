@@ -1,18 +1,18 @@
 /**
- * OSCILLOSCOPE VIEW PAGE - Pedagogisk version
+ * OSCILLOSCOPE VIEW PAGE - Signalöversikt
  * 
-  * En "pulstagare" för civilisationen - som en hjärtmonitor fast för hela världen.
-  * GLOBAL FIRST: Startar alltid på global nivå, drill-down till kontinenter/länder.
- * Designad så en 15-åring kan förstå och använda den.
+ * En professionell "pulstagare" för civilisationen.
+ * GLOBAL FIRST: Startar på global nivå med drill-down.
+ * 
+ * Design: Klinisk, tydlig, myndighetsdesign.
  */
 
-import React, { useState, useEffect } from 'react';
- import { useGeo } from '@/contexts/GeoContext';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useGeo } from '@/contexts/GeoContext';
 import { OscilloscopeView } from '@/components/lambda';
+import { OscilloscopeControlPanel, type GeoSelection } from '@/components/oscilloscope';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import {
   type OscilloscopeConfig,
@@ -23,7 +23,10 @@ import {
   type OscilloscopeChannel,
 } from '@/lib/lambda/oscilloscope-mode';
 
-// Generate synthetic signal data for demo
+// ============================================
+// SIGNAL DATA GENERATION
+// ============================================
+
 function generateSignalData(points: number, baseValue: number, volatility: number): number[] {
   const values: number[] = [];
   let current = baseValue;
@@ -45,212 +48,44 @@ function generateNoiseFloor(points: number): number[] {
   return Array(points).fill(0).map(() => 0.02 + Math.random() * 0.05);
 }
 
-// Helper to create channel
-function createChannel(id: string, label: string, color: string): OscilloscopeChannel {
-  return {
-    id,
-    label,
-    color,
-    visible: true,
-    signal_type: 'amplitude',
-    source_kpi_code: id.toUpperCase(),
-    scale: 'auto',
-  };
-}
+// ============================================
+// INDICATOR DEFINITIONS
+// ============================================
 
-// Signal presets med enkla förklaringar
-const SIGNAL_PRESETS: Array<{ 
-  id: string; 
-  name: string; 
-  simpleExplanation: string;
-  channels: OscilloscopeChannel[];
-}> = [
-  {
-    id: 'economic',
-    name: 'Pengasignaler',
-     simpleExplanation: 'Visar hur det går för världsekonomin - produktion, handel, sysselsättning.',
-    channels: [
-       createChannel('gdp', 'Global BNP-tillväxt', 'hsl(142, 76%, 45%)'),
-       createChannel('employment', 'Global sysselsättning', 'hsl(217, 91%, 60%)'),
-       createChannel('inflation', 'Global inflation', 'hsl(24, 95%, 53%)'),
-    ],
-  },
-  {
-    id: 'demographic',
-    name: 'Befolkningssignaler',
-     simpleExplanation: 'Visar hur världens befolkning förändras - födelsetal, medelålder, migration.',
-    channels: [
-       createChannel('population', 'Världsbefolkning', 'hsl(263, 70%, 50%)'),
-       createChannel('birth_rate', 'Globalt födelsetal', 'hsl(330, 81%, 60%)'),
-       createChannel('median_age', 'Medianålder', 'hsl(172, 66%, 50%)'),
-    ],
-  },
-  {
-    id: 'health',
-    name: 'Hälsosignaler',
-     simpleExplanation: 'Visar hur frisk mänskligheten är - livslängd, barnadödlighet, sjukdomar.',
-    channels: [
-       createChannel('life_exp', 'Global medellivslängd', 'hsl(142, 76%, 45%)'),
-       createChannel('infant_mortality', 'Barnadödlighet', 'hsl(0, 84%, 60%)'),
-       createChannel('disease_burden', 'Sjukdomsbörda', 'hsl(270, 70%, 60%)'),
-    ],
-  },
-  {
-    id: 'education',
-     name: 'Utbildningssignaler',
-     simpleExplanation: 'Visar global utbildningsnivå - läskunnighet, skolår, jämställdhet.',
-    channels: [
-       createChannel('literacy', 'Global läskunnighet', 'hsl(217, 91%, 60%)'),
-       createChannel('mean_schooling', 'Genomsnittliga skolår', 'hsl(142, 76%, 45%)'),
-       createChannel('gender_parity', 'Jämställdhet i utbildning', 'hsl(330, 81%, 60%)'),
-    ],
-  },
-];
+const ALL_INDICATORS: Record<string, { name: string; color: string }> = {
+  gdp_growth: { name: 'BNP-tillväxt', color: 'hsl(142, 76%, 45%)' },
+  employment: { name: 'Sysselsättning', color: 'hsl(217, 91%, 60%)' },
+  inflation: { name: 'Inflation', color: 'hsl(24, 95%, 53%)' },
+  trade_balance: { name: 'Handelsbalans', color: 'hsl(263, 70%, 50%)' },
+  debt_gdp: { name: 'Statsskuld/BNP', color: 'hsl(330, 81%, 60%)' },
+  population: { name: 'Befolkning', color: 'hsl(263, 70%, 50%)' },
+  birth_rate: { name: 'Födelsetal', color: 'hsl(330, 81%, 60%)' },
+  median_age: { name: 'Medianålder', color: 'hsl(172, 66%, 50%)' },
+  dependency_ratio: { name: 'Försörjningskvot', color: 'hsl(45, 93%, 47%)' },
+  migration_net: { name: 'Nettomigration', color: 'hsl(199, 89%, 48%)' },
+  life_exp: { name: 'Medellivslängd', color: 'hsl(142, 76%, 45%)' },
+  infant_mortality: { name: 'Barnadödlighet', color: 'hsl(0, 84%, 60%)' },
+  disease_burden: { name: 'Sjukdomsbörda', color: 'hsl(270, 70%, 60%)' },
+  healthcare_spending: { name: 'Vårdkostnader', color: 'hsl(199, 89%, 48%)' },
+  literacy: { name: 'Läskunnighet', color: 'hsl(217, 91%, 60%)' },
+  mean_schooling: { name: 'Skolår (genomsnitt)', color: 'hsl(142, 76%, 45%)' },
+  tertiary_enrollment: { name: 'Högskoledeltagande', color: 'hsl(330, 81%, 60%)' },
+  co2_emissions: { name: 'CO2-utsläpp', color: 'hsl(45, 93%, 47%)' },
+  renewable_energy: { name: 'Förnybar energi', color: 'hsl(142, 76%, 45%)' },
+  air_quality: { name: 'Luftkvalitet', color: 'hsl(199, 89%, 48%)' },
+};
 
-// Pedagogisk onboarding-komponent
-const WelcomeCard: React.FC<{ onDismiss: () => void }> = ({ onDismiss }) => (
-  <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/30 mb-6">
-    <CardContent className="p-6">
-      <div className="flex items-start gap-4">
-        <span className="text-4xl">💓</span>
-        <div className="flex-1">
-          <h2 className="text-xl font-bold mb-2">Vad är detta?</h2>
-          <p className="text-muted-foreground mb-4">
-             Tänk dig en <strong className="text-foreground">hjärtmonitor på sjukhus</strong> - den visar 
-             hjärtats slag som en våglinje. Den här sidan gör samma sak, fast för <strong className="text-foreground">hela mänskligheten</strong>!
-          </p>
-          <div className="grid sm:grid-cols-3 gap-4 mb-4">
-            <div className="p-3 rounded-lg bg-background/80">
-              <p className="font-medium mb-1">[↑] Linjen går uppåt</p>
-              <p className="text-sm text-muted-foreground">= Det ökar (fler jobb, mer pengar, osv.)</p>
-            </div>
-            <div className="p-3 rounded-lg bg-background/80">
-              <p className="font-medium mb-1">[↓] Linjen går nedåt</p>
-              <p className="text-sm text-muted-foreground">= Det minskar</p>
-            </div>
-            <div className="p-3 rounded-lg bg-background/80">
-              <p className="font-medium mb-1">[~] Linjen hoppar mycket</p>
-              <p className="text-sm text-muted-foreground">= Ostadig situation</p>
-            </div>
-          </div>
-          <Button onClick={onDismiss} className="w-full sm:w-auto">
-            Jag fattar – visa mig signalerna
-          </Button>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
+// ============================================
+// SIGNAL STATUS CARD
+// ============================================
 
-// Hjälp-dialog med visuella förklaringar
-const HelpDialog: React.FC = () => (
-  <Dialog>
-    <DialogTrigger asChild>
-      <Button variant="outline" size="sm" className="gap-2">
-        [?] Hur läser jag detta?
-      </Button>
-    </DialogTrigger>
-    <DialogContent className="max-w-lg">
-      <DialogHeader>
-        <DialogTitle>Så här läser du signalerna</DialogTitle>
-      </DialogHeader>
-      <div className="space-y-6">
-        <div className="space-y-3">
-          <h3 className="font-semibold">De olika linjerna</h3>
-          <p className="text-sm text-muted-foreground">
-            Varje färgad linje representerar en mätning. Klicka på en linjes namn 
-            längst ner för att dölja/visa den.
-          </p>
-        </div>
-        
-        <div className="space-y-3">
-          <h3 className="font-semibold">Vad betyder rörelserna?</h3>
-          <div className="grid gap-2 text-sm">
-            <div className="flex items-center gap-3 p-2 rounded bg-muted/50">
-              <span className="text-lg">📈</span>
-              <div>
-                <p className="font-medium">Uppåt = ökning</p>
-                <p className="text-muted-foreground">Värdet växer (t.ex. fler jobb)</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-2 rounded bg-muted/50">
-              <span className="text-lg">📉</span>
-              <div>
-                <p className="font-medium">Nedåt = minskning</p>
-                <p className="text-muted-foreground">Värdet krymper</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-2 rounded bg-muted/50">
-              <span className="text-lg">📊</span>
-              <div>
-                <p className="font-medium">Hoppig linje = osäkerhet</p>
-                <p className="text-muted-foreground">Mycket förändring, svårare att förutsäga</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-2 rounded bg-muted/50">
-              <span className="text-lg">➡️</span>
-              <div>
-                <p className="font-medium">Rak linje = stabilt</p>
-                <p className="text-muted-foreground">Inte mycket förändring</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="space-y-3">
-          <h3 className="font-semibold">Det suddiga området</h3>
-          <p className="text-sm text-muted-foreground">
-            Den genomskinliga ytan runt varje linje visar <strong>osäkerheten</strong> i mätningen. 
-            Bredare = mer osäker data. Smalare = pålitligare data.
-          </p>
-        </div>
-        
-        <div className="p-3 rounded-lg border bg-amber-500/10 border-amber-500/30">
-          <p className="text-sm">
-            <strong className="text-amber-700">Kom ihåg:</strong> Bara för att två linjer rör sig 
-            samtidigt betyder det inte att den ena <em>orsakar</em> den andra. Det kan vara slump!
-          </p>
-        </div>
-      </div>
-    </DialogContent>
-  </Dialog>
-);
-
-// Preset-kort med tydlig förklaring
-const PresetCard: React.FC<{
-  preset: typeof SIGNAL_PRESETS[0];
-  isActive: boolean;
-  onClick: () => void;
-}> = ({ preset, isActive, onClick }) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      'p-4 rounded-lg border text-left transition-all w-full',
-      isActive 
-        ? 'border-primary bg-primary/5 ring-2 ring-primary/20' 
-        : 'border-border hover:border-primary/50 hover:bg-muted/50'
-    )}
-  >
-    <p className="font-semibold mb-1">{preset.name}</p>
-    <p className="text-sm text-muted-foreground">{preset.simpleExplanation}</p>
-    <div className="flex gap-2 mt-3">
-      {preset.channels.map(ch => (
-        <div 
-          key={ch.id} 
-          className="w-3 h-3 rounded-full" 
-          style={{ backgroundColor: ch.color }}
-          title={ch.label}
-        />
-      ))}
-    </div>
-  </button>
-);
-
-// Enkel signalstatus
-const SignalStatusCard: React.FC<{
+interface SignalStatusCardProps {
   channel: OscilloscopeChannel;
   trace: SignalTrace | undefined;
-}> = ({ channel, trace }) => {
+  geoName: string;
+}
+
+const SignalStatusCard: React.FC<SignalStatusCardProps> = ({ channel, trace, geoName }) => {
   if (!trace) return null;
   
   const current = trace.values[trace.values.length - 1] || 0;
@@ -260,67 +95,71 @@ const SignalStatusCard: React.FC<{
   const isDown = change < -0.5;
   
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+    <article className="flex items-center gap-3 p-4 bg-muted/30 border border-border">
       <div 
         className="w-4 h-4 rounded-full shrink-0"
         style={{ backgroundColor: channel.color }}
+        aria-hidden="true"
       />
       <div className="flex-1 min-w-0">
         <p className="font-medium text-sm truncate">{channel.label}</p>
+        <p className="text-xs text-muted-foreground font-mono">{geoName}</p>
       </div>
       <div className="text-right">
-        <p className="font-mono font-bold text-lg">{current.toFixed(0)}</p>
+        <p className="font-mono font-bold text-xl tabular-nums">{current.toFixed(0)}</p>
         <p className={cn(
           'text-xs font-mono',
-          isUp && 'text-emerald-600',
-          isDown && 'text-red-600',
+          isUp && 'text-status-stable',
+          isDown && 'text-status-critical',
           !isUp && !isDown && 'text-muted-foreground'
         )}>
-          {isUp ? '[↑]' : isDown ? '[↓]' : '[→]'} {isUp && '+'}{change.toFixed(1)}
+          {isUp ? '[+]' : isDown ? '[-]' : '[=]'} {isUp && '+'}{change.toFixed(1)}
         </p>
       </div>
-    </div>
+    </article>
   );
 };
 
+// ============================================
+// MAIN PAGE COMPONENT
+// ============================================
+
 export default function OscilloscopeViewPage() {
-   const { scope } = useGeo();
-  const [showWelcome, setShowWelcome] = useState(true);
-  const [activePreset, setActivePreset] = useState(SIGNAL_PRESETS[0]);
-  const [timeBase, setTimeBase] = useState<TimeBase>('1y');
+  useGeo(); // Access context for future geo integration
+  
+  // Control panel state
+  const [geoSelections, setGeoSelections] = useState<GeoSelection[]>([
+    { level: 'global', code: 'GLOBAL', name: 'Global' }
+  ]);
+  const [selectedIndicators, setSelectedIndicators] = useState<string[]>([
+    'gdp_growth', 'employment', 'inflation'
+  ]);
+  const [timeSpan, setTimeSpan] = useState<string>('1y');
+  
+  // Oscilloscope state
   const [traces, setTraces] = useState<SignalTrace[]>([]);
   const [isLive, setIsLive] = useState(false);
   
-   // Dynamic title based on geographic scope
-   const getScopeTitle = () => {
-     switch (scope.level) {
-       case 'global':
-         return 'Global Pulstagare';
-       case 'region':
-         return `${scope.name} Pulstagare`;
-       case 'country':
-         return `${scope.name_local || scope.name} Pulstagare`;
-       default:
-         return 'Civilisationens Pulstagare';
-     }
-   };
-   
-   const getScopeDescription = () => {
-     switch (scope.level) {
-       case 'global':
-         return 'Se hur det går för mänskligheten i realtid. Klicka på en världsdel för att fördjupa.';
-       case 'region':
-         return `Se hur det går för ${scope.name} i realtid. Klicka på ett land för att fördjupa.`;
-       case 'country':
-         return `Se hur det går för ${scope.name_local || scope.name} i realtid.`;
-       default:
-         return 'Se hur det går i realtid.';
-     }
-   };
-   
+  // Build channels from selected indicators
+  const channels: OscilloscopeChannel[] = useMemo(() => {
+    return selectedIndicators.map(code => {
+      const ind = ALL_INDICATORS[code];
+      if (!ind) return null;
+      return {
+        id: code,
+        label: ind.name,
+        color: ind.color,
+        visible: true,
+        signal_type: 'amplitude' as const,
+        source_kpi_code: code.toUpperCase(),
+        scale: 'auto' as const,
+      };
+    }).filter(Boolean) as OscilloscopeChannel[];
+  }, [selectedIndicators]);
+  
   const config: OscilloscopeConfig = {
-    channels: activePreset.channels,
-    time_base: timeBase,
+    channels,
+    time_base: timeSpan as TimeBase,
     view_mode: 'realtime',
     show_grid: true,
     show_noise_floor: true,
@@ -331,24 +170,26 @@ export default function OscilloscopeViewPage() {
   
   const systemStatus: SystemStatus = {
     overall_health: 'stable',
-    active_channels: activePreset.channels.filter(c => c.visible).length,
+    active_channels: channels.filter(c => c.visible).length,
     noise_level: 'low',
     clarity_score: 87,
     data_freshness_hours: 2,
   };
   
-  // Generate initial traces
+  // Generate traces when indicators change
   useEffect(() => {
     const points = 100;
-    const newTraces: SignalTrace[] = activePreset.channels.map((channel, idx) => ({
+    const newTraces: SignalTrace[] = channels.map((channel, idx) => ({
       channel_id: channel.id,
       values: generateSignalData(points, 50 + idx * 10, 15),
       noise_floor: generateNoiseFloor(points),
-      timestamps: Array(points).fill(0).map((_, i) => new Date(Date.now() - (points - i) * 86400000).toISOString()),
+      timestamps: Array(points).fill(0).map((_, i) => 
+        new Date(Date.now() - (points - i) * 86400000).toISOString()
+      ),
       quality_markers: Array(points).fill('reliable' as const),
     }));
     setTraces(newTraces);
-  }, [activePreset]);
+  }, [channels]);
   
   // Live update simulation
   useEffect(() => {
@@ -367,123 +208,133 @@ export default function OscilloscopeViewPage() {
   }, [isLive]);
   
   const handleChannelToggle = (channelId: string) => {
-    setActivePreset(prev => ({
-      ...prev,
-      channels: prev.channels.map(c => 
-        c.id === channelId ? { ...c, visible: !c.visible } : c
-      ),
-    }));
+    if (selectedIndicators.includes(channelId)) {
+      setSelectedIndicators(prev => prev.filter(i => i !== channelId));
+    }
   };
   
+  // Get geo scope title
+  const getScopeTitle = () => {
+    if (geoSelections.length === 0) return 'Signalöversikt';
+    if (geoSelections.length === 1) return `${geoSelections[0].name} Signalöversikt`;
+    return `Signalöversikt (${geoSelections.length} områden)`;
+  };
+  
+  const currentDate = new Date().toLocaleDateString('sv-SE', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-6xl mx-auto py-8 px-4">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-6">
-          <div>
-             <h1 className="text-3xl font-bold mb-2">{getScopeTitle()}</h1>
-            <p className="text-muted-foreground max-w-xl">
-               {getScopeDescription()}
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <HelpDialog />
-            <Button
-              variant={isLive ? "destructive" : "default"}
-              onClick={() => setIsLive(!isLive)}
-              className="gap-2"
-            >
-              {isLive ? (
-                <>
-                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                  Stoppa live
-                </>
-              ) : (
-                '[▶] Starta live'
-              )}
-            </Button>
-          </div>
-        </div>
-        
-        {/* Welcome onboarding */}
-        {showWelcome && <WelcomeCard onDismiss={() => setShowWelcome(false)} />}
-        
-        {/* Preset selection - mobile friendly */}
-        <div className="mb-6">
-          <h2 className="text-sm font-medium text-muted-foreground mb-3">
-            Vad vill du se? Välj en kategori:
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {SIGNAL_PRESETS.map(preset => (
-              <PresetCard
-                key={preset.id}
-                preset={preset}
-                isActive={activePreset.id === preset.id}
-                onClick={() => setActivePreset(preset)}
-              />
-            ))}
+    <main className="min-h-screen bg-background">
+      {/* HEADER */}
+      <header className="border-b border-border bg-card">
+        <div className="container max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <nav className="text-xs font-mono text-muted-foreground mb-2" aria-label="Breadcrumb">
+                <span>{geoSelections[0]?.name || 'Global'}</span>
+                <span className="mx-2">[/]</span>
+                <span className="text-foreground">Signalöversikt</span>
+              </nav>
+              <h1 className="text-2xl font-bold">{getScopeTitle()}</h1>
+            </div>
+            
+            <div className="flex items-center gap-4 text-sm">
+              <time className="font-mono text-muted-foreground" dateTime={new Date().toISOString()}>
+                {currentDate} · CET
+              </time>
+              <Button
+                variant={isLive ? "destructive" : "default"}
+                onClick={() => setIsLive(!isLive)}
+                className="font-mono"
+              >
+                {isLive ? (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-white animate-pulse mr-2" />
+                    LIVE
+                  </>
+                ) : (
+                  '[PLAY] Starta live'
+                )}
+              </Button>
+            </div>
           </div>
         </div>
-        
-        {/* Main oscilloscope */}
-        <OscilloscopeView
-          config={config}
-          traces={traces}
-          warnings={warnings}
-          systemStatus={systemStatus}
-          onTimeBaseChange={setTimeBase}
-          onChannelToggle={handleChannelToggle}
-          language="sv"
+      </header>
+      
+      <div className="container max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {/* CONTROL PANEL */}
+        <OscilloscopeControlPanel
+          geoSelections={geoSelections}
+          selectedIndicators={selectedIndicators}
+          timeSpan={timeSpan}
+          onGeoChange={setGeoSelections}
+          onIndicatorsChange={setSelectedIndicators}
+          onTimeSpanChange={setTimeSpan}
         />
         
-        {/* Simple signal cards */}
-        <div className="mt-6">
-          <h2 className="text-lg font-semibold mb-3">Just nu visar signalerna:</h2>
-          <div className="grid sm:grid-cols-3 gap-3">
-            {activePreset.channels.filter(c => c.visible).map(channel => (
-              <SignalStatusCard
-                key={channel.id}
-                channel={channel}
-                trace={traces.find(t => t.channel_id === channel.id)}
-              />
-            ))}
-          </div>
-        </div>
+        {/* MAIN OSCILLOSCOPE */}
+        {channels.length > 0 ? (
+          <OscilloscopeView
+            config={config}
+            traces={traces}
+            warnings={warnings}
+            systemStatus={systemStatus}
+            onTimeBaseChange={(tb) => setTimeSpan(tb)}
+            onChannelToggle={handleChannelToggle}
+            language="sv"
+          />
+        ) : (
+          <Card className="border-dashed">
+            <CardContent className="py-12 text-center">
+              <p className="text-muted-foreground font-mono">
+                [!] Välj minst en indikator för att visa signaler
+              </p>
+            </CardContent>
+          </Card>
+        )}
         
-        {/* Time selector - simpler */}
-        <div className="mt-6">
-          <h2 className="text-sm font-medium text-muted-foreground mb-3">
-            Hur långt tillbaka vill du se?
-          </h2>
-          <Tabs value={timeBase} onValueChange={(v) => setTimeBase(v as TimeBase)}>
-            <TabsList>
-              <TabsTrigger value="1m">1 månad</TabsTrigger>
-              <TabsTrigger value="3m">3 månader</TabsTrigger>
-              <TabsTrigger value="1y">1 år</TabsTrigger>
-              <TabsTrigger value="5y">5 år</TabsTrigger>
-              <TabsTrigger value="10y">10 år</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-        
-        {/* Footer with important disclaimer */}
-        <Card className="mt-8 border-amber-500/30 bg-amber-500/5">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">⚠️</span>
-              <div>
-                <p className="font-semibold text-amber-700 mb-1">Viktigt att förstå</p>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• <strong>Korrelation ≠ orsak:</strong> Bara för att två linjer går åt samma håll betyder det inte att den ena påverkar den andra</li>
-                  <li>• <strong>Data är inte hela sanningen:</strong> Det finns alltid saker som inte går att mäta</li>
-                  <li>• <strong>Titta på trenden, inte enskilda hopp:</strong> Ett tillfälligt hopp kan vara slump</li>
-                </ul>
-              </div>
+        {/* SIGNAL STATUS CARDS */}
+        {channels.length > 0 && (
+          <section aria-labelledby="signal-status-heading">
+            <h2 id="signal-status-heading" className="text-lg font-semibold mb-4">
+              Just nu visar signalerna:
+            </h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {channels.filter(c => c.visible).map(channel => (
+                <SignalStatusCard
+                  key={channel.id}
+                  channel={channel}
+                  trace={traces.find(t => t.channel_id === channel.id)}
+                  geoName={geoSelections[0]?.name || 'Global'}
+                />
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          </section>
+        )}
+        
+        {/* FOOTER DISCLAIMER */}
+        <footer className="pt-6">
+          <Card className="border-status-warning/30 bg-status-warning/5">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <span className="font-mono text-lg text-status-warning">[!]</span>
+                <div>
+                  <p className="font-semibold text-status-warning mb-1">Viktigt att förstå</p>
+                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Signalerna visar <strong>observerade mönster</strong>, inte orsaker eller förutsägelser</li>
+                    <li>Korrelation mellan signaler innebär inte automatiskt kausalitet</li>
+                    <li>Data kan ha olika kvalitet beroende på källa och geografiskt område</li>
+                    <li>Alla värden normaliseras för jämförbarhet – se ursprungsdata för absoluta tal</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </footer>
       </div>
-    </div>
+    </main>
   );
 }
