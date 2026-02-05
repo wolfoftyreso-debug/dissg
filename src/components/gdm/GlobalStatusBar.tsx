@@ -19,7 +19,7 @@ export function GlobalStatusBar({ timeYear }: GlobalStatusBarProps) {
   const color = getLambdaColor(globalLambda?.lambda || 0.86);
 
   return (
-    <div className="absolute top-4 left-4 z-10 pointer-events-none">
+    <div className="absolute top-4 left-4 z-30 pointer-events-none">
       <div 
         className="p-4 rounded-sm backdrop-blur-sm border pointer-events-auto"
         style={{ 
