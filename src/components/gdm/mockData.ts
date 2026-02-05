@@ -155,10 +155,6 @@ export function getDiagnosticPanelData(geoCode: string): DiagnosticPanelData | n
 }
 
 // =============================================================================
-// LAMBDA COLOR SCALE
-// =============================================================================
-
-// =============================================================================
 // LAMBDA COLOR SCALE - MYNDIGHETSPALETT
 // Dämpade, kliniska färger för professionellt utseende
 // =============================================================================
