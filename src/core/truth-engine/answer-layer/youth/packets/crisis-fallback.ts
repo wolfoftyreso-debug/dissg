@@ -1,140 +1,114 @@
  /**
+  * CRISIS FALLBACK PACKETS
+  * 
+  * High-risk questions redirect here. Never provide detailed answers.
+  * Always route to human support.
+  */
+ 
+ /**
+  * CRISIS RESOURCES (by region)
+  */
+ export const CRISIS_RESOURCES = {
+   DEFAULT: {
+     text: 'If you are in crisis, please reach out to a crisis helpline in your area.',
+     international: 'Find resources at findahelpline.com',
+   },
+   SE: {
+     name: 'Mind självmordslinjen',
+     phone: '90101',
+     text_chat: 'mind.se',
+     available: '24/7',
+   },
+   US: {
+     name: '988 Suicide & Crisis Lifeline',
+     phone: '988',
+     text: 'Text HOME to 741741',
+     available: '24/7',
+   },
+   UK: {
+     name: 'Samaritans',
+     phone: '116 123',
+     email: 'jo@samaritans.org',
+     available: '24/7',
+   },
+   AU: {
+     name: 'Lifeline',
+     phone: '13 11 14',
+     text: 'Text 0477 13 11 14',
+     available: '24/7',
+   },
+   CA: {
+     name: 'Talk Suicide Canada',
+     phone: '1-833-456-4566',
+     text: 'Text 45645',
+     available: '24/7',
+   },
+ } as const;
+ 
+ /**
   * CRISIS FALLBACK PACKET
   * 
-  * This packet activates when crisis is detected.
-  * ABSOLUTE RULE: No analysis, no statistics, only safety + help paths.
-  */
- 
- import type { CrisisModeResponse, CrisisResource } from '../types';
- 
- /**
-  * CRISIS RESOURCES BY REGION
-  */
- export const CRISIS_RESOURCES: Record<string, CrisisResource[]> = {
-   SE: [
-     {
-       name: 'BRIS',
-       country_code: 'SE',
-       phone: '116 111',
-       url: 'https://www.bris.se',
-       hours: '24/7',
-       languages: ['sv'],
-     },
-     {
-       name: 'Mind Självmordslinjen',
-       country_code: 'SE',
-       phone: '90101',
-       url: 'https://mind.se/sjalvmordslinjen',
-       hours: '24/7',
-       languages: ['sv'],
-     },
-   ],
-   UK: [
-     {
-       name: 'Childline',
-       country_code: 'UK',
-       phone: '0800 1111',
-       url: 'https://www.childline.org.uk',
-       hours: '24/7',
-       languages: ['en'],
-     },
-     {
-       name: 'Samaritans',
-       country_code: 'UK',
-       phone: '116 123',
-       url: 'https://www.samaritans.org',
-       hours: '24/7',
-       languages: ['en'],
-     },
-   ],
-   US: [
-     {
-       name: '988 Suicide & Crisis Lifeline',
-       country_code: 'US',
-       phone: '988',
-       url: 'https://988lifeline.org',
-       hours: '24/7',
-       languages: ['en', 'es'],
-     },
-   ],
-   DEFAULT: [
-     {
-       name: 'International Association for Suicide Prevention',
-       country_code: 'INTL',
-       phone: null,
-       url: 'https://www.iasp.info/resources/Crisis_Centres/',
-       hours: '24/7',
-       languages: ['en'],
-     },
-   ],
- };
- 
- /**
-  * GET CRISIS RESOURCES FOR REGION
-  */
- export function getCrisisResourcesForRegion(regionCode: string): CrisisResource[] {
-   return CRISIS_RESOURCES[regionCode] || CRISIS_RESOURCES.DEFAULT;
- }
- 
- /**
-  * GENERATE CRISIS RESPONSE
-  * 
-  * This is the ONLY response when crisis is detected.
-  * NO analysis. NO statistics. ONLY safety.
-  */
- export function generateCrisisFallbackResponse(
-   regionCode: string = 'DEFAULT',
-   language: 'en' | 'sv' = 'en'
- ): CrisisModeResponse {
-   const resources = getCrisisResourcesForRegion(regionCode);
-   
-   const messages = {
-     en: {
-       primary: "I'm really glad you reached out. What you're feeling matters, and you deserve support.",
-       safety: "If you are in immediate danger, please contact emergency services (112 in Europe, 911 in US) right now.",
-       action: "Please talk to someone who can help. Here are people who are ready to listen:",
-     },
-     sv: {
-       primary: "Jag är verkligen glad att du hörde av dig. Det du känner är viktigt, och du förtjänar stöd.",
-       safety: "Om du är i omedelbar fara, ring 112 nu direkt.",
-       action: "Snälla prata med någon som kan hjälpa. Här är personer som är redo att lyssna:",
-     },
-   };
-   
-   const msg = messages[language];
-   const hotlines = resources.filter(r => r.phone !== null);
-   const chatResources = resources.filter(r => r.url !== null && r.phone === null);
-   
-   return {
-     mode: 'crisis_support',
-     triggered_by: 'crisis_detection',
-     priority: 'immediate',
-     response: {
-       message: `${msg.primary} ${msg.action}`,
-       hotlines,
-       chat_resources: chatResources,
-       safety_message: msg.safety,
-     },
-     analytics_disabled: true,
-     follow_up_blocked: true,
-   };
- }
- 
- /**
-  * CRISIS PACKET (For registry)
+  * Used for ANY high-risk query. No exceptions.
   */
  export const PACKET_CRISIS_SUPPORT = {
-   id: 'answer:youth:crisis_support:v1',
-   version: 1,
-   status: 'stable' as const,
-   type: 'crisis_fallback' as const,
-   description: 'Immediate crisis support - no analysis, only safety and resources',
-   triggers: [
-     'self-harm keywords',
-     'suicide keywords',
-     'extreme distress',
-     'abuse indicators',
-     'eating disorder indicators',
-   ],
-   response_generator: generateCrisisFallbackResponse,
- };
+   id: 'youth:crisis:support:v1',
+   question_class: 'crisis',
+   risk_level: 'high',
+   
+   // NEVER changes based on query
+   text: `
+ It sounds like you might be going through something really difficult right now.
+ You do not have to face this alone.
+ 
+ Please reach out to someone who can help:
+ • A trusted adult (parent, teacher, counselor)
+ • A crisis helpline (available 24/7, confidential)
+ 
+ Your feelings are valid, and support is available.
+   `.trim(),
+   
+   // Required sections
+   sections: {
+     normalize: true,
+     limits: false, // Not appropriate for crisis
+     when_to_seek_help: true,
+     crisis_resources: true,
+   },
+   
+   // Never claim confidence in crisis
+   confidence: { coverage: 'not_applicable', tier: 1 },
+   
+   // Metadata
+   metadata: {
+     never_modify: true,
+     always_include_resources: true,
+     no_data_dependencies: true,
+   },
+ } as const;
+ 
+ /**
+  * Generate crisis response with appropriate resources
+  */
+ export function generateCrisisFallbackResponse(regionCode?: string): {
+   text: string;
+   resources: typeof CRISIS_RESOURCES[keyof typeof CRISIS_RESOURCES];
+   show_all_resources: boolean;
+ } {
+   const resources = regionCode && CRISIS_RESOURCES[regionCode as keyof typeof CRISIS_RESOURCES]
+     ? CRISIS_RESOURCES[regionCode as keyof typeof CRISIS_RESOURCES]
+     : CRISIS_RESOURCES.DEFAULT;
+   
+   return {
+     text: PACKET_CRISIS_SUPPORT.text,
+     resources,
+     show_all_resources: !regionCode,
+   };
+ }
+ 
+ /**
+  * Get crisis resources for specific region
+  */
+ export function getCrisisResourcesForRegion(regionCode: string) {
+   return CRISIS_RESOURCES[regionCode as keyof typeof CRISIS_RESOURCES] 
+     || CRISIS_RESOURCES.DEFAULT;
+ }
