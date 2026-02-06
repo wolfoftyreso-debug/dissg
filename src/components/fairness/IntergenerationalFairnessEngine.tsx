@@ -2,6 +2,8 @@
  * INTERGENERATIONAL FAIRNESS ENGINE (IFE)
  * 
  * "Vem får nyttan – och vem betalar, över generationer?"
+ * 
+ * SPOTLESS UI: Allt är klickbart för fördjupning
  */
 
 import React, { useState } from 'react';
@@ -12,6 +14,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { StructuralPositionAlert, DecisionCorrelationAlert } from '@/components/ui/ExpandableInfoAlert';
 import {
   Clock,
@@ -24,11 +27,17 @@ import {
   Scale,
   Baby,
   Globe,
-  Calendar
+  Calendar,
+  ChevronRight,
+  ExternalLink,
+  Database,
+  FileText,
+  BarChart3
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
+  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
+  AreaChart, Area
 } from 'recharts';
 import {
   IFE_CORE_QUESTION,
@@ -39,7 +48,8 @@ import {
   TIME_RESPONSIBILITY,
   GLOBAL_FAIRNESS_DATA,
   KEY_MESSAGES,
-  SWEDEN_MANDATE_PERIODS
+  SWEDEN_MANDATE_PERIODS,
+  type DebtCategory
 } from '@/config/intergenerationalFairnessConfig';
 
 // Trend icon helper
@@ -62,20 +72,424 @@ const DebtLevelBadge: React.FC<{ level: string }> = ({ level }) => {
   return <Badge variant="outline" className="text-xs">{c.label}</Badge>;
 };
 
-// Debt categories panel
-const DebtCategoriesPanel: React.FC = () => (
+// Component detail data for drill-down
+const COMPONENT_DETAILS: Record<string, {
+  title: string;
+  definition: string;
+  currentValue: string;
+  trend: string;
+  source: string;
+  methodology: string;
+  historicalData: { year: number; value: number }[];
+}> = {
+  state_debt: {
+    title: 'Statsskuld per capita',
+    definition: 'Den totala statsskulden dividerad med befolkningen. Mäter hur mycket skuld varje medborgare teoretiskt "bär".',
+    currentValue: '142 000 kr',
+    trend: '+3.2% senaste året',
+    source: 'Riksgälden, SCB',
+    methodology: 'Nominell skuld / befolkning vid årets slut',
+    historicalData: [
+      { year: 2015, value: 98000 }, { year: 2017, value: 105000 },
+      { year: 2019, value: 112000 }, { year: 2021, value: 128000 },
+      { year: 2023, value: 138000 }, { year: 2024, value: 142000 }
+    ]
+  },
+  implicit_debt: {
+    title: 'Implicit skuld (pensioner, åtaganden)',
+    definition: 'Framtida åtaganden som inte syns i statsbudgeten men som staten är förpliktigad att betala.',
+    currentValue: '~2.8 biljoner kr',
+    trend: 'Ökande med åldrande befolkning',
+    source: 'ESV, Pensionsmyndigheten',
+    methodology: 'Nuvärde av framtida pensionsåtaganden + vårdkostnader',
+    historicalData: [
+      { year: 2015, value: 2100 }, { year: 2017, value: 2250 },
+      { year: 2019, value: 2400 }, { year: 2021, value: 2550 },
+      { year: 2023, value: 2700 }, { year: 2024, value: 2800 }
+    ]
+  },
+  municipal_debt: {
+    title: 'Kommunal skuld',
+    definition: 'Kommunernas och regionernas samlade skuldsättning.',
+    currentValue: '785 mdr kr',
+    trend: '+5.1% senaste året',
+    source: 'SKR, SCB',
+    methodology: 'Aggregerad kommunal upplåning',
+    historicalData: [
+      { year: 2015, value: 520 }, { year: 2017, value: 580 },
+      { year: 2019, value: 650 }, { year: 2021, value: 710 },
+      { year: 2023, value: 750 }, { year: 2024, value: 785 }
+    ]
+  },
+  guarantees: {
+    title: 'Garantier & framtida åtaganden',
+    definition: 'Statliga garantier och borgensåtaganden som kan bli verkliga kostnader.',
+    currentValue: '~1.2 biljoner kr',
+    trend: 'Stabilt',
+    source: 'Riksgälden',
+    methodology: 'Nominellt värde av utställda garantier',
+    historicalData: [
+      { year: 2015, value: 900 }, { year: 2017, value: 980 },
+      { year: 2019, value: 1050 }, { year: 2021, value: 1120 },
+      { year: 2023, value: 1180 }, { year: 2024, value: 1200 }
+    ]
+  },
+  maintenance: {
+    title: 'Underhållsunderskott',
+    definition: 'Eftersatt underhåll av offentlig infrastruktur som ackumuleras som framtida kostnad.',
+    currentValue: '~300 mdr kr',
+    trend: 'Ökande',
+    source: 'Trafikverket, SKR',
+    methodology: 'Beräknat gap mellan optimalt och faktiskt underhåll',
+    historicalData: [
+      { year: 2015, value: 180 }, { year: 2017, value: 210 },
+      { year: 2019, value: 240 }, { year: 2021, value: 270 },
+      { year: 2023, value: 290 }, { year: 2024, value: 300 }
+    ]
+  },
+  deferred: {
+    title: 'Eftersatt infrastruktur',
+    definition: 'Infrastrukturprojekt som skjutits upp eller inte genomförts trots identifierat behov.',
+    currentValue: '150+ projekt',
+    trend: 'Ökande kö',
+    source: 'Trafikverket, Energimyndigheten',
+    methodology: 'Antal och värde av uppskjutna projekt',
+    historicalData: [
+      { year: 2015, value: 80 }, { year: 2017, value: 95 },
+      { year: 2019, value: 110 }, { year: 2021, value: 130 },
+      { year: 2023, value: 145 }, { year: 2024, value: 150 }
+    ]
+  },
+  investment_gap: {
+    title: 'Investeringsgap',
+    definition: 'Skillnaden mellan vad som behöver investeras och vad som faktiskt investeras.',
+    currentValue: '~80 mdr kr/år',
+    trend: 'Stabilt gap',
+    source: 'Konjunkturinstitutet, SNS',
+    methodology: 'Behovsanalys minus faktiska investeringar',
+    historicalData: [
+      { year: 2015, value: 50 }, { year: 2017, value: 55 },
+      { year: 2019, value: 65 }, { year: 2021, value: 75 },
+      { year: 2023, value: 78 }, { year: 2024, value: 80 }
+    ]
+  },
+  resource_depletion: {
+    title: 'Resursutarmning',
+    definition: 'Användning av naturresurser i takt som överstiger naturlig förnyelse.',
+    currentValue: '3.8 jordklot/år',
+    trend: 'Långsamt minskande',
+    source: 'Global Footprint Network',
+    methodology: 'Ekologiskt fotavtryck / biokapacitet',
+    historicalData: [
+      { year: 2015, value: 4.2 }, { year: 2017, value: 4.1 },
+      { year: 2019, value: 4.0 }, { year: 2021, value: 3.9 },
+      { year: 2023, value: 3.85 }, { year: 2024, value: 3.8 }
+    ]
+  },
+  restoration: {
+    title: 'Miljöåterställningsbehov',
+    definition: 'Uppskattad kostnad för att återställa degraderade ekosystem och miljöer.',
+    currentValue: '~200 mdr kr',
+    trend: 'Ökande',
+    source: 'Naturvårdsverket, EU',
+    methodology: 'Sammanställning av restaureringskostnader',
+    historicalData: [
+      { year: 2015, value: 120 }, { year: 2017, value: 140 },
+      { year: 2019, value: 160 }, { year: 2021, value: 175 },
+      { year: 2023, value: 190 }, { year: 2024, value: 200 }
+    ]
+  },
+  long_term: {
+    title: 'Långsiktiga belastningar',
+    definition: 'Framtida miljökostnader från nuvarande aktiviteter (klimat, föroreningar).',
+    currentValue: 'Ej kvantifierbart',
+    trend: 'Ackumulerande',
+    source: 'SMHI, Naturvårdsverket',
+    methodology: 'Scenariobaserade uppskattningar',
+    historicalData: []
+  },
+  capacity: {
+    title: 'Minskad kapacitet',
+    definition: 'Reducerad förmåga hos offentliga institutioner att leverera tjänster.',
+    currentValue: 'Index: 72/100',
+    trend: 'Sjunkande',
+    source: 'ESV, Statskontoret',
+    methodology: 'Sammansatt index av leveransförmåga',
+    historicalData: [
+      { year: 2015, value: 85 }, { year: 2017, value: 82 },
+      { year: 2019, value: 79 }, { year: 2021, value: 76 },
+      { year: 2023, value: 74 }, { year: 2024, value: 72 }
+    ]
+  },
+  competence: {
+    title: 'Kompetensförlust',
+    definition: 'Förlust av kritisk kompetens inom offentlig sektor genom pensionsavgångar och låg attraktivitet.',
+    currentValue: '~25% gap',
+    trend: 'Accelererande',
+    source: 'Arbetsförmedlingen, SKR',
+    methodology: 'Rekryteringsbehov vs tillgänglig kompetens',
+    historicalData: [
+      { year: 2015, value: 12 }, { year: 2017, value: 15 },
+      { year: 2019, value: 18 }, { year: 2021, value: 21 },
+      { year: 2023, value: 23 }, { year: 2024, value: 25 }
+    ]
+  },
+  trust: {
+    title: 'Förtroendenedbrytning',
+    definition: 'Minskande förtroende för samhällsinstitutioner över tid.',
+    currentValue: 'Index: 58/100',
+    trend: 'Långsamt sjunkande',
+    source: 'SOM-institutet',
+    methodology: 'Årliga förtroendemätningar',
+    historicalData: [
+      { year: 2015, value: 68 }, { year: 2017, value: 65 },
+      { year: 2019, value: 63 }, { year: 2021, value: 61 },
+      { year: 2023, value: 59 }, { year: 2024, value: 58 }
+    ]
+  }
+};
+
+// Category detail data
+const CATEGORY_DETAILS: Record<string, {
+  fullDescription: string;
+  keyIndicators: string[];
+  policyImplications: string[];
+  internationalComparison: string;
+}> = {
+  financial: {
+    fullDescription: 'Finansiell skuld inkluderar alla explicita och implicita ekonomiska åtaganden som nuvarande generationer skapar och som framtida generationer måste hantera. Detta omfattar statsskuld, pensionsåtaganden, kommunal skuld och garantier.',
+    keyIndicators: ['Skuld/BNP-kvot', 'Implicit pensionsskuld', 'Kommunal skuld per capita'],
+    policyImplications: ['Budgetdisciplin behövs', 'Pensionssystemets hållbarhet', 'Generationskontrakt'],
+    internationalComparison: 'Sverige: 33% av BNP. EU-snitt: 84%. Japan: 264%.'
+  },
+  infrastructural: {
+    fullDescription: 'Infrastrukturell skuld uppstår när underhåll och nyinvesteringar skjuts upp. Kostnaderna försvinner inte – de ackumuleras och växer med tiden. En krona i uppskjutet underhåll blir ofta 3-5 kronor i framtida reparationskostnader.',
+    keyIndicators: ['Underhållsunderskott', 'Investeringsgap', 'Antal uppskjutna projekt'],
+    policyImplications: ['Långsiktig infrastrukturplanering', 'Skuldfinansering av investeringar', 'Livscykelkostnadsanalys'],
+    internationalComparison: 'Sverige investerar ~3% av BNP. Behov: ~4.5%. Schweiz: 5%.'
+  },
+  ecological: {
+    fullDescription: 'Ekologisk skuld representerar uttaget av naturresurser och miljöförstöring som framtida generationer måste hantera. Detta inkluderar klimatförändringar, artutrotning, markförstöring och vattenföroreningar.',
+    keyIndicators: ['Ekologiskt fotavtryck', 'Koldioxidskuld', 'Biodiversitetsförlust'],
+    policyImplications: ['Klimatinvesteringar', 'Cirkulär ekonomi', 'Naturrestaurering'],
+    internationalComparison: 'Sverige: 3.8 jordklot. Globalt snitt: 1.7. Mål: 1.0.'
+  },
+  institutional: {
+    fullDescription: 'Institutionell erosion är den mest förbisedda skulden. När institutioner tappar kompetens, kapacitet och förtroende tar det generationer att återbygga. Detta påverkar statens förmåga att hantera framtida kriser.',
+    keyIndicators: ['Institutionsförtroende', 'Kompetensförsörjning', 'Leveranskapacitet'],
+    policyImplications: ['Långsiktig kompetensplanering', 'Institutionellt underhåll', 'Transparent styrning'],
+    internationalComparison: 'Sverige: Topp 10 globalt. Men fallande trend senaste 15 åren.'
+  }
+};
+
+// Component drill-down dialog
+interface ComponentDialogProps {
+  componentId: string | null;
+  onClose: () => void;
+}
+
+const ComponentDrillDownDialog: React.FC<ComponentDialogProps> = ({ componentId, onClose }) => {
+  const details = componentId ? COMPONENT_DETAILS[componentId] : null;
+  
+  if (!details) return null;
+  
+  return (
+    <Dialog open={!!componentId} onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            {details.title}
+          </DialogTitle>
+          <DialogDescription>Fördjupad analys och metodik</DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          {/* Definition */}
+          <div className="p-3 bg-muted/50 rounded-lg">
+            <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Definition
+            </h4>
+            <p className="text-sm text-muted-foreground">{details.definition}</p>
+          </div>
+          
+          {/* Current value */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-3 border rounded-lg">
+              <p className="text-xs text-muted-foreground">Nuvarande värde</p>
+              <p className="text-xl font-bold">{details.currentValue}</p>
+            </div>
+            <div className="p-3 border rounded-lg">
+              <p className="text-xs text-muted-foreground">Trend</p>
+              <p className="text-sm font-medium">{details.trend}</p>
+            </div>
+          </div>
+          
+          {/* Historical chart */}
+          {details.historicalData.length > 0 && (
+            <div className="p-3 border rounded-lg">
+              <h4 className="text-sm font-medium mb-2">Historisk utveckling</h4>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={details.historicalData}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                    <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--background))', 
+                        border: '1px solid hsl(var(--border))' 
+                      }} 
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="hsl(var(--primary))"
+                      fill="hsl(var(--primary))"
+                      fillOpacity={0.2}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+          
+          {/* Methodology */}
+          <div className="p-3 border rounded-lg">
+            <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              Metodik
+            </h4>
+            <p className="text-sm text-muted-foreground">{details.methodology}</p>
+          </div>
+          
+          {/* Source */}
+          <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+            <div>
+              <p className="text-xs text-muted-foreground">Källa</p>
+              <p className="text-sm font-medium">{details.source}</p>
+            </div>
+            <ExternalLink className="h-4 w-4 text-muted-foreground" />
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Category drill-down dialog
+interface CategoryDialogProps {
+  category: DebtCategory | null;
+  onClose: () => void;
+  onComponentClick: (componentId: string) => void;
+}
+
+const CategoryDrillDownDialog: React.FC<CategoryDialogProps> = ({ category, onClose, onComponentClick }) => {
+  const details = category ? CATEGORY_DETAILS[category.id] : null;
+  
+  if (!category || !details) return null;
+  
+  return (
+    <Dialog open={!!category} onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <span className="text-2xl">{category.icon}</span>
+            {category.labelSv}
+          </DialogTitle>
+          <DialogDescription className="flex items-center gap-2">
+            <DebtLevelBadge level={category.currentLevel} />
+            <TrendIcon trend={category.trendDirection} />
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          {/* Full description */}
+          <div className="p-3 bg-muted/50 rounded-lg">
+            <p className="text-sm">{details.fullDescription}</p>
+          </div>
+          
+          {/* Components - clickable for further drill-down */}
+          <div>
+            <h4 className="text-sm font-medium mb-2">Komponenter (klicka för fördjupning)</h4>
+            <div className="space-y-2">
+              {category.components.map(comp => (
+                <button
+                  key={comp.id}
+                  onClick={() => {
+                    onClose();
+                    onComponentClick(comp.id);
+                  }}
+                  className="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors text-left"
+                >
+                  <span className="text-sm font-medium">{comp.labelSv}</span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          {/* Key indicators */}
+          <div className="p-3 border rounded-lg">
+            <h4 className="text-sm font-medium mb-2">Nyckelindikatorer</h4>
+            <div className="flex flex-wrap gap-2">
+              {details.keyIndicators.map((ind, i) => (
+                <Badge key={i} variant="secondary">{ind}</Badge>
+              ))}
+            </div>
+          </div>
+          
+          {/* Policy implications */}
+          <div className="p-3 border rounded-lg">
+            <h4 className="text-sm font-medium mb-2">Policyimplikationer</h4>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              {details.policyImplications.map((impl, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-primary">•</span>
+                  {impl}
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* International comparison */}
+          <div className="p-3 bg-primary/5 rounded-lg">
+            <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              Internationell jämförelse
+            </h4>
+            <p className="text-sm text-muted-foreground">{details.internationalComparison}</p>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Debt categories panel with clickable elements
+const DebtCategoriesPanel: React.FC<{
+  onCategoryClick: (cat: DebtCategory) => void;
+  onComponentClick: (componentId: string) => void;
+}> = ({ onCategoryClick, onComponentClick }) => (
   <div className="grid gap-4 md:grid-cols-2">
     {DEBT_CATEGORIES.map(cat => (
-      <Card key={cat.id} className={`${
-        cat.currentLevel === 'critical' || cat.currentLevel === 'high' 
-          ? 'border-red-200 bg-red-50/30 dark:bg-red-950/20' 
-          : ''
-      }`}>
+      <Card 
+        key={cat.id} 
+        className={`cursor-pointer hover:shadow-md transition-all ${
+          cat.currentLevel === 'critical' || cat.currentLevel === 'high' 
+            ? 'border-red-200 bg-red-50/30 dark:bg-red-950/20' 
+            : ''
+        }`}
+        onClick={() => onCategoryClick(cat)}
+      >
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-xl">{cat.icon}</span>
-              <CardTitle className="text-sm">{cat.labelSv}</CardTitle>
+              <CardTitle className="text-sm hover:text-primary transition-colors">
+                {cat.labelSv}
+              </CardTitle>
             </div>
             <div className="flex items-center gap-2">
               <DebtLevelBadge level={cat.currentLevel} />
@@ -87,7 +501,17 @@ const DebtCategoriesPanel: React.FC = () => (
           <p className="text-xs text-muted-foreground mb-3">{cat.descriptionSv}</p>
           <div className="flex flex-wrap gap-1">
             {cat.components.map(c => (
-              <Badge key={c.id} variant="secondary" className="text-xs">{c.labelSv}</Badge>
+              <Badge 
+                key={c.id} 
+                variant="secondary" 
+                className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onComponentClick(c.id);
+                }}
+              >
+                {c.labelSv}
+              </Badge>
             ))}
           </div>
         </CardContent>
@@ -406,9 +830,30 @@ const MandatePeriodPanel: React.FC = () => (
 // Main component
 const IntergenerationalFairnessEngine: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedCategory, setSelectedCategory] = useState<DebtCategory | null>(null);
+  const [selectedComponent, setSelectedComponent] = useState<string | null>(null);
+
+  const handleCategoryClick = (cat: DebtCategory) => {
+    setSelectedCategory(cat);
+  };
+
+  const handleComponentClick = (componentId: string) => {
+    setSelectedComponent(componentId);
+  };
 
   return (
     <div className="space-y-6 p-4 max-w-6xl mx-auto">
+      {/* Drill-down dialogs */}
+      <CategoryDrillDownDialog 
+        category={selectedCategory} 
+        onClose={() => setSelectedCategory(null)}
+        onComponentClick={handleComponentClick}
+      />
+      <ComponentDrillDownDialog 
+        componentId={selectedComponent} 
+        onClose={() => setSelectedComponent(null)} 
+      />
+
       {/* Header */}
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2">
@@ -446,7 +891,10 @@ const IntergenerationalFairnessEngine: React.FC = () => {
         </TabsList>
 
         <TabsContent value="overview" className="mt-4 space-y-6">
-          <DebtCategoriesPanel />
+          <DebtCategoriesPanel 
+            onCategoryClick={handleCategoryClick}
+            onComponentClick={handleComponentClick}
+          />
           <Alert className="bg-muted/30">
             <AlertDescription className="text-xs">
               📌 {KEY_MESSAGES.workShifted.sv}
