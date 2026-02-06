@@ -4557,6 +4557,7 @@ export type Database = {
       }
       global_index_questions: {
         Row: {
+          agent_optimization_notes: string | null
           ai_retrieval_tags: string[]
           answer_count: number | null
           answer_type: Database["public"]["Enums"]["answer_type"]
@@ -4567,10 +4568,15 @@ export type Database = {
           data_quality: Database["public"]["Enums"]["data_quality_grade"] | null
           domain_code: string
           id: string
+          intent_layer: Database["public"]["Enums"]["intent_layer"] | null
           is_answerable: boolean | null
           is_published: boolean | null
           last_answered_at: string | null
+          misinterpretation_risk:
+            | Database["public"]["Enums"]["misinterpretation_risk"]
+            | null
           parent_question_id: string | null
+          primary_ai_agent: Database["public"]["Enums"]["ai_agent_class"] | null
           primary_source_types: string[]
           question_en: string
           question_id: string
@@ -4579,6 +4585,9 @@ export type Database = {
           related_question_ids: string[] | null
           scope: Database["public"]["Enums"]["question_scope"]
           search_volume_estimate: number | null
+          secondary_ai_agents:
+            | Database["public"]["Enums"]["ai_agent_class"][]
+            | null
           seo_priority: number | null
           subdomain_code: string | null
           time_dimension: Database["public"]["Enums"]["time_dimension"]
@@ -4590,6 +4599,7 @@ export type Database = {
           view_count: number | null
         }
         Insert: {
+          agent_optimization_notes?: string | null
           ai_retrieval_tags?: string[]
           answer_count?: number | null
           answer_type?: Database["public"]["Enums"]["answer_type"]
@@ -4602,10 +4612,17 @@ export type Database = {
             | null
           domain_code: string
           id?: string
+          intent_layer?: Database["public"]["Enums"]["intent_layer"] | null
           is_answerable?: boolean | null
           is_published?: boolean | null
           last_answered_at?: string | null
+          misinterpretation_risk?:
+            | Database["public"]["Enums"]["misinterpretation_risk"]
+            | null
           parent_question_id?: string | null
+          primary_ai_agent?:
+            | Database["public"]["Enums"]["ai_agent_class"]
+            | null
           primary_source_types?: string[]
           question_en: string
           question_id: string
@@ -4614,6 +4631,9 @@ export type Database = {
           related_question_ids?: string[] | null
           scope?: Database["public"]["Enums"]["question_scope"]
           search_volume_estimate?: number | null
+          secondary_ai_agents?:
+            | Database["public"]["Enums"]["ai_agent_class"][]
+            | null
           seo_priority?: number | null
           subdomain_code?: string | null
           time_dimension?: Database["public"]["Enums"]["time_dimension"]
@@ -4625,6 +4645,7 @@ export type Database = {
           view_count?: number | null
         }
         Update: {
+          agent_optimization_notes?: string | null
           ai_retrieval_tags?: string[]
           answer_count?: number | null
           answer_type?: Database["public"]["Enums"]["answer_type"]
@@ -4637,10 +4658,17 @@ export type Database = {
             | null
           domain_code?: string
           id?: string
+          intent_layer?: Database["public"]["Enums"]["intent_layer"] | null
           is_answerable?: boolean | null
           is_published?: boolean | null
           last_answered_at?: string | null
+          misinterpretation_risk?:
+            | Database["public"]["Enums"]["misinterpretation_risk"]
+            | null
           parent_question_id?: string | null
+          primary_ai_agent?:
+            | Database["public"]["Enums"]["ai_agent_class"]
+            | null
           primary_source_types?: string[]
           question_en?: string
           question_id?: string
@@ -4649,6 +4677,9 @@ export type Database = {
           related_question_ids?: string[] | null
           scope?: Database["public"]["Enums"]["question_scope"]
           search_volume_estimate?: number | null
+          secondary_ai_agents?:
+            | Database["public"]["Enums"]["ai_agent_class"][]
+            | null
           seo_priority?: number | null
           subdomain_code?: string | null
           time_dimension?: Database["public"]["Enums"]["time_dimension"]
@@ -11286,6 +11317,14 @@ export type Database = {
         | "completed"
         | "rejected"
         | "deferred"
+      ai_agent_class:
+        | "policy"
+        | "journalism"
+        | "finance"
+        | "corporate"
+        | "health"
+        | "legal"
+        | "general"
       analysis_method:
         | "trend_detection"
         | "change_point_detection"
@@ -11326,6 +11365,12 @@ export type Database = {
         | "method_reviewer"
         | "system_maintainer"
         | "public_observer"
+      intent_layer:
+        | "descriptive"
+        | "comparative"
+        | "trend"
+        | "structural"
+        | "allocation"
       kpi_category:
         | "demografi_halsa"
         | "arbete_produktivitet"
@@ -11335,6 +11380,7 @@ export type Database = {
         | "infrastruktur"
         | "systemrisk_styrning"
       kpi_status: "positive" | "warning" | "critical" | "neutral"
+      misinterpretation_risk: "low" | "medium" | "high"
       observation_type:
         | "trend_deviation"
         | "threshold_breach"
@@ -11590,6 +11636,15 @@ export const Constants = {
         "rejected",
         "deferred",
       ],
+      ai_agent_class: [
+        "policy",
+        "journalism",
+        "finance",
+        "corporate",
+        "health",
+        "legal",
+        "general",
+      ],
       analysis_method: [
         "trend_detection",
         "change_point_detection",
@@ -11634,6 +11689,13 @@ export const Constants = {
         "system_maintainer",
         "public_observer",
       ],
+      intent_layer: [
+        "descriptive",
+        "comparative",
+        "trend",
+        "structural",
+        "allocation",
+      ],
       kpi_category: [
         "demografi_halsa",
         "arbete_produktivitet",
@@ -11644,6 +11706,7 @@ export const Constants = {
         "systemrisk_styrning",
       ],
       kpi_status: ["positive", "warning", "critical", "neutral"],
+      misinterpretation_risk: ["low", "medium", "high"],
       observation_type: [
         "trend_deviation",
         "threshold_breach",
