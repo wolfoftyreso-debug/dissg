@@ -108,6 +108,13 @@ export function MapContainer({
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const cityMarkersRef = useRef<mapboxgl.Marker[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [currentZoom, setCurrentZoom] = useState(2);
+  
+  // Zoom thresholds for marker visibility (prevent overlap)
+  const COUNTRY_HIDE_ZOOM = 5;   // Hide country markers when zoomed in more than this
+  const STATE_MIN_ZOOM = 4;      // States visible at zoom 4+
+  const STATE_HIDE_ZOOM = 7;     // Hide state markers when zoomed past 7
+  const CITY_MIN_ZOOM = 6;       // Cities visible at zoom 6+
 
   // Initialize map
   useEffect(() => {
@@ -149,6 +156,13 @@ export function MapContainer({
 
     map.current.on('load', () => {
       setIsLoaded(true);
+    });
+
+    // Track zoom level for marker visibility
+    map.current.on('zoom', () => {
+      if (map.current) {
+        setCurrentZoom(map.current.getZoom());
+      }
     });
 
     return () => {
@@ -314,6 +328,44 @@ export function MapContainer({
       markersRef.current.push(marker);
     });
   }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear, activeRegionType, activeLegalTopic, activeThematicLayer]);
+
+  // Update marker visibility based on zoom level
+  useEffect(() => {
+    if (!map.current || !isLoaded) return;
+
+    // Update country and state marker visibility
+    markersRef.current.forEach(marker => {
+      const el = marker.getElement();
+      const isCountry = el.classList.contains('country-marker-wrapper');
+      const isState = el.classList.contains('state-marker-wrapper');
+      
+      if (isCountry) {
+        // Hide countries when zoomed in too much (they get cluttered)
+        if (currentZoom > COUNTRY_HIDE_ZOOM) {
+          el.style.display = 'none';
+        } else {
+          el.style.display = '';
+        }
+      } else if (isState) {
+        // Show states only in a certain zoom range
+        if (currentZoom >= STATE_MIN_ZOOM && currentZoom <= STATE_HIDE_ZOOM) {
+          el.style.display = '';
+        } else {
+          el.style.display = 'none';
+        }
+      }
+    });
+
+    // Update city marker visibility
+    cityMarkersRef.current.forEach(marker => {
+      const el = marker.getElement();
+      if (currentZoom >= CITY_MIN_ZOOM) {
+        el.style.display = '';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  }, [currentZoom, isLoaded, COUNTRY_HIDE_ZOOM, STATE_MIN_ZOOM, STATE_HIDE_ZOOM, CITY_MIN_ZOOM]);
 
   // Add city markers when enabled (use hierarchical 3D style)
   useEffect(() => {
