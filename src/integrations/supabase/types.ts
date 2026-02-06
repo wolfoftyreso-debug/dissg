@@ -435,6 +435,116 @@ export type Database = {
           },
         ]
       }
+      analysis_reports: {
+        Row: {
+          canonical_url: string | null
+          citation_count: number | null
+          comparison: Json | null
+          confidence_score: number | null
+          content_markdown: string
+          created_at: string | null
+          data_last_verified: string | null
+          data_period_end: string | null
+          data_period_start: string | null
+          deep_dive_links: string[] | null
+          expires_at: string | null
+          generation_prompt: string | null
+          generation_timestamp: string | null
+          id: string
+          mechanisms: string | null
+          meta_description: string | null
+          meta_title: string | null
+          model_used: string | null
+          published_at: string | null
+          question_id: string
+          slug: string
+          status: Database["public"]["Enums"]["report_status"] | null
+          structured_data: Json | null
+          subtitle: string | null
+          summary: string
+          timeline: Json | null
+          title: string
+          uncertainty: string | null
+          updated_at: string | null
+          version: number
+          view_count: number | null
+        }
+        Insert: {
+          canonical_url?: string | null
+          citation_count?: number | null
+          comparison?: Json | null
+          confidence_score?: number | null
+          content_markdown: string
+          created_at?: string | null
+          data_last_verified?: string | null
+          data_period_end?: string | null
+          data_period_start?: string | null
+          deep_dive_links?: string[] | null
+          expires_at?: string | null
+          generation_prompt?: string | null
+          generation_timestamp?: string | null
+          id?: string
+          mechanisms?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          model_used?: string | null
+          published_at?: string | null
+          question_id: string
+          slug: string
+          status?: Database["public"]["Enums"]["report_status"] | null
+          structured_data?: Json | null
+          subtitle?: string | null
+          summary: string
+          timeline?: Json | null
+          title: string
+          uncertainty?: string | null
+          updated_at?: string | null
+          version?: number
+          view_count?: number | null
+        }
+        Update: {
+          canonical_url?: string | null
+          citation_count?: number | null
+          comparison?: Json | null
+          confidence_score?: number | null
+          content_markdown?: string
+          created_at?: string | null
+          data_last_verified?: string | null
+          data_period_end?: string | null
+          data_period_start?: string | null
+          deep_dive_links?: string[] | null
+          expires_at?: string | null
+          generation_prompt?: string | null
+          generation_timestamp?: string | null
+          id?: string
+          mechanisms?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          model_used?: string | null
+          published_at?: string | null
+          question_id?: string
+          slug?: string
+          status?: Database["public"]["Enums"]["report_status"] | null
+          structured_data?: Json | null
+          subtitle?: string | null
+          summary?: string
+          timeline?: Json | null
+          title?: string
+          uncertainty?: string | null
+          updated_at?: string | null
+          version?: number
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_reports_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "report_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       anti_influence_log: {
         Row: {
           attempt_description: string
@@ -8737,6 +8847,179 @@ export type Database = {
         }
         Relationships: []
       }
+      report_citations: {
+        Row: {
+          citation_order: number | null
+          cited_date: string | null
+          cited_value: string | null
+          created_at: string | null
+          data_type: string | null
+          id: string
+          indicator_code: string | null
+          is_verified: boolean | null
+          last_verified_at: string | null
+          reliability_score: number | null
+          report_id: string
+          source_name: string
+          source_organization: string | null
+          source_url: string | null
+        }
+        Insert: {
+          citation_order?: number | null
+          cited_date?: string | null
+          cited_value?: string | null
+          created_at?: string | null
+          data_type?: string | null
+          id?: string
+          indicator_code?: string | null
+          is_verified?: boolean | null
+          last_verified_at?: string | null
+          reliability_score?: number | null
+          report_id: string
+          source_name: string
+          source_organization?: string | null
+          source_url?: string | null
+        }
+        Update: {
+          citation_order?: number | null
+          cited_date?: string | null
+          cited_value?: string | null
+          created_at?: string | null
+          data_type?: string | null
+          id?: string
+          indicator_code?: string | null
+          is_verified?: boolean | null
+          last_verified_at?: string | null
+          reliability_score?: number | null
+          report_id?: string
+          source_name?: string
+          source_organization?: string | null
+          source_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_citations_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_generation_queue: {
+        Row: {
+          completed_at: string | null
+          error_message: string | null
+          geo_code: string | null
+          id: string
+          priority: number | null
+          question_id: string | null
+          queued_at: string | null
+          report_id: string | null
+          started_at: string | null
+          status: string | null
+          time_period: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          error_message?: string | null
+          geo_code?: string | null
+          id?: string
+          priority?: number | null
+          question_id?: string | null
+          queued_at?: string | null
+          report_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          time_period?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          error_message?: string | null
+          geo_code?: string | null
+          id?: string
+          priority?: number | null
+          question_id?: string | null
+          queued_at?: string | null
+          report_id?: string | null
+          started_at?: string | null
+          status?: string | null
+          time_period?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_generation_queue_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "report_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_generation_queue_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "analysis_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_questions: {
+        Row: {
+          category: Database["public"]["Enums"]["report_category"]
+          created_at: string | null
+          geo_code: string | null
+          geo_level: string
+          id: string
+          is_active: boolean | null
+          meta_description: string | null
+          meta_title: string | null
+          primary_indicator_codes: string[] | null
+          priority_rank: number | null
+          question_text: string
+          question_text_en: string | null
+          search_variants: string[] | null
+          secondary_indicator_codes: string[] | null
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["report_category"]
+          created_at?: string | null
+          geo_code?: string | null
+          geo_level?: string
+          id?: string
+          is_active?: boolean | null
+          meta_description?: string | null
+          meta_title?: string | null
+          primary_indicator_codes?: string[] | null
+          priority_rank?: number | null
+          question_text: string
+          question_text_en?: string | null
+          search_variants?: string[] | null
+          secondary_indicator_codes?: string[] | null
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["report_category"]
+          created_at?: string | null
+          geo_code?: string | null
+          geo_level?: string
+          id?: string
+          is_active?: boolean | null
+          meta_description?: string | null
+          meta_title?: string | null
+          primary_indicator_codes?: string[] | null
+          priority_rank?: number | null
+          question_text?: string
+          question_text_en?: string | null
+          search_variants?: string[] | null
+          secondary_indicator_codes?: string[] | null
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       reproducibility_records: {
         Row: {
           created_at: string | null
@@ -10585,6 +10868,13 @@ export type Database = {
       }
       generate_trust_log_id: { Args: never; Returns: string }
       get_gov_role: { Args: { _user_id: string }; Returns: string }
+      get_report_with_citations: {
+        Args: { p_slug: string }
+        Returns: {
+          citations: Json
+          report: Json
+        }[]
+      }
       get_user_tier: {
         Args: { p_user_id: string }
         Returns: Database["public"]["Enums"]["subscription_tier"]
@@ -10619,6 +10909,10 @@ export type Database = {
         Returns: boolean
       }
       increment_node_view: { Args: { p_node_id: string }; Returns: undefined }
+      increment_report_view: {
+        Args: { p_report_id: string }
+        Returns: undefined
+      }
       is_in_grace_period: { Args: { p_user_id: string }; Returns: boolean }
       track_deeper_click: { Args: { p_node_id: string }; Returns: undefined }
       validate_data_contract: { Args: { p_data: Json }; Returns: Json }
@@ -10699,6 +10993,13 @@ export type Database = {
         | "comparison"
         | "consequence"
         | "forecast"
+      report_category: "societal_state" | "comparison" | "trend"
+      report_status:
+        | "draft"
+        | "generating"
+        | "review"
+        | "published"
+        | "archived"
       responsibility_area:
         | "halsa"
         | "arbete"
@@ -10977,6 +11278,8 @@ export const Constants = {
         "consequence",
         "forecast",
       ],
+      report_category: ["societal_state", "comparison", "trend"],
+      report_status: ["draft", "generating", "review", "published", "archived"],
       responsibility_area: [
         "halsa",
         "arbete",
