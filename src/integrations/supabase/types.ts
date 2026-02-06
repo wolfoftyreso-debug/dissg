@@ -2280,6 +2280,45 @@ export type Database = {
           },
         ]
       }
+      data_source_types: {
+        Row: {
+          code: string
+          created_at: string | null
+          description: string | null
+          examples: string[] | null
+          id: string
+          name_en: string
+          name_sv: string
+          reliability_default:
+            | Database["public"]["Enums"]["data_quality_grade"]
+            | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          description?: string | null
+          examples?: string[] | null
+          id?: string
+          name_en: string
+          name_sv: string
+          reliability_default?:
+            | Database["public"]["Enums"]["data_quality_grade"]
+            | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          examples?: string[] | null
+          id?: string
+          name_en?: string
+          name_sv?: string
+          reliability_default?:
+            | Database["public"]["Enums"]["data_quality_grade"]
+            | null
+        }
+        Relationships: []
+      }
       data_sources: {
         Row: {
           api_endpoint: string | null
@@ -4417,6 +4456,233 @@ export type Database = {
           },
         ]
       }
+      global_index_answers: {
+        Row: {
+          aggregation_method: string | null
+          citation_count: number | null
+          citations: Json
+          comparison: Json | null
+          confidence_score: number | null
+          created_at: string | null
+          data_points: Json
+          data_quality: Database["public"]["Enums"]["data_quality_grade"] | null
+          deep_dive_links: string[] | null
+          expires_at: string | null
+          generated_at: string | null
+          generated_by: string | null
+          generation_prompt_hash: string | null
+          geo_scope: string
+          id: string
+          is_current: boolean | null
+          mechanisms: string | null
+          model_used: string | null
+          question_id: string
+          source_checksums: string[] | null
+          summary: string
+          time_period_end: string | null
+          time_period_start: string | null
+          timeline: Json | null
+          uncertainty: string | null
+          view_count: number | null
+        }
+        Insert: {
+          aggregation_method?: string | null
+          citation_count?: number | null
+          citations?: Json
+          comparison?: Json | null
+          confidence_score?: number | null
+          created_at?: string | null
+          data_points?: Json
+          data_quality?:
+            | Database["public"]["Enums"]["data_quality_grade"]
+            | null
+          deep_dive_links?: string[] | null
+          expires_at?: string | null
+          generated_at?: string | null
+          generated_by?: string | null
+          generation_prompt_hash?: string | null
+          geo_scope?: string
+          id?: string
+          is_current?: boolean | null
+          mechanisms?: string | null
+          model_used?: string | null
+          question_id: string
+          source_checksums?: string[] | null
+          summary: string
+          time_period_end?: string | null
+          time_period_start?: string | null
+          timeline?: Json | null
+          uncertainty?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          aggregation_method?: string | null
+          citation_count?: number | null
+          citations?: Json
+          comparison?: Json | null
+          confidence_score?: number | null
+          created_at?: string | null
+          data_points?: Json
+          data_quality?:
+            | Database["public"]["Enums"]["data_quality_grade"]
+            | null
+          deep_dive_links?: string[] | null
+          expires_at?: string | null
+          generated_at?: string | null
+          generated_by?: string | null
+          generation_prompt_hash?: string | null
+          geo_scope?: string
+          id?: string
+          is_current?: boolean | null
+          mechanisms?: string | null
+          model_used?: string | null
+          question_id?: string
+          source_checksums?: string[] | null
+          summary?: string
+          time_period_end?: string | null
+          time_period_start?: string | null
+          timeline?: Json | null
+          uncertainty?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "global_index_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "global_index_questions"
+            referencedColumns: ["question_id"]
+          },
+        ]
+      }
+      global_index_questions: {
+        Row: {
+          ai_retrieval_tags: string[]
+          answer_count: number | null
+          answer_type: Database["public"]["Enums"]["answer_type"]
+          created_at: string | null
+          created_by: string | null
+          cross_reference_domains: string[] | null
+          data_coverage_percent: number | null
+          data_quality: Database["public"]["Enums"]["data_quality_grade"] | null
+          domain_code: string
+          id: string
+          is_answerable: boolean | null
+          is_published: boolean | null
+          last_answered_at: string | null
+          parent_question_id: string | null
+          primary_source_types: string[]
+          question_en: string
+          question_id: string
+          question_sv: string
+          question_variants: string[] | null
+          related_question_ids: string[] | null
+          scope: Database["public"]["Enums"]["question_scope"]
+          search_volume_estimate: number | null
+          seo_priority: number | null
+          subdomain_code: string | null
+          time_dimension: Database["public"]["Enums"]["time_dimension"]
+          update_frequency:
+            | Database["public"]["Enums"]["question_update_frequency"]
+            | null
+          updated_at: string | null
+          version: number | null
+          view_count: number | null
+        }
+        Insert: {
+          ai_retrieval_tags?: string[]
+          answer_count?: number | null
+          answer_type?: Database["public"]["Enums"]["answer_type"]
+          created_at?: string | null
+          created_by?: string | null
+          cross_reference_domains?: string[] | null
+          data_coverage_percent?: number | null
+          data_quality?:
+            | Database["public"]["Enums"]["data_quality_grade"]
+            | null
+          domain_code: string
+          id?: string
+          is_answerable?: boolean | null
+          is_published?: boolean | null
+          last_answered_at?: string | null
+          parent_question_id?: string | null
+          primary_source_types?: string[]
+          question_en: string
+          question_id: string
+          question_sv: string
+          question_variants?: string[] | null
+          related_question_ids?: string[] | null
+          scope?: Database["public"]["Enums"]["question_scope"]
+          search_volume_estimate?: number | null
+          seo_priority?: number | null
+          subdomain_code?: string | null
+          time_dimension?: Database["public"]["Enums"]["time_dimension"]
+          update_frequency?:
+            | Database["public"]["Enums"]["question_update_frequency"]
+            | null
+          updated_at?: string | null
+          version?: number | null
+          view_count?: number | null
+        }
+        Update: {
+          ai_retrieval_tags?: string[]
+          answer_count?: number | null
+          answer_type?: Database["public"]["Enums"]["answer_type"]
+          created_at?: string | null
+          created_by?: string | null
+          cross_reference_domains?: string[] | null
+          data_coverage_percent?: number | null
+          data_quality?:
+            | Database["public"]["Enums"]["data_quality_grade"]
+            | null
+          domain_code?: string
+          id?: string
+          is_answerable?: boolean | null
+          is_published?: boolean | null
+          last_answered_at?: string | null
+          parent_question_id?: string | null
+          primary_source_types?: string[]
+          question_en?: string
+          question_id?: string
+          question_sv?: string
+          question_variants?: string[] | null
+          related_question_ids?: string[] | null
+          scope?: Database["public"]["Enums"]["question_scope"]
+          search_volume_estimate?: number | null
+          seo_priority?: number | null
+          subdomain_code?: string | null
+          time_dimension?: Database["public"]["Enums"]["time_dimension"]
+          update_frequency?:
+            | Database["public"]["Enums"]["question_update_frequency"]
+            | null
+          updated_at?: string | null
+          version?: number | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "global_index_questions_domain_code_fkey"
+            columns: ["domain_code"]
+            isOneToOne: false
+            referencedRelation: "global_question_domains"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "global_index_questions_parent_question_id_fkey"
+            columns: ["parent_question_id"]
+            isOneToOne: false
+            referencedRelation: "global_index_questions"
+            referencedColumns: ["question_id"]
+          },
+          {
+            foreignKeyName: "global_index_questions_subdomain_code_fkey"
+            columns: ["subdomain_code"]
+            isOneToOne: false
+            referencedRelation: "global_question_subdomains"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       global_kpi_mappings: {
         Row: {
           created_at: string
@@ -4682,6 +4948,100 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "global_master_index_config"
             referencedColumns: ["version"]
+          },
+        ]
+      }
+      global_question_domains: {
+        Row: {
+          code: string
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name_en: string
+          name_sv: string
+          parent_domain_code: string | null
+          question_count: number | null
+          sort_order: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name_en: string
+          name_sv: string
+          parent_domain_code?: string | null
+          question_count?: number | null
+          sort_order?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name_en?: string
+          name_sv?: string
+          parent_domain_code?: string | null
+          question_count?: number | null
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "global_question_domains_parent_domain_code_fkey"
+            columns: ["parent_domain_code"]
+            isOneToOne: false
+            referencedRelation: "global_question_domains"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      global_question_subdomains: {
+        Row: {
+          code: string
+          created_at: string | null
+          description: string | null
+          domain_code: string
+          id: string
+          is_active: boolean | null
+          name_en: string
+          name_sv: string
+          question_count: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          description?: string | null
+          domain_code: string
+          id?: string
+          is_active?: boolean | null
+          name_en: string
+          name_sv: string
+          question_count?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          domain_code?: string
+          id?: string
+          is_active?: boolean | null
+          name_en?: string
+          name_sv?: string
+          question_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "global_question_subdomains_domain_code_fkey"
+            columns: ["domain_code"]
+            isOneToOne: false
+            referencedRelation: "global_question_domains"
+            referencedColumns: ["code"]
           },
         ]
       }
@@ -10935,6 +11295,15 @@ export type Database = {
         | "decomposition"
         | "anomaly_detection"
       analysis_status: "pending" | "in_progress" | "completed" | "verified"
+      answer_type:
+        | "statistic"
+        | "index"
+        | "comparison"
+        | "ranking"
+        | "trend"
+        | "correlation"
+        | "distribution"
+        | "aggregate"
       app_role:
         | "public"
         | "researcher"
@@ -10947,6 +11316,7 @@ export type Database = {
         | "operativ"
       comparability_level: "full" | "partial" | "limited" | "none"
       data_depth_level: "global_baseline" | "regional_bloc" | "national_deep"
+      data_quality_grade: "A" | "B" | "C" | "D" | "unverified"
       data_source_type: "api" | "file_feed" | "manual" | "calculated"
       delivery_method: "api" | "webhook" | "sse" | "kafka"
       feed_severity: "low" | "medium" | "high" | "critical"
@@ -10993,6 +11363,15 @@ export type Database = {
         | "comparison"
         | "consequence"
         | "forecast"
+      question_scope: "global" | "regional" | "national" | "municipal"
+      question_update_frequency:
+        | "realtime"
+        | "daily"
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "event_based"
       report_category: "societal_state" | "comparison" | "trend"
       report_status:
         | "draft"
@@ -11052,6 +11431,14 @@ export type Database = {
         | "paused"
         | "incomplete"
       subscription_tier: "guest" | "observer" | "analyst" | "institutional"
+      time_dimension:
+        | "realtime"
+        | "daily"
+        | "weekly"
+        | "monthly"
+        | "quarterly"
+        | "yearly"
+        | "historical"
       trend_direction: "up" | "down" | "stable"
       trust_log_change_type:
         | "data_update"
@@ -11213,6 +11600,16 @@ export const Constants = {
         "anomaly_detection",
       ],
       analysis_status: ["pending", "in_progress", "completed", "verified"],
+      answer_type: [
+        "statistic",
+        "index",
+        "comparison",
+        "ranking",
+        "trend",
+        "correlation",
+        "distribution",
+        "aggregate",
+      ],
       app_role: [
         "public",
         "researcher",
@@ -11226,6 +11623,7 @@ export const Constants = {
       ],
       comparability_level: ["full", "partial", "limited", "none"],
       data_depth_level: ["global_baseline", "regional_bloc", "national_deep"],
+      data_quality_grade: ["A", "B", "C", "D", "unverified"],
       data_source_type: ["api", "file_feed", "manual", "calculated"],
       delivery_method: ["api", "webhook", "sse", "kafka"],
       feed_severity: ["low", "medium", "high", "critical"],
@@ -11277,6 +11675,16 @@ export const Constants = {
         "comparison",
         "consequence",
         "forecast",
+      ],
+      question_scope: ["global", "regional", "national", "municipal"],
+      question_update_frequency: [
+        "realtime",
+        "daily",
+        "weekly",
+        "monthly",
+        "quarterly",
+        "yearly",
+        "event_based",
       ],
       report_category: ["societal_state", "comparison", "trend"],
       report_status: ["draft", "generating", "review", "published", "archived"],
@@ -11337,6 +11745,15 @@ export const Constants = {
         "incomplete",
       ],
       subscription_tier: ["guest", "observer", "analyst", "institutional"],
+      time_dimension: [
+        "realtime",
+        "daily",
+        "weekly",
+        "monthly",
+        "quarterly",
+        "yearly",
+        "historical",
+      ],
       trend_direction: ["up", "down", "stable"],
       trust_log_change_type: [
         "data_update",

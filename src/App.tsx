@@ -111,6 +111,7 @@ import WhatWeDoNot from "./pages/WhatWeDoNot";
 import Validator from "./pages/Validator";
 import ReportsPage from "./pages/Reports";
 import ReportPage from "./pages/Report";
+import GlobalIndex from "./pages/GlobalIndex";
 
 const queryClient = new QueryClient();
 
@@ -229,6 +230,7 @@ const App = () => (
                 <Route path="/validator" element={<Validator />} />
                 <Route path="/reports" element={<ReportsPage />} />
                 <Route path="/report/:slug" element={<ReportPage />} />
+                <Route path="/global-index" element={<GlobalIndex />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />

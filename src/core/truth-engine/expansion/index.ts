@@ -17,6 +17,29 @@
 // AI-Agent Question Types
 export * from './questions/ai-agent-questions';
 
+// Global Index Question Types (explicit exports to avoid conflicts)
+export type {
+  QuestionScope,
+  TimeDimension,
+  AnswerType,
+  UpdateFrequency,
+  DataQualityGrade,
+  QuestionDomain,
+  QuestionSubdomain,
+  GlobalIndexQuestion,
+  GlobalIndexAnswer,
+  TimelineEntry,
+  ComparisonData,
+  DataPoint,
+  Citation,
+  QuestionGenerationRequest,
+  QuestionSearchParams,
+  DomainCode,
+} from './questions/global-question-types';
+
+export { QUESTION_RULES, DOMAIN_CODES } from './questions/global-question-types';
+export { SAMPLE_QUESTIONS } from './questions/sample-questions';
+
 // News Signal Engine
 export * from './signals/news-signal-engine';
 
