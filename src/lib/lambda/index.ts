@@ -103,3 +103,6 @@ export * from './setpoint-tolerance';
 
 // Lambda 1.0 (Global Optimal Balance Index)
 export * from './lambda-1.0';
+
+// Benchmark Normalization (OMX30-style global average = 100)
+export * from './benchmark-normalization';
