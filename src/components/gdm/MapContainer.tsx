@@ -18,6 +18,7 @@ import {
   MOCK_CITIES_HIERARCHICAL,
 } from './HierarchicalMarkers';
 import { IQ_DATA, getIQColor } from './IQIndicator';
+import { getRegionColor, type RegionType } from './RegionIndicator';
 import type { MapMode } from './types';
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
@@ -41,6 +42,8 @@ interface MapContainerProps {
   selectedCityIndicators?: string[];
   onSelectCity?: (cityId: string) => void;
   selectedCity?: string | null;
+  // Region visualization
+  activeRegionType?: RegionType | null;
 }
 
 /**
@@ -88,6 +91,7 @@ export function MapContainer({
   selectedCityIndicators = [],
   onSelectCity,
   selectedCity,
+  activeRegionType = null,
 }: MapContainerProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -164,12 +168,17 @@ export function MapContainer({
 
       const isSelected = selectedCountry === country.code;
       
-      // Determine score and color based on active layer
+      // Determine score and color based on active layer or region type
       let score: number;
       let scoreColor: string;
       let scoreLabel: string;
       
-      if (activeLayer === 'iq') {
+      if (activeRegionType) {
+        // Color by region type
+        score = 0; // Not used for regions
+        scoreColor = getRegionColor(country.code, activeRegionType);
+        scoreLabel = country.name.sv;
+      } else if (activeLayer === 'iq') {
         const iqInfo = IQ_DATA[country.code];
         score = iqInfo?.score || 0;
         scoreColor = iqInfo ? getIQColor(iqInfo.score) : '#9CA3AF';
@@ -189,10 +198,15 @@ export function MapContainer({
       el.setAttribute('aria-label', `${country.name.sv}: ${scoreLabel}`);
       
       // Create flag marker with 3D styling
+      // Show score badge only when not in region mode
+      const badgeContent = activeRegionType 
+        ? '' 
+        : `<div class="marker-score-badge" style="background: ${scoreColor}">${activeLayer === 'iq' ? (IQ_DATA[country.code]?.score || '—') : score}</div>`;
+      
       el.innerHTML = `
-        <div class="marker-container marker-country ${isSelected ? 'marker-selected' : ''}" style="${isSelected ? `box-shadow: 0 0 0 3px white, 0 0 0 5px ${scoreColor};` : ''}">
+        <div class="marker-container marker-country ${isSelected ? 'marker-selected' : ''}" style="${isSelected ? `box-shadow: 0 0 0 3px white, 0 0 0 5px ${scoreColor};` : ''}; ${activeRegionType ? `border: 3px solid ${scoreColor}; border-radius: 12px;` : ''}">
           <div class="marker-flag-large">${flag}</div>
-          <div class="marker-score-badge" style="background: ${scoreColor}">${activeLayer === 'iq' ? (IQ_DATA[country.code]?.score || '—') : score}</div>
+          ${badgeContent}
         </div>
       `;
 
@@ -258,7 +272,7 @@ export function MapContainer({
 
       markersRef.current.push(marker);
     });
-  }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear]);
+  }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear, activeRegionType]);
 
   // Add city markers when enabled (use hierarchical 3D style)
   useEffect(() => {

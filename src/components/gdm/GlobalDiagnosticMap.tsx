@@ -16,6 +16,7 @@ import { CountryInfoPanel } from './CountryInfoPanel';
 import { CityIndicatorSelector } from './CityIndicatorSelector';
 import { CityInfoPanel } from './CityInfoPanel';
 import { IQLegend } from './IQIndicator';
+import { RegionTypeSelector, RegionLegend, type RegionType } from './RegionIndicator';
 import type { MapLayerId, MapMode } from './types';
 
 /** Schema.org JSON-LD for machine readability */
@@ -40,6 +41,9 @@ export function GlobalDiagnosticMap() {
   const [showCitySelector, setShowCitySelector] = useState(false);
   const [selectedCityIndicators, setSelectedCityIndicators] = useState<string[]>(['life_expectancy', 'median_income']);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
+
+  // Region visualization state
+  const [activeRegionType, setActiveRegionType] = useState<RegionType | null>(null);
 
   // Time animation
   useEffect(() => {
@@ -96,6 +100,7 @@ export function GlobalDiagnosticMap() {
             selectedCityIndicators={selectedCityIndicators}
             onSelectCity={setSelectedCity}
             selectedCity={selectedCity}
+            activeRegionType={activeRegionType}
           />
         </section>
 
@@ -123,8 +128,23 @@ export function GlobalDiagnosticMap() {
           onToggle={() => setShowCitySelector(!showCitySelector)}
         />
 
+        {/* Region Type Selector - top left below cities */}
+        <div className="absolute top-20 left-4 z-20">
+          <RegionTypeSelector
+            selected={activeRegionType}
+            onChange={setActiveRegionType}
+          />
+        </div>
+
+        {/* Region Legend - show when region type is active */}
+        {activeRegionType && (
+          <div className="absolute bottom-24 right-4 z-20">
+            <RegionLegend regionType={activeRegionType} />
+          </div>
+        )}
+
         {/* IQ Legend - show when IQ layer is active */}
-        {activeIndex === 'iq' && (
+        {activeIndex === 'iq' && !activeRegionType && (
           <div className="absolute bottom-24 right-4 z-20">
             <IQLegend />
           </div>
