@@ -109,6 +109,9 @@ import GDGSpec from "./pages/GDGSpec";
 import Methodology from "./pages/Methodology";
 import WhatWeDoNot from "./pages/WhatWeDoNot";
 import Validator from "./pages/Validator";
+import ReportsPage from "./pages/Reports";
+import ReportPage from "./pages/Report";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -224,6 +227,8 @@ const App = () => (
                 <Route path="/methodology" element={<Methodology />} />
                 <Route path="/what-we-do-not" element={<WhatWeDoNot />} />
                 <Route path="/validator" element={<Validator />} />
+                <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/report/:slug" element={<ReportPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
