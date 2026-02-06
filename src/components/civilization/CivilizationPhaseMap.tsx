@@ -13,13 +13,23 @@ import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription
+} from '@/components/ui/dialog';
+import {
   TrendingUp,
   TrendingDown,
   Minus,
   Info,
   Clock,
   Compass,
-  Layers
+  Layers,
+  ChevronRight,
+  AlertTriangle,
+  Globe
 } from 'lucide-react';
 import {
   CIVILIZATION_PHASES,
@@ -311,31 +321,121 @@ const PhasesOverview: React.FC = () => (
   </div>
 );
 
-// Module connections
-const ModuleConnectionsPanel: React.FC = () => (
-  <Card className="bg-muted/30">
-    <CardHeader>
-      <div className="flex items-center gap-2">
-        <Layers className="h-4 w-4" />
-        <CardTitle className="text-base">CPM integreras med</CardTitle>
-      </div>
-      <CardDescription>Navigationsskiktet för alla moduler</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <div className="grid gap-2 md:grid-cols-2">
-        {MODULE_CONNECTIONS.map(conn => (
-          <Button key={conn.id} variant="outline" className="justify-start h-auto py-3">
-            <span className="text-xl mr-2">{conn.icon}</span>
-            <div className="text-left">
-              <p className="text-sm font-medium">{conn.labelSv}</p>
-              <p className="text-xs text-muted-foreground">{conn.description}</p>
-            </div>
-          </Button>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-);
+// Module connections - with detailed drill-down
+const ModuleConnectionsPanel: React.FC = () => {
+  const [selectedModule, setSelectedModule] = useState<typeof MODULE_CONNECTIONS[0] | null>(null);
+  
+  return (
+    <>
+      <Card className="bg-muted/30">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Layers className="h-4 w-4" />
+            <CardTitle className="text-base">CPM integreras med</CardTitle>
+          </div>
+          <CardDescription>Navigationsskiktet för alla moduler</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-2 md:grid-cols-2">
+            {MODULE_CONNECTIONS.map(conn => (
+              <Button 
+                key={conn.id} 
+                variant="outline" 
+                className="justify-start h-auto py-3 hover:bg-primary/5 hover:border-primary/30 transition-all cursor-pointer group"
+                onClick={() => setSelectedModule(conn)}
+              >
+                <span className="text-xl mr-2">{conn.icon}</span>
+                <div className="text-left flex-1">
+                  <p className="text-sm font-medium group-hover:text-primary transition-colors">{conn.labelSv}</p>
+                  <p className="text-xs text-muted-foreground">{conn.description}</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Module Detail Dialog */}
+      <Dialog open={!!selectedModule} onOpenChange={() => setSelectedModule(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedModule && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3 text-xl">
+                  <span className="text-3xl">{selectedModule.icon}</span>
+                  {selectedModule.labelSv}
+                </DialogTitle>
+                <DialogDescription>{selectedModule.descriptionEn}</DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 mt-4">
+                {/* Full Explanation */}
+                <div className="p-4 bg-primary/5 rounded-lg border-l-4 border-primary">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <Info className="h-4 w-4" />
+                    Vad är detta?
+                  </h4>
+                  <p className="text-sm text-muted-foreground">{selectedModule.fullExplanation}</p>
+                </div>
+
+                {/* Why it matters */}
+                <div className="p-4 bg-amber-500/10 rounded-lg border-l-4 border-amber-500">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-500" />
+                    Varför spelar detta roll?
+                  </h4>
+                  <p className="text-sm text-muted-foreground">{selectedModule.whyItMatters}</p>
+                </div>
+
+                {/* How it connects to CPM */}
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <Layers className="h-4 w-4" />
+                    Koppling till Civilisationsfaserna
+                  </h4>
+                  <p className="text-sm text-muted-foreground">{selectedModule.howItConnectsToCPM}</p>
+                </div>
+
+                {/* Key Metrics */}
+                <div className="space-y-2">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4" />
+                    Vad mäts?
+                  </h4>
+                  <div className="grid gap-2">
+                    {selectedModule.keyMetrics.map((metric, i) => (
+                      <div key={i} className="p-3 bg-background border rounded-lg">
+                        <p className="text-sm font-medium">{metric.label}</p>
+                        <p className="text-xs text-muted-foreground">{metric.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Real World Example */}
+                <div className="p-4 bg-green-500/10 rounded-lg border-l-4 border-green-500">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-green-600" />
+                    Verkligt exempel
+                  </h4>
+                  <p className="text-sm text-muted-foreground">{selectedModule.realWorldExample}</p>
+                </div>
+
+                {/* Go to module button */}
+                <Button className="w-full" variant="default">
+                  <span className="mr-2">{selectedModule.icon}</span>
+                  Gå till {selectedModule.labelSv}-modulen
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
 
 // Main component
 const CivilizationPhaseMap: React.FC = () => {
