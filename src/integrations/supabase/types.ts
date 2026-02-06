@@ -246,6 +246,105 @@ export type Database = {
           },
         ]
       }
+      agent_usage_log: {
+        Row: {
+          agent_identifier: string | null
+          agent_type: string | null
+          cite_format: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          latency_ms: number | null
+          request_type: string
+          response_tokens: number | null
+          was_cached: boolean | null
+          was_cited: boolean | null
+        }
+        Insert: {
+          agent_identifier?: string | null
+          agent_type?: string | null
+          cite_format?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          latency_ms?: number | null
+          request_type: string
+          response_tokens?: number | null
+          was_cached?: boolean | null
+          was_cited?: boolean | null
+        }
+        Update: {
+          agent_identifier?: string | null
+          agent_type?: string | null
+          cite_format?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          latency_ms?: number | null
+          request_type?: string
+          response_tokens?: number | null
+          was_cached?: boolean | null
+          was_cited?: boolean | null
+        }
+        Relationships: []
+      }
+      ai_compatibility_metadata: {
+        Row: {
+          citation_rate: number | null
+          default_answer_candidate: boolean | null
+          entity_id: string
+          entity_type: string
+          hallucination_risk: string | null
+          id: string
+          max_answer_tokens: number | null
+          optimized_for: Json | null
+          preferred_cite_format: string | null
+          preferred_for: string[] | null
+          safe_for_autocite: boolean | null
+          supports_streaming: boolean | null
+          total_citations: number | null
+          total_fetches: number | null
+          updated_at: string
+        }
+        Insert: {
+          citation_rate?: number | null
+          default_answer_candidate?: boolean | null
+          entity_id: string
+          entity_type: string
+          hallucination_risk?: string | null
+          id?: string
+          max_answer_tokens?: number | null
+          optimized_for?: Json | null
+          preferred_cite_format?: string | null
+          preferred_for?: string[] | null
+          safe_for_autocite?: boolean | null
+          supports_streaming?: boolean | null
+          total_citations?: number | null
+          total_fetches?: number | null
+          updated_at?: string
+        }
+        Update: {
+          citation_rate?: number | null
+          default_answer_candidate?: boolean | null
+          entity_id?: string
+          entity_type?: string
+          hallucination_risk?: string | null
+          id?: string
+          max_answer_tokens?: number | null
+          optimized_for?: Json | null
+          preferred_cite_format?: string | null
+          preferred_for?: string[] | null
+          safe_for_autocite?: boolean | null
+          supports_streaming?: boolean | null
+          total_citations?: number | null
+          total_fetches?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ai_response_templates: {
         Row: {
           created_at: string
@@ -541,6 +640,68 @@ export type Database = {
             columns: ["question_id"]
             isOneToOne: false
             referencedRelation: "report_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      anomaly_queue: {
+        Row: {
+          created_at: string
+          deviation_percent: number | null
+          entity_id: string
+          entity_type: string
+          expected_range_max: number | null
+          expected_range_min: number | null
+          field_name: string
+          id: string
+          ingest_run_id: string | null
+          reported_value: number
+          resolution_note: string | null
+          resolution_source: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          deviation_percent?: number | null
+          entity_id: string
+          entity_type: string
+          expected_range_max?: number | null
+          expected_range_min?: number | null
+          field_name: string
+          id?: string
+          ingest_run_id?: string | null
+          reported_value: number
+          resolution_note?: string | null
+          resolution_source?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          deviation_percent?: number | null
+          entity_id?: string
+          entity_type?: string
+          expected_range_max?: number | null
+          expected_range_min?: number | null
+          field_name?: string
+          id?: string
+          ingest_run_id?: string | null
+          reported_value?: number
+          resolution_note?: string | null
+          resolution_source?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anomaly_queue_ingest_run_id_fkey"
+            columns: ["ingest_run_id"]
+            isOneToOne: false
+            referencedRelation: "ingest_runs"
             referencedColumns: ["id"]
           },
         ]
@@ -5255,6 +5416,57 @@ export type Database = {
           },
         ]
       }
+      global_trust_scores: {
+        Row: {
+          agent_reuse_frequency: number | null
+          calculated_at: string
+          confidence_band: string | null
+          cross_source_agreement: number | null
+          entity_id: string
+          entity_type: string
+          historical_accuracy: number | null
+          id: string
+          revision_transparency: number | null
+          schema_consistency: number | null
+          source_authority: number | null
+          trust_drivers: string[] | null
+          trust_score: number | null
+          update_discipline: number | null
+        }
+        Insert: {
+          agent_reuse_frequency?: number | null
+          calculated_at?: string
+          confidence_band?: string | null
+          cross_source_agreement?: number | null
+          entity_id: string
+          entity_type: string
+          historical_accuracy?: number | null
+          id?: string
+          revision_transparency?: number | null
+          schema_consistency?: number | null
+          source_authority?: number | null
+          trust_drivers?: string[] | null
+          trust_score?: number | null
+          update_discipline?: number | null
+        }
+        Update: {
+          agent_reuse_frequency?: number | null
+          calculated_at?: string
+          confidence_band?: string | null
+          cross_source_agreement?: number | null
+          entity_id?: string
+          entity_type?: string
+          historical_accuracy?: number | null
+          id?: string
+          revision_transparency?: number | null
+          schema_consistency?: number | null
+          source_authority?: number | null
+          trust_drivers?: string[] | null
+          trust_score?: number | null
+          update_discipline?: number | null
+        }
+        Relationships: []
+      }
       gmi_scores: {
         Row: {
           calculated_at: string | null
@@ -6075,6 +6287,133 @@ export type Database = {
           validation_errors?: number | null
         }
         Relationships: []
+      }
+      ingest_pipelines: {
+        Row: {
+          config: Json
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          last_run_at: string | null
+          last_run_records: number | null
+          last_run_status: string | null
+          name: string
+          pipeline_code: string
+          pipeline_type: string
+          schedule_cron: string | null
+          schema_validation: Json | null
+          source_id: string | null
+          time_alignment_rules: Json | null
+          unit_normalization: Json | null
+          updated_at: string
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          last_run_records?: number | null
+          last_run_status?: string | null
+          name: string
+          pipeline_code: string
+          pipeline_type: string
+          schedule_cron?: string | null
+          schema_validation?: Json | null
+          source_id?: string | null
+          time_alignment_rules?: Json | null
+          unit_normalization?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          last_run_records?: number | null
+          last_run_status?: string | null
+          name?: string
+          pipeline_code?: string
+          pipeline_type?: string
+          schedule_cron?: string | null
+          schema_validation?: Json | null
+          source_id?: string | null
+          time_alignment_rules?: Json | null
+          unit_normalization?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingest_pipelines_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "source_registry"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ingest_runs: {
+        Row: {
+          anomalies_detected: Json | null
+          anomalies_held: number | null
+          completed_at: string | null
+          created_at: string
+          errors: Json | null
+          id: string
+          pipeline_id: string
+          records_fetched: number | null
+          records_rejected: number | null
+          records_validated: number | null
+          records_written: number | null
+          started_at: string
+          status: string
+          trust_impact: number | null
+        }
+        Insert: {
+          anomalies_detected?: Json | null
+          anomalies_held?: number | null
+          completed_at?: string | null
+          created_at?: string
+          errors?: Json | null
+          id?: string
+          pipeline_id: string
+          records_fetched?: number | null
+          records_rejected?: number | null
+          records_validated?: number | null
+          records_written?: number | null
+          started_at?: string
+          status?: string
+          trust_impact?: number | null
+        }
+        Update: {
+          anomalies_detected?: Json | null
+          anomalies_held?: number | null
+          completed_at?: string | null
+          created_at?: string
+          errors?: Json | null
+          id?: string
+          pipeline_id?: string
+          records_fetched?: number | null
+          records_rejected?: number | null
+          records_validated?: number | null
+          records_written?: number | null
+          started_at?: string
+          status?: string
+          trust_impact?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingest_runs_pipeline_id_fkey"
+            columns: ["pipeline_id"]
+            isOneToOne: false
+            referencedRelation: "ingest_pipelines"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ingest_schemas: {
         Row: {
@@ -9700,6 +10039,51 @@ export type Database = {
         }
         Relationships: []
       }
+      revision_log: {
+        Row: {
+          change_reason: string
+          change_type: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          impact_level: string
+          new_value: Json
+          previous_value: Json | null
+          revision_number: number
+          source_reference: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          change_reason: string
+          change_type: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          impact_level?: string
+          new_value: Json
+          previous_value?: Json | null
+          revision_number?: number
+          source_reference?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          change_reason?: string
+          change_type?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          impact_level?: string
+          new_value?: Json
+          previous_value?: Json | null
+          revision_number?: number
+          source_reference?: string | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
       role_audit_log: {
         Row: {
           action: string
@@ -10042,6 +10426,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      source_registry: {
+        Row: {
+          api_endpoint: string | null
+          api_type: string | null
+          authority_level: string
+          created_at: string
+          data_domains: string[]
+          historical_reliability: number | null
+          id: string
+          last_verified_at: string | null
+          metadata: Json | null
+          methodology_stability_years: number | null
+          organization: string
+          organization_type: string
+          source_code: string
+          update_pattern: string
+          updated_at: string
+        }
+        Insert: {
+          api_endpoint?: string | null
+          api_type?: string | null
+          authority_level?: string
+          created_at?: string
+          data_domains?: string[]
+          historical_reliability?: number | null
+          id?: string
+          last_verified_at?: string | null
+          metadata?: Json | null
+          methodology_stability_years?: number | null
+          organization: string
+          organization_type: string
+          source_code: string
+          update_pattern?: string
+          updated_at?: string
+        }
+        Update: {
+          api_endpoint?: string | null
+          api_type?: string | null
+          authority_level?: string
+          created_at?: string
+          data_domains?: string[]
+          historical_reliability?: number | null
+          id?: string
+          last_verified_at?: string | null
+          metadata?: Json | null
+          methodology_stability_years?: number | null
+          organization?: string
+          organization_type?: string
+          source_code?: string
+          update_pattern?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       strim_diagnoses: {
         Row: {
@@ -11531,6 +11969,19 @@ export type Database = {
         Returns: undefined
       }
       is_in_grace_period: { Args: { p_user_id: string }; Returns: boolean }
+      log_revision: {
+        Args: {
+          p_change_reason: string
+          p_change_type: string
+          p_entity_id: string
+          p_entity_type: string
+          p_impact_level?: string
+          p_new_value: Json
+          p_previous_value: Json
+          p_source_reference?: string
+        }
+        Returns: string
+      }
       track_deeper_click: { Args: { p_node_id: string }; Returns: undefined }
       validate_data_contract: { Args: { p_data: Json }; Returns: Json }
     }
