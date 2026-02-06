@@ -1308,6 +1308,361 @@ const GEO_DATA_SOURCES: Record<string, { sources: string[]; note: string }> = {
 };
 
 // ============================================
+// REGION-SPECIFIC DATA GENERATOR
+// ============================================
+
+// Baseline scores per region - reflects actual global health disparities
+const REGION_BASELINE_SCORES: Record<string, {
+  health: number;
+  economy: number;
+  education: number;
+  environment: number;
+  safety: number;
+  democracy: number;
+}> = {
+  // Global average
+  'global': { health: 68, economy: 55, education: 62, environment: 52, safety: 58, democracy: 54 },
+  
+  // Continents
+  'europe': { health: 82, economy: 73, education: 81, environment: 68, safety: 78, democracy: 82 },
+  'americas': { health: 72, economy: 61, education: 68, environment: 55, safety: 52, democracy: 65 },
+  'asia': { health: 71, economy: 62, education: 66, environment: 48, safety: 64, democracy: 48 },
+  'africa': { health: 52, economy: 38, education: 45, environment: 58, safety: 42, democracy: 44 },
+  'oceania': { health: 78, economy: 72, education: 76, environment: 62, safety: 75, democracy: 85 },
+  
+  // Nordic countries (high scores)
+  'SE': { health: 86, economy: 78, education: 85, environment: 72, safety: 68, democracy: 92 },
+  'NO': { health: 88, economy: 82, education: 84, environment: 68, safety: 82, democracy: 95 },
+  'DK': { health: 85, economy: 79, education: 82, environment: 70, safety: 84, democracy: 94 },
+  'FI': { health: 84, economy: 76, education: 88, environment: 74, safety: 86, democracy: 93 },
+  'IS': { health: 87, economy: 75, education: 83, environment: 78, safety: 92, democracy: 96 },
+  
+  // Western Europe
+  'DE': { health: 83, economy: 81, education: 79, environment: 65, safety: 75, democracy: 88 },
+  'FR': { health: 84, economy: 72, education: 76, environment: 62, safety: 68, democracy: 82 },
+  'UK': { health: 82, economy: 74, education: 78, environment: 64, safety: 72, democracy: 84 },
+  'NL': { health: 85, economy: 80, education: 82, environment: 66, safety: 80, democracy: 91 },
+  
+  // Americas
+  'US': { health: 76, economy: 78, education: 74, environment: 52, safety: 48, democracy: 72 },
+  'CA': { health: 84, economy: 77, education: 82, environment: 68, safety: 82, democracy: 88 },
+  'BR': { health: 62, economy: 52, education: 56, environment: 48, safety: 38, democracy: 58 },
+  'MX': { health: 68, economy: 58, education: 58, environment: 52, safety: 35, democracy: 55 },
+  
+  // Asia
+  'JP': { health: 88, economy: 75, education: 84, environment: 62, safety: 92, democracy: 78 },
+  'CN': { health: 72, economy: 68, education: 72, environment: 42, safety: 78, democracy: 18 },
+  'IN': { health: 58, economy: 52, education: 52, environment: 38, safety: 48, democracy: 62 },
+  'KR': { health: 85, economy: 76, education: 86, environment: 55, safety: 88, democracy: 82 },
+  
+  // Africa
+  'ZA': { health: 55, economy: 48, education: 52, environment: 58, safety: 32, democracy: 68 },
+  'NG': { health: 45, economy: 42, education: 48, environment: 45, safety: 35, democracy: 52 },
+  'EG': { health: 62, economy: 52, education: 58, environment: 48, safety: 58, democracy: 28 },
+  'KE': { health: 52, economy: 45, education: 55, environment: 62, safety: 45, democracy: 58 },
+  
+  // Oceania
+  'AU': { health: 86, economy: 78, education: 82, environment: 58, safety: 82, democracy: 88 },
+  'NZ': { health: 85, economy: 75, education: 80, environment: 72, safety: 88, democracy: 92 },
+};
+
+function getStatus(score: number): 'excellent' | 'good' | 'attention' | 'critical' {
+  if (score >= 80) return 'excellent';
+  if (score >= 65) return 'good';
+  if (score >= 45) return 'attention';
+  return 'critical';
+}
+
+function generateScopedCategories(scopeCode: string): CategoryData[] {
+  const baseline = REGION_BASELINE_SCORES[scopeCode] || REGION_BASELINE_SCORES['global'];
+  const scope = GEO_SCOPES[scopeCode] || GEO_SCOPES['global'];
+  
+  // Add small random variation to make it feel "live" (+/- 2)
+  const vary = (base: number) => Math.max(0, Math.min(100, base + Math.floor(Math.random() * 5) - 2));
+  const trendVary = () => (Math.random() * 4 - 2).toFixed(1);
+  
+  const dataSource = GEO_DATA_SOURCES[scopeCode] || GEO_DATA_SOURCES['global'];
+  const sources = dataSource.sources;
+  
+  return [
+    {
+      id: 'health',
+      name: 'Hälsa & Välbefinnande',
+      icon: '❤️',
+      score: vary(baseline.health),
+      trend: parseFloat(trendVary()),
+      status: getStatus(baseline.health),
+      description: 'Livslängd, sjukvård och allmän folkhälsa',
+      indicators: [
+        { 
+          id: '1', 
+          name: 'Förväntad livslängd', 
+          value: (baseline.health * 0.95 + 5).toFixed(1), 
+          unit: 'år', 
+          trend: parseFloat((Math.random() * 2 - 0.5).toFixed(2)), 
+          status: getStatus(baseline.health), 
+          explanation: 'Genomsnittlig förväntad livslängd vid födseln', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Hur många år en person som föds idag statistiskt kan förväntas leva, baserat på nuvarande dödlighetstal.',
+          howItsMeasured: 'Nationella statistikbyråer samlar in dödsorsaksdata och beräknar förväntad livslängd med Kaplan-Meier-metoden.',
+          whyItMatters: 'En av de viktigaste indikatorerna på övergripande samhällshälsa. Påverkas av sjukvård, levnadsvanor, miljö och socioekonomiska faktorer.',
+          exampleInPractice: `I ${scope.name} kan en person som föds idag statistiskt förvänta sig att leva cirka ${(baseline.health * 0.95 + 5).toFixed(0)} år.`,
+          source: sources[0], 
+          sourceUrl: 'https://data.worldbank.org/indicator/SP.DYN.LE00.IN'
+        },
+        { 
+          id: '2', 
+          name: 'Spädbarnsdödlighet', 
+          value: Math.max(1, Math.round((100 - baseline.health) * 0.5)).toString(), 
+          unit: 'per 1000', 
+          trend: parseFloat((Math.random() * 3 - 2).toFixed(1)), 
+          status: getStatus(baseline.health - 5), 
+          explanation: 'Dödsfall bland barn under 1 år per 1000 levande födda', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Antal barn som dör innan de fyllt ett år, per 1000 levande födda.',
+          howItsMeasured: 'Rapporteras av förlossningsenheter och dödsorsaksregister, normaliserat per 1000 födslar.',
+          whyItMatters: 'En känslig indikator på sjukvårdskvalitet, nutrition och sanitära förhållanden.',
+          exampleInPractice: `I ${scope.name} dör cirka ${Math.max(1, Math.round((100 - baseline.health) * 0.5))} av 1000 nyfödda barn innan de fyllt ett år.`,
+          source: sources[1] || sources[0], 
+          sourceUrl: 'https://data.worldbank.org/indicator/SP.DYN.IMRT.IN'
+        },
+        { 
+          id: '3', 
+          name: 'Vårdtillgänglighet', 
+          value: Math.round(baseline.health * 0.9).toString(), 
+          unit: 'index', 
+          trend: parseFloat((Math.random() * 2 - 1).toFixed(1)), 
+          status: getStatus(baseline.health - 3), 
+          explanation: 'Tillgång till grundläggande sjukvård (0-100 index)', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Ett sammansatt index som mäter tillgång till sjukvård, läkartäthet, och vårdinfrastruktur.',
+          howItsMeasured: 'WHO sammanställer nationella data om vårdpersonal, sjukhus och behandlingskostnader.',
+          whyItMatters: 'God vårdtillgänglighet minskar dödlighet och ökar livskvalitet.',
+          exampleInPractice: `Ett värde på ${Math.round(baseline.health * 0.9)} betyder ${baseline.health >= 70 ? 'relativt god' : 'begränsad'} tillgång till sjukvård jämfört med globalt genomsnitt.`,
+          source: 'WHO', 
+          sourceUrl: 'https://www.who.int/data/gho'
+        },
+      ]
+    },
+    {
+      id: 'economy',
+      name: 'Ekonomi & Arbete',
+      icon: '💼',
+      score: vary(baseline.economy),
+      trend: parseFloat(trendVary()),
+      status: getStatus(baseline.economy),
+      description: 'Sysselsättning, inkomster och ekonomisk stabilitet',
+      indicators: [
+        { 
+          id: '4', 
+          name: 'Arbetslöshet', 
+          value: Math.max(2, Math.round((100 - baseline.economy) * 0.15)).toString(), 
+          unit: '%', 
+          trend: parseFloat((Math.random() * 2 - 1).toFixed(1)), 
+          status: getStatus(baseline.economy - 5), 
+          explanation: 'Andel arbetslösa av arbetskraften', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andelen personer som aktivt söker arbete men inte har ett jobb.',
+          howItsMeasured: 'Nationella arbetskraftsundersökningar med standardiserade ILO-definitioner.',
+          whyItMatters: 'Hög arbetslöshet påverkar individers ekonomi, psykiska hälsa och samhällets skatteintäkter.',
+          exampleInPractice: `I ${scope.name} är cirka ${Math.max(2, Math.round((100 - baseline.economy) * 0.15))}% av arbetskraften utan arbete.`,
+          source: sources[0], 
+          sourceUrl: 'https://data.worldbank.org/indicator/SL.UEM.TOTL.ZS'
+        },
+        { 
+          id: '5', 
+          name: 'BNP per capita', 
+          value: (baseline.economy * 800 + 5000).toLocaleString('sv-SE'), 
+          unit: 'USD', 
+          trend: parseFloat((Math.random() * 4 - 1).toFixed(1)), 
+          status: getStatus(baseline.economy), 
+          explanation: 'Bruttonationalprodukt per invånare', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Det totala ekonomiska värdet av alla producerade varor och tjänster, delat med befolkningen.',
+          howItsMeasured: 'Nationalräkenskaper summerar produktion, justerat för köpkraftsparitet (PPP).',
+          whyItMatters: 'Ett grundläggande mått på ekonomiskt välstånd, men säger inget om fördelning.',
+          exampleInPractice: `I ${scope.name} produceras i genomsnitt ${(baseline.economy * 800 + 5000).toLocaleString('sv-SE')} USD i ekonomiskt värde per person och år.`,
+          source: 'World Bank', 
+          sourceUrl: 'https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.CD'
+        },
+      ]
+    },
+    {
+      id: 'education',
+      name: 'Utbildning & Kunskap',
+      icon: '🎓',
+      score: vary(baseline.education),
+      trend: parseFloat(trendVary()),
+      status: getStatus(baseline.education),
+      description: 'Skolresultat, utbildningsnivå och kompetens',
+      indicators: [
+        { 
+          id: '7', 
+          name: 'Läskunnighet', 
+          value: Math.min(99.8, baseline.education + 15).toFixed(1), 
+          unit: '%', 
+          trend: parseFloat((Math.random() * 1).toFixed(1)), 
+          status: getStatus(baseline.education + 10), 
+          explanation: 'Andel vuxna som kan läsa och skriva', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andelen av vuxna (15+) som kan läsa och skriva en enkel text.',
+          howItsMeasured: 'UNESCO samlar in data från nationella utbildningsundersökningar.',
+          whyItMatters: 'Grundläggande läskunnighet är en förutsättning för ekonomiskt och demokratiskt deltagande.',
+          exampleInPractice: `I ${scope.name} kan ${Math.min(99.8, baseline.education + 15).toFixed(0)}% av den vuxna befolkningen läsa och skriva.`,
+          source: 'UNESCO', 
+          sourceUrl: 'https://data.worldbank.org/indicator/SE.ADT.LITR.ZS'
+        },
+        { 
+          id: '8', 
+          name: 'Högskoleutbildade', 
+          value: Math.max(5, Math.round(baseline.education * 0.45)).toString(), 
+          unit: '%', 
+          trend: parseFloat((Math.random() * 2).toFixed(1)), 
+          status: getStatus(baseline.education - 5), 
+          explanation: 'Andel av befolkningen med eftergymnasial utbildning', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andelen vuxna (25-64 år) med minst två års högskoleutbildning.',
+          howItsMeasured: 'Nationella utbildningsregister och folkräkningsdata.',
+          whyItMatters: 'Utbildningsnivån påverkar innovation, produktivitet och konkurrenskraft.',
+          exampleInPractice: `I ${scope.name} har cirka ${Math.max(5, Math.round(baseline.education * 0.45))}% av vuxna en högskoleexamen.`,
+          source: 'OECD', 
+          sourceUrl: 'https://data.oecd.org/eduatt/population-with-tertiary-education.htm'
+        },
+      ]
+    },
+    {
+      id: 'environment',
+      name: 'Miljö & Klimat',
+      icon: '🌿',
+      score: vary(baseline.environment),
+      trend: parseFloat(trendVary()),
+      status: getStatus(baseline.environment),
+      description: 'Utsläpp, förnybar energi och naturresurser',
+      indicators: [
+        { 
+          id: '9', 
+          name: 'CO2-utsläpp', 
+          value: Math.max(0.5, ((100 - baseline.environment) * 0.18)).toFixed(1), 
+          unit: 'ton/capita', 
+          trend: parseFloat((Math.random() * 4 - 3).toFixed(1)), 
+          status: getStatus(baseline.environment - 10), 
+          explanation: 'Årliga koldioxidutsläpp per person', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Den genomsnittliga mängden koldioxid per invånare från energi, transport och industri.',
+          howItsMeasured: 'Nationella utsläppsrapporter till UNFCCC, delat med befolkning.',
+          whyItMatters: 'Koldioxid är den viktigaste växthusgasen bakom klimatförändringarna.',
+          exampleInPractice: `I ${scope.name} släpper varje person ut cirka ${Math.max(0.5, ((100 - baseline.environment) * 0.18)).toFixed(1)} ton CO2 per år.`,
+          source: 'Our World in Data', 
+          sourceUrl: 'https://ourworldindata.org/co2-emissions'
+        },
+        { 
+          id: '10', 
+          name: 'Förnybar energi', 
+          value: Math.min(95, Math.round(baseline.environment * 0.8)).toString(), 
+          unit: '%', 
+          trend: parseFloat((Math.random() * 3).toFixed(1)), 
+          status: getStatus(baseline.environment + 5), 
+          explanation: 'Andel energi från förnybara källor', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andelen av total energiförbrukning från förnybara källor (sol, vind, vatten, bio).',
+          howItsMeasured: 'Energibalanser rapporterade av nationella energimyndigheter till IEA.',
+          whyItMatters: 'Förnybar energi minskar utsläpp och ökar energisäkerhet.',
+          exampleInPractice: `I ${scope.name} kommer cirka ${Math.min(95, Math.round(baseline.environment * 0.8))}% av energin från förnybara källor.`,
+          source: 'IEA', 
+          sourceUrl: 'https://www.iea.org/data-and-statistics'
+        },
+      ]
+    },
+    {
+      id: 'safety',
+      name: 'Trygghet & Säkerhet',
+      icon: '🛡️',
+      score: vary(baseline.safety),
+      trend: parseFloat(trendVary()),
+      status: getStatus(baseline.safety),
+      description: 'Brottslighet, rättsväsende och social trygghet',
+      indicators: [
+        { 
+          id: '11', 
+          name: 'Mordfrekvens', 
+          value: Math.max(0.5, ((100 - baseline.safety) * 0.3)).toFixed(1), 
+          unit: 'per 100k', 
+          trend: parseFloat((Math.random() * 3 - 1.5).toFixed(1)), 
+          status: getStatus(baseline.safety - 5), 
+          explanation: 'Antal mord per 100 000 invånare per år', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Antal avsiktliga dödligt våld per 100 000 invånare.',
+          howItsMeasured: 'Brottsstatistik och dödsorsaksregister, harmoniserat via UNODC.',
+          whyItMatters: 'Mordfrekvens är en stark indikator på samhällets grundläggande trygghet.',
+          exampleInPractice: `I ${scope.name} begås cirka ${Math.max(0.5, ((100 - baseline.safety) * 0.3)).toFixed(1)} mord per 100 000 invånare och år.`,
+          source: 'UNODC', 
+          sourceUrl: 'https://dataunodc.un.org/content/homicide-rate-option-2'
+        },
+        { 
+          id: '12', 
+          name: 'Upplevd trygghet', 
+          value: Math.min(95, Math.round(baseline.safety * 0.85)).toString(), 
+          unit: '%', 
+          trend: parseFloat((Math.random() * 2 - 1).toFixed(1)), 
+          status: getStatus(baseline.safety), 
+          explanation: 'Andel som känner sig trygga i sitt bostadsområde', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andel respondenter som uppger att de känner sig trygga att gå ute på kvällen.',
+          howItsMeasured: 'Nationella trygghetsundersökningar och Gallup World Poll.',
+          whyItMatters: 'Upplevd trygghet påverkar livskvalitet och social sammanhållning.',
+          exampleInPractice: `I ${scope.name} uppger ${Math.min(95, Math.round(baseline.safety * 0.85))}% att de känner sig trygga i sitt bostadsområde.`,
+          source: 'Gallup', 
+          sourceUrl: 'https://news.gallup.com/poll/topic/world_poll.aspx'
+        },
+      ]
+    },
+    {
+      id: 'democracy',
+      name: 'Demokrati & Samhälle',
+      icon: '🏛️',
+      score: vary(baseline.democracy),
+      trend: parseFloat(trendVary()),
+      status: getStatus(baseline.democracy),
+      description: 'Politiskt deltagande, förtroende och medborgarskap',
+      indicators: [
+        { 
+          id: '13', 
+          name: 'Demokratiindex', 
+          value: (baseline.democracy / 10).toFixed(1), 
+          unit: '/10', 
+          trend: parseFloat((Math.random() * 1 - 0.5).toFixed(2)), 
+          status: getStatus(baseline.democracy), 
+          explanation: 'Economist Intelligence Unit Democracy Index', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Ett sammansatt index av valsystem, pluralism, politisk kultur och civila rättigheter.',
+          howItsMeasured: 'EIU bedömer 60 indikatorer baserat på expertundersökningar och offentliga data.',
+          whyItMatters: 'Demokratiska institutioner korrelerar med mänsklig utveckling och fred.',
+          exampleInPractice: `${scope.name} klassificeras som ${baseline.democracy >= 80 ? 'full demokrati' : baseline.democracy >= 60 ? 'ofullständig demokrati' : baseline.democracy >= 40 ? 'hybridregim' : 'auktoritär regim'} med indexvärde ${(baseline.democracy / 10).toFixed(1)}.`,
+          source: 'EIU', 
+          sourceUrl: 'https://www.eiu.com/n/campaigns/democracy-index-2024/'
+        },
+        { 
+          id: '14', 
+          name: 'Pressfrihet', 
+          value: Math.min(100, Math.round(baseline.democracy * 0.95)).toString(), 
+          unit: 'index', 
+          trend: parseFloat((Math.random() * 2 - 1).toFixed(1)), 
+          status: getStatus(baseline.democracy - 3), 
+          explanation: 'Press Freedom Index (omvänd skala, högre = bättre)', 
+          lastUpdated: '2025-01-15',
+          whatItMeasures: 'Graden av mediefrihet och journalisters säkerhet.',
+          howItsMeasured: 'Reporters Without Borders sammanställer expertbedömningar och incidentrapporter.',
+          whyItMatters: 'Fri press är grundläggande för demokratiskt ansvarsutkrävande.',
+          exampleInPractice: `${scope.name} har ${baseline.democracy >= 80 ? 'mycket hög' : baseline.democracy >= 60 ? 'god' : baseline.democracy >= 40 ? 'begränsad' : 'mycket begränsad'} pressfrihet.`,
+          source: 'RSF', 
+          sourceUrl: 'https://rsf.org/en/index'
+        },
+      ]
+    },
+  ];
+}
+
+// ============================================
 // GEO SCOPE SELECTOR COMPONENT
 // ============================================
 
@@ -1461,201 +1816,9 @@ export const AppleHealthDashboard: React.FC<AppleHealthDashboardProps> = ({ clas
   const geoScope = GEO_SCOPES[currentGeoScope] || GEO_SCOPES['global'];
   const { title: scopeTitle, subtitle: scopeSubtitle } = getScopeTitle(geoScope);
 
-  // Mock data (would be fetched based on geo scope in real implementation)
-  const categories: CategoryData[] = [
-    {
-      id: 'health',
-      name: 'Hälsa & Välbefinnande',
-      icon: '❤️',
-      score: 82,
-      trend: 1.2,
-      status: 'good',
-      description: 'Livslängd, sjukvård och allmän folkhälsa',
-      indicators: [
-        { 
-          id: '1', name: 'Förväntad livslängd', value: '83.1', unit: 'år', trend: 0.12, status: 'excellent', 
-          explanation: 'Genomsnittlig förväntad livslängd vid födseln', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Detta mäter hur många år en person som föds idag statistiskt kan förväntas leva, baserat på nuvarande dödlighetstal i olika åldersgrupper.',
-          howItsMeasured: 'SCB samlar in data om alla dödsfall i Sverige och beräknar sannolikheten att dö i varje åldersgrupp. Dessa sannolikheter summeras sedan till en förväntad livslängd.',
-          whyItMatters: 'Förväntad livslängd är en av de viktigaste indikatorerna på ett samhälles övergripande hälsa. Den påverkas av sjukvårdens kvalitet, levnadsvanor, miljö och socioekonomiska faktorer.',
-          exampleInPractice: 'Om du föds i Sverige 2025 kan du statistiskt förvänta dig att leva till 83 år. Men detta är ett genomsnitt – din faktiska livslängd beror på dina livsval och omständigheter.',
-          source: 'SCB', sourceUrl: 'https://www.scb.se/hitta-statistik/statistik-efter-amne/befolkning/befolkningens-sammansattning/befolkningsstatistik/'
-        },
-        { 
-          id: '2', name: 'Överdödlighet', value: '4.2', unit: '%', trend: 10.5, status: 'attention', 
-          explanation: 'Dödlighet över förväntad baslinje', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Överdödlighet visar hur många fler personer som dött jämfört med vad som är "normalt" baserat på historiska mönster.',
-          howItsMeasured: 'Man jämför faktiska dödsfall med en förväntad nivå beräknad från de senaste 5 årens genomsnitt, justerat för åldersfördelning och säsongsvariationer.',
-          whyItMatters: 'Överdödlighet fungerar som en "varningsklocka" för folkhälsan. Ökad överdödlighet kan signalera pandemier, värmeböljor, eller försämrad sjukvård.',
-          exampleInPractice: 'Om överdödligheten är 4.2% betyder det att 4.2% fler människor har dött än förväntat. I ett land med 100 000 förväntade dödsfall per år motsvarar det 4 200 extra dödsfall.',
-          source: 'Socialstyrelsen', sourceUrl: 'https://www.socialstyrelsen.se/'
-        },
-        { 
-          id: '3', name: 'Vårdkötid', value: '89', unit: 'dagar', trend: 5.3, status: 'attention', 
-          explanation: 'Medianväntetid för specialistvård', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Detta mäter hur länge patienter i genomsnitt väntar på att få träffa en specialist efter remiss från vårdcentral.',
-          howItsMeasured: 'Regionerna rapporterar väntetider för alla patienter i kö till specialistvård. Medianen beräknas – alltså den tid där hälften väntat kortare och hälften längre.',
-          whyItMatters: 'Långa vårdköer kan leda till att sjukdomar förvärras, ökad smärta och lidande, samt i värsta fall att behandling kommer för sent.',
-          exampleInPractice: 'Om du behöver träffa en ortoped för en knäskada tar det i genomsnitt 89 dagar från remiss till första besök. Under denna tid kan du behöva hantera smärta och begränsad rörlighet.',
-          source: 'SKR', sourceUrl: 'https://www.vantetider.se/'
-        },
-      ]
-    },
-    {
-      id: 'economy',
-      name: 'Ekonomi & Arbete',
-      icon: '💼',
-      score: 71,
-      trend: -0.8,
-      status: 'attention',
-      description: 'Sysselsättning, inkomster och ekonomisk stabilitet',
-      indicators: [
-        { 
-          id: '4', name: 'Arbetslöshet', value: '7.8', unit: '%', trend: 1.2, status: 'attention', 
-          explanation: 'Andel arbetslösa av arbetskraften', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Andelen personer som aktivt söker arbete men inte har ett jobb, av alla som antingen arbetar eller söker arbete.',
-          howItsMeasured: 'SCB genomför månatliga arbetskraftsundersökningar (AKU) där ett urval av befolkningen intervjuas om sin arbetsmarknadsstatus.',
-          whyItMatters: 'Arbetslöshet påverkar individers ekonomi, psykiska hälsa och samhällets skatteintäkter. Hög arbetslöshet kan leda till ökade sociala problem.',
-          exampleInPractice: 'Av 100 personer som vill arbeta har 7-8 stycken inget jobb just nu trots att de aktivt söker. Detta inkluderar inte de som gett upp att söka.',
-          source: 'SCB', sourceUrl: 'https://www.scb.se/hitta-statistik/statistik-efter-amne/arbetsmarknad/'
-        },
-        { 
-          id: '5', name: 'Medianinkomst', value: '32,400', unit: 'kr', trend: 2.1, status: 'good', 
-          explanation: 'Median månadslön före skatt', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Den månadslön där hälften av alla anställda tjänar mer och hälften tjänar mindre. Visar vad en "typisk" person tjänar.',
-          howItsMeasured: 'Arbetsgivare rapporterar alla löner till Skatteverket. SCB beräknar sedan medianen för alla heltidsanställda.',
-          whyItMatters: 'Medianinkomsten visar den ekonomiska standarden för vanliga människor bättre än genomsnittslön, eftersom extremt höga löner inte snedvrider resultatet.',
-          exampleInPractice: 'Om medianinkomsten är 32 400 kr betyder det att en "vanlig" svensk tjänar ungefär detta före skatt. Efter skatt blir det cirka 25 000-26 000 kr.',
-          source: 'SCB', sourceUrl: 'https://www.scb.se/hitta-statistik/statistik-efter-amne/arbetsmarknad/loner-och-arbetskostnader/'
-        },
-        { 
-          id: '6', name: 'BNP-tillväxt', value: '1.2', unit: '%', trend: -0.5, status: 'attention', 
-          explanation: 'Årlig ekonomisk tillväxt', lastUpdated: '2025-01-15',
-          whatItMeasures: 'BNP (Bruttonationalprodukt) mäter det totala värdet av alla varor och tjänster som produceras i landet under ett år. Tillväxten visar hur mycket detta ökat jämfört med förra året.',
-          howItsMeasured: 'SCB samlar in data från företag, myndigheter och hushåll om produktion, konsumtion, investeringar, export och import. Allt summeras och jämförs med föregående år.',
-          whyItMatters: 'BNP-tillväxt indikerar om ekonomin expanderar eller krymper. Positiv tillväxt betyder oftast fler jobb och högre inkomster, men säger inget om hur välståndet fördelas.',
-          exampleInPractice: 'Om BNP växer 1.2% och förra årets BNP var 5 000 miljarder kr, har ekonomin vuxit med 60 miljarder kr. Det motsvarar ungefär värdet av all svensk möbelproduktion.',
-          source: 'SCB', sourceUrl: 'https://www.scb.se/hitta-statistik/statistik-efter-amne/nationalrakenskaper/'
-        },
-      ]
-    },
-    {
-      id: 'education',
-      name: 'Utbildning & Kunskap',
-      icon: '🎓',
-      score: 78,
-      trend: 0.5,
-      status: 'good',
-      description: 'Skolresultat, utbildningsnivå och kompetens',
-      indicators: [
-        { 
-          id: '7', name: 'Gymnasiebehörighet', value: '84.2', unit: '%', trend: -0.3, status: 'good', 
-          explanation: 'Andel elever som uppnår gymnasiebehörighet', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Andelen niondeklassare som har tillräckligt höga betyg för att bli antagna till ett nationellt gymnasieprogram.',
-          howItsMeasured: 'Skolverket samlar in slutbetygen från alla grundskolor. För gymnasiebehörighet krävs godkänt i svenska, engelska, matematik och minst fem andra ämnen.',
-          whyItMatters: 'Elever utan gymnasiebehörighet har svårare att få jobb och löper högre risk för arbetslöshet och utanförskap senare i livet.',
-          exampleInPractice: 'I en klass med 30 elever når 25-26 stycken gymnasiebehörighet. De 4-5 som inte gör det behöver gå introduktionsprogram innan de kan börja ett vanligt gymnasieprogram.',
-          source: 'Skolverket', sourceUrl: 'https://www.skolverket.se/'
-        },
-        { 
-          id: '8', name: 'Högskoleutbildade', value: '43.1', unit: '%', trend: 0.8, status: 'good', 
-          explanation: 'Andel av befolkningen med eftergymnasial utbildning', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Andelen vuxna (25-64 år) som har genomfört minst två års högskoleutbildning eller motsvarande.',
-          howItsMeasured: 'SCB registrerar alla examina och utbildningar och beräknar andelen av befolkningen i arbetsför ålder med eftergymnasial utbildning.',
-          whyItMatters: 'Utbildningsnivån påverkar innovation, produktivitet och konkurrenskraft. Högutbildade har generellt högre inkomster och lägre arbetslöshet.',
-          exampleInPractice: 'Av 10 vuxna svenskar har ungefär 4 stycken en högskoleexamen eller liknande. Detta är en av de högsta andelarna i världen.',
-          source: 'SCB', sourceUrl: 'https://www.scb.se/hitta-statistik/statistik-efter-amne/utbildning-och-forskning/'
-        },
-      ]
-    },
-    {
-      id: 'environment',
-      name: 'Miljö & Klimat',
-      icon: '🌿',
-      score: 68,
-      trend: 2.3,
-      status: 'attention',
-      description: 'Utsläpp, förnybar energi och naturresurser',
-      indicators: [
-        { 
-          id: '9', name: 'CO2-utsläpp', value: '4.2', unit: 'ton/capita', trend: -3.2, status: 'good', 
-          explanation: 'Årliga koldioxidutsläpp per person', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Den genomsnittliga mängden koldioxid som varje invånare orsakar genom transport, uppvärmning, konsumtion och industri.',
-          howItsMeasured: 'Naturvårdsverket samlar in data om bränsleförbrukning, industriutsläpp och energianvändning. Totala utsläpp delas med befolkningen.',
-          whyItMatters: 'Koldioxid är den viktigaste växthusgasen som driver klimatförändringarna. Minskade utsläpp är nödvändigt för att uppnå klimatmålen.',
-          exampleInPractice: '4.2 ton CO2 motsvarar ungefär att köra 20 000 km med en bensinbil, eller 8 flygresor Stockholm-London tur och retur.',
-          source: 'Naturvårdsverket', sourceUrl: 'https://www.naturvardsverket.se/'
-        },
-        { 
-          id: '10', name: 'Förnybar energi', value: '56.4', unit: '%', trend: 2.1, status: 'excellent', 
-          explanation: 'Andel energi från förnybara källor', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Andelen av Sveriges totala energiförbrukning som kommer från förnybara källor som vattenkraft, vindkraft, sol och biobränslen.',
-          howItsMeasured: 'Energimyndigheten samlar in data om all energiproduktion och -konsumtion i Sverige och beräknar andelen från förnybara källor.',
-          whyItMatters: 'Förnybar energi minskar beroendet av fossila bränslen, reducerar utsläpp och stärker energisäkerheten.',
-          exampleInPractice: 'Av elen du använder hemma kommer mer än hälften från vattenkraft, vindkraft eller sol. Resten kommer främst från kärnkraft.',
-          source: 'Energimyndigheten', sourceUrl: 'https://www.energimyndigheten.se/'
-        },
-      ]
-    },
-    {
-      id: 'safety',
-      name: 'Trygghet & Säkerhet',
-      icon: '🛡️',
-      score: 65,
-      trend: -2.1,
-      status: 'attention',
-      description: 'Brottslighet, rättsväsende och social trygghet',
-      indicators: [
-        { 
-          id: '11', name: 'Anmälda brott', value: '14,200', unit: 'per 100k', trend: 3.5, status: 'attention', 
-          explanation: 'Antal anmälda brott per 100 000 invånare', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Antalet brott som anmäls till polisen per 100 000 invånare under ett år.',
-          howItsMeasured: 'Brå (Brottsförebyggande rådet) sammanställer alla polisanmälningar och normaliserar per capita för att kunna jämföra mellan regioner och över tid.',
-          whyItMatters: 'Anmälda brott ger en bild av brottsligheten, men visar inte hela sanningen eftersom många brott aldrig anmäls (mörkertal).',
-          exampleInPractice: 'I en stad med 100 000 invånare anmäls ungefär 14 200 brott per år – cirka 40 per dag. Detta inkluderar allt från cykelstölder till grova våldsbrott.',
-          source: 'Brå', sourceUrl: 'https://www.bra.se/'
-        },
-        { 
-          id: '12', name: 'Uppklarade brott', value: '18.2', unit: '%', trend: -1.2, status: 'critical', 
-          explanation: 'Andel brott som leder till åtal', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Andelen av alla anmälda brott där någon identifieras, åtalas och döms eller får annan påföljd.',
-          howItsMeasured: 'Brå följer alla anmälningar och registrerar hur många som leder till att ärendet "klaras upp" genom lagföring, åtalsunderlåtelse eller nedläggning.',
-          whyItMatters: 'Låg uppklaringsgrad kan minska förtroendet för rättssystemet och signalera att det "lönar sig" att begå brott.',
-          exampleInPractice: 'Av 100 anmälda brott leder bara 18 till att någon ställs till svars. 82 brott förblir outredda – ofta för att det saknas bevis eller vittnen.',
-          source: 'Brå', sourceUrl: 'https://www.bra.se/'
-        },
-      ]
-    },
-    {
-      id: 'democracy',
-      name: 'Demokrati & Samhälle',
-      icon: '🏛️',
-      score: 88,
-      trend: 0.3,
-      status: 'excellent',
-      description: 'Politiskt deltagande, förtroende och medborgarskap',
-      indicators: [
-        { 
-          id: '13', name: 'Valdeltagande', value: '87.2', unit: '%', trend: 0.5, status: 'excellent', 
-          explanation: 'Andel röstande i senaste riksdagsvalet', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Andelen röstberättigade som faktiskt röstar i riksdagsvalet.',
-          howItsMeasured: 'Valmyndigheten räknar alla giltiga röster och jämför med antalet röstberättigade medborgare.',
-          whyItMatters: 'Högt valdeltagande stärker demokratins legitimitet. När många röstar representerar de folkvalda en bredare del av befolkningen.',
-          exampleInPractice: 'Av 100 röstberättigade svenskar går 87 och röstar. Detta är ett av de högsta valdeltagandena i världen.',
-          source: 'Valmyndigheten', sourceUrl: 'https://www.val.se/'
-        },
-        { 
-          id: '14', name: 'Institutionsförtroende', value: '62.3', unit: '%', trend: -1.8, status: 'good', 
-          explanation: 'Andel med förtroende för offentliga institutioner', lastUpdated: '2025-01-15',
-          whatItMeasures: 'Andelen befolkning som uppger att de har stort eller ganska stort förtroende för institutioner som riksdag, regering, polis och domstolar.',
-          howItsMeasured: 'SOM-institutet vid Göteborgs universitet genomför årliga enkätundersökningar med ett representativt urval av befolkningen.',
-          whyItMatters: 'Förtroende för institutioner är grunden för ett fungerande samhälle. Lågt förtroende kan leda till minskad följsamhet av lagar och ökad polarisering.',
-          exampleInPractice: 'Av 10 svenskar har 6 stycken förtroende för våra myndigheter och institutioner. 4 har lågt eller inget förtroende.',
-          source: 'SOM-institutet', sourceUrl: 'https://www.gu.se/som-institutet'
-        },
-      ]
-    },
-  ];
+  // Generate data based on geo scope
+  // Different regions have different baseline scores and variations
+  const categories = React.useMemo(() => generateScopedCategories(currentGeoScope), [currentGeoScope]);
 
   const handleCategoryClick = (category: CategoryData) => {
     setSelectedCategory(category);
