@@ -588,9 +588,97 @@ export const KEY_MESSAGES = {
 
 // === 7. MODULE CONNECTIONS ===
 
-export const MODULE_CONNECTIONS = [
-  { id: 'resilience', label: 'Resilience', labelSv: 'Resiliens', icon: '🔄', description: 'Hur väl omställning kan ske', descriptionEn: 'How well transition can occur' },
-  { id: 'fairness', label: 'Intergenerational Fairness', labelSv: 'Intergenerationell rättvisa', icon: '⏳', description: 'Vem betalar', descriptionEn: 'Who pays' },
-  { id: 'capacity', label: 'Carrying Capacity', labelSv: 'Bärkraft', icon: '🌍', description: 'Energi & resurser', descriptionEn: 'Energy & resources' },
-  { id: 'scenarios', label: 'Policy Scenarios', labelSv: 'Policyscenarier', icon: '🧪', description: 'Historiska paralleller', descriptionEn: 'Historical parallels' }
+export interface ModuleConnection {
+  id: string;
+  label: string;
+  labelSv: string;
+  icon: string;
+  description: string;
+  descriptionEn: string;
+  route: string;
+  // Detailed information for drill-down
+  fullExplanation: string;
+  whyItMatters: string;
+  howItConnectsToCPM: string;
+  keyMetrics: { label: string; description: string }[];
+  realWorldExample: string;
+}
+
+export const MODULE_CONNECTIONS: ModuleConnection[] = [
+  { 
+    id: 'resilience', 
+    label: 'Resilience', 
+    labelSv: 'Resiliens', 
+    icon: '🔄', 
+    description: 'Hur väl omställning kan ske', 
+    descriptionEn: 'How well transition can occur',
+    route: '/resilience',
+    fullExplanation: 'Resiliens mäter hur väl ett samhälle klarar chocker – ekonomiska kriser, naturkatastrofer, pandemier eller politiska omvälvningar. Det handlar inte om att undvika problem, utan om att studsa tillbaka efter dem.',
+    whyItMatters: 'Ett samhälle med hög resiliens kan gå igenom fas 4 (Överbelastning) utan att kollapsa. Det ger tid att genomföra reformer. Ett samhälle med låg resiliens kan kollapsa vid första allvarliga chock.',
+    howItConnectsToCPM: 'Resiliens avgör hastigheten på fasövergångar. Hög resiliens = långsammare förfall, snabbare återhämtning. Låg resiliens = snabba, okontrollerade övergångar.',
+    keyMetrics: [
+      { label: 'Buffer-kapacitet', description: 'Hur stora reserver finns? (valutareserv, livsmedelslagring, energireserv)' },
+      { label: 'Institutionell flexibilitet', description: 'Kan systemet ändra regler snabbt vid kris?' },
+      { label: 'Social sammanhållning', description: 'Hjälper folk varandra i kriser eller splittras samhället?' },
+      { label: 'Diversifiering', description: 'Är ekonomin beroende av en sektor, eller finns många ben att stå på?' }
+    ],
+    realWorldExample: 'Finland visade extrem resiliens under 90-talskrisen (BNP föll 14%) – befolkningen accepterade hårda åtstramningar, bankerna räddades ordnat, och landet återhämtade sig på ett decennium. Jämför med Grekland 2010 där låg social sammanhållning ledde till en utdragen kris.'
+  },
+  { 
+    id: 'fairness', 
+    label: 'Intergenerational Fairness', 
+    labelSv: 'Intergenerationell rättvisa', 
+    icon: '⏳', 
+    description: 'Vem betalar', 
+    descriptionEn: 'Who pays',
+    route: '/fairness',
+    fullExplanation: 'Denna modul mäter om vi lever på framtida generationers bekostnad. Den räknar samman alla "skulder" vi lämnar efter oss: statsskuld, pensionslöften, klimatpåverkan, utarmad natur, och förfallen infrastruktur.',
+    whyItMatters: 'Om vi systematiskt skjuter kostnader på våra barn och barnbarn bygger vi upp en tidsinställd bomb. Vid någon punkt måste notan betalas – antingen genom drastiska nedskärningar, inflation, eller kollaps.',
+    howItConnectsToCPM: 'Hög intergenerationell skuld är ett klassiskt tecken på Fas 4 (Överbelastning). Det visar att systemet "lånar" från framtiden för att upprätthålla nuet – en ohållbar strategi.',
+    keyMetrics: [
+      { label: 'Ofinansierade löften', description: 'Pensioner och välfärd vi lovat men inte sparat till' },
+      { label: 'Statsskuld per ung person', description: 'Hur mycket skuld får varje 20-åring ärva?' },
+      { label: 'Infrastrukturskuld', description: 'Kostnaden för alla vägar, broar, VA-system som förfaller' },
+      { label: 'Klimatskuld', description: 'Kostnaden för klimatanpassning som framtiden måste betala' }
+    ],
+    realWorldExample: 'Japan har världens högsta skuld (260% av BNP) och en åldrande befolkning. Varje japanskt barn föds med en skuld på över 100 000 dollar. Sverige är bättre, men pensionssystemet och infrastrukturen har stora dolda hål.'
+  },
+  { 
+    id: 'capacity', 
+    label: 'Carrying Capacity', 
+    labelSv: 'Bärkraft', 
+    icon: '🌍', 
+    description: 'Energi & resurser', 
+    descriptionEn: 'Energy & resources',
+    route: '/capacity',
+    fullExplanation: 'Bärkraft handlar om fysiska gränser: energi, vatten, mat, mineraler, och planetära gränser. Det svarar på frågan: "Hur många människor kan leva på denna nivå, med tillgängliga resurser?"',
+    whyItMatters: 'All ekonomi och välfärd bygger ytterst på fysiska resurser. Om vi överskrider bärkraften – antingen lokalt eller globalt – blir kollaps oundviklig, oavsett ekonomisk skicklighet.',
+    howItConnectsToCPM: 'Bärkraft sätter de yttre gränserna för alla faser. Ett samhälle som överskrider sin bärkraft tvingas in i Fas 5 (Omställning), vare sig det vill eller inte.',
+    keyMetrics: [
+      { label: 'Energi per capita', description: 'Tillgänglig energi per person – grunden för allt' },
+      { label: 'Ekologiskt fotavtryck', description: 'Hur många jordklot behövs om alla levde så?' },
+      { label: 'Resursberoende', description: 'Import av kritiska resurser (mat, energi, mineraler)' },
+      { label: 'Systemgränser', description: 'Hur nära planetära gränser (kol, kväve, vatten) är vi?' }
+    ],
+    realWorldExample: 'Påskön (Rapa Nui) är historiens mest kända exempel på överskjutande av bärkraft. Befolkningen växte, skogen höggs ner, jorden utarmades, och samhället kollapsade. Det tog 300 år – snabbare än de flesta tror.'
+  },
+  { 
+    id: 'scenarios', 
+    label: 'Policy Scenarios', 
+    labelSv: 'Policyscenarier', 
+    icon: '🧪', 
+    description: 'Historiska paralleller', 
+    descriptionEn: 'Historical parallels',
+    route: '/scenarios',
+    fullExplanation: 'Denna modul analyserar vad som historiskt hänt när samhällen stått inför liknande utmaningar. Den identifierar policybeslut som fungerat – och katastrofala misstag som bör undvikas.',
+    whyItMatters: 'Vi är inte de första att stå inför dessa utmaningar. Genom att studera historien kan vi lära av andras misstag och framgångar – och undvika att uppfinna hjulet på nytt.',
+    howItConnectsToCPM: 'Scenariomotorn kopplar varje fas till historiska paralleller. "Ni är i Fas 4 – här är 12 samhällen som varit där förut, och detta är vad som hände."',
+    keyMetrics: [
+      { label: 'Historiska paralleller', description: 'Liknande situationer i historien och deras utfall' },
+      { label: 'Framgångsrika omställningar', description: 'Vilka policies har faktiskt fungerat?' },
+      { label: 'Varningssignaler', description: 'Vilka mönster föregick kollaps i liknande fall?' },
+      { label: 'Tidsramar', description: 'Hur lång tid tog omställningar i jämförbara fall?' }
+    ],
+    realWorldExample: 'När Sverige stod inför bankkrisen 1991-1994 studerade beslutsfattarna Norges misslyckade hantering av en liknande kris. De valde en annan väg – snabb rekapitalisering, dåliga lån i "skräpbanken" – och lyckades. Historisk kunskap räddade Sverige.'
+  }
 ];
