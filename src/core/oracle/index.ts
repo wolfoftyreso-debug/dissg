@@ -70,6 +70,26 @@ export {
   type ResponseValidation,
 } from './oracleResponse';
 
+// Oracle Resilience
+export {
+  analyzeQueryForPressure,
+  buildReframedResponse,
+  stripFraming,
+  handleAdversarialQuery,
+  shouldRemainSilent,
+  PRESSURE_QUERY_EXAMPLES,
+  FRAMING_IMMUNITY,
+  SILENCE_PRINCIPLE,
+  ORACLE_RESILIENCE_STATUS,
+  type QueryAnalysis,
+  type ResolvableComponent,
+  type ResponseMode,
+  type ReframedResponse,
+  type ClaimValidation,
+  type SilenceReason,
+  type OracleSilence,
+} from './oracleResilience';
+
 // ============================================
 // ORACLE STATUS
 // ============================================
