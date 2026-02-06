@@ -6,7 +6,7 @@
  * ALLT är klickbart för fördjupning.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -742,6 +742,71 @@ const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({
   const best = regions[0];
   const worst = regions[regions.length - 1];
 
+  // CSV download function
+  const handleDownloadCSV = useCallback(() => {
+    const headers = ['Län', 'Värde', 'Förändring (%)', 'Befolkning'];
+    const csvContent = [
+      headers.join(','),
+      ...regions.map(r => 
+        `"${r.name}",${r.value},${r.change},${r.population}`
+      )
+    ].join('\n');
+    
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${indicatorName.replace(/\s+/g, '_')}_regional_data.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [regions, indicatorName]);
+
+  // Excel-compatible CSV (with BOM for Swedish characters)
+  const handleOpenExcel = useCallback(() => {
+    const headers = ['Län', 'Värde', 'Förändring (%)', 'Befolkning'];
+    const csvContent = [
+      headers.join('\t'),
+      ...regions.map(r => 
+        `${r.name}\t${r.value}\t${r.change}\t${r.population}`
+      )
+    ].join('\n');
+    
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${indicatorName.replace(/\s+/g, '_')}_regional_data.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [regions, indicatorName]);
+
+  // Share link function
+  const handleShareLink = useCallback(async () => {
+    const shareUrl = `${window.location.origin}/indicator/${encodeURIComponent(indicatorName)}?view=regional`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Regional data: ${indicatorName}`,
+          text: `Se regional fördelning för ${indicatorName}`,
+          url: shareUrl,
+        });
+      } catch (err) {
+        // User cancelled or error - fallback to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        alert('Länk kopierad till urklipp!');
+      }
+    } else {
+      // Fallback: copy to clipboard
+      await navigator.clipboard.writeText(shareUrl);
+      alert('Länk kopierad till urklipp!');
+    }
+  }, [indicatorName]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh]">
@@ -758,103 +823,53 @@ const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({
           <div className="space-y-4 mt-4">
             {/* Summary cards */}
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-center">
-                <p className="text-xs text-emerald-600 mb-1">🏆 Högst</p>
-                <p className="font-bold text-emerald-900">{best.name}</p>
-                <p className="text-xl font-semibold text-emerald-700">{best.value}%</p>
+              <div className="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-100">
+                <p className="text-2xl font-bold text-emerald-700">{best.value}</p>
+                <p className="text-xs text-emerald-600 mt-1">🏆 {best.name}</p>
               </div>
-              <div className="bg-blue-50 p-3 rounded-xl border border-blue-200 text-center">
-                <p className="text-xs text-blue-600 mb-1">📊 Rikssnitt</p>
-                <p className="font-bold text-blue-900">Sverige</p>
-                <p className="text-xl font-semibold text-blue-700">{nationalAvg}%</p>
+              <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-200">
+                <p className="text-2xl font-bold text-slate-700">{nationalAvg}</p>
+                <p className="text-xs text-slate-500 mt-1">📊 Rikssnitt</p>
               </div>
-              <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 text-center">
-                <p className="text-xs text-amber-600 mb-1">⚠️ Lägst</p>
-                <p className="font-bold text-amber-900">{worst.name}</p>
-                <p className="text-xl font-semibold text-amber-700">{worst.value}%</p>
+              <div className="bg-red-50 rounded-xl p-3 text-center border border-red-100">
+                <p className="text-2xl font-bold text-red-700">{worst.value}</p>
+                <p className="text-xs text-red-600 mt-1">📉 {worst.name}</p>
               </div>
             </div>
 
-            {/* Spread info */}
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-slate-600">Spridning (max - min):</span>
-                <span className="font-bold text-slate-900">{(best.value - worst.value).toFixed(1)} procentenheter</span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-2 mt-2">
-                <div 
-                  className="h-full rounded-full bg-gradient-to-r from-amber-400 via-blue-500 to-emerald-500"
-                  style={{ width: '100%' }}
-                />
-              </div>
-              <div className="flex justify-between text-xs text-slate-500 mt-1">
-                <span>{worst.value}%</span>
-                <span>{nationalAvg}%</span>
-                <span>{best.value}%</span>
-              </div>
-            </div>
-
-            {/* Regional list */}
+            {/* Region list */}
             <div className="space-y-1">
-              <p className="text-sm font-medium text-slate-700 mb-2">
-                📍 Alla län (sorterat efter värde)
-              </p>
-              
-              {regions.map((region, index) => {
-                const deviation = region.value - nationalAvg;
-                const barWidth = ((region.value - worst.value) / (best.value - worst.value)) * 100;
-                
+              {regions.map((region, i) => {
+                const isAboveAvg = region.value >= nationalAvg;
                 return (
                   <button
                     key={region.name}
-                    className="w-full p-3 bg-white rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 transition-all text-left group"
-                    onClick={() => {
-                      // Would open municipality view
-                    }}
+                    className="w-full flex items-center gap-3 p-3 bg-white border rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-colors text-left group"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-slate-400 font-mono w-5">#{index + 1}</span>
-                      <span className="font-medium text-slate-800 flex-1">{region.name}</span>
-                      
-                      {/* Mini bar */}
-                      <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div 
-                          className={cn(
-                            "h-full rounded-full",
-                            deviation >= 2 ? "bg-emerald-500" :
-                            deviation >= 0 ? "bg-blue-500" :
-                            deviation >= -2 ? "bg-amber-500" : "bg-red-500"
-                          )}
-                          style={{ width: `${barWidth}%` }}
-                        />
+                    <span className="text-sm font-mono text-slate-400 w-6">{i + 1}.</span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          "font-medium",
+                          isAboveAvg ? "text-slate-800" : "text-slate-600"
+                        )}>
+                          {region.name}
+                        </span>
+                        {i === 0 && <span className="text-xs">🥇</span>}
+                        {i === 1 && <span className="text-xs">🥈</span>}
+                        {i === 2 && <span className="text-xs">🥉</span>}
                       </div>
-                      
-                      <span className="font-mono text-sm font-semibold text-slate-700 w-14 text-right">
-                        {region.value}%
-                      </span>
-                      
-                      <span className={cn(
-                        "text-xs font-medium w-12 text-right",
-                        region.change >= 0 ? "text-emerald-600" : "text-red-500"
-                      )}>
-                        {region.change >= 0 ? '+' : ''}{region.change}%
-                      </span>
-                      
-                      <span className={cn(
-                        "text-xs w-16 text-right",
-                        deviation >= 0 ? "text-emerald-600" : "text-amber-600"
-                      )}>
-                        {deviation >= 0 ? '+' : ''}{deviation.toFixed(1)} vs snitt
-                      </span>
-                      
-                      <span className="text-slate-400 group-hover:text-blue-500 transition-colors">→</span>
                     </div>
-                    
-                    <div className="flex items-center gap-2 mt-1 ml-8">
-                      <span className="text-xs text-slate-400">
-                        👥 {region.population.toLocaleString('sv-SE')} invånare
-                      </span>
-                    </div>
+                    <span className="font-mono text-sm text-slate-700 font-medium">
+                      {region.value}
+                    </span>
+                    <span className={cn(
+                      "text-xs font-medium min-w-[50px] text-right",
+                      region.change >= 0 ? "text-emerald-600" : "text-red-600"
+                    )}>
+                      {region.change >= 0 ? '+' : ''}{region.change.toFixed(1)}%
+                    </span>
+                    <span className="text-slate-300 group-hover:text-slate-500 transition-colors">→</span>
                   </button>
                 );
               })}
@@ -871,15 +886,30 @@ const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({
               </ul>
             </div>
 
-            {/* Export buttons */}
+            {/* Export buttons - NOW FUNCTIONAL */}
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="flex-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1"
+                onClick={handleDownloadCSV}
+              >
                 📥 Ladda ner CSV
               </Button>
-              <Button variant="outline" size="sm" className="flex-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1"
+                onClick={handleOpenExcel}
+              >
                 📊 Öppna i Excel
               </Button>
-              <Button variant="outline" size="sm" className="flex-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1"
+                onClick={handleShareLink}
+              >
                 🔗 Dela länk
               </Button>
             </div>
