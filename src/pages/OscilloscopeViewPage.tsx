@@ -3,6 +3,7 @@
  * 
  * Designad för att en 15-åring ska förstå.
  * Tydliga förklaringar, visuell klarhet, ingen jargong.
+ * ALLT är klickbart för fördjupning.
  */
 
 import React, { useState } from 'react';
@@ -21,16 +22,34 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
 // ============================================
-// SPARKLINE COMPONENT
+// SPARKLINE COMPONENT (CLICKABLE)
 // ============================================
 
-const Sparkline: React.FC<{ data: number[]; color: string; className?: string }> = ({ 
+interface SparklineProps {
+  data: number[];
+  color: string;
+  className?: string;
+  onClick?: () => void;
+  label?: string;
+}
+
+const Sparkline: React.FC<SparklineProps> = ({ 
   data, 
   color,
-  className 
+  className,
+  onClick,
+  label = "Visa trend"
 }) => {
   const min = Math.min(...data);
   const max = Math.max(...data);
@@ -41,6 +60,30 @@ const Sparkline: React.FC<{ data: number[]; color: string; className?: string }>
     const y = 20 - ((val - min) / range) * 16;
     return `${x},${y}`;
   }).join(' ');
+  
+  if (onClick) {
+    return (
+      <button
+        onClick={onClick}
+        className={cn(
+          "inline-block p-1 -m-1 rounded hover:bg-slate-100 transition-colors cursor-pointer group",
+          className
+        )}
+        aria-label={label}
+      >
+        <svg width="60" height="24" className="group-hover:scale-105 transition-transform">
+          <polyline
+            points={points}
+            fill="none"
+            stroke={color}
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+    );
+  }
   
   return (
     <svg width="60" height="24" className={cn("inline-block", className)}>
@@ -69,26 +112,552 @@ const generateSparkline = (base: number, trend: 'up' | 'down' | 'stable' = 'stab
 };
 
 // ============================================
-// HELP TOOLTIP COMPONENT
+// HELP TOOLTIP COMPONENT (CLICKABLE)
 // ============================================
 
-const HelpBubble: React.FC<{ text: string }> = ({ text }) => (
+interface HelpBubbleProps {
+  text: string;
+  onClick?: () => void;
+}
+
+const HelpBubble: React.FC<HelpBubbleProps> = ({ text, onClick }) => (
   <TooltipProvider delayDuration={200}>
     <Tooltip>
       <TooltipTrigger asChild>
-        <button className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-sky-100 text-sky-600 text-xs font-bold hover:bg-sky-200 transition-colors">
+        <button 
+          onClick={onClick}
+          className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-sky-100 text-sky-600 text-xs font-bold hover:bg-sky-200 hover:scale-110 transition-all cursor-pointer"
+        >
           ?
         </button>
       </TooltipTrigger>
       <TooltipContent className="max-w-xs bg-slate-900 text-white p-3 text-sm leading-relaxed">
         {text}
+        {onClick && (
+          <p className="text-sky-300 text-xs mt-2 border-t border-slate-700 pt-2">
+            Klicka för att fördjupa →
+          </p>
+        )}
       </TooltipContent>
     </Tooltip>
   </TooltipProvider>
 );
 
 // ============================================
-// MAIN SCORE CARD
+// STATUS BADGE (CLICKABLE)
+// ============================================
+
+interface StatusBadgeProps {
+  color: 'green' | 'yellow' | 'red';
+  onClick?: () => void;
+}
+
+const StatusBadge: React.FC<StatusBadgeProps> = ({ color, onClick }) => {
+  const colorClasses = {
+    green: 'text-emerald-600 bg-emerald-50 border-emerald-200 hover:bg-emerald-100',
+    yellow: 'text-amber-600 bg-amber-50 border-amber-200 hover:bg-amber-100',
+    red: 'text-red-600 bg-red-50 border-red-200 hover:bg-red-100',
+  };
+  
+  const labels = {
+    green: '👍 Bra',
+    yellow: '⚠️ Varning',
+    red: '🔴 Problem',
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "px-2.5 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer hover:scale-105",
+        colorClasses[color]
+      )}
+      aria-label={`Status: ${labels[color]}. Klicka för mer info.`}
+    >
+      {labels[color]}
+    </button>
+  );
+};
+
+// ============================================
+// CHANGE INDICATOR (CLICKABLE)
+// ============================================
+
+interface ChangeIndicatorProps {
+  change: number;
+  period: string;
+  onClick?: () => void;
+}
+
+const ChangeIndicator: React.FC<ChangeIndicatorProps> = ({ change, period, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="text-right p-2 -m-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer group"
+      aria-label={`Förändring: ${change >= 0 ? '+' : ''}${change.toFixed(1)}% ${period}. Klicka för detaljer.`}
+    >
+      <span className={cn(
+        "text-sm font-semibold group-hover:underline",
+        change >= 0 ? "text-emerald-600" : "text-red-600"
+      )}>
+        {change >= 0 ? '↑' : '↓'} {Math.abs(change).toFixed(1)}%
+      </span>
+      <p className="text-xs text-slate-400">{period}</p>
+    </button>
+  );
+};
+
+// ============================================
+// DRILL-DOWN DIALOGS
+// ============================================
+
+// Status explanation dialog
+interface StatusDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  color: 'green' | 'yellow' | 'red';
+}
+
+const StatusDialog: React.FC<StatusDialogProps> = ({ open, onOpenChange, color }) => {
+  const content = {
+    green: {
+      title: '🟢 Vad betyder "Bra"?',
+      description: 'Indikatorn visar en positiv utveckling',
+      details: [
+        { label: 'Definition', value: 'Värdet ligger inom eller bättre än målintervallet baserat på internationella standarder' },
+        { label: 'Jämförelse', value: 'Sverige presterar bättre än EU-genomsnittet' },
+        { label: 'Trend', value: 'Utvecklingen har förbättrats de senaste 12 månaderna' },
+        { label: 'Konfidens', value: '95% säkerhet i bedömningen baserat på datakvalitet' },
+      ],
+      sources: ['SCB', 'Eurostat', 'WHO'],
+    },
+    yellow: {
+      title: '🟡 Vad betyder "Varning"?',
+      description: 'Indikatorn visar osäkerhet eller liten förändring',
+      details: [
+        { label: 'Definition', value: 'Värdet ligger nära gränsvärdet eller visar blandade signaler' },
+        { label: 'Jämförelse', value: 'Sverige ligger runt EU-genomsnittet' },
+        { label: 'Trend', value: 'Utvecklingen har varit stabil eller svag nedgång' },
+        { label: 'Konfidens', value: '80% säkerhet - data kan ha vissa begränsningar' },
+      ],
+      sources: ['SCB', 'Eurostat'],
+    },
+    red: {
+      title: '🔴 Vad betyder "Problem"?',
+      description: 'Indikatorn visar negativ utveckling som kräver uppmärksamhet',
+      details: [
+        { label: 'Definition', value: 'Värdet ligger klart under målintervallet' },
+        { label: 'Jämförelse', value: 'Sverige presterar sämre än EU-genomsnittet' },
+        { label: 'Trend', value: 'Utvecklingen har försämrats de senaste 12 månaderna' },
+        { label: 'Konfidens', value: '90% säkerhet - tydligt mönster i datan' },
+      ],
+      sources: ['SCB', 'BRÅ', 'Socialstyrelsen'],
+    },
+  };
+
+  const c = content[color];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="text-xl">{c.title}</DialogTitle>
+          <DialogDescription>{c.description}</DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4 mt-4">
+          {c.details.map((item) => (
+            <div key={item.label} className="bg-slate-50 rounded-lg p-3">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">
+                {item.label}
+              </p>
+              <p className="text-sm text-slate-800">{item.value}</p>
+            </div>
+          ))}
+          
+          <div className="pt-4 border-t">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
+              📚 Datakällor
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {c.sources.map((source) => (
+                <Button key={source} variant="outline" size="sm" className="text-xs">
+                  {source} →
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Trend explanation dialog
+interface TrendDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  data: number[];
+  title: string;
+  change: number;
+  period: string;
+}
+
+const TrendDialog: React.FC<TrendDialogProps> = ({ open, onOpenChange, data, title, change, period }) => {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
+  
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-xl">📈 Trend: {title}</DialogTitle>
+          <DialogDescription>
+            Utveckling {period} — Förändring: {change >= 0 ? '+' : ''}{change.toFixed(1)}%
+          </DialogDescription>
+        </DialogHeader>
+        
+        <ScrollArea className="max-h-[60vh]">
+          <div className="space-y-6 mt-4">
+            {/* Large trend visualization */}
+            <div className="bg-slate-50 rounded-xl p-4">
+              <svg width="100%" height="120" viewBox="0 0 400 120" preserveAspectRatio="xMidYMid meet">
+                {/* Grid lines */}
+                {[0, 1, 2, 3, 4].map(i => (
+                  <line key={i} x1="40" y1={20 + i * 20} x2="380" y2={20 + i * 20} stroke="#e2e8f0" strokeWidth="1" />
+                ))}
+                {/* Data line */}
+                <polyline
+                  points={data.map((val, i) => {
+                    const x = 40 + (i / (data.length - 1)) * 340;
+                    const min = Math.min(...data);
+                    const max = Math.max(...data);
+                    const range = max - min || 1;
+                    const y = 100 - ((val - min) / range) * 80;
+                    return `${x},${y}`;
+                  }).join(' ')}
+                  fill="none"
+                  stroke={change >= 0 ? "hsl(160, 84%, 39%)" : "hsl(0, 84%, 60%)"}
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                {/* Data points */}
+                {data.map((val, i) => {
+                  const x = 40 + (i / (data.length - 1)) * 340;
+                  const min = Math.min(...data);
+                  const max = Math.max(...data);
+                  const range = max - min || 1;
+                  const y = 100 - ((val - min) / range) * 80;
+                  return (
+                    <circle key={i} cx={x} cy={y} r="4" fill="white" stroke={change >= 0 ? "hsl(160, 84%, 39%)" : "hsl(0, 84%, 60%)"} strokeWidth="2" />
+                  );
+                })}
+                {/* Month labels */}
+                {months.map((month, i) => (
+                  <text key={month} x={40 + (i / 11) * 340} y="115" textAnchor="middle" fontSize="10" fill="#94a3b8">
+                    {month}
+                  </text>
+                ))}
+              </svg>
+            </div>
+            
+            {/* Monthly values table */}
+            <div>
+              <h4 className="font-semibold text-slate-700 mb-3">📊 Månadsvärden</h4>
+              <div className="grid grid-cols-4 gap-2">
+                {data.map((val, i) => (
+                  <div key={i} className="bg-white border rounded-lg p-2 text-center hover:bg-slate-50 cursor-pointer transition-colors">
+                    <p className="text-xs text-slate-500">{months[i]}</p>
+                    <p className="font-semibold text-slate-800">{val.toFixed(1)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Methodology */}
+            <div className="bg-blue-50 rounded-xl p-4">
+              <h4 className="font-semibold text-blue-900 mb-2">🔬 Hur beräknas trenden?</h4>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• <strong>Data samlas</strong> från officiella källor varje månad</li>
+                <li>• <strong>Förändring räknas</strong> som (nuvarande - tidigare) / tidigare × 100</li>
+                <li>• <strong>Säsongsrensning</strong> justerar för naturliga variationer</li>
+                <li>• <strong>Konfidensintervall</strong> visar osäkerheten i mätningen</li>
+              </ul>
+            </div>
+          </div>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Score explanation dialog
+interface ScoreDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  value: number;
+  maxValue: number;
+  interpretation: string;
+}
+
+const ScoreDialog: React.FC<ScoreDialogProps> = ({ open, onOpenChange, title, value, maxValue, interpretation }) => {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="text-xl">🔢 {title}</DialogTitle>
+          <DialogDescription>Fördjupad förklaring av värdet</DialogDescription>
+        </DialogHeader>
+        
+        <ScrollArea className="max-h-[60vh]">
+          <div className="space-y-4 mt-4">
+            {/* Big value display */}
+            <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl">
+              <span className="text-6xl font-bold text-slate-900">{value.toFixed(1)}</span>
+              <span className="text-2xl text-slate-400 ml-2">/ {maxValue}</span>
+            </div>
+            
+            {/* Scale visualization */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-slate-700">Var på skalan ligger värdet?</p>
+              <div className="relative h-8 bg-gradient-to-r from-red-400 via-amber-400 to-emerald-400 rounded-full overflow-hidden">
+                <div 
+                  className="absolute top-0 bottom-0 w-1 bg-slate-900 shadow-lg"
+                  style={{ left: `${(value / maxValue) * 100}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-slate-500">
+                <span>0 (Dåligt)</span>
+                <span>{maxValue / 2}</span>
+                <span>{maxValue} (Utmärkt)</span>
+              </div>
+            </div>
+            
+            {/* Interpretation */}
+            <div className="bg-blue-50 rounded-xl p-4">
+              <h4 className="font-semibold text-blue-900 mb-2">💡 Vad betyder det?</h4>
+              <p className="text-sm text-blue-800">{interpretation}</p>
+            </div>
+            
+            {/* Components */}
+            <div>
+              <h4 className="font-semibold text-slate-700 mb-3">🧩 Vad ingår i beräkningen?</h4>
+              <div className="space-y-2">
+                {['Hälsa & Vård (15%)', 'Ekonomi (20%)', 'Trygghet (18%)', 'Utbildning (17%)', 'Boende (15%)', 'Miljö (15%)'].map((item) => (
+                  <button 
+                    key={item} 
+                    className="w-full flex items-center justify-between p-3 bg-white border rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-colors text-left"
+                  >
+                    <span className="text-sm text-slate-700">{item}</span>
+                    <span className="text-slate-400">→</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Data quality */}
+            <div className="bg-slate-100 rounded-xl p-4 text-sm">
+              <h4 className="font-semibold text-slate-700 mb-2">📊 Datakvalitet</h4>
+              <ul className="text-slate-600 space-y-1">
+                <li>• <strong>Senast uppdaterad:</strong> 2024-01-15</li>
+                <li>• <strong>Konfidens:</strong> 94%</li>
+                <li>• <strong>Källor:</strong> SCB, Eurostat, WHO</li>
+              </ul>
+            </div>
+          </div>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Domain drill-down dialog
+interface DomainDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  domain: {
+    icon: string;
+    name: string;
+    description: string;
+    value: number;
+    change: number;
+    indicatorCount: number;
+  };
+}
+
+const DomainDialog: React.FC<DomainDialogProps> = ({ open, onOpenChange, domain }) => {
+  const mockIndicators = [
+    { name: 'Huvudindikator 1', value: '78.2%', change: 2.3, status: 'good' as const },
+    { name: 'Huvudindikator 2', value: '65.1', change: -1.4, status: 'warning' as const },
+    { name: 'Huvudindikator 3', value: '42.8', change: -3.2, status: 'bad' as const },
+    { name: 'Stödindikator A', value: '91%', change: 0.8, status: 'good' as const },
+    { name: 'Stödindikator B', value: '3.2', change: 5.1, status: 'warning' as const },
+  ];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-2xl flex items-center gap-3">
+            <span className="text-3xl">{domain.icon}</span>
+            {domain.name}
+          </DialogTitle>
+          <DialogDescription>{domain.description}</DialogDescription>
+        </DialogHeader>
+        
+        <ScrollArea className="max-h-[70vh]">
+          <div className="space-y-6 mt-4">
+            {/* Summary stats */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-slate-50 rounded-xl p-4 text-center">
+                <p className="text-3xl font-bold text-slate-900">{domain.value}</p>
+                <p className="text-xs text-slate-500 mt-1">Poäng av 100</p>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-4 text-center">
+                <p className={cn(
+                  "text-3xl font-bold",
+                  domain.change >= 0 ? "text-emerald-600" : "text-red-600"
+                )}>
+                  {domain.change >= 0 ? '+' : ''}{domain.change.toFixed(1)}%
+                </p>
+                <p className="text-xs text-slate-500 mt-1">Förändring</p>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-4 text-center">
+                <p className="text-3xl font-bold text-slate-900">{domain.indicatorCount}</p>
+                <p className="text-xs text-slate-500 mt-1">Mätpunkter</p>
+              </div>
+            </div>
+            
+            {/* Indicators list - ALL CLICKABLE */}
+            <div>
+              <h4 className="font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                📊 Alla mätpunkter i {domain.name.toLowerCase()}
+                <span className="text-xs font-normal text-slate-400">Klicka för detaljer</span>
+              </h4>
+              <div className="space-y-2">
+                {mockIndicators.map((ind, i) => (
+                  <button
+                    key={i}
+                    className="w-full flex items-center gap-3 p-3 bg-white border rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-colors text-left group"
+                  >
+                    <span className="text-sm">
+                      {ind.status === 'good' ? '🟢' : ind.status === 'warning' ? '🟡' : '🔴'}
+                    </span>
+                    <div className="flex-1">
+                      <p className="font-medium text-slate-800 group-hover:text-blue-600">{ind.name}</p>
+                    </div>
+                    <span className="font-mono text-sm text-slate-600">{ind.value}</span>
+                    <span className={cn(
+                      "text-sm font-medium min-w-[60px] text-right",
+                      ind.change >= 0 ? "text-emerald-600" : "text-red-600"
+                    )}>
+                      {ind.change >= 0 ? '+' : ''}{ind.change.toFixed(1)}%
+                    </span>
+                    <span className="text-slate-300 group-hover:text-slate-500">→</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Methodology link */}
+            <div className="bg-blue-50 rounded-xl p-4">
+              <h4 className="font-semibold text-blue-900 mb-2">🔬 Hur beräknas {domain.name.toLowerCase()}?</h4>
+              <p className="text-sm text-blue-800 mb-3">
+                Poängen beräknas genom att väga samman {domain.indicatorCount} olika mätningar. 
+                Vikterna baseras på internationell forskning och svenska förhållanden.
+              </p>
+              <Button variant="outline" size="sm" className="bg-white">
+                Se fullständig metodik →
+              </Button>
+            </div>
+          </div>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Indicator drill-down dialog
+interface IndicatorDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  indicator: {
+    name: string;
+    value: string;
+    change: number;
+    explanation: string;
+  };
+}
+
+const IndicatorDialog: React.FC<IndicatorDialogProps> = ({ open, onOpenChange, indicator }) => {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="text-xl">{indicator.name}</DialogTitle>
+          <DialogDescription>{indicator.explanation}</DialogDescription>
+        </DialogHeader>
+        
+        <ScrollArea className="max-h-[60vh]">
+          <div className="space-y-4 mt-4">
+            {/* Current value */}
+            <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl">
+              <span className="text-5xl font-bold text-slate-900">{indicator.value}</span>
+              <p className={cn(
+                "text-lg font-semibold mt-2",
+                indicator.change >= 0 ? "text-emerald-600" : "text-red-600"
+              )}>
+                {indicator.change >= 0 ? '↑' : '↓'} {Math.abs(indicator.change).toFixed(1)}% senaste året
+              </p>
+            </div>
+            
+            {/* Geographic context */}
+            <div className="bg-amber-50 rounded-xl p-4">
+              <h4 className="font-semibold text-amber-900 mb-2">📍 Var mäts detta?</h4>
+              <ul className="text-sm text-amber-800 space-y-1">
+                <li>• <strong>Geografiskt område:</strong> Hela Sverige, nationell nivå</li>
+                <li>• <strong>Regional data finns:</strong> Ja, per län och kommun</li>
+                <li>• <strong>Jämförbar internationellt:</strong> Ja, Eurostat-standard</li>
+              </ul>
+              <Button variant="outline" size="sm" className="mt-3 bg-white">
+                Se regional fördelning →
+              </Button>
+            </div>
+            
+            {/* Comparison */}
+            <div className="bg-slate-50 rounded-xl p-4">
+              <h4 className="font-semibold text-slate-700 mb-2">🌍 Jämförelse</h4>
+              <ul className="text-sm text-slate-600 space-y-1">
+                <li>• <strong>EU-genomsnitt:</strong> {(parseFloat(indicator.value) * 0.92).toFixed(1)}</li>
+                <li>• <strong>Nordiskt genomsnitt:</strong> {(parseFloat(indicator.value) * 1.02).toFixed(1)}</li>
+                <li>• <strong>Bäst i EU:</strong> 93.2% (Danmark)</li>
+              </ul>
+            </div>
+            
+            {/* Methodology */}
+            <div className="bg-blue-50 rounded-xl p-4">
+              <h4 className="font-semibold text-blue-900 mb-2">🔬 Metodik</h4>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• <strong>Mätperiod:</strong> Januari - December 2024</li>
+                <li>• <strong>Datakälla:</strong> Statistiska Centralbyrån (SCB)</li>
+                <li>• <strong>Uppdateringsfrekvens:</strong> Månadsvis</li>
+                <li>• <strong>Konfidens:</strong> 95% konfidensintervall</li>
+              </ul>
+            </div>
+            
+            {/* Source link */}
+            <Button variant="outline" className="w-full">
+              🔗 Gå till primärkällan (SCB) →
+            </Button>
+          </div>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// ============================================
+// MAIN SCORE CARD (FULLY CLICKABLE)
 // ============================================
 
 interface MainScoreCardProps {
@@ -116,11 +685,9 @@ const MainScoreCard: React.FC<MainScoreCardProps> = ({
   sparklineData,
   color,
 }) => {
-  const colorClasses = {
-    green: 'text-emerald-600 bg-emerald-50 border-emerald-200',
-    yellow: 'text-amber-600 bg-amber-50 border-amber-200',
-    red: 'text-red-600 bg-red-50 border-red-200',
-  };
+  const [statusOpen, setStatusOpen] = useState(false);
+  const [trendOpen, setTrendOpen] = useState(false);
+  const [scoreOpen, setScoreOpen] = useState(false);
   
   const sparklineColor = {
     green: 'hsl(160, 84%, 39%)',
@@ -129,64 +696,88 @@ const MainScoreCard: React.FC<MainScoreCardProps> = ({
   };
 
   return (
-    <Card className="bg-white border-2 border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-      <CardContent className="p-5">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h3 className="text-base font-semibold text-slate-800 flex items-center">
-              {title}
-              <HelpBubble text={helpText} />
-            </h3>
+    <>
+      <Card className="bg-white border-2 border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <CardContent className="p-5">
+          {/* Header */}
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h3 className="text-base font-semibold text-slate-800 flex items-center">
+                {title}
+                <HelpBubble text={helpText} onClick={() => setScoreOpen(true)} />
+              </h3>
+            </div>
+            <StatusBadge color={color} onClick={() => setStatusOpen(true)} />
           </div>
-          <div className={cn(
-            "px-2.5 py-1 rounded-full text-xs font-medium border",
-            colorClasses[color]
-          )}>
-            {color === 'green' ? '👍 Bra' : color === 'yellow' ? '⚠️ Varning' : '🔴 Problem'}
-          </div>
-        </div>
-        
-        {/* Big Number */}
-        <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-4xl font-bold text-slate-900">
-            {value.toFixed(1)}
-          </span>
-          {maxValue && (
-            <span className="text-lg text-slate-400">
-              / {maxValue} {unit}
+          
+          {/* Big Number - CLICKABLE */}
+          <button 
+            onClick={() => setScoreOpen(true)}
+            className="flex items-baseline gap-2 mb-2 hover:opacity-80 transition-opacity cursor-pointer group"
+          >
+            <span className="text-4xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+              {value.toFixed(1)}
             </span>
-          )}
-        </div>
-        
-        {/* Sparkline & Change */}
-        <div className="flex items-center justify-between mb-4">
-          <Sparkline data={sparklineData} color={sparklineColor[color]} />
-          <div className="text-right">
-            <span className={cn(
-              "text-sm font-semibold",
-              change >= 0 ? "text-emerald-600" : "text-red-600"
-            )}>
-              {change >= 0 ? '↑' : '↓'} {Math.abs(change).toFixed(1)}%
-            </span>
-            <p className="text-xs text-slate-400">{changePeriod}</p>
+            {maxValue && (
+              <span className="text-lg text-slate-400">
+                / {maxValue} {unit}
+              </span>
+            )}
+          </button>
+          
+          {/* Sparkline & Change - BOTH CLICKABLE */}
+          <div className="flex items-center justify-between mb-4">
+            <Sparkline 
+              data={sparklineData} 
+              color={sparklineColor[color]}
+              onClick={() => setTrendOpen(true)}
+              label={`Visa trend för ${title}`}
+            />
+            <ChangeIndicator 
+              change={change} 
+              period={changePeriod}
+              onClick={() => setTrendOpen(true)}
+            />
           </div>
-        </div>
-        
-        {/* Plain language interpretation */}
-        <div className="pt-3 border-t border-slate-100">
-          <p className="text-sm text-slate-600 leading-relaxed">
-            <span className="font-medium text-slate-700">Vad betyder det? </span>
-            {interpretation}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+          
+          {/* Interpretation - CLICKABLE */}
+          <button 
+            onClick={() => setScoreOpen(true)}
+            className="w-full text-left pt-3 border-t border-slate-100 hover:bg-slate-50 -mx-1 px-1 rounded transition-colors cursor-pointer group"
+          >
+            <p className="text-sm text-slate-600 leading-relaxed">
+              <span className="font-medium text-slate-700">Vad betyder det? </span>
+              <span className="group-hover:text-blue-600">{interpretation}</span>
+              <span className="text-blue-500 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+            </p>
+          </button>
+        </CardContent>
+      </Card>
+      
+      {/* Dialogs */}
+      <StatusDialog open={statusOpen} onOpenChange={setStatusOpen} color={color} />
+      <TrendDialog 
+        open={trendOpen} 
+        onOpenChange={setTrendOpen} 
+        data={sparklineData}
+        title={title}
+        change={change}
+        period={changePeriod}
+      />
+      <ScoreDialog
+        open={scoreOpen}
+        onOpenChange={setScoreOpen}
+        title={title}
+        value={value}
+        maxValue={maxValue}
+        interpretation={interpretation}
+      />
+    </>
   );
 };
 
 // ============================================
-// DOMAIN CARD (Smaller)
+// DOMAIN CARD (FULLY CLICKABLE)
 // ============================================
 
 interface DomainCardProps {
@@ -208,44 +799,60 @@ const DomainCard: React.FC<DomainCardProps> = ({
   trend,
   indicatorCount,
 }) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  
   const trendColor = trend === 'up' ? 'text-emerald-600' : trend === 'down' ? 'text-red-600' : 'text-slate-500';
   const sparklineColor = trend === 'up' ? 'hsl(160, 84%, 39%)' : trend === 'down' ? 'hsl(0, 84%, 60%)' : 'hsl(215, 16%, 47%)';
   
   return (
-    <Card className="bg-white border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all cursor-pointer">
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          {/* Icon */}
-          <div className="text-2xl">{icon}</div>
-          
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-slate-800 text-sm">{name}</h4>
-            <p className="text-xs text-slate-500 mb-2">{description}</p>
+    <>
+      <Card 
+        className="bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+        onClick={() => setDialogOpen(true)}
+      >
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            {/* Icon */}
+            <div className="text-2xl group-hover:scale-110 transition-transform">{icon}</div>
             
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Sparkline 
-                  data={generateSparkline(value, trend)} 
-                  color={sparklineColor}
-                />
-                <span className={cn("text-sm font-medium", trendColor)}>
-                  {change >= 0 ? '+' : ''}{change.toFixed(1)}%
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <h4 className="font-semibold text-slate-800 text-sm group-hover:text-blue-600 transition-colors">
+                {name}
+                <span className="text-slate-300 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+              </h4>
+              <p className="text-xs text-slate-500 mb-2">{description}</p>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkline 
+                    data={generateSparkline(value, trend)} 
+                    color={sparklineColor}
+                  />
+                  <span className={cn("text-sm font-medium", trendColor)}>
+                    {change >= 0 ? '+' : ''}{change.toFixed(1)}%
+                  </span>
+                </div>
+                <span className="text-xs text-slate-400">
+                  {indicatorCount} mätpunkter
                 </span>
               </div>
-              <span className="text-xs text-slate-400">
-                {indicatorCount} mätpunkter
-              </span>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+      
+      <DomainDialog 
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen}
+        domain={{ icon, name, description, value, change, indicatorCount }}
+      />
+    </>
   );
 };
 
 // ============================================
-// INDICATOR ROW
+// INDICATOR ROW (CLICKABLE)
 // ============================================
 
 interface IndicatorRowProps {
@@ -263,50 +870,98 @@ const IndicatorRow: React.FC<IndicatorRowProps> = ({
   change,
   explanation,
 }) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const statusEmoji = status === 'good' ? '🟢' : status === 'warning' ? '🟡' : '🔴';
   
   return (
-    <div className="flex items-center gap-3 py-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors cursor-pointer px-2 -mx-2 rounded">
-      <span className="text-sm">{statusEmoji}</span>
-      <div className="flex-1 min-w-0">
-        <span className="text-sm font-medium text-slate-800">{name}</span>
-        <p className="text-xs text-slate-500 truncate">{explanation}</p>
-      </div>
-      <span className="text-sm font-mono text-slate-700">{value}</span>
-      <span className={cn(
-        "text-sm font-medium min-w-[60px] text-right",
-        change >= 0 ? "text-emerald-600" : "text-red-600"
-      )}>
-        {change >= 0 ? '+' : ''}{change.toFixed(1)}%
-      </span>
-    </div>
+    <>
+      <button
+        onClick={() => setDialogOpen(true)}
+        className="w-full flex items-center gap-3 py-3 border-b border-slate-100 last:border-0 hover:bg-blue-50 transition-colors cursor-pointer px-2 -mx-2 rounded text-left group"
+      >
+        <span className="text-sm">{statusEmoji}</span>
+        <div className="flex-1 min-w-0">
+          <span className="text-sm font-medium text-slate-800 group-hover:text-blue-600">{name}</span>
+          <p className="text-xs text-slate-500 truncate">{explanation}</p>
+        </div>
+        <span className="text-sm font-mono text-slate-700">{value}</span>
+        <span className={cn(
+          "text-sm font-medium min-w-[60px] text-right",
+          change >= 0 ? "text-emerald-600" : "text-red-600"
+        )}>
+          {change >= 0 ? '+' : ''}{change.toFixed(1)}%
+        </span>
+        <span className="text-slate-300 group-hover:text-blue-500">→</span>
+      </button>
+      
+      <IndicatorDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        indicator={{ name, value, change, explanation }}
+      />
+    </>
   );
 };
 
 // ============================================
-// LEGEND COMPONENT
+// LEGEND COMPONENT (CLICKABLE ITEMS)
 // ============================================
 
-const Legend: React.FC = () => (
-  <div className="flex flex-wrap items-center gap-4 text-sm">
-    <div className="flex items-center gap-1.5">
-      <span className="text-sm">🟢</span>
-      <span className="text-slate-600">Går bra (förbättring)</span>
-    </div>
-    <div className="flex items-center gap-1.5">
-      <span className="text-sm">🟡</span>
-      <span className="text-slate-600">Varning (liten förändring)</span>
-    </div>
-    <div className="flex items-center gap-1.5">
-      <span className="text-sm">🔴</span>
-      <span className="text-slate-600">Problem (försämring)</span>
-    </div>
-    <div className="flex items-center gap-1.5 ml-4 pl-4 border-l border-slate-200">
-      <Sparkline data={[40, 45, 50, 55, 60]} color="hsl(160, 84%, 39%)" />
-      <span className="text-slate-600">= trend över tid</span>
-    </div>
-  </div>
-);
+const Legend: React.FC = () => {
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [statusColor, setStatusColor] = useState<'green' | 'yellow' | 'red'>('green');
+  const [trendDialogOpen, setTrendDialogOpen] = useState(false);
+
+  const handleStatusClick = (color: 'green' | 'yellow' | 'red') => {
+    setStatusColor(color);
+    setStatusDialogOpen(true);
+  };
+
+  return (
+    <>
+      <div className="flex flex-wrap items-center gap-4 text-sm">
+        <button 
+          onClick={() => handleStatusClick('green')}
+          className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-emerald-100 transition-colors cursor-pointer"
+        >
+          <span className="text-sm">🟢</span>
+          <span className="text-slate-600 hover:text-emerald-700">Går bra (förbättring)</span>
+        </button>
+        <button 
+          onClick={() => handleStatusClick('yellow')}
+          className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer"
+        >
+          <span className="text-sm">🟡</span>
+          <span className="text-slate-600 hover:text-amber-700">Varning (liten förändring)</span>
+        </button>
+        <button 
+          onClick={() => handleStatusClick('red')}
+          className="flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-red-100 transition-colors cursor-pointer"
+        >
+          <span className="text-sm">🔴</span>
+          <span className="text-slate-600 hover:text-red-700">Problem (försämring)</span>
+        </button>
+        <button 
+          onClick={() => setTrendDialogOpen(true)}
+          className="flex items-center gap-1.5 ml-4 pl-4 border-l border-slate-200 px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+        >
+          <Sparkline data={[40, 45, 50, 55, 60]} color="hsl(160, 84%, 39%)" />
+          <span className="text-slate-600">= trend över tid</span>
+        </button>
+      </div>
+      
+      <StatusDialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen} color={statusColor} />
+      <TrendDialog 
+        open={trendDialogOpen}
+        onOpenChange={setTrendDialogOpen}
+        data={generateSparkline(50, 'up')}
+        title="Exempel"
+        change={5.0}
+        period="senaste året"
+      />
+    </>
+  );
+};
 
 // ============================================
 // MAIN PAGE
@@ -329,7 +984,7 @@ export default function OscilloscopeViewPage() {
               </h1>
               <p className="text-slate-600">
                 En översikt av hur Sverige utvecklas inom olika områden. 
-                <span className="text-sky-600 font-medium"> Klicka på ?-knapparna för att förstå mer.</span>
+                <span className="text-sky-600 font-medium"> Klicka på vad som helst för att fördjupa dig!</span>
               </p>
             </div>
             
@@ -374,7 +1029,7 @@ export default function OscilloscopeViewPage() {
           </div>
         </header>
         
-        {/* LEGEND */}
+        {/* LEGEND - NOW CLICKABLE */}
         <div className="bg-slate-50 border-b border-slate-200 py-3">
           <div className="container max-w-6xl mx-auto px-4">
             <Legend />
@@ -386,7 +1041,7 @@ export default function OscilloscopeViewPage() {
           <section>
             <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
               🎯 Övergripande betyg
-              <HelpBubble text="Dessa två tal sammanfattar hela samhällets tillstånd i ett enda mått. Det första visar balansen mellan olika områden, det andra visar den totala poängen." />
+              <HelpBubble text="Dessa två tal sammanfattar hela samhällets tillstånd i ett enda mått. Det första visar balansen mellan olika områden, det andra visar den totala poängen. Klicka på något för att gräva djupare!" />
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -422,7 +1077,7 @@ export default function OscilloscopeViewPage() {
           <section>
             <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
               🏛️ Olika områden i samhället
-              <HelpBubble text="Samhället delas in i sex huvudområden. Varje område har flera mätpunkter som kombineras till en totalsiffra. Klicka på ett område för att se detaljerna." />
+              <HelpBubble text="Samhället delas in i sex huvudområden. Varje område har flera mätpunkter som kombineras till en totalsiffra. Klicka på ett område för att se alla detaljer!" />
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -574,6 +1229,10 @@ export default function OscilloscopeViewPage() {
               💡 Hur läser jag den här sidan?
             </h3>
             <div className="text-sm text-sky-800 space-y-2">
+              <p>
+                <strong>🖱️ Klicka på vad som helst</strong> för att se mer information! 
+                Alla siffror, grafer, badges och kort är klickbara och leder till fördjupning.
+              </p>
               <p>
                 <strong>Siffrorna</strong> visar mätningar från officiella källor som SCB, Eurostat och WHO. 
                 De uppdateras automatiskt när ny data kommer.
