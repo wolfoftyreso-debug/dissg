@@ -613,19 +613,6 @@ const GeoScopeSelector: React.FC<GeoScopeSelectorProps> = ({ currentScope, onSco
   const scope = GEO_SCOPES[currentScope] || GEO_SCOPES['SE'];
   const levelInfo = LEVEL_LABELS[scope.level];
 
-  // Build breadcrumb path
-  const buildPath = (scopeCode: string): GeoScope[] => {
-    const path: GeoScope[] = [];
-    let current = GEO_SCOPES[scopeCode];
-    while (current) {
-      path.unshift(current);
-      current = current.parent ? GEO_SCOPES[current.parent] : undefined;
-    }
-    return path;
-  };
-
-  const path = buildPath(currentScope);
-
   // Group scopes by level for selection
   const scopesByLevel = {
     global: Object.values(GEO_SCOPES).filter(s => s.level === 'global'),
@@ -656,20 +643,6 @@ const GeoScopeSelector: React.FC<GeoScopeSelectorProps> = ({ currentScope, onSco
         </svg>
       </button>
 
-      {/* Breadcrumb path */}
-      <div className="flex items-center gap-1 mt-2 text-xs text-slate-500">
-        {path.map((p, i) => (
-          <React.Fragment key={p.code}>
-            {i > 0 && <span className="mx-1">›</span>}
-            <button 
-              onClick={() => onScopeChange(p.code)}
-              className={`hover:text-blue-600 hover:underline ${p.code === currentScope ? 'font-semibold text-slate-700' : ''}`}
-            >
-              {p.flag} {p.name}
-            </button>
-          </React.Fragment>
-        ))}
-      </div>
 
       {/* Dropdown */}
       {isOpen && (
