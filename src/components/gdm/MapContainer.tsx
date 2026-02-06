@@ -1,22 +1,28 @@
 /**
  * Enhanced MapContainer Component
  * 
- * MYNDIGHETSDESIGN: Strikt, klinisk map display.
- * Shows λ values and GEDI counts per country.
- * 
- * @semantic Proper ARIA for interactive map markers
- * @a11y Keyboard navigation and screen reader support
+ * Supports multiple map modes: satellite (photorealistic), 3D globe, 2D flat.
+ * Clean, minimal country markers with scores.
  */
 
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { COUNTRIES, LAMBDA_OVERLAYS, getLambdaColor } from './mockData';
+import type { MapMode } from './types';
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
 
+// Map styles for each mode
+const MAP_STYLES: Record<MapMode, string> = {
+  satellite: 'mapbox://styles/mapbox/satellite-streets-v12',
+  '3d': 'mapbox://styles/mapbox/light-v11',
+  '2d': 'mapbox://styles/mapbox/light-v11',
+};
+
 interface MapContainerProps {
   theme: 'dark' | 'light';
+  mapMode: MapMode;
   onSelectCountry: (code: string) => void;
   selectedCountry: string | null;
   activeLayer: string;
@@ -24,7 +30,8 @@ interface MapContainerProps {
 }
 
 export function MapContainer({
-  theme,
+  theme: _theme,
+  mapMode,
   onSelectCountry,
   selectedCountry,
   activeLayer,
@@ -41,14 +48,15 @@ export function MapContainer({
 
     mapboxgl.accessToken = MAPBOX_TOKEN;
 
+    const projection = mapMode === '3d' ? 'globe' : 'mercator';
+    const style = MAP_STYLES[mapMode];
+
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: theme === 'dark' 
-        ? 'mapbox://styles/mapbox/dark-v11'
-        : 'mapbox://styles/mapbox/light-v11',
-      center: [15, 35],
-      zoom: 2.2,
-      projection: 'mercator',
+      style,
+      center: [10, 30],
+      zoom: mapMode === '3d' ? 1.5 : 2,
+      projection,
       attributionControl: false,
       fadeDuration: 0,
     });
@@ -56,8 +64,21 @@ export function MapContainer({
     // Navigation controls
     map.current.addControl(
       new mapboxgl.NavigationControl({ showCompass: true }), 
-      'top-right'
+      'bottom-left'
     );
+
+    // Globe atmosphere for 3D mode
+    map.current.on('style.load', () => {
+      if (mapMode === '3d' && map.current) {
+        map.current.setFog({
+          color: 'rgb(220, 230, 240)',
+          'high-color': 'rgb(180, 200, 220)',
+          'horizon-blend': 0.05,
+          'space-color': 'rgb(240, 245, 250)',
+          'star-intensity': 0,
+        });
+      }
+    });
 
     map.current.on('load', () => {
       setIsLoaded(true);
@@ -67,7 +88,7 @@ export function MapContainer({
       markersRef.current.forEach(m => m.remove());
       map.current?.remove();
     };
-  }, [theme]);
+  }, [mapMode]);
 
   // Add country markers
   useEffect(() => {
@@ -83,87 +104,65 @@ export function MapContainer({
       if (!lambdaData) return;
 
       const isSelected = selectedCountry === country.code;
-      const isDark = theme === 'dark';
+      const score = Math.round(lambdaData.lambda * 100);
       const color = getLambdaColor(lambdaData.lambda);
-      const hasActiveGEDI = lambdaData.activeGEDICodes.length > 0;
       
-      // Create myndighets-style marker
+      // Create clean, modern marker
       const el = document.createElement('div');
-      el.className = 'gdm-lambda-marker';
+      el.className = 'gdm-marker';
       el.setAttribute('role', 'button');
       el.setAttribute('tabindex', '0');
-      el.setAttribute('aria-label', `${country.name.sv}: Lambda ${lambdaData.lambda.toFixed(2)}${hasActiveGEDI ? `, ${lambdaData.activeGEDICodes.length} aktiva GEDI-koder` : ''}`);
-      el.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+      el.setAttribute('aria-label', `${country.name.sv}: ${score} poäng`);
       
-      el.style.cssText = `
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        cursor: pointer;
-        transition: transform 0.15s ease;
-        z-index: ${isSelected ? 100 : 10};
+      
+      el.innerHTML = `
+        <div class="gdm-marker-content ${isSelected ? 'gdm-marker-selected' : ''}">
+          <div class="gdm-marker-score" style="background: ${color}">${score}</div>
+          <div class="gdm-marker-flag">${country.code}</div>
+        </div>
       `;
-
-      // Lambda value box
-      const lambdaBox = document.createElement('div');
-      lambdaBox.style.cssText = `
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        padding: 3px 6px;
-        background: ${isDark ? 'hsl(222.2 84% 4.9% / 0.95)' : 'hsl(0 0% 100% / 0.98)'};
-        border: 1px solid ${isSelected ? color : (isDark ? 'hsl(215 20.2% 35% / 0.6)' : 'hsl(214.3 31.8% 91.4% / 0.9)')};
-        border-radius: 2px;
-        font-family: 'SF Mono', 'Fira Code', 'Consolas', ui-monospace, monospace;
-        font-size: 11px;
-        box-shadow: ${isSelected 
-          ? `0 0 0 2px ${color}40` 
-          : '0 2px 6px rgba(0,0,0,0.2)'};
-        white-space: nowrap;
-        ${hasActiveGEDI ? `border-left: 3px solid ${color};` : ''}
-      `;
-
-      // Lambda value
-      const lambdaValue = document.createElement('span');
-      lambdaValue.style.cssText = `
-        font-weight: 600;
-        color: ${color};
-        letter-spacing: -0.02em;
-      `;
-      lambdaValue.textContent = lambdaData.lambda.toFixed(2);
-      lambdaBox.appendChild(lambdaValue);
-
-      // GEDI count if any
-      if (hasActiveGEDI) {
-        const gediCount = document.createElement('span');
-        gediCount.style.cssText = `
+      
+      // Styles
+      const styles = document.createElement('style');
+      styles.textContent = `
+        .gdm-marker {
+          cursor: pointer;
+          transition: transform 0.2s ease;
+        }
+        .gdm-marker:hover {
+          transform: scale(1.15);
+          z-index: 100 !important;
+        }
+        .gdm-marker-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2px;
+        }
+        .gdm-marker-score {
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 13px;
+          font-weight: 700;
+          color: white;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+          min-width: 32px;
+          text-align: center;
+        }
+        .gdm-marker-flag {
           font-size: 9px;
-          color: ${isDark ? 'hsl(215 20.2% 65.1%)' : 'hsl(215 16.3% 46.9%)'};
-          margin-left: 2px;
-        `;
-        gediCount.textContent = `[${lambdaData.activeGEDICodes.length}]`;
-        gediCount.setAttribute('aria-hidden', 'true');
-        lambdaBox.appendChild(gediCount);
-      }
-
-      el.appendChild(lambdaBox);
-
-      // Country code label below
-      const codeLabel = document.createElement('div');
-      codeLabel.style.cssText = `
-        margin-top: 2px;
-        padding: 1px 4px;
-        background: ${isDark ? 'hsl(222.2 84% 4.9% / 0.9)' : 'hsl(0 0% 100% / 0.95)'};
-        border-radius: 1px;
-        font-family: 'SF Mono', 'Fira Code', 'Consolas', ui-monospace, monospace;
-        font-size: 9px;
-        font-weight: 600;
-        color: ${isDark ? 'hsl(215 20.2% 65.1%)' : 'hsl(215 16.3% 46.9%)'};
-        letter-spacing: 0.02em;
+          font-weight: 600;
+          color: #64748b;
+          background: white;
+          padding: 1px 4px;
+          border-radius: 4px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .gdm-marker-selected .gdm-marker-score {
+          box-shadow: 0 0 0 3px white, 0 0 0 5px ${color};
+        }
       `;
-      codeLabel.textContent = country.code;
-      codeLabel.setAttribute('aria-hidden', 'true');
-      el.appendChild(codeLabel);
+      el.appendChild(styles);
 
       // Click handler
       const handleSelect = (e: Event) => {
@@ -179,28 +178,6 @@ export function MapContainer({
         }
       });
 
-      // Hover effects
-      el.addEventListener('mouseenter', () => {
-        el.style.transform = 'scale(1.1)';
-        el.style.zIndex = '150';
-      });
-      
-      el.addEventListener('mouseleave', () => {
-        el.style.transform = 'scale(1)';
-        el.style.zIndex = isSelected ? '100' : '10';
-      });
-
-      // Focus effects
-      el.addEventListener('focus', () => {
-        el.style.transform = 'scale(1.1)';
-        el.style.zIndex = '150';
-      });
-      
-      el.addEventListener('blur', () => {
-        el.style.transform = 'scale(1)';
-        el.style.zIndex = isSelected ? '100' : '10';
-      });
-
       const marker = new mapboxgl.Marker({ 
         element: el,
         anchor: 'center',
@@ -210,7 +187,7 @@ export function MapContainer({
 
       markersRef.current.push(marker);
     });
-  }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear, theme]);
+  }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear]);
 
   // Fly to selected country
   useEffect(() => {
@@ -220,62 +197,37 @@ export function MapContainer({
     if (country) {
       map.current.flyTo({
         center: country.center,
-        zoom: 4,
+        zoom: mapMode === '3d' ? 3 : 4,
         duration: 1200,
       });
     }
-  }, [selectedCountry]);
+  }, [selectedCountry, mapMode]);
 
   if (!MAPBOX_TOKEN) {
     return (
-      <div 
-        className="h-full flex items-center justify-center bg-background"
-        role="alert"
-      >
-        <div className="text-center p-8 font-mono">
-          <div className="text-lg font-semibold">[!] MAPBOX_TOKEN SAKNAS</div>
-          <div className="text-sm text-muted-foreground mt-2">
-            Konfiguration krävs för kartvisning
-          </div>
+      <div className="h-full flex items-center justify-center bg-slate-50">
+        <div className="text-center p-8">
+          <div className="text-6xl mb-4">🗺️</div>
+          <div className="text-lg font-medium text-slate-600">Kartan laddas...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div 
-      className="relative w-full h-full"
-      role="application"
-      aria-label="Interaktiv världskarta med Lambda-värden"
-    >
+    <div className="relative w-full h-full">
       <div 
         ref={mapContainer} 
         className="w-full h-full"
         style={{ minHeight: '100%' }}
-        aria-hidden="true"
       />
-      
-      {/* Screen reader description */}
-      <div className="sr-only">
-        <p>
-          Interaktiv karta som visar Lambda-systembalans för olika länder.
-          Använd Tab för att navigera mellan länder, Enter för att välja.
-        </p>
-      </div>
       
       {/* Loading overlay */}
       {!isLoaded && (
-        <div 
-          className="absolute inset-0 flex items-center justify-center bg-background/80 z-50"
-          role="status"
-          aria-live="polite"
-        >
-          <div className="flex flex-col items-center gap-3">
-            <div 
-              className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"
-              aria-hidden="true"
-            />
-            <span className="text-sm font-mono text-muted-foreground">Laddar karta...</span>
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-50/90 z-50">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-3 border-slate-300 border-t-blue-500 rounded-full animate-spin" />
+            <span className="text-sm text-slate-500">Laddar världskarta...</span>
           </div>
         </div>
       )}
