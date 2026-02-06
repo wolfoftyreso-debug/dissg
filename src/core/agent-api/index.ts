@@ -2,6 +2,7 @@
  * AGENT-NATIVE API
  * 
  * Machine-first. Deterministic. No guessing.
+ * "AI-agenter vill inte tolka – de vill resolva."
  */
 
 // Schemas
@@ -39,9 +40,14 @@ export {
 } from './guardrails';
 
 // SDK
-import { TruthEngineSDK as SDK, createAgentSDK as createSDKFn } from './sdk';
-export { SDK as TruthEngineSDK, createSDKFn as createAgentSDK };
-export { SDK_FUNCTIONS, SDK_CONTRACT, type AgentSDKConfig, type SDKResponse } from './sdk';
+export { 
+  TruthEngineSDK, 
+  createAgentSDK,
+  SDK_FUNCTIONS,
+  SDK_CONTRACT,
+  type AgentSDKConfig,
+  type SDKResponse,
+} from './sdk';
 
 // Documentation
 export {
@@ -59,18 +65,27 @@ export const AGENT_API_VERSION = '1.0.0' as const;
  * ENDPOINT REGISTRY
  */
 export const ENDPOINTS = {
+  // Core resolve
+  'POST /v1/resolve': 'Query → Canonical Answer (main method)',
+  
+  // Direct lookup
+  'GET /v1/questions/{question_id}': 'Ultra-fast lookup by ID (<50ms)',
+  
   // Graph traversal
-  'GET /api/graph/node/{id}': 'Get single truth node',
-  'GET /api/graph/traverse': 'Traverse graph from node',
+  'GET /v1/graph/node/{node_id}': 'Get full graph node',
+  'GET /v1/graph/traverse': 'Traverse graph from node',
   
   // Semantic retrieval
-  'GET /api/semantic/answer': 'Get structured answer',
+  'GET /v1/semantic/answer': 'Get structured answer',
   
   // Index access
-  'GET /api/index/{index_id}': 'Get index value',
+  'GET /v1/index/{index_id}': 'Get computed index value',
   
   // Decision underlag
-  'GET /api/decision/{graph_id}/resolve': 'Resolve decision graph',
+  'GET /v1/decision/{graph_id}/resolve': 'Resolve decision graph (never recommends)',
+  
+  // Enterprise
+  'POST /v1/datasets/export': 'Export full dataset (enterprise)',
 } as const;
 
 /**
@@ -81,14 +96,72 @@ export const API_RULES = {
   no_summaries: true,
   always_schema: true,
   always_uncertainty: true,
+  always_guarantees: true,
   deterministic: true,
   version_pinned: true,
   cache_stable: true,
 } as const;
 
 /**
+ * RATE LIMIT TIERS
+ */
+export const RATE_LIMIT_TIERS = {
+  free: {
+    agent_type: 'general',
+    requests_per_minute: 10,
+    answer_depth: 'short',
+    numerical_summaries: false,
+    dataset_export: false,
+  },
+  pro: {
+    agent_type: 'journalism',
+    requests_per_minute: 100,
+    answer_depth: 'full',
+    numerical_summaries: true,
+    dataset_export: false,
+  },
+  pro_plus: {
+    agent_type: 'finance',
+    requests_per_minute: 500,
+    answer_depth: 'full',
+    numerical_summaries: true,
+    dataset_export: false,
+  },
+  enterprise: {
+    agent_type: 'policy',
+    requests_per_minute: 1000,
+    answer_depth: 'full',
+    numerical_summaries: true,
+    dataset_export: true,
+    historical_access: true,
+  },
+} as const;
+
+/**
+ * TRUST HANDSHAKE
+ */
+export const TRUST_HANDSHAKE = {
+  guarantees: {
+    no_opinion: true,
+    no_speculation: true,
+    source_traceable: true,
+    revision_logged: true,
+  },
+  response_headers: [
+    'X-DISSG-Trust-Score',
+    'X-DISSG-Confidence-Band',
+    'X-DISSG-Safe-Autocite',
+    'X-DISSG-Hallucination-Risk',
+    'X-DISSG-Request-ID',
+  ],
+  contract_url: 'https://dissg.global/api/contract',
+} as const;
+
+/**
  * QUICK SDK FACTORY
  */
-export function createSDK(baseUrl: string, apiKey?: string) {
-  return new SDK({ baseUrl, apiKey });
+import { TruthEngineSDK } from './sdk';
+
+export function createSDK(baseUrl: string = 'https://api.dissg.global', apiKey?: string) {
+  return new TruthEngineSDK({ baseUrl, apiKey });
 }
