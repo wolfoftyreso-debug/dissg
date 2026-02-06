@@ -964,12 +964,195 @@ const Legend: React.FC = () => {
 };
 
 // ============================================
+// COUNTRY-SPECIFIC DATA
+// ============================================
+
+interface CountryData {
+  name: string;
+  flag: string;
+  balance: { value: number; change: number; status: 'green' | 'yellow' | 'red' };
+  health: { value: number; change: number; status: 'green' | 'yellow' | 'red' };
+  domains: {
+    healthCare: { value: number; change: number; trend: 'up' | 'down' | 'stable' };
+    economy: { value: number; change: number; trend: 'up' | 'down' | 'stable' };
+    safety: { value: number; change: number; trend: 'up' | 'down' | 'stable' };
+    education: { value: number; change: number; trend: 'up' | 'down' | 'stable' };
+    housing: { value: number; change: number; trend: 'up' | 'down' | 'stable' };
+    environment: { value: number; change: number; trend: 'up' | 'down' | 'stable' };
+  };
+  topIndicators: Array<{ name: string; value: string; change: number; explanation: string }>;
+  bottomIndicators: Array<{ name: string; value: string; change: number; explanation: string; status: 'bad' | 'warning' }>;
+}
+
+const COUNTRY_DATA: Record<string, CountryData> = {
+  SE: {
+    name: 'Sverige',
+    flag: '🇸🇪',
+    balance: { value: 0.94, change: -2.1, status: 'yellow' },
+    health: { value: 76.3, change: 1.3, status: 'green' },
+    domains: {
+      healthCare: { value: 72, change: 0.8, trend: 'up' },
+      economy: { value: 68, change: -1.2, trend: 'down' },
+      safety: { value: 54, change: -2.1, trend: 'down' },
+      education: { value: 74, change: 0.3, trend: 'stable' },
+      housing: { value: 58, change: -0.5, trend: 'down' },
+      environment: { value: 71, change: 1.2, trend: 'up' },
+    },
+    topIndicators: [
+      { name: 'Sysselsättningsgrad', value: '78.2%', change: 2.3, explanation: 'Hur många som har jobb' },
+      { name: 'Medellivslängd', value: '83.1 år', change: 0.4, explanation: 'Hur länge vi lever i snitt' },
+      { name: 'Förnybar energi', value: '67%', change: 3.8, explanation: 'Andel el från sol, vind och vatten' },
+      { name: 'Gymnasiebehörighet', value: '85.3%', change: 1.2, explanation: 'Elever som klarar gymnasiet' },
+    ],
+    bottomIndicators: [
+      { name: 'Vårdköer', value: '127 dagar', change: 15.2, explanation: 'Väntetid för att få vård', status: 'bad' },
+      { name: 'Skjutningar', value: '4.2/100k', change: 8.7, explanation: 'Skjutningar per 100 000 invånare', status: 'bad' },
+      { name: 'Boendesegregation', value: '42 index', change: 2.1, explanation: 'Hur uppdelat boendet är', status: 'warning' },
+      { name: 'Lärarbrist', value: '18.3%', change: 4.6, explanation: 'Skolor som saknar behöriga lärare', status: 'warning' },
+    ],
+  },
+  NO: {
+    name: 'Norge',
+    flag: '🇳🇴',
+    balance: { value: 0.97, change: 0.3, status: 'green' },
+    health: { value: 82.1, change: 0.8, status: 'green' },
+    domains: {
+      healthCare: { value: 84, change: 1.2, trend: 'up' },
+      economy: { value: 88, change: 2.3, trend: 'up' },
+      safety: { value: 78, change: 0.5, trend: 'stable' },
+      education: { value: 79, change: 0.7, trend: 'up' },
+      housing: { value: 72, change: 1.1, trend: 'up' },
+      environment: { value: 76, change: 0.9, trend: 'up' },
+    },
+    topIndicators: [
+      { name: 'BNP per capita', value: '89 200 USD', change: 4.1, explanation: 'Ekonomisk produktion per person' },
+      { name: 'Medellivslängd', value: '83.8 år', change: 0.3, explanation: 'Hur länge vi lever i snitt' },
+      { name: 'Vattenkraft', value: '92%', change: 1.2, explanation: 'Andel förnybar el' },
+      { name: 'Arbetslöshet', value: '3.4%', change: -0.8, explanation: 'Andel utan jobb' },
+    ],
+    bottomIndicators: [
+      { name: 'Bostadspriser', value: '142 index', change: 6.3, explanation: 'Prisökning på bostäder', status: 'warning' },
+      { name: 'Psykisk ohälsa', value: '18.2%', change: 2.1, explanation: 'Unga med ångest/depression', status: 'warning' },
+      { name: 'Glesbygdsavfolkning', value: '-2.1%', change: 0.5, explanation: 'Befolkningsminskning utanför städer', status: 'warning' },
+      { name: 'Oljeberoende', value: '54%', change: -1.2, explanation: 'Andel av BNP från olja', status: 'warning' },
+    ],
+  },
+  DK: {
+    name: 'Danmark',
+    flag: '🇩🇰',
+    balance: { value: 0.96, change: 0.4, status: 'green' },
+    health: { value: 79.8, change: 0.6, status: 'green' },
+    domains: {
+      healthCare: { value: 78, change: 0.9, trend: 'up' },
+      economy: { value: 76, change: 1.4, trend: 'up' },
+      safety: { value: 82, change: 0.2, trend: 'stable' },
+      education: { value: 77, change: 0.5, trend: 'stable' },
+      housing: { value: 65, change: -0.3, trend: 'down' },
+      environment: { value: 74, change: 2.1, trend: 'up' },
+    },
+    topIndicators: [
+      { name: 'Lyckoindex', value: '7.6/10', change: 0.2, explanation: 'Självrapporterad livstillfredsställelse' },
+      { name: 'Vindkraft', value: '48%', change: 5.2, explanation: 'Andel el från vindkraft' },
+      { name: 'Cykelinfrastruktur', value: '92 poäng', change: 3.1, explanation: 'Kvalitet på cykelvägar' },
+      { name: 'Låg korruption', value: '90/100', change: 0.5, explanation: 'Korruptionsindex (högt = bra)' },
+    ],
+    bottomIndicators: [
+      { name: 'Skattetryck', value: '47%', change: 0.3, explanation: 'Skatter som andel av BNP', status: 'warning' },
+      { name: 'Bostadsbrist', value: '23%', change: 1.8, explanation: 'Kommuner med bostadsbrist', status: 'warning' },
+      { name: 'Gängkriminalitet', value: '2.8/100k', change: 4.2, explanation: 'Gängrelaterade brott', status: 'bad' },
+      { name: 'Läkarbrist', value: '12%', change: 1.4, explanation: 'Områden med läkarbrist', status: 'warning' },
+    ],
+  },
+  FI: {
+    name: 'Finland',
+    flag: '🇫🇮',
+    balance: { value: 0.95, change: -0.2, status: 'green' },
+    health: { value: 78.4, change: 0.5, status: 'green' },
+    domains: {
+      healthCare: { value: 76, change: 0.4, trend: 'stable' },
+      economy: { value: 71, change: -0.8, trend: 'down' },
+      safety: { value: 85, change: 0.3, trend: 'stable' },
+      education: { value: 86, change: 0.1, trend: 'stable' },
+      housing: { value: 68, change: 0.2, trend: 'stable' },
+      environment: { value: 79, change: 1.5, trend: 'up' },
+    },
+    topIndicators: [
+      { name: 'PISA-resultat', value: '516 poäng', change: 0.8, explanation: 'Internationellt utbildningstest' },
+      { name: 'Trygghet', value: '89/100', change: 0.4, explanation: 'Upplevd trygghet i samhället' },
+      { name: 'Jämställdhet', value: '86%', change: 0.7, explanation: 'Jämställdhetsindex' },
+      { name: 'Digital mognad', value: '91 poäng', change: 2.3, explanation: 'Digitalisering av offentlig sektor' },
+    ],
+    bottomIndicators: [
+      { name: 'Befolkningsåldring', value: '23%', change: 0.8, explanation: 'Andel över 65 år', status: 'warning' },
+      { name: 'Självmordstal', value: '13.4/100k', change: -2.1, explanation: 'Självmord per 100 000', status: 'warning' },
+      { name: 'Arbetslöshet', value: '7.2%', change: 0.5, explanation: 'Andel utan jobb', status: 'warning' },
+      { name: 'Glesbygd', value: '18 inv/km²', change: -0.3, explanation: 'Befolkningstäthet', status: 'warning' },
+    ],
+  },
+  DE: {
+    name: 'Tyskland',
+    flag: '🇩🇪',
+    balance: { value: 0.88, change: -1.8, status: 'yellow' },
+    health: { value: 71.2, change: -0.9, status: 'yellow' },
+    domains: {
+      healthCare: { value: 74, change: -0.5, trend: 'down' },
+      economy: { value: 65, change: -2.4, trend: 'down' },
+      safety: { value: 71, change: -1.2, trend: 'down' },
+      education: { value: 69, change: -0.8, trend: 'down' },
+      housing: { value: 52, change: -1.5, trend: 'down' },
+      environment: { value: 68, change: 0.8, trend: 'up' },
+    },
+    topIndicators: [
+      { name: 'Industriproduktion', value: '92 index', change: 1.2, explanation: 'Tillverkningsindustri' },
+      { name: 'Forskning & Utveckling', value: '3.1% av BNP', change: 0.3, explanation: 'Investeringar i FoU' },
+      { name: 'Kolreduktion', value: '-42%', change: 5.2, explanation: 'Utsläppsminskning sedan 1990' },
+      { name: 'Yrkesutbildning', value: '87%', change: 0.6, explanation: 'Kvalitet på yrkesutbildning' },
+    ],
+    bottomIndicators: [
+      { name: 'Energikris', value: '182 index', change: 34.5, explanation: 'Energiprisutveckling', status: 'bad' },
+      { name: 'Infrastruktur', value: '58 poäng', change: -3.2, explanation: 'Vägar, broar, järnväg', status: 'bad' },
+      { name: 'Digitalisering', value: '62 poäng', change: 1.8, explanation: 'Digital offentlig sektor', status: 'warning' },
+      { name: 'Lärarbrist', value: '26%', change: 3.4, explanation: 'Skolor som saknar lärare', status: 'bad' },
+    ],
+  },
+  GLOBAL: {
+    name: 'Hela världen',
+    flag: '🌍',
+    balance: { value: 0.72, change: -0.5, status: 'yellow' },
+    health: { value: 58.2, change: 0.3, status: 'yellow' },
+    domains: {
+      healthCare: { value: 54, change: 0.6, trend: 'up' },
+      economy: { value: 52, change: 1.2, trend: 'up' },
+      safety: { value: 48, change: -1.5, trend: 'down' },
+      education: { value: 58, change: 0.8, trend: 'up' },
+      housing: { value: 45, change: -0.3, trend: 'down' },
+      environment: { value: 42, change: -2.1, trend: 'down' },
+    },
+    topIndicators: [
+      { name: 'Fattigdomsminskning', value: '-1.2%/år', change: 0.5, explanation: 'Minskning av extrem fattigdom' },
+      { name: 'Barnadödlighet', value: '-2.8%/år', change: 0.3, explanation: 'Minskning av barnadödlighet' },
+      { name: 'Alfabetisering', value: '87%', change: 0.4, explanation: 'Andel som kan läsa och skriva' },
+      { name: 'Internetåtkomst', value: '63%', change: 4.2, explanation: 'Befolkning med internettillgång' },
+    ],
+    bottomIndicators: [
+      { name: 'Klimatkris', value: '+1.2°C', change: 0.08, explanation: 'Global temperaturökning', status: 'bad' },
+      { name: 'Konflikter', value: '56 aktiva', change: 12.0, explanation: 'Pågående väpnade konflikter', status: 'bad' },
+      { name: 'Hunger', value: '735 M', change: 2.4, explanation: 'Människor som lider av hunger', status: 'bad' },
+      { name: 'Biodiversitet', value: '-2.5%/år', change: 0.3, explanation: 'Förlust av arter', status: 'bad' },
+    ],
+  },
+};
+
+// ============================================
 // MAIN PAGE
 // ============================================
 
 export default function OscilloscopeViewPage() {
   const [selectedCountry, setSelectedCountry] = useState('SE');
   const [timeSpan, setTimeSpan] = useState('12m');
+  
+  // Get data for selected country
+  const countryData = COUNTRY_DATA[selectedCountry] || COUNTRY_DATA.SE;
   
   return (
     <TooltipProvider>
@@ -983,8 +1166,8 @@ export default function OscilloscopeViewPage() {
                 📊 Hur mår samhället just nu?
               </h1>
               <p className="text-slate-600">
-                En översikt av hur Sverige utvecklas inom olika områden. 
-                <span className="text-sky-600 font-medium"> Klicka på vad som helst för att fördjupa dig!</span>
+                En översikt av hur {countryData.flag} {countryData.name} utvecklas inom olika områden. 
+                <span className="text-sky-600 font-medium"> Klicka på ?-knapparna för att förstå mer.</span>
               </p>
             </div>
             
@@ -1048,27 +1231,27 @@ export default function OscilloscopeViewPage() {
               <MainScoreCard
                 title="Samhällsbalans"
                 helpText="Mäter om samhället är i balans. Värdet 1.0 är perfekt balans. Under 1.0 betyder att vissa områden halkar efter. Det är som en våg - alla delar ska väga lika mycket."
-                value={0.94}
+                value={countryData.balance.value}
                 maxValue={1.0}
                 unit=""
-                change={-2.1}
+                change={countryData.balance.change}
                 changePeriod="senaste året"
-                interpretation="Samhället är lite obalanserat just nu. Hälsa och trygghet har försämrats mer än ekonomi och jobb."
-                sparklineData={generateSparkline(94, 'down')}
-                color="yellow"
+                interpretation={`${countryData.name} har en samhällsbalans på ${countryData.balance.value.toFixed(2)}. ${countryData.balance.status === 'green' ? 'Detta indikerar god balans mellan olika samhällsområden.' : countryData.balance.status === 'yellow' ? 'Vissa områden behöver extra uppmärksamhet.' : 'Betydande obalans mellan samhällsområden.'}`}
+                sparklineData={generateSparkline(countryData.balance.value * 100, countryData.balance.change >= 0 ? 'up' : 'down')}
+                color={countryData.balance.status}
               />
               
               <MainScoreCard
                 title="Systemhälsa"
                 helpText="Ett totalbetyg för hur bra samhället fungerar, från 0 till 100. Ju högre siffra, desto bättre. Det räknas ut från 56 olika mätningar inom hälsa, ekonomi, utbildning och mer."
-                value={76.3}
+                value={countryData.health.value}
                 maxValue={100}
                 unit="poäng"
-                change={1.3}
+                change={countryData.health.change}
                 changePeriod="senaste året"
-                interpretation="Ganska bra! Sverige ligger på plats 6 i världen. Ekonomin går bra men trygghet och integration behöver förbättras."
-                sparklineData={generateSparkline(76, 'up')}
-                color="green"
+                interpretation={`${countryData.name} har en systemhälsa på ${countryData.health.value.toFixed(1)} av 100. ${countryData.health.status === 'green' ? 'Detta är över genomsnittet.' : countryData.health.status === 'yellow' ? 'Presterar runt genomsnittet.' : 'Under genomsnittet för jämförbara länder.'}`}
+                sparklineData={generateSparkline(countryData.health.value, countryData.health.change >= 0 ? 'up' : 'down')}
+                color={countryData.health.status}
               />
             </div>
           </section>
@@ -1085,54 +1268,54 @@ export default function OscilloscopeViewPage() {
                 icon="🏥"
                 name="Hälsa & Vård"
                 description="Hur friska vi är och hur vården fungerar"
-                value={72}
-                change={0.8}
-                trend="up"
+                value={countryData.domains.healthCare.value}
+                change={countryData.domains.healthCare.change}
+                trend={countryData.domains.healthCare.trend}
                 indicatorCount={8}
               />
               <DomainCard
                 icon="💰"
                 name="Ekonomi"
                 description="Jobb, löner och hur pengarna fördelas"
-                value={68}
-                change={-1.2}
-                trend="down"
+                value={countryData.domains.economy.value}
+                change={countryData.domains.economy.change}
+                trend={countryData.domains.economy.trend}
                 indicatorCount={9}
               />
               <DomainCard
                 icon="🛡️"
                 name="Trygghet"
                 description="Säkerhet, brott och känslan av trygghet"
-                value={54}
-                change={-2.1}
-                trend="down"
+                value={countryData.domains.safety.value}
+                change={countryData.domains.safety.change}
+                trend={countryData.domains.safety.trend}
                 indicatorCount={10}
               />
               <DomainCard
                 icon="📚"
                 name="Utbildning"
                 description="Skolor, kunskap och lärande"
-                value={74}
-                change={0.3}
-                trend="stable"
+                value={countryData.domains.education.value}
+                change={countryData.domains.education.change}
+                trend={countryData.domains.education.trend}
                 indicatorCount={7}
               />
               <DomainCard
                 icon="🏠"
                 name="Boende & Integration"
                 description="Bostäder och hur väl vi lever tillsammans"
-                value={58}
-                change={-0.5}
-                trend="down"
+                value={countryData.domains.housing.value}
+                change={countryData.domains.housing.change}
+                trend={countryData.domains.housing.trend}
                 indicatorCount={6}
               />
               <DomainCard
                 icon="🌱"
                 name="Miljö & Klimat"
                 description="Naturens tillstånd och hållbarhet"
-                value={71}
-                change={1.2}
-                trend="up"
+                value={countryData.domains.environment.value}
+                change={countryData.domains.environment.change}
+                trend={countryData.domains.environment.trend}
                 indicatorCount={8}
               />
             </div>
@@ -1144,39 +1327,21 @@ export default function OscilloscopeViewPage() {
             <Card className="bg-emerald-50/50 border-emerald-200">
               <CardContent className="p-5">
                 <h3 className="font-semibold text-emerald-800 mb-3 flex items-center gap-2">
-                  📈 Går bäst just nu
+                  📈 Går bäst just nu i {countryData.name}
                   <span className="text-xs font-normal text-emerald-600">(senaste 12 månaderna)</span>
                 </h3>
                 
                 <div className="space-y-1">
-                  <IndicatorRow
-                    status="good"
-                    name="Sysselsättningsgrad"
-                    value="78.2%"
-                    change={2.3}
-                    explanation="Hur många som har jobb"
-                  />
-                  <IndicatorRow
-                    status="good"
-                    name="Medellivslängd"
-                    value="83.1 år"
-                    change={0.4}
-                    explanation="Hur länge vi lever i snitt"
-                  />
-                  <IndicatorRow
-                    status="good"
-                    name="Förnybar energi"
-                    value="67%"
-                    change={3.8}
-                    explanation="Andel el från sol, vind och vatten"
-                  />
-                  <IndicatorRow
-                    status="good"
-                    name="Gymnasiebehörighet"
-                    value="85.3%"
-                    change={1.2}
-                    explanation="Elever som klarar gymnasiet"
-                  />
+                  {countryData.topIndicators.map((indicator, index) => (
+                    <IndicatorRow
+                      key={index}
+                      status="good"
+                      name={indicator.name}
+                      value={indicator.value}
+                      change={indicator.change}
+                      explanation={indicator.explanation}
+                    />
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -1185,39 +1350,21 @@ export default function OscilloscopeViewPage() {
             <Card className="bg-red-50/50 border-red-200">
               <CardContent className="p-5">
                 <h3 className="font-semibold text-red-800 mb-3 flex items-center gap-2">
-                  📉 Behöver förbättras
+                  📉 Behöver förbättras i {countryData.name}
                   <span className="text-xs font-normal text-red-600">(senaste 12 månaderna)</span>
                 </h3>
                 
                 <div className="space-y-1">
-                  <IndicatorRow
-                    status="bad"
-                    name="Vårdköer"
-                    value="127 dagar"
-                    change={15.2}
-                    explanation="Väntetid för att få vård"
-                  />
-                  <IndicatorRow
-                    status="bad"
-                    name="Skjutningar"
-                    value="4.2/100k"
-                    change={8.7}
-                    explanation="Skjutningar per 100 000 invånare"
-                  />
-                  <IndicatorRow
-                    status="warning"
-                    name="Boendesegregation"
-                    value="42 index"
-                    change={2.1}
-                    explanation="Hur uppdelat boendet är"
-                  />
-                  <IndicatorRow
-                    status="warning"
-                    name="Lärarbrist"
-                    value="18.3%"
-                    change={4.6}
-                    explanation="Skolor som saknar behöriga lärare"
-                  />
+                  {countryData.bottomIndicators.map((indicator, index) => (
+                    <IndicatorRow
+                      key={index}
+                      status={indicator.status}
+                      name={indicator.name}
+                      value={indicator.value}
+                      change={indicator.change}
+                      explanation={indicator.explanation}
+                    />
+                  ))}
                 </div>
               </CardContent>
             </Card>
