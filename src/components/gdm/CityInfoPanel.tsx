@@ -60,14 +60,14 @@ export function CityInfoPanel({ cityId, selectedIndicators, onClose }: CityInfoP
   const city = MOCK_CITIES.find(c => c.id === cityId);
   
   if (!city) {
-    // City not in our full dataset - show limited info panel
+    // City not in our full dataset - show summary panel with available benchmark data
     return (
       <aside className="absolute top-0 right-0 h-full w-96 bg-white shadow-2xl z-40 animate-in slide-in-from-right duration-300">
         <div className="p-5">
           <header className="flex items-start justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold text-slate-900">📍 {cityId}</h2>
-              <p className="text-sm text-slate-500 mt-1">Begränsad data tillgänglig</p>
+              <p className="text-sm text-slate-500 mt-1">Översikt</p>
             </div>
             <button 
               onClick={onClose}
@@ -78,16 +78,16 @@ export function CityInfoPanel({ cityId, selectedIndicators, onClose }: CityInfoP
             </button>
           </header>
           
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
-            <p className="text-sm text-amber-800">
-              <span className="font-semibold">⚠️ Begränsad täckning</span><br/>
-              Denna stad har inte fullständig indikatordata i systemet ännu. 
-              Endast grundläggande benchmark-poäng visas.
+          <div className="bg-muted/50 border border-border rounded-xl p-4 mb-5">
+            <p className="text-sm text-muted-foreground">
+              <span className="font-semibold">📊 Benchmark-poäng</span><br/>
+              Aggregerad poäng baserad på tillgängliga globala indikatorer. 
+              Detaljerad indikatordata expanderas löpande.
             </p>
           </div>
           
-          <p className="text-xs text-slate-400">
-            Zooma ut eller välj en stad med full datatäckning (Stockholm, Göteborg, Malmö, Oslo, Köpenhamn, Helsingfors).
+          <p className="text-xs text-muted-foreground">
+            Klicka på andra städer för att jämföra benchmark-poäng.
           </p>
         </div>
       </aside>
