@@ -404,6 +404,213 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
 };
 
 // ============================================
+// GEO SCOPE TYPES & DATA
+// ============================================
+
+type GeoLevel = 'global' | 'continent' | 'country' | 'region';
+
+interface GeoScope {
+  level: GeoLevel;
+  code: string;
+  name: string;
+  flag?: string;
+  parent?: string;
+}
+
+const GEO_SCOPES: Record<string, GeoScope> = {
+  // Global
+  'global': { level: 'global', code: 'global', name: 'Hela världen', flag: '🌍' },
+  // Continents
+  'europe': { level: 'continent', code: 'europe', name: 'Europa', flag: '🇪🇺', parent: 'global' },
+  'asia': { level: 'continent', code: 'asia', name: 'Asien', flag: '🌏', parent: 'global' },
+  'americas': { level: 'continent', code: 'americas', name: 'Amerika', flag: '🌎', parent: 'global' },
+  'africa': { level: 'continent', code: 'africa', name: 'Afrika', flag: '🌍', parent: 'global' },
+  // Countries
+  'SE': { level: 'country', code: 'SE', name: 'Sverige', flag: '🇸🇪', parent: 'europe' },
+  'NO': { level: 'country', code: 'NO', name: 'Norge', flag: '🇳🇴', parent: 'europe' },
+  'DK': { level: 'country', code: 'DK', name: 'Danmark', flag: '🇩🇰', parent: 'europe' },
+  'FI': { level: 'country', code: 'FI', name: 'Finland', flag: '🇫🇮', parent: 'europe' },
+  'DE': { level: 'country', code: 'DE', name: 'Tyskland', flag: '🇩🇪', parent: 'europe' },
+  'FR': { level: 'country', code: 'FR', name: 'Frankrike', flag: '🇫🇷', parent: 'europe' },
+  'GB': { level: 'country', code: 'GB', name: 'Storbritannien', flag: '🇬🇧', parent: 'europe' },
+  'US': { level: 'country', code: 'US', name: 'USA', flag: '🇺🇸', parent: 'americas' },
+  'CN': { level: 'country', code: 'CN', name: 'Kina', flag: '🇨🇳', parent: 'asia' },
+  'JP': { level: 'country', code: 'JP', name: 'Japan', flag: '🇯🇵', parent: 'asia' },
+  // Swedish regions
+  'SE-AB': { level: 'region', code: 'SE-AB', name: 'Stockholms län', parent: 'SE' },
+  'SE-O': { level: 'region', code: 'SE-O', name: 'Västra Götaland', parent: 'SE' },
+  'SE-M': { level: 'region', code: 'SE-M', name: 'Skåne', parent: 'SE' },
+};
+
+const LEVEL_LABELS: Record<GeoLevel, { icon: string; label: string }> = {
+  global: { icon: '🌍', label: 'Global' },
+  continent: { icon: '🗺️', label: 'Världsdel' },
+  country: { icon: '🏳️', label: 'Land' },
+  region: { icon: '📍', label: 'Region' },
+};
+
+// ============================================
+// GEO SCOPE SELECTOR COMPONENT
+// ============================================
+
+interface GeoScopeSelectorProps {
+  currentScope: string;
+  onScopeChange: (scope: string) => void;
+}
+
+const GeoScopeSelector: React.FC<GeoScopeSelectorProps> = ({ currentScope, onScopeChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const scope = GEO_SCOPES[currentScope] || GEO_SCOPES['SE'];
+  const levelInfo = LEVEL_LABELS[scope.level];
+
+  // Build breadcrumb path
+  const buildPath = (scopeCode: string): GeoScope[] => {
+    const path: GeoScope[] = [];
+    let current = GEO_SCOPES[scopeCode];
+    while (current) {
+      path.unshift(current);
+      current = current.parent ? GEO_SCOPES[current.parent] : undefined;
+    }
+    return path;
+  };
+
+  const path = buildPath(currentScope);
+
+  // Group scopes by level for selection
+  const scopesByLevel = {
+    global: Object.values(GEO_SCOPES).filter(s => s.level === 'global'),
+    continent: Object.values(GEO_SCOPES).filter(s => s.level === 'continent'),
+    country: Object.values(GEO_SCOPES).filter(s => s.level === 'country'),
+    region: Object.values(GEO_SCOPES).filter(s => s.level === 'region' && s.parent === currentScope),
+  };
+
+  return (
+    <div className="relative">
+      {/* Current scope button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md hover:border-slate-300 transition-all"
+      >
+        <span className="text-xl">{scope.flag || levelInfo.icon}</span>
+        <div className="text-left">
+          <div className="text-xs text-slate-500 uppercase tracking-wide">{levelInfo.label}</div>
+          <div className="font-semibold text-slate-900">{scope.name}</div>
+        </div>
+        <svg 
+          className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Breadcrumb path */}
+      <div className="flex items-center gap-1 mt-2 text-xs text-slate-500">
+        {path.map((p, i) => (
+          <React.Fragment key={p.code}>
+            {i > 0 && <span className="mx-1">›</span>}
+            <button 
+              onClick={() => onScopeChange(p.code)}
+              className={`hover:text-blue-600 hover:underline ${p.code === currentScope ? 'font-semibold text-slate-700' : ''}`}
+            >
+              {p.flag} {p.name}
+            </button>
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* Dropdown */}
+      {isOpen && (
+        <>
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setIsOpen(false)} 
+          />
+          <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="p-3 bg-slate-50 border-b border-slate-200">
+              <p className="text-xs font-medium text-slate-600">Välj geografisk nivå</p>
+            </div>
+            
+            <div className="max-h-80 overflow-y-auto">
+              {/* Global */}
+              <div className="p-2 border-b border-slate-100">
+                <p className="text-[10px] uppercase tracking-wider text-slate-400 px-2 mb-1">Global</p>
+                {scopesByLevel.global.map(s => (
+                  <button
+                    key={s.code}
+                    onClick={() => { onScopeChange(s.code); setIsOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left hover:bg-blue-50 transition-colors ${currentScope === s.code ? 'bg-blue-50' : ''}`}
+                  >
+                    <span className="text-lg">{s.flag}</span>
+                    <span className="font-medium text-slate-700">{s.name}</span>
+                    {currentScope === s.code && <span className="ml-auto text-blue-600">✓</span>}
+                  </button>
+                ))}
+              </div>
+
+              {/* Continents */}
+              <div className="p-2 border-b border-slate-100">
+                <p className="text-[10px] uppercase tracking-wider text-slate-400 px-2 mb-1">Världsdelar</p>
+                <div className="grid grid-cols-2 gap-1">
+                  {scopesByLevel.continent.map(s => (
+                    <button
+                      key={s.code}
+                      onClick={() => { onScopeChange(s.code); setIsOpen(false); }}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left hover:bg-blue-50 transition-colors text-sm ${currentScope === s.code ? 'bg-blue-50' : ''}`}
+                    >
+                      <span>{s.flag}</span>
+                      <span className="text-slate-700">{s.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Countries */}
+              <div className="p-2">
+                <p className="text-[10px] uppercase tracking-wider text-slate-400 px-2 mb-1">Länder</p>
+                <div className="grid grid-cols-2 gap-1">
+                  {scopesByLevel.country.map(s => (
+                    <button
+                      key={s.code}
+                      onClick={() => { onScopeChange(s.code); setIsOpen(false); }}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left hover:bg-blue-50 transition-colors text-sm ${currentScope === s.code ? 'bg-blue-50' : ''}`}
+                    >
+                      <span>{s.flag}</span>
+                      <span className="text-slate-700 truncate">{s.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+// ============================================
+// SCOPE-AWARE TITLE
+// ============================================
+
+function getScopeTitle(scope: GeoScope): { title: string; subtitle: string } {
+  switch (scope.level) {
+    case 'global':
+      return { title: 'Global Diagnos', subtitle: 'Hur mår världen just nu? Klicka för att utforska.' };
+    case 'continent':
+      return { title: `${scope.name}s Hälsa`, subtitle: `Hur mår ${scope.name} just nu? Klicka för att utforska.` };
+    case 'country':
+      return { title: `${scope.name}s Hälsa`, subtitle: `Hur mår ${scope.name} just nu? Klicka för att utforska.` };
+    case 'region':
+      return { title: `${scope.name}`, subtitle: `Regional status för ${scope.name}. Klicka för att utforska.` };
+    default:
+      return { title: 'Samhällets Hälsa', subtitle: 'Klicka för att utforska.' };
+  }
+}
+
+// ============================================
 // MAIN APPLE HEALTH DASHBOARD
 // ============================================
 export interface AppleHealthDashboardProps {
@@ -415,8 +622,13 @@ export const AppleHealthDashboard: React.FC<AppleHealthDashboardProps> = ({ clas
   const [selectedIndicator, setSelectedIndicator] = useState<IndicatorData | null>(null);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [indicatorDialogOpen, setIndicatorDialogOpen] = useState(false);
+  
+  // GEO SCOPE STATE - defaults to global
+  const [currentGeoScope, setCurrentGeoScope] = useState<string>('global');
+  const geoScope = GEO_SCOPES[currentGeoScope] || GEO_SCOPES['global'];
+  const { title: scopeTitle, subtitle: scopeSubtitle } = getScopeTitle(geoScope);
 
-  // Mock data
+  // Mock data (would be fetched based on geo scope in real implementation)
   const categories: CategoryData[] = [
     {
       id: 'health',
@@ -517,22 +729,31 @@ export const AppleHealthDashboard: React.FC<AppleHealthDashboardProps> = ({ clas
 
   return (
     <div className={cn("min-h-screen bg-slate-50", className)}>
-      {/* Header */}
+      {/* Header with Geo Scope Selector */}
       <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Samhällets Hälsa</h1>
-              <p className="text-slate-600 text-sm mt-1">
-                Hur mår Sverige just nu? Klicka för att utforska.
-              </p>
+          <div className="flex items-start justify-between gap-4">
+            {/* Geo Scope Selector - Left side */}
+            <div className="flex-1">
+              <GeoScopeSelector 
+                currentScope={currentGeoScope} 
+                onScopeChange={setCurrentGeoScope} 
+              />
             </div>
+            
+            {/* Login button - Right side */}
             <Link 
               to="/login" 
-              className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 transition-colors"
+              className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-xl hover:bg-slate-800 transition-colors shrink-0"
             >
               Logga in
             </Link>
+          </div>
+          
+          {/* Dynamic title based on scope */}
+          <div className="mt-4">
+            <h1 className="text-2xl font-bold text-slate-900">{scopeTitle}</h1>
+            <p className="text-slate-600 text-sm mt-1">{scopeSubtitle}</p>
           </div>
         </div>
       </div>
