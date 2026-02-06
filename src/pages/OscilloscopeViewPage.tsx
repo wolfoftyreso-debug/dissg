@@ -706,6 +706,7 @@ interface RegionalDistributionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   indicatorName: string;
+  countryName?: string;
 }
 
 // Mock municipality data per region
@@ -905,10 +906,11 @@ const MunicipalityDialog: React.FC<MunicipalityDialogProps> = ({
   );
 };
 
-const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({ 
-  open, 
-  onOpenChange, 
-  indicatorName 
+const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({
+  open,
+  onOpenChange,
+  indicatorName,
+  countryName = 'valt område',
 }) => {
   const [selectedRegion, setSelectedRegion] = useState<{ name: string; value: number } | null>(null);
   
@@ -943,10 +945,10 @@ const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({
 
   // CSV download function
   const handleDownloadCSV = useCallback(() => {
-    const headers = ['Län', 'Värde', 'Förändring (%)', 'Befolkning'];
+    const headers = ['Region', 'Värde', 'Förändring (%)', 'Befolkning'];
     const csvContent = [
       headers.join(','),
-      ...regions.map(r => 
+      ...regions.map(r =>
         `"${r.name}",${r.value},${r.change},${r.population}`
       )
     ].join('\n');
@@ -964,10 +966,10 @@ const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({
 
   // Excel-compatible CSV (with BOM for Swedish characters)
   const handleOpenExcel = useCallback(() => {
-    const headers = ['Län', 'Värde', 'Förändring (%)', 'Befolkning'];
+    const headers = ['Region', 'Värde', 'Förändring (%)', 'Befolkning'];
     const csvContent = [
       headers.join('\t'),
-      ...regions.map(r => 
+      ...regions.map(r =>
         `${r.name}\t${r.value}\t${r.change}\t${r.population}`
       )
     ].join('\n');
@@ -1015,7 +1017,7 @@ const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({
               🗺️ Regional fördelning: {indicatorName}
             </DialogTitle>
             <DialogDescription>
-              Data per län i Sverige • Klicka på ett län för kommundata
+              Data per region i {countryName} • Klicka på en region för lokal fördelning
             </DialogDescription>
           </DialogHeader>
           
@@ -1040,7 +1042,7 @@ const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({
               {/* Region list */}
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground mb-2">
-                  📍 Alla län (sorterat efter värde)
+                  📍 Alla regioner (sorterat efter värde)
                 </p>
                 {regions.map((region, i) => {
                   const isAboveAvg = region.value >= nationalAvg;
@@ -1171,7 +1173,12 @@ interface IndicatorDialogProps {
   countryName?: string; // Add country name prop
 }
 
-const IndicatorDialog: React.FC<IndicatorDialogProps> = ({ open, onOpenChange, indicator, countryName = 'Sverige' }) => {
+const IndicatorDialog: React.FC<IndicatorDialogProps> = ({
+  open,
+  onOpenChange,
+  indicator,
+  countryName = 'valt område',
+}) => {
   const [regionalOpen, setRegionalOpen] = useState(false);
   
   return (
@@ -1255,6 +1262,7 @@ const IndicatorDialog: React.FC<IndicatorDialogProps> = ({ open, onOpenChange, i
         open={regionalOpen}
         onOpenChange={setRegionalOpen}
         indicatorName={indicator.name}
+        countryName={countryName}
       />
     </>
   );
@@ -1474,7 +1482,7 @@ const IndicatorRow: React.FC<IndicatorRowProps> = ({
   value,
   change,
   explanation,
-  countryName = 'Sverige',
+  countryName = 'valt område',
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const statusEmoji = status === 'good' ? '🟢' : status === 'warning' ? '🟡' : '🔴';

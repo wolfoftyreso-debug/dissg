@@ -403,7 +403,7 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
   indicator,
   open,
   onOpenChange,
-  geoScopeName = 'Sverige',
+  geoScopeName = 'valt område',
 }) => {
   if (!indicator) return null;
 
