@@ -396,12 +396,14 @@ interface IndicatorDetailDialogProps {
   indicator: IndicatorData | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  geoScopeName?: string;
 }
 
 const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
   indicator,
   open,
   onOpenChange,
+  geoScopeName = 'Sverige',
 }) => {
   if (!indicator) return null;
 
@@ -698,7 +700,7 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
                       <span className="text-sm text-slate-600 flex items-center gap-2">
                         <span>📍</span> Geografiskt område
                       </span>
-                      <span className="font-medium">Sverige, nationellt</span>
+                      <span className="font-medium">{geoScopeName}, nationellt</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-slate-600 flex items-center gap-2">
@@ -729,7 +731,7 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
                       </div>
                       <div className="flex justify-between py-1 border-b border-slate-200">
                         <span className="text-slate-600">Geografisk täckning</span>
-                        <span className="font-medium">Sverige, nationellt</span>
+                        <span className="font-medium">{geoScopeName}, nationellt</span>
                       </div>
                       <div className="flex justify-between py-1 border-b border-slate-200">
                         <span className="text-slate-600">Uppdateringsfrekvens</span>
@@ -1953,6 +1955,7 @@ export const AppleHealthDashboard: React.FC<AppleHealthDashboardProps> = ({ clas
         indicator={selectedIndicator}
         open={indicatorDialogOpen}
         onOpenChange={setIndicatorDialogOpen}
+        geoScopeName={geoScope.name}
       />
       
       <PriorityDetailDialog
