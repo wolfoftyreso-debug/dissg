@@ -433,11 +433,14 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
             {indicator.whatItMeasures && (
               <Dialog>
                 <DialogTrigger asChild>
-                  <Card className="bg-blue-50 border-blue-200 cursor-pointer hover:bg-blue-100/80 hover:border-blue-300 transition-all group">
+                  <Card className="bg-blue-50 border-blue-200 cursor-pointer hover:bg-blue-100 hover:border-blue-400 hover:shadow-md transition-all group active:scale-[0.99]">
                     <CardContent className="p-4">
                       <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
                         <span className="text-lg">📖</span> Vad mäter detta?
-                        <span className="ml-auto text-xs text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">Läs mer →</span>
+                        <span className="ml-auto text-xs text-blue-600 group-hover:text-blue-700 transition-colors flex items-center gap-1">
+                          <span className="opacity-60 group-hover:opacity-100">Fördjupa</span>
+                          <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                        </span>
                       </h4>
                       <p className="text-sm text-blue-800 leading-relaxed">
                         {indicator.whatItMeasures}
@@ -489,11 +492,14 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
             {indicator.howItsMeasured && (
               <Dialog>
                 <DialogTrigger asChild>
-                  <Card className="bg-slate-50 border-slate-200 cursor-pointer hover:bg-slate-100/80 hover:border-slate-300 transition-all group">
+                  <Card className="bg-slate-50 border-slate-200 cursor-pointer hover:bg-slate-100 hover:border-slate-400 hover:shadow-md transition-all group active:scale-[0.99]">
                     <CardContent className="p-4">
                       <h4 className="font-bold text-slate-800 mb-2 flex items-center gap-2">
                         <span className="text-lg">🔬</span> Hur mäts det?
-                        <span className="ml-auto text-xs text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">Läs mer →</span>
+                        <span className="ml-auto text-xs text-slate-600 group-hover:text-slate-700 transition-colors flex items-center gap-1">
+                          <span className="opacity-60 group-hover:opacity-100">Fördjupa</span>
+                          <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                        </span>
                       </h4>
                       <p className="text-sm text-slate-700 leading-relaxed">
                         {indicator.howItsMeasured}
@@ -556,11 +562,14 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
             {indicator.whyItMatters && (
               <Dialog>
                 <DialogTrigger asChild>
-                  <Card className="bg-emerald-50 border-emerald-200 cursor-pointer hover:bg-emerald-100/80 hover:border-emerald-300 transition-all group">
+                  <Card className="bg-emerald-50 border-emerald-200 cursor-pointer hover:bg-emerald-100 hover:border-emerald-400 hover:shadow-md transition-all group active:scale-[0.99]">
                     <CardContent className="p-4">
                       <h4 className="font-bold text-emerald-900 mb-2 flex items-center gap-2">
                         <span className="text-lg">💡</span> Varför är det viktigt?
-                        <span className="ml-auto text-xs text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity">Läs mer →</span>
+                        <span className="ml-auto text-xs text-emerald-600 group-hover:text-emerald-700 transition-colors flex items-center gap-1">
+                          <span className="opacity-60 group-hover:opacity-100">Fördjupa</span>
+                          <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                        </span>
                       </h4>
                       <p className="text-sm text-emerald-800 leading-relaxed">
                         {indicator.whyItMatters}
@@ -615,11 +624,14 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
             {indicator.exampleInPractice && (
               <Dialog>
                 <DialogTrigger asChild>
-                  <Card className="bg-purple-50 border-purple-200 cursor-pointer hover:bg-purple-100/80 hover:border-purple-300 transition-all group">
+                  <Card className="bg-purple-50 border-purple-200 cursor-pointer hover:bg-purple-100 hover:border-purple-400 hover:shadow-md transition-all group active:scale-[0.99]">
                     <CardContent className="p-4">
                       <h4 className="font-bold text-purple-900 mb-2 flex items-center gap-2">
                         <span className="text-lg">🏠</span> Konkret exempel
-                        <span className="ml-auto text-xs text-purple-500 opacity-0 group-hover:opacity-100 transition-opacity">Läs mer →</span>
+                        <span className="ml-auto text-xs text-purple-600 group-hover:text-purple-700 transition-colors flex items-center gap-1">
+                          <span className="opacity-60 group-hover:opacity-100">Fördjupa</span>
+                          <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                        </span>
                       </h4>
                       <p className="text-sm text-purple-800 leading-relaxed italic">
                         "{indicator.exampleInPractice}"
