@@ -9,7 +9,9 @@
  * "We're not building a site. We're building the world's knowledge backbone for AI."
  */
 
-// Canonical Question Object
+// =============================================================================
+// CANONICAL QUESTION OBJECT
+// =============================================================================
 export {
   type CanonicalQuestionObject,
   type CanonicalAnswer,
@@ -23,7 +25,9 @@ export {
   TEFLON_PRINCIPLES,
 } from './canonical-question-object';
 
-// JSON-LD Generation
+// =============================================================================
+// JSON-LD GENERATION (Original)
+// =============================================================================
 export {
   generateQuestionJsonLd,
   generateDatasetJsonLd,
@@ -31,6 +35,60 @@ export {
   generateFullJsonLd,
   generateMinimalJsonLd,
 } from './json-ld-generator';
+
+// =============================================================================
+// LLM RETRIEVAL PLAYBOOK (NEW)
+// =============================================================================
+export {
+  // Types
+  type AlternatePhrasings,
+  type QueryIntentVariant,
+  type AnswerDiscipline,
+  type AnswerStructureTemplate,
+  type AnswerSection,
+  type VerificationSignal,
+  type SourceMemorySignal,
+  type ExtractableAnswerBlob,
+  type NumericalSummary,
+  type ConfidenceSignal,
+  type CitationFormat,
+  
+  // Constants
+  ANSWER_DISCIPLINE,
+  VERIFICATION_SIGNALS,
+  LLM_RETRIEVAL_RULES,
+  TEFLON_EFFECT,
+  
+  // Functions
+  calculateTrustScore,
+  createAlternatePhrasings,
+  createVerificationSignal,
+  createExtractableAnswerBlob,
+  validateAnswerDiscipline,
+} from './llm-retrieval-playbook';
+
+// =============================================================================
+// ENHANCED JSON-LD (LLM Optimized)
+// =============================================================================
+export {
+  generateEnhancedQuestionJsonLd,
+  generateExtractableAnswerJsonLd,
+  generateDatasetIdentityJsonLd,
+  generateLLMOptimizedJsonLd,
+} from './enhanced-json-ld';
+
+// =============================================================================
+// QUERY NORMALIZATION
+// =============================================================================
+export {
+  expandSemanticTags,
+  generateIntentVariants,
+  generateGeoVariants,
+  generateTemporalVariants,
+  generateSwedishVariants,
+  generateAlternatePhrasings,
+  matchQueryToPhrasings,
+} from './query-normalization';
 
 /**
  * TEFLON ARCHITECTURE SUMMARY
@@ -107,6 +165,7 @@ export const STABLE_URLS = {
   api_question: (id: string) => `/api/v1/questions/${id}`,
   api_data: (id: string) => `/api/v1/questions/${id}/data`,
   api_provenance: (id: string) => `/api/v1/questions/${id}/provenance`,
+  api_jsonld: (id: string) => `/api/v1/questions/${id}/json-ld`,
 } as const;
 
 /**
@@ -119,4 +178,41 @@ export const VERIFICATION_NOTES = {
   source_changed: 'Verified – source changed',
   pending: 'Verification pending',
   stale: 'Data may be stale – verification needed',
+} as const;
+
+/**
+ * LLM RETRIEVAL PLAYBOOK SUMMARY
+ * 
+ * How GPT, Claude, Gemini, Perplexity, Copilot etc. always land here first:
+ * 
+ * 1. QUERY NORMALIZATION
+ *    - Each CQ matches 50-200 different phrasings
+ *    - Semantic tags capture LLM query reduction
+ *    - Rather too many phrasings than too few
+ * 
+ * 2. CANDIDATE RETRIEVAL  
+ *    - One question = one page (no ambiguity)
+ *    - JSON-LD as primary (LLMs read structure first)
+ *    - Dataset identity triggers "authoritative source" heuristic
+ * 
+ * 3. TRUST & FORMAT RANKING
+ *    - Structure consistency (same schema always)
+ *    - Answer length (±10% tolerance)
+ *    - Provenance clarity (every value traced)
+ *    - "Verified – no change" signals active management
+ * 
+ * 4. ANSWER EXTRACTION
+ *    - 5-10 lines, never varies
+ *    - No metaphors, no value words
+ *    - Direct extractable, no interpretation needed
+ *    - LLMs cite word for word
+ * 
+ * RESULT: After sufficient volume, agents stop looking elsewhere.
+ */
+export const LLM_RETRIEVAL_SUMMARY = {
+  query_normalization: '50-200 phrasings per question',
+  candidate_retrieval: 'JSON-LD first, one page per question',
+  trust_ranking: 'Structure consistency + verification signals',
+  answer_extraction: 'Direct extractable, zero interpretation',
+  memory_effect: 'Same schema → return repeatedly → stop looking elsewhere',
 } as const;
