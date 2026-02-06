@@ -56,12 +56,40 @@ function normalizeValue(value: number, indicatorId: string): number {
 export function CityInfoPanel({ cityId, selectedIndicators, onClose }: CityInfoPanelProps) {
   const [dialog, setDialog] = useState<DialogState>({ type: null });
   
+  // Find city in MOCK_CITIES (has full indicator data)
   const city = MOCK_CITIES.find(c => c.id === cityId);
   
   if (!city) {
+    // City not in our full dataset - show limited info panel
     return (
-      <aside className="absolute top-0 right-0 h-full w-80 bg-white shadow-2xl z-40 flex items-center justify-center">
-        <p className="text-slate-500">Stad hittades inte</p>
+      <aside className="absolute top-0 right-0 h-full w-96 bg-white shadow-2xl z-40 animate-in slide-in-from-right duration-300">
+        <div className="p-5">
+          <header className="flex items-start justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">📍 {cityId}</h2>
+              <p className="text-sm text-slate-500 mt-1">Begränsad data tillgänglig</p>
+            </div>
+            <button 
+              onClick={onClose}
+              className="text-slate-400 hover:text-slate-600 p-2 -mr-2 -mt-2"
+              aria-label="Stäng"
+            >
+              ✕
+            </button>
+          </header>
+          
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
+            <p className="text-sm text-amber-800">
+              <span className="font-semibold">⚠️ Begränsad täckning</span><br/>
+              Denna stad har inte fullständig indikatordata i systemet ännu. 
+              Endast grundläggande benchmark-poäng visas.
+            </p>
+          </div>
+          
+          <p className="text-xs text-slate-400">
+            Zooma ut eller välj en stad med full datatäckning (Stockholm, Göteborg, Malmö, Oslo, Köpenhamn, Helsingfors).
+          </p>
+        </div>
       </aside>
     );
   }
