@@ -385,17 +385,25 @@ export function MapContainer({
 
     if (!showCities) return;
 
-    // Combine old mock cities with new hierarchical cities
+    // Use MOCK_CITIES as primary source (has full indicator data)
+    // Add hierarchical cities that don't exist in MOCK_CITIES
     const allCities = [
       ...MOCK_CITIES.map(c => ({ 
         id: c.id, 
         name: c.name, 
         coordinates: c.coordinates, 
-        score: calculateCityScore(c, selectedCityIndicators) 
+        score: calculateCityScore(c, selectedCityIndicators),
+        hasFullData: true
       })),
       ...MOCK_CITIES_HIERARCHICAL
         .filter(c => !MOCK_CITIES.some(m => m.id === c.id))
-        .map(c => ({ id: c.id, name: c.name, coordinates: c.coordinates, score: c.score || 100 }))
+        .map(c => ({ 
+          id: c.id, 
+          name: c.name, 
+          coordinates: c.coordinates, 
+          score: c.score || 100,
+          hasFullData: false
+        }))
     ];
 
     // Add markers for each city with 3D sphere styling

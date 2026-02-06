@@ -362,6 +362,14 @@ export const MOCK_STATES: MarkerEntity[] = [
 ];
 
 export const MOCK_CITIES_HIERARCHICAL: MarkerEntity[] = [
+  // Nordic Cities - use same IDs as MOCK_CITIES for compatibility
+  { id: 'stockholm', name: 'Stockholm', level: 'city', countryCode: 'SE', parentId: 'stockholm-region', coordinates: [18.0686, 59.3293], population: 975000, score: 112 },
+  { id: 'gothenburg', name: 'Göteborg', level: 'city', countryCode: 'SE', parentId: 'vastra-gotaland', coordinates: [11.9746, 57.7089], population: 583000, score: 106 },
+  { id: 'malmo', name: 'Malmö', level: 'city', countryCode: 'SE', parentId: 'skane', coordinates: [13.0038, 55.6049], population: 347000, score: 94 },
+  { id: 'oslo', name: 'Oslo', level: 'city', countryCode: 'NO', parentId: 'NO', coordinates: [10.7522, 59.9139], population: 698000, score: 115 },
+  { id: 'copenhagen', name: 'Köpenhamn', level: 'city', countryCode: 'DK', parentId: 'DK', coordinates: [12.5683, 55.6761], population: 644000, score: 111 },
+  { id: 'helsinki', name: 'Helsingfors', level: 'city', countryCode: 'FI', parentId: 'FI', coordinates: [24.9384, 60.1699], population: 656000, score: 109 },
+  
   // USA Cities
   { id: 'los-angeles', name: 'Los Angeles', level: 'city', countryCode: 'US', parentId: 'california', coordinates: [-118.2437, 34.0522], population: 4000000, score: 89 },
   { id: 'san-francisco', name: 'San Francisco', level: 'city', countryCode: 'US', parentId: 'california', coordinates: [-122.4194, 37.7749], population: 880000, score: 102 },
@@ -371,20 +379,10 @@ export const MOCK_CITIES_HIERARCHICAL: MarkerEntity[] = [
   { id: 'seattle', name: 'Seattle', level: 'city', countryCode: 'US', parentId: 'washington', coordinates: [-122.3321, 47.6062], population: 750000, score: 105 },
   { id: 'miami', name: 'Miami', level: 'city', countryCode: 'US', parentId: 'florida', coordinates: [-80.1918, 25.7617], population: 470000, score: 78 },
   
-  // Swedish Cities
-  { id: 'stockholm-city', name: 'Stockholm', level: 'city', countryCode: 'SE', parentId: 'stockholm-region', coordinates: [18.0686, 59.3293], population: 975000, score: 112 },
-  { id: 'gothenburg', name: 'Göteborg', level: 'city', countryCode: 'SE', parentId: 'vastra-gotaland', coordinates: [11.9746, 57.7089], population: 583000, score: 106 },
-  { id: 'malmo', name: 'Malmö', level: 'city', countryCode: 'SE', parentId: 'skane', coordinates: [13.0038, 55.6049], population: 347000, score: 94 },
-  
   // German Cities
   { id: 'munich', name: 'München', level: 'city', countryCode: 'DE', parentId: 'bayern', coordinates: [11.5820, 48.1351], population: 1500000, score: 112 },
   { id: 'cologne', name: 'Köln', level: 'city', countryCode: 'DE', parentId: 'nordrhein-westfalen', coordinates: [6.9603, 50.9375], population: 1080000, score: 98 },
   { id: 'stuttgart', name: 'Stuttgart', level: 'city', countryCode: 'DE', parentId: 'baden-wurttemberg', coordinates: [9.1829, 48.7758], population: 635000, score: 108 },
-  
-  // Nordic Cities
-  { id: 'oslo', name: 'Oslo', level: 'city', countryCode: 'NO', parentId: 'NO', coordinates: [10.7522, 59.9139], population: 698000, score: 115 },
-  { id: 'copenhagen', name: 'København', level: 'city', countryCode: 'DK', parentId: 'DK', coordinates: [12.5683, 55.6761], population: 644000, score: 111 },
-  { id: 'helsinki', name: 'Helsinki', level: 'city', countryCode: 'FI', parentId: 'FI', coordinates: [24.9384, 60.1699], population: 656000, score: 109 },
   
   // Other Major Cities
   { id: 'london', name: 'London', level: 'city', countryCode: 'GB', parentId: 'GB', coordinates: [-0.1276, 51.5074], population: 8982000, score: 94 },
