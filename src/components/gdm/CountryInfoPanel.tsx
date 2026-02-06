@@ -14,6 +14,7 @@ import type { MapLayerId } from './types';
 import { ClickableCountryName } from '@/components/ui/ClickableCountryName';
 import { SourceAttribution } from '@/components/transparency/SourceAttribution';
 import { CountryKeyMetrics, type KeyMetric } from './CountryKeyMetrics';
+import { GeopoliticalContext } from './GeopoliticalContext';
 
 interface CountryInfoPanelProps {
   countryCode: string;
@@ -281,6 +282,13 @@ export function CountryInfoPanel({ countryCode, activeIndex: _activeIndex, onClo
             <CountryKeyMetrics 
               countryCode={countryCode}
               onMetricClick={(metric) => openDialog('metric', metric)}
+              className="mb-5"
+            />
+
+            {/* GEOPOLITICAL CONTEXT */}
+            <GeopoliticalContext 
+              countryCode={countryCode}
+              countryName={geo.name.sv}
               className="mb-5"
             />
 
