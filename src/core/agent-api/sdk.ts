@@ -284,27 +284,50 @@ export function createAgentSDK(config: AgentSDKConfig): TruthEngineSDK {
 }
 
 /**
- * SDK EXPORTS (THREE FUNCTIONS)
+ * SDK EXPORTS - CORE RESOLVE METHOD (THE MAIN ONE)
  */
 export const SDK_FUNCTIONS = {
   getTruthNode: 'Retrieves a single truth node by ID',
   traverseGraph: 'Traverses the graph from a starting node',
   resolveDecision: 'Resolves a decision graph for a scope',
+  resolve: 'Query → Canonical Answer (main method for AI agents)',
 } as const;
 
 /**
- * SDK CONTRACT
+ * SDK CONTRACT - TRUST HANDSHAKE
  */
 export const SDK_CONTRACT = {
   version: '1.0.0',
-  functions: 3,
-  guarantees: [
+  functions: 4,
+  
+  // Trust handshake (makes AI agents trust you)
+  guarantees: {
+    no_opinion: true,
+    no_speculation: true,
+    source_traceable: true,
+    revision_logged: true,
+  },
+  
+  api_guarantees: [
     'Deterministic responses',
     'Version-pinned results',
     'No advice or recommendations',
     'All uncertainty included',
     'Stable pagination',
   ],
+  
+  rate_limits: {
+    free: { requests_per_minute: 10, answer_depth: 'short' },
+    pro: { requests_per_minute: 100, answer_depth: 'full', numerical_summaries: true },
+    enterprise: { requests_per_minute: 1000, answer_depth: 'full', datasets: true },
+  },
+  
+  response_time_sla: {
+    p50: '50ms',
+    p95: '200ms',
+    p99: '500ms',
+  },
+  
   prohibitions: [
     'No smart inference',
     'No gap filling',
