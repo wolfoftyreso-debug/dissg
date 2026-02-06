@@ -122,7 +122,7 @@ const PhaseTimeline: React.FC<{ selectedCountry?: CountryPhaseData }> = ({ selec
   </div>
 );
 
-// Phase detail card
+// Phase detail card - with simple explanations
 const PhaseDetailCard: React.FC<{ phase: CivilizationPhase }> = ({ phase }) => (
   <Card className="border-2" style={{ borderColor: phase.color }}>
     <CardHeader className="pb-2">
@@ -136,6 +136,20 @@ const PhaseDetailCard: React.FC<{ phase: CivilizationPhase }> = ({ phase }) => (
       <CardDescription>{phase.descriptionSv}</CardDescription>
     </CardHeader>
     <CardContent className="space-y-3">
+      {/* Simple explanation for 15-year-olds */}
+      <div className="p-3 bg-primary/5 rounded-lg border-l-4" style={{ borderLeftColor: phase.color }}>
+        <p className="text-sm font-medium mb-1">🎯 Vad betyder detta?</p>
+        <p className="text-sm text-muted-foreground">{phase.simpleExplanation}</p>
+      </div>
+
+      {/* Real world example */}
+      <div className="p-3 bg-muted/50 rounded-lg">
+        <p className="text-xs font-medium mb-1">📚 Verkligt exempel:</p>
+        <p className="text-xs text-muted-foreground">{phase.realWorldExample}</p>
+      </div>
+      
+      <Separator />
+      
       <div>
         <p className="text-xs font-medium text-muted-foreground mb-2">Kännetecken:</p>
         <div className="flex flex-wrap gap-1">
@@ -144,8 +158,6 @@ const PhaseDetailCard: React.FC<{ phase: CivilizationPhase }> = ({ phase }) => (
           ))}
         </div>
       </div>
-      
-      <Separator />
       
       <div>
         <p className="text-xs font-medium text-muted-foreground mb-2">
@@ -238,14 +250,51 @@ const CountryDetailPanel: React.FC<{ country: CountryPhaseData }> = ({ country }
           </div>
         </div>
 
-        {/* Historical transitions */}
-        <div className="p-3 bg-muted/30 rounded-lg">
-          <div className="flex items-center gap-2 text-sm">
+        {/* Historical transitions - with clear explanations */}
+        <div className="p-4 bg-muted/30 rounded-lg space-y-3">
+          <div className="flex items-center gap-2 text-sm font-medium">
             <Clock className="h-4 w-4" />
             <span>Historiska omställningar: <strong>{country.historicalTransitions}</strong></span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Denna region har historiskt rört sig {country.velocity > 2 ? 'snabbt' : 'måttligt'} mellan faser.
+          
+          <div className="p-3 bg-background rounded-lg border">
+            <p className="text-xs font-medium mb-2">🤔 Vad är en "historisk omställning"?</p>
+            <p className="text-xs text-muted-foreground">
+              Det är när ett land gått igenom en stor förändring – som en ekonomisk kris, ett krig, eller en reform – 
+              och lyckats vända utvecklingen. Ju fler gånger ett land klarat detta, desto mer erfarenhet har de.
+            </p>
+          </div>
+
+          {/* Show each historical transition */}
+          <div className="space-y-2">
+            <p className="text-xs font-medium">{country.nameSv}s omställningar:</p>
+            {country.historicalTransitionDetails.map((transition, i) => (
+              <div key={i} className="p-3 bg-background rounded-lg border-l-4 border-primary/50">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium">{transition.name}</span>
+                  <Badge variant="outline" className="text-xs">{transition.year}</Badge>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                  <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 rounded text-red-700 dark:text-red-300">
+                    {transition.fromPhase}
+                  </span>
+                  <span>→</span>
+                  <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 rounded text-green-700 dark:text-green-300">
+                    {transition.toPhase}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">{transition.description}</p>
+              </div>
+            ))}
+          </div>
+          
+          <p className="text-xs text-muted-foreground italic">
+            {country.velocity > 2 
+              ? '⚡ Denna region rör sig snabbt genom faserna just nu – snabbare än genomsnittet.'
+              : country.velocity < -1
+              ? '📈 Denna region rör sig bakåt mot en tidigare fas – en positiv trend!'
+              : '➡️ Denna region rör sig i måttlig takt mellan faserna.'
+            }
           </p>
         </div>
       </CardContent>

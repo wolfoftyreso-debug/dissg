@@ -25,6 +25,7 @@ export const CPM_OBSERVATION = {
 };
 
 // === 2. THE FIVE PHASES ===
+// Förklarade så att en 15-åring förstår
 
 export interface CivilizationPhase {
   id: 'building' | 'expansion' | 'maturity' | 'overload' | 'transition';
@@ -33,6 +34,8 @@ export interface CivilizationPhase {
   labelSv: string;
   description: string;
   descriptionSv: string;
+  simpleExplanation: string; // Enkel förklaring för 15-åringar
+  realWorldExample: string; // Konkret exempel
   characteristics: { label: string; labelSv: string }[];
   color: string;
   keyFactors: { label: string; labelSv: string }[];
@@ -46,6 +49,8 @@ export const CIVILIZATION_PHASES: CivilizationPhase[] = [
     labelSv: 'Uppbyggnad',
     description: 'Foundation establishment, low complexity',
     descriptionSv: 'Grundläggning, låg komplexitet',
+    simpleExplanation: 'Samhället är som ett nystartat företag – fullt av energi, få skulder, och alla tror på framtiden. Man bygger skolor, vägar och sjukhus.',
+    realWorldExample: 'Sverige 1945-1965: Efter andra världskriget byggdes folkhemmet. Inga stora skulder, massor av jobb, och folk trodde imorgon skulle bli bättre.',
     characteristics: [
       { label: 'Increasing energy per capita', labelSv: 'Ökande energi per capita' },
       { label: 'Growing institutional capacity', labelSv: 'Växande institutionell kapacitet' },
@@ -66,6 +71,8 @@ export const CIVILIZATION_PHASES: CivilizationPhase[] = [
     labelSv: 'Expansion',
     description: 'Rapid growth, increasing complexity',
     descriptionSv: 'Snabb tillväxt, ökande komplexitet',
+    simpleExplanation: 'Samhället växer snabbt – som en tonåring i tillväxtspurt. Fler människor, mer teknik, allt blir mer komplicerat. Det går bra, men det börjar bli rörigt.',
+    realWorldExample: 'Sverige 1965-1990: Ekonomin exploderade. Volvo, IKEA, ABBA. Alla fick det bättre, men skatterna och byråkratin växte också.',
     characteristics: [
       { label: 'Rapid population growth', labelSv: 'Snabb befolkningstillväxt' },
       { label: 'Technical acceleration', labelSv: 'Teknisk acceleration' },
@@ -86,6 +93,8 @@ export const CIVILIZATION_PHASES: CivilizationPhase[] = [
     labelSv: 'Mognad',
     description: 'Stable growth, high welfare, rising maintenance',
     descriptionSv: 'Stabil tillväxt, högt välstånd, ökande underhåll',
+    simpleExplanation: 'Samhället är som en medelålders person med bra jobb – livet är stabilt och bekvämt, men mer tid går åt till att underhålla det man redan har. Mindre tid till nya äventyr.',
+    realWorldExample: 'Sverige 1990-2010: Hög levnadsstandard, bra välfärd, men pengarna gick till att reparera och underhålla, inte bygga nytt.',
     characteristics: [
       { label: 'Stable growth', labelSv: 'Stabil tillväxt' },
       { label: 'High prosperity', labelSv: 'Högt välstånd' },
@@ -106,6 +115,8 @@ export const CIVILIZATION_PHASES: CivilizationPhase[] = [
     labelSv: 'Överbelastning',
     description: 'Rising debt, shrinking margins, fragmentation',
     descriptionSv: 'Stigande skuld, minskande marginaler, fragmentering',
+    simpleExplanation: 'Samhället har för mycket på sitt tallrik. Som när du har för många appar öppna och telefonen blir seg. Skulderna växer, folk bråkar mer om vem som ska betala, och systemet knarrar.',
+    realWorldExample: 'Sverige nu (2010-): Välfärden kostar mer än vad vi betalar in. Infrastrukturen förfaller. Politiken blir mer splittrad. Marginalerna krymper.',
     characteristics: [
       { label: 'Rising debt (financial & institutional)', labelSv: 'Stigande skuld (finansiell & institutionell)' },
       { label: 'Shrinking margins', labelSv: 'Minskande marginaler' },
@@ -126,6 +137,8 @@ export const CIVILIZATION_PHASES: CivilizationPhase[] = [
     labelSv: 'Omställning',
     description: 'Reform or decline, power redistribution',
     descriptionSv: 'Reform eller förfall, maktomfördelning',
+    simpleExplanation: 'En vägkorsning. Samhället måste välja: förnya sig och börja om (som Japan efter kriget), eller fortsätta nedåt (som Romarriket). Det är nu det avgörs.',
+    realWorldExample: 'Japan 1945 valde reform → blev ekonomisk supermakt. Sovjetunionen 1991 klarade inte omställningen → kollapsade.',
     characteristics: [
       { label: 'Reforms or decline', labelSv: 'Reformer eller förfall' },
       { label: 'Power redistribution', labelSv: 'Omfördelning av makt & resurser' },
@@ -204,6 +217,15 @@ export const PLACEMENT_INDICATORS: PlacementIndicator[] = [
 
 // === 4. COUNTRY PHASE DATA ===
 
+// Historiska omställningar förklarade på ett enkelt sätt
+export interface HistoricalTransition {
+  year: string;
+  name: string;
+  fromPhase: string;
+  toPhase: string;
+  description: string; // Enkel förklaring för 15-åringar
+}
+
 export interface CountryPhaseData {
   code: string;
   name: string;
@@ -213,6 +235,7 @@ export interface CountryPhaseData {
   velocity: number; // -10 to +10 (negative = moving backward)
   accelerating: boolean;
   historicalTransitions: number; // successful transitions in history
+  historicalTransitionDetails: HistoricalTransition[]; // Konkreta exempel
   indicatorScores: Record<string, number>; // 0-100 for each indicator
 }
 
@@ -226,6 +249,29 @@ export const COUNTRY_PHASE_DATA: CountryPhaseData[] = [
     velocity: 2.5,
     accelerating: false,
     historicalTransitions: 3,
+    historicalTransitionDetails: [
+      {
+        year: '1809',
+        name: 'Från stormakt till neutralitet',
+        fromPhase: 'Överbelastning',
+        toPhase: 'Uppbyggnad',
+        description: 'Sverige förlorade Finland och gav upp sina stormaktsdrömmar. Istället började man bygga ett modernt, neutralt land med nya lagar och universitet.'
+      },
+      {
+        year: '1932',
+        name: 'Depression till folkhem',
+        fromPhase: 'Överbelastning',
+        toPhase: 'Uppbyggnad',
+        description: 'Under 30-talets kris enades Sverige om "folkhemmet" – en vision där staten tar hand om alla medborgare. Denna omställning la grunden för välfärdsstaten.'
+      },
+      {
+        year: '1991-1994',
+        name: 'Finanskris till reform',
+        fromPhase: 'Överbelastning',
+        toPhase: 'Mognad',
+        description: 'Bankerna höll på att krascha och arbetslösheten exploderade. Sverige svarade med stora reformer: budgettak, självständig riksbank, och en ny pensionsmodell.'
+      }
+    ],
     indicatorScores: {
       energy_trend: 55,
       resilience: 68,
@@ -244,6 +290,22 @@ export const COUNTRY_PHASE_DATA: CountryPhaseData[] = [
     velocity: 0.8,
     accelerating: false,
     historicalTransitions: 2,
+    historicalTransitionDetails: [
+      {
+        year: '1905',
+        name: 'Självständighet från Sverige',
+        fromPhase: 'Expansion',
+        toPhase: 'Uppbyggnad',
+        description: 'Norge bröt sig loss från unionen med Sverige och började bygga ett eget land från grunden – fredligt och demokratiskt.'
+      },
+      {
+        year: '1969-1990',
+        name: 'Oljans omvandling',
+        fromPhase: 'Mognad',
+        toPhase: 'Expansion',
+        description: 'Oljan hittades i Nordsjön. Istället för att slösa bort pengarna skapade Norge en oljefond för framtida generationer – en av världens smartaste ekonomiska beslut.'
+      }
+    ],
     indicatorScores: {
       energy_trend: 85,
       resilience: 82,
@@ -262,6 +324,22 @@ export const COUNTRY_PHASE_DATA: CountryPhaseData[] = [
     velocity: 4.2,
     accelerating: true,
     historicalTransitions: 2,
+    historicalTransitionDetails: [
+      {
+        year: '1861-1865',
+        name: 'Inbördeskrig till industrialisering',
+        fromPhase: 'Överbelastning',
+        toPhase: 'Expansion',
+        description: 'Ett brutalt krig som nästan splittrade landet. Men efteråt förenades USA och blev världens starkaste industriland.'
+      },
+      {
+        year: '1933-1945',
+        name: 'New Deal och Andra världskriget',
+        fromPhase: 'Överbelastning',
+        toPhase: 'Expansion',
+        description: 'Börskraschen 1929 orsakade massarbetslöshet. President Roosevelt svarade med massiva jobbprogram, och kriget startade en industriboost som varade i decennier.'
+      }
+    ],
     indicatorScores: {
       energy_trend: 62,
       resilience: 55,
@@ -280,6 +358,22 @@ export const COUNTRY_PHASE_DATA: CountryPhaseData[] = [
     velocity: 1.5,
     accelerating: false,
     historicalTransitions: 2,
+    historicalTransitionDetails: [
+      {
+        year: '1868',
+        name: 'Meiji-restaurationen',
+        fromPhase: 'Omställning',
+        toPhase: 'Uppbyggnad',
+        description: 'Japan gick från att vara ett isolerat medeltida samhälle till en modern industristat på bara några decennier. En av historiens mest imponerande omställningar.'
+      },
+      {
+        year: '1945-1970',
+        name: 'Efterkrigsmiraklet',
+        fromPhase: 'Omställning',
+        toPhase: 'Expansion',
+        description: 'Helt krossade efter atombomberna och kriget byggde Japan upp sig till världens näst största ekonomi. Folk arbetade hårt och sparade pengar till framtiden.'
+      }
+    ],
     indicatorScores: {
       energy_trend: 42,
       resilience: 72,
@@ -298,6 +392,36 @@ export const COUNTRY_PHASE_DATA: CountryPhaseData[] = [
     velocity: -1.2,
     accelerating: false,
     historicalTransitions: 4,
+    historicalTransitionDetails: [
+      {
+        year: '221 f.Kr.',
+        name: 'Första kejsardömet',
+        fromPhase: 'Omställning',
+        toPhase: 'Uppbyggnad',
+        description: 'Kina förenades för första gången under en kejsare. Muren byggdes och ett gemensamt skriftspråk infördes.'
+      },
+      {
+        year: '618-907',
+        name: 'Tang-dynastin',
+        fromPhase: 'Uppbyggnad',
+        toPhase: 'Expansion',
+        description: 'En guldålder då Kina var världens mest avancerade civilisation. Konst, poesi och handel blomstrade längs Sidenvägen.'
+      },
+      {
+        year: '1949',
+        name: 'Kommunistrevolutionen',
+        fromPhase: 'Överbelastning',
+        toPhase: 'Omställning',
+        description: 'Efter årtionden av kaos och krig tog kommunisterna makten. En total omstart – med både framsteg och enorma tragedier som kulturrevolutionen.'
+      },
+      {
+        year: '1978-idag',
+        name: 'Deng Xiaopings reformer',
+        fromPhase: 'Omställning',
+        toPhase: 'Expansion',
+        description: 'Kina öppnade ekonomin och blev världens fabrik. Hundratals miljoner lyftes ur fattigdom på rekordtid.'
+      }
+    ],
     indicatorScores: {
       energy_trend: 72,
       resilience: 58,
@@ -316,6 +440,29 @@ export const COUNTRY_PHASE_DATA: CountryPhaseData[] = [
     velocity: 2.8,
     accelerating: true,
     historicalTransitions: 3,
+    historicalTransitionDetails: [
+      {
+        year: '1871',
+        name: 'Riksenandet',
+        fromPhase: 'Uppbyggnad',
+        toPhase: 'Expansion',
+        description: 'De tyska småstaterna förenades till ett land. Inom några decennier blev Tyskland Europas starkaste industriland.'
+      },
+      {
+        year: '1945-1955',
+        name: 'Wirtschaftswunder',
+        fromPhase: 'Omställning',
+        toPhase: 'Uppbyggnad',
+        description: 'Tyskland låg i ruiner efter kriget. Men med hårt arbete och amerikanskt stöd byggdes landet upp till en ekonomisk stormakt på bara ett decennium.'
+      },
+      {
+        year: '1990',
+        name: 'Återförening',
+        fromPhase: 'Mognad',
+        toPhase: 'Expansion',
+        description: 'Muren föll och Öst- och Västtyskland blev ett igen. En enorm utmaning att slå samman två helt olika ekonomiska system.'
+      }
+    ],
     indicatorScores: {
       energy_trend: 45,
       resilience: 62,
@@ -334,6 +481,22 @@ export const COUNTRY_PHASE_DATA: CountryPhaseData[] = [
     velocity: -2.5,
     accelerating: false,
     historicalTransitions: 2,
+    historicalTransitionDetails: [
+      {
+        year: '1947',
+        name: 'Självständighet',
+        fromPhase: 'Omställning',
+        toPhase: 'Uppbyggnad',
+        description: 'Indien bröt sig loss från brittiskt styre efter fredlig kamp under Gandhi. Men delningen med Pakistan orsakade enormt lidande.'
+      },
+      {
+        year: '1991',
+        name: 'Ekonomiska liberaliseringen',
+        fromPhase: 'Överbelastning',
+        toPhase: 'Expansion',
+        description: 'Indien stod vid konkursens rand. Svaret blev att öppna ekonomin. Nu växer medelklassen snabbt och IT-industrin är världsledande.'
+      }
+    ],
     indicatorScores: {
       energy_trend: 75,
       resilience: 48,
@@ -352,6 +515,15 @@ export const COUNTRY_PHASE_DATA: CountryPhaseData[] = [
     velocity: 1.8,
     accelerating: false,
     historicalTransitions: 1,
+    historicalTransitionDetails: [
+      {
+        year: '1985-1994',
+        name: 'Demokratisering och Plano Real',
+        fromPhase: 'Överbelastning',
+        toPhase: 'Mognad',
+        description: 'Efter årtionden av militärdiktatur blev Brasilien demokratiskt. Hyperinflationen (tusentals procent per år!) tämjdes med en smart valutareform.'
+      }
+    ],
     indicatorScores: {
       energy_trend: 68,
       resilience: 45,
