@@ -577,6 +577,195 @@ const DomainDialog: React.FC<DomainDialogProps> = ({ open, onOpenChange, domain 
   );
 };
 
+// Regional distribution dialog
+interface RegionalDistributionDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  indicatorName: string;
+}
+
+const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({ 
+  open, 
+  onOpenChange, 
+  indicatorName 
+}) => {
+  // Mock regional data
+  const regions = [
+    { name: 'Stockholm', value: 82.4, change: 1.8, population: 2415139 },
+    { name: 'Västra Götaland', value: 79.1, change: 2.1, population: 1734280 },
+    { name: 'Skåne', value: 76.8, change: 1.2, population: 1402425 },
+    { name: 'Östergötland', value: 78.3, change: 0.9, population: 470862 },
+    { name: 'Uppsala', value: 81.2, change: 2.4, population: 395026 },
+    { name: 'Jönköping', value: 80.5, change: 1.5, population: 368882 },
+    { name: 'Halland', value: 79.8, change: 1.1, population: 340243 },
+    { name: 'Örebro', value: 77.2, change: 0.6, population: 308058 },
+    { name: 'Gävleborg', value: 74.1, change: -0.3, population: 288386 },
+    { name: 'Dalarna', value: 75.6, change: 0.2, population: 287386 },
+    { name: 'Västerbotten', value: 78.9, change: 1.8, population: 274539 },
+    { name: 'Norrbotten', value: 77.4, change: 1.0, population: 249693 },
+    { name: 'Södermanland', value: 76.2, change: 0.4, population: 301665 },
+    { name: 'Värmland', value: 74.8, change: -0.1, population: 283196 },
+    { name: 'Västmanland', value: 77.0, change: 0.8, population: 278929 },
+    { name: 'Kronoberg', value: 78.1, change: 1.3, population: 203340 },
+    { name: 'Kalmar', value: 76.4, change: 0.5, population: 246782 },
+    { name: 'Blekinge', value: 75.3, change: 0.1, population: 159606 },
+    { name: 'Jämtland', value: 76.7, change: 0.9, population: 132054 },
+    { name: 'Västernorrland', value: 74.5, change: -0.2, population: 243061 },
+    { name: 'Gotland', value: 77.8, change: 1.4, population: 60124 },
+  ].sort((a, b) => b.value - a.value);
+
+  const nationalAvg = 78.2;
+  const best = regions[0];
+  const worst = regions[regions.length - 1];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle className="text-xl flex items-center gap-2">
+            🗺️ Regional fördelning: {indicatorName}
+          </DialogTitle>
+          <DialogDescription>
+            Data per län i Sverige • Klicka på ett län för kommundata
+          </DialogDescription>
+        </DialogHeader>
+        
+        <ScrollArea className="max-h-[70vh]">
+          <div className="space-y-4 mt-4">
+            {/* Summary cards */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-center">
+                <p className="text-xs text-emerald-600 mb-1">🏆 Högst</p>
+                <p className="font-bold text-emerald-900">{best.name}</p>
+                <p className="text-xl font-semibold text-emerald-700">{best.value}%</p>
+              </div>
+              <div className="bg-blue-50 p-3 rounded-xl border border-blue-200 text-center">
+                <p className="text-xs text-blue-600 mb-1">📊 Rikssnitt</p>
+                <p className="font-bold text-blue-900">Sverige</p>
+                <p className="text-xl font-semibold text-blue-700">{nationalAvg}%</p>
+              </div>
+              <div className="bg-amber-50 p-3 rounded-xl border border-amber-200 text-center">
+                <p className="text-xs text-amber-600 mb-1">⚠️ Lägst</p>
+                <p className="font-bold text-amber-900">{worst.name}</p>
+                <p className="text-xl font-semibold text-amber-700">{worst.value}%</p>
+              </div>
+            </div>
+
+            {/* Spread info */}
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-600">Spridning (max - min):</span>
+                <span className="font-bold text-slate-900">{(best.value - worst.value).toFixed(1)} procentenheter</span>
+              </div>
+              <div className="w-full bg-slate-200 rounded-full h-2 mt-2">
+                <div 
+                  className="h-full rounded-full bg-gradient-to-r from-amber-400 via-blue-500 to-emerald-500"
+                  style={{ width: '100%' }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-slate-500 mt-1">
+                <span>{worst.value}%</span>
+                <span>{nationalAvg}%</span>
+                <span>{best.value}%</span>
+              </div>
+            </div>
+
+            {/* Regional list */}
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-slate-700 mb-2">
+                📍 Alla län (sorterat efter värde)
+              </p>
+              
+              {regions.map((region, index) => {
+                const deviation = region.value - nationalAvg;
+                const barWidth = ((region.value - worst.value) / (best.value - worst.value)) * 100;
+                
+                return (
+                  <button
+                    key={region.name}
+                    className="w-full p-3 bg-white rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 transition-all text-left group"
+                    onClick={() => {
+                      // Would open municipality view
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-slate-400 font-mono w-5">#{index + 1}</span>
+                      <span className="font-medium text-slate-800 flex-1">{region.name}</span>
+                      
+                      {/* Mini bar */}
+                      <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div 
+                          className={cn(
+                            "h-full rounded-full",
+                            deviation >= 2 ? "bg-emerald-500" :
+                            deviation >= 0 ? "bg-blue-500" :
+                            deviation >= -2 ? "bg-amber-500" : "bg-red-500"
+                          )}
+                          style={{ width: `${barWidth}%` }}
+                        />
+                      </div>
+                      
+                      <span className="font-mono text-sm font-semibold text-slate-700 w-14 text-right">
+                        {region.value}%
+                      </span>
+                      
+                      <span className={cn(
+                        "text-xs font-medium w-12 text-right",
+                        region.change >= 0 ? "text-emerald-600" : "text-red-500"
+                      )}>
+                        {region.change >= 0 ? '+' : ''}{region.change}%
+                      </span>
+                      
+                      <span className={cn(
+                        "text-xs w-16 text-right",
+                        deviation >= 0 ? "text-emerald-600" : "text-amber-600"
+                      )}>
+                        {deviation >= 0 ? '+' : ''}{deviation.toFixed(1)} vs snitt
+                      </span>
+                      
+                      <span className="text-slate-400 group-hover:text-blue-500 transition-colors">→</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mt-1 ml-8">
+                      <span className="text-xs text-slate-400">
+                        👥 {region.population.toLocaleString('sv-SE')} invånare
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Methodology */}
+            <div className="bg-blue-50/80 p-4 rounded-xl border border-blue-100">
+              <h4 className="font-semibold text-blue-900 mb-2">📊 Om regional data</h4>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• <strong>Källa:</strong> Statistiska Centralbyrån (SCB), regionalt register</li>
+                <li>• <strong>Uppdatering:</strong> Kvartalsvis</li>
+                <li>• <strong>Senaste data:</strong> Q4 2024</li>
+                <li>• <strong>Täckning:</strong> 21 län, 290 kommuner</li>
+              </ul>
+            </div>
+
+            {/* Export buttons */}
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="flex-1">
+                📥 Ladda ner CSV
+              </Button>
+              <Button variant="outline" size="sm" className="flex-1">
+                📊 Öppna i Excel
+              </Button>
+              <Button variant="outline" size="sm" className="flex-1">
+                🔗 Dela länk
+              </Button>
+            </div>
+          </div>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 // Indicator drill-down dialog
 interface IndicatorDialogProps {
   open: boolean;
@@ -590,69 +779,84 @@ interface IndicatorDialogProps {
 }
 
 const IndicatorDialog: React.FC<IndicatorDialogProps> = ({ open, onOpenChange, indicator }) => {
+  const [regionalOpen, setRegionalOpen] = useState(false);
+  
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="text-xl">{indicator.name}</DialogTitle>
-          <DialogDescription>{indicator.explanation}</DialogDescription>
-        </DialogHeader>
-        
-        <ScrollArea className="max-h-[60vh]">
-          <div className="space-y-4 mt-4">
-            {/* Current value */}
-            <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl">
-              <span className="text-5xl font-bold text-slate-900">{indicator.value}</span>
-              <p className={cn(
-                "text-lg font-semibold mt-2",
-                indicator.change >= 0 ? "text-emerald-600" : "text-red-600"
-              )}>
-                {indicator.change >= 0 ? '↑' : '↓'} {Math.abs(indicator.change).toFixed(1)}% senaste året
-              </p>
-            </div>
-            
-            {/* Geographic context */}
-            <div className="bg-amber-50 rounded-xl p-4">
-              <h4 className="font-semibold text-amber-900 mb-2">📍 Var mäts detta?</h4>
-              <ul className="text-sm text-amber-800 space-y-1">
-                <li>• <strong>Geografiskt område:</strong> Hela Sverige, nationell nivå</li>
-                <li>• <strong>Regional data finns:</strong> Ja, per län och kommun</li>
-                <li>• <strong>Jämförbar internationellt:</strong> Ja, Eurostat-standard</li>
-              </ul>
-              <Button variant="outline" size="sm" className="mt-3 bg-white">
-                Se regional fördelning →
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl">{indicator.name}</DialogTitle>
+            <DialogDescription>{indicator.explanation}</DialogDescription>
+          </DialogHeader>
+          
+          <ScrollArea className="max-h-[60vh]">
+            <div className="space-y-4 mt-4">
+              {/* Current value */}
+              <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl">
+                <span className="text-5xl font-bold text-slate-900">{indicator.value}</span>
+                <p className={cn(
+                  "text-lg font-semibold mt-2",
+                  indicator.change >= 0 ? "text-emerald-600" : "text-red-600"
+                )}>
+                  {indicator.change >= 0 ? '↑' : '↓'} {Math.abs(indicator.change).toFixed(1)}% senaste året
+                </p>
+              </div>
+              
+              {/* Geographic context */}
+              <div className="bg-amber-50 rounded-xl p-4">
+                <h4 className="font-semibold text-amber-900 mb-2">📍 Var mäts detta?</h4>
+                <ul className="text-sm text-amber-800 space-y-1">
+                  <li>• <strong>Geografiskt område:</strong> Hela Sverige, nationell nivå</li>
+                  <li>• <strong>Regional data finns:</strong> Ja, per län och kommun</li>
+                  <li>• <strong>Jämförbar internationellt:</strong> Ja, Eurostat-standard</li>
+                </ul>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-3 bg-white hover:bg-amber-100 hover:border-amber-300"
+                  onClick={() => setRegionalOpen(true)}
+                >
+                  🗺️ Se regional fördelning →
+                </Button>
+              </div>
+              
+              {/* Comparison */}
+              <div className="bg-slate-50 rounded-xl p-4">
+                <h4 className="font-semibold text-slate-700 mb-2">🌍 Jämförelse</h4>
+                <ul className="text-sm text-slate-600 space-y-1">
+                  <li>• <strong>EU-genomsnitt:</strong> {(parseFloat(indicator.value) * 0.92).toFixed(1)}</li>
+                  <li>• <strong>Nordiskt genomsnitt:</strong> {(parseFloat(indicator.value) * 1.02).toFixed(1)}</li>
+                  <li>• <strong>Bäst i EU:</strong> 93.2% (Danmark)</li>
+                </ul>
+              </div>
+              
+              {/* Methodology */}
+              <div className="bg-blue-50 rounded-xl p-4">
+                <h4 className="font-semibold text-blue-900 mb-2">🔬 Metodik</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• <strong>Mätperiod:</strong> Januari - December 2024</li>
+                  <li>• <strong>Datakälla:</strong> Statistiska Centralbyrån (SCB)</li>
+                  <li>• <strong>Uppdateringsfrekvens:</strong> Månadsvis</li>
+                  <li>• <strong>Konfidens:</strong> 95% konfidensintervall</li>
+                </ul>
+              </div>
+              
+              {/* Source link */}
+              <Button variant="outline" className="w-full">
+                🔗 Gå till primärkällan (SCB) →
               </Button>
             </div>
-            
-            {/* Comparison */}
-            <div className="bg-slate-50 rounded-xl p-4">
-              <h4 className="font-semibold text-slate-700 mb-2">🌍 Jämförelse</h4>
-              <ul className="text-sm text-slate-600 space-y-1">
-                <li>• <strong>EU-genomsnitt:</strong> {(parseFloat(indicator.value) * 0.92).toFixed(1)}</li>
-                <li>• <strong>Nordiskt genomsnitt:</strong> {(parseFloat(indicator.value) * 1.02).toFixed(1)}</li>
-                <li>• <strong>Bäst i EU:</strong> 93.2% (Danmark)</li>
-              </ul>
-            </div>
-            
-            {/* Methodology */}
-            <div className="bg-blue-50 rounded-xl p-4">
-              <h4 className="font-semibold text-blue-900 mb-2">🔬 Metodik</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• <strong>Mätperiod:</strong> Januari - December 2024</li>
-                <li>• <strong>Datakälla:</strong> Statistiska Centralbyrån (SCB)</li>
-                <li>• <strong>Uppdateringsfrekvens:</strong> Månadsvis</li>
-                <li>• <strong>Konfidens:</strong> 95% konfidensintervall</li>
-              </ul>
-            </div>
-            
-            {/* Source link */}
-            <Button variant="outline" className="w-full">
-              🔗 Gå till primärkällan (SCB) →
-            </Button>
-          </div>
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+      
+      <RegionalDistributionDialog
+        open={regionalOpen}
+        onOpenChange={setRegionalOpen}
+        indicatorName={indicator.name}
+      />
+    </>
   );
 };
 
