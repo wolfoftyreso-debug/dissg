@@ -133,6 +133,62 @@ export {
   DSL_PRINCIPLES,
 } from './query-template-dsl';
 
+// STEG 19: Visibility Signals
+export type {
+  AgentDemandSignal,
+  SearchDemandSignal,
+  StabilitySignal,
+  RiskSignal,
+  CoverageSignal,
+  TemporalRelevanceSignal,
+  QuestionSignalPackage,
+} from './visibility-signals';
+
+export {
+  SIGNAL_WEIGHTS,
+  calculateAgentDemandScore,
+  calculateSearchDemandScore,
+  calculateStabilityScore,
+  calculateRiskScore,
+  calculateCoverageScore,
+  calculateTemporalRelevanceScore,
+  calculateVisibilityScore,
+  SIGNAL_PRINCIPLES,
+} from './visibility-signals';
+
+// STEG 19: Visibility Engine
+export type {
+  VisibilityState,
+  ExposureTarget,
+  VisibilityProfile,
+  VisibilityDecision,
+  VisibilityEngineStats,
+} from './visibility-engine';
+
+export {
+  PRIORITY_ORDER,
+  VisibilityEngine,
+  SILENCE_STRATEGY,
+  VISIBILITY_PRINCIPLES,
+  createVisibilityEngine,
+} from './visibility-engine';
+
+// STEG 19: Search Engine Routing
+export type {
+  SearchEngineProfile,
+  RoutingRule,
+  RoutedQuestion,
+  SearchRoutingStats,
+} from './search-engine-routing';
+
+export {
+  SEARCH_ENGINE_PROFILES,
+  DEFAULT_ROUTING_RULES,
+  SearchEngineRouter,
+  ROUTING_PRINCIPLES,
+  createSearchRouter,
+} from './search-engine-routing';
+
 /**
  * META-LAYER MATHEMATICS
  * 
@@ -219,6 +275,43 @@ export const STEG_18_OUTCOMES = {
     search_engines: 180,  // Crawl-yta
     ai_agents: 250,       // Agent-precision
     human_ui: 40,         // Minimal cognitive overload
+  },
+} as const;
+
+/**
+ * STEG 19 OUTCOMES: RANKING & VISIBILITY ENGINE
+ * 
+ * After this step you have:
+ * - 10M questions with controlled visibility
+ * - Maximum coverage with minimal risk
+ * - Dynamic relevance with static truth
+ * 
+ * You have built:
+ * "A motor that decides what the world sees as 'the right question to ask'"
+ */
+export const STEG_19_OUTCOMES = {
+  controlled_visibility: true,
+  maximum_coverage: true,
+  minimal_risk: true,
+  dynamic_relevance: true,
+  static_truth: true,
+  
+  priority_order: {
+    first: 'ai_agents',      // When AI agents trust you...
+    second: 'search_engines', // ...search engines adapt
+    third: 'humans',         // ...humans follow automatically
+  },
+  
+  silence_as_strategy: {
+    dormant_questions: true,
+    latent_variants: true,
+    agent_only_questions: true,
+  },
+  
+  eliminates: {
+    cannibalization: true,
+    duplicate_content: true,
+    ranking_conflicts: true,
   },
 } as const;
 
