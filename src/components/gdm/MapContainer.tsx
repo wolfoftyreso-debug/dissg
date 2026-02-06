@@ -2,15 +2,21 @@
  * Enhanced MapContainer Component
  * 
  * Supports multiple map modes: satellite (photorealistic), 3D globe, 2D flat.
- * Clean, minimal country markers with scores.
- * NEW: City-level markers with selectable indicators.
+ * Hierarchical markers: Countries (flags), States, Cities with 3D styling.
  */
 
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { COUNTRIES, LAMBDA_OVERLAYS, getLambdaColor } from './mockData';
-import { MOCK_CITIES, type CityData, CITY_INDICATORS } from './CityMarkers';
+import { COUNTRIES, LAMBDA_OVERLAYS } from './mockData';
+import { MOCK_CITIES, type CityData } from './CityMarkers';
+import { 
+  injectMarkerStyles, 
+  getScoreColor as getHierarchicalScoreColor,
+  getFlag,
+  MOCK_STATES, 
+  MOCK_CITIES_HIERARCHICAL,
+} from './HierarchicalMarkers';
 import type { MapMode } from './types';
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
@@ -68,13 +74,7 @@ function calculateCityScore(city: CityData, selectedIndicators: string[]): numbe
   return count > 0 ? Math.round(total / count) : 50;
 }
 
-function getScoreColor(score: number): string {
-  if (score >= 80) return '#22c55e';
-  if (score >= 60) return '#84cc16';
-  if (score >= 40) return '#eab308';
-  if (score >= 20) return '#f97316';
-  return '#ef4444';
-}
+// Score color is now imported from HierarchicalMarkers
 
 export function MapContainer({
   theme: _theme,
@@ -143,7 +143,12 @@ export function MapContainer({
     };
   }, [mapMode]);
 
-  // Add country markers
+  // Inject hierarchical marker styles once
+  useEffect(() => {
+    injectMarkerStyles();
+  }, []);
+
+  // Add country markers with flags
   useEffect(() => {
     if (!map.current || !isLoaded) return;
 
@@ -151,71 +156,29 @@ export function MapContainer({
     markersRef.current.forEach(m => m.remove());
     markersRef.current = [];
 
-    // Add markers for each country
+    // Add markers for each country (with FLAGS)
     COUNTRIES.forEach(country => {
       const lambdaData = LAMBDA_OVERLAYS[country.code];
       if (!lambdaData) return;
 
       const isSelected = selectedCountry === country.code;
       const score = Math.round(lambdaData.lambda * 100);
-      const color = getLambdaColor(lambdaData.lambda);
+      const scoreColor = getHierarchicalScoreColor(score);
+      const flag = getFlag(country.code);
       
-      // Create clean, modern marker
       const el = document.createElement('div');
-      el.className = 'gdm-marker';
+      el.className = 'country-marker-wrapper';
       el.setAttribute('role', 'button');
       el.setAttribute('tabindex', '0');
       el.setAttribute('aria-label', `${country.name.sv}: ${score} poäng`);
       
-      
+      // Create flag marker with 3D styling
       el.innerHTML = `
-        <div class="gdm-marker-content ${isSelected ? 'gdm-marker-selected' : ''}">
-          <div class="gdm-marker-score" style="background: ${color}">${score}</div>
-          <div class="gdm-marker-flag">${country.code}</div>
+        <div class="marker-container marker-country ${isSelected ? 'marker-selected' : ''}" style="${isSelected ? `box-shadow: 0 0 0 3px white, 0 0 0 5px ${scoreColor};` : ''}">
+          <div class="marker-flag-large">${flag}</div>
+          <div class="marker-score-badge" style="background: ${scoreColor}">${score}</div>
         </div>
       `;
-      
-      // Styles
-      const styles = document.createElement('style');
-      styles.textContent = `
-        .gdm-marker {
-          cursor: pointer;
-          transition: transform 0.2s ease;
-        }
-        .gdm-marker:hover {
-          transform: scale(1.15);
-          z-index: 100 !important;
-        }
-        .gdm-marker-content {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 2px;
-        }
-        .gdm-marker-score {
-          padding: 4px 8px;
-          border-radius: 12px;
-          font-size: 13px;
-          font-weight: 700;
-          color: white;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-          min-width: 32px;
-          text-align: center;
-        }
-        .gdm-marker-flag {
-          font-size: 9px;
-          font-weight: 600;
-          color: #64748b;
-          background: white;
-          padding: 1px 4px;
-          border-radius: 4px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .gdm-marker-selected .gdm-marker-score {
-          box-shadow: 0 0 0 3px white, 0 0 0 5px ${color};
-        }
-      `;
-      el.appendChild(styles);
 
       // Click handler
       const handleSelect = (e: Event) => {
@@ -240,9 +203,48 @@ export function MapContainer({
 
       markersRef.current.push(marker);
     });
+
+    // Add STATE markers
+    MOCK_STATES.forEach(state => {
+      const isSelected = false; // TODO: state selection
+      const scoreColor = getHierarchicalScoreColor(state.score || 100);
+      const flag = getFlag(state.countryCode);
+      const abbrev = state.id.substring(0, 3).toUpperCase();
+      
+      const el = document.createElement('div');
+      el.className = 'state-marker-wrapper';
+      el.setAttribute('role', 'button');
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('aria-label', `${state.name}: ${state.score} poäng`);
+      
+      el.innerHTML = `
+        <div class="marker-container marker-state ${isSelected ? 'marker-selected' : ''}">
+          <div class="marker-state-icon">
+            <div class="marker-mini-flag">${flag}</div>
+            <div class="marker-state-abbrev">${abbrev}</div>
+          </div>
+          <div class="marker-score-badge-sm" style="background: ${scoreColor}">${state.score}</div>
+        </div>
+        <div class="marker-label marker-label-state">${state.name}</div>
+      `;
+
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // TODO: Handle state selection
+      });
+
+      const marker = new mapboxgl.Marker({ 
+        element: el,
+        anchor: 'center',
+      })
+        .setLngLat(state.coordinates)
+        .addTo(map.current!);
+
+      markersRef.current.push(marker);
+    });
   }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear]);
 
-  // Add city markers when enabled
+  // Add city markers when enabled (use hierarchical 3D style)
   useEffect(() => {
     if (!map.current || !isLoaded) return;
 
@@ -252,12 +254,24 @@ export function MapContainer({
 
     if (!showCities) return;
 
-    // Add markers for each city
-    MOCK_CITIES.forEach(city => {
+    // Combine old mock cities with new hierarchical cities
+    const allCities = [
+      ...MOCK_CITIES.map(c => ({ 
+        id: c.id, 
+        name: c.name, 
+        coordinates: c.coordinates, 
+        score: calculateCityScore(c, selectedCityIndicators) 
+      })),
+      ...MOCK_CITIES_HIERARCHICAL
+        .filter(c => !MOCK_CITIES.some(m => m.id === c.id))
+        .map(c => ({ id: c.id, name: c.name, coordinates: c.coordinates, score: c.score || 100 }))
+    ];
+
+    // Add markers for each city with 3D sphere styling
+    allCities.forEach(city => {
       const isSelected = selectedCity === city.id;
-      const score = calculateCityScore(city, selectedCityIndicators);
-      const scoreColor = getScoreColor(score);
-      const showDetails = selectedCityIndicators.length <= 4 && selectedCityIndicators.length > 0;
+      const score = city.score || 100;
+      const scoreColor = getHierarchicalScoreColor(score);
       
       const el = document.createElement('div');
       el.className = 'city-marker-wrapper';
@@ -265,100 +279,15 @@ export function MapContainer({
       el.setAttribute('tabindex', '0');
       el.setAttribute('aria-label', `${city.name}: ${score} poäng`);
       
-      // Build indicator icons HTML
-      let indicatorIconsHTML = '';
-      if (showDetails) {
-        indicatorIconsHTML = selectedCityIndicators.slice(0, 4).map(id => {
-          const indicator = CITY_INDICATORS.find(i => i.id === id);
-          if (!indicator) return '';
-          return `<span class="city-indicator-icon" style="background: ${indicator.color}20" title="${indicator.name}">${indicator.icon}</span>`;
-        }).join('');
-      } else if (selectedCityIndicators.length > 4) {
-        indicatorIconsHTML = `<span class="city-more-indicators">+${selectedCityIndicators.length}</span>`;
-      }
-      
+      // New 3D sphere style for cities
       el.innerHTML = `
-        <div class="city-marker-main ${isSelected ? 'city-marker-selected' : ''}" style="--score-color: ${scoreColor}">
-          <div class="city-score" style="background: ${scoreColor}">${score}</div>
-          ${indicatorIconsHTML ? `<div class="city-indicators">${indicatorIconsHTML}</div>` : ''}
+        <div class="marker-container marker-city ${isSelected ? 'marker-selected' : ''}" style="${isSelected ? `box-shadow: 0 0 0 3px white, 0 0 0 5px ${scoreColor};` : ''}">
+          <div class="marker-city-dot" style="background: ${scoreColor}">
+            <span class="marker-city-score">${score}</span>
+          </div>
         </div>
-        <div class="city-name">${city.name}</div>
+        <div class="marker-label marker-label-city">${city.name}</div>
       `;
-      
-      // Inject styles once
-      if (!document.getElementById('city-marker-styles')) {
-        const styles = document.createElement('style');
-        styles.id = 'city-marker-styles';
-        styles.textContent = `
-          .city-marker-wrapper {
-            cursor: pointer;
-            transition: transform 0.2s ease, z-index 0s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 10;
-          }
-          .city-marker-wrapper:hover {
-            transform: scale(1.15);
-            z-index: 200 !important;
-          }
-          .city-marker-main {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-            border: 2px solid white;
-          }
-          .city-marker-selected {
-            border-color: var(--score-color);
-            box-shadow: 0 0 0 3px var(--score-color), 0 2px 12px rgba(0,0,0,0.2);
-          }
-          .city-score {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 12px;
-          }
-          .city-indicators {
-            display: flex;
-            gap: 2px;
-          }
-          .city-indicator-icon {
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-          }
-          .city-more-indicators {
-            font-size: 10px;
-            color: #64748b;
-            padding: 0 4px;
-          }
-          .city-name {
-            margin-top: 4px;
-            padding: 2px 8px;
-            background: white;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #334155;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            white-space: nowrap;
-          }
-        `;
-        document.head.appendChild(styles);
-      }
 
       // Click handler
       const handleSelect = (e: Event) => {
@@ -374,11 +303,13 @@ export function MapContainer({
         }
       });
 
+      const coords: [number, number] = city.coordinates;
+
       const marker = new mapboxgl.Marker({ 
         element: el,
         anchor: 'center',
       })
-        .setLngLat(city.coordinates)
+        .setLngLat(coords)
         .addTo(map.current!);
 
       cityMarkersRef.current.push(marker);
