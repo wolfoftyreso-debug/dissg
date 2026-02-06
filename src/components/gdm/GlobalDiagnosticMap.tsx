@@ -35,7 +35,7 @@ export function GlobalDiagnosticMap() {
   const [timeYear, setTimeYear] = useState(2024);
   const [isPlaying, setIsPlaying] = useState(false);
   
-  // City layer state
+  // City layer state - ALWAYS show cities, user selects which indicators to view
   const [showCitySelector, setShowCitySelector] = useState(false);
   const [selectedCityIndicators, setSelectedCityIndicators] = useState<string[]>(['life_expectancy', 'median_income']);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
@@ -65,8 +65,8 @@ export function GlobalDiagnosticMap() {
     setSelectedCity(null);
   }, []);
 
-  // Show cities when indicators are selected
-  const showCities = selectedCityIndicators.length > 0;
+  // ALWAYS show cities - user selects indicators then zooms in
+  const showCities = true;
 
   return (
     <>
