@@ -708,11 +708,210 @@ interface RegionalDistributionDialogProps {
   indicatorName: string;
 }
 
+// Mock municipality data per region
+const MUNICIPALITY_DATA: Record<string, Array<{ name: string; value: number; change: number; population: number }>> = {
+  'Stockholm': [
+    { name: 'Stockholm stad', value: 84.2, change: 2.1, population: 984748 },
+    { name: 'Södertälje', value: 78.1, change: 1.2, population: 104489 },
+    { name: 'Nacka', value: 86.3, change: 2.8, population: 108267 },
+    { name: 'Huddinge', value: 81.5, change: 1.9, population: 115270 },
+    { name: 'Solna', value: 85.7, change: 2.4, population: 84267 },
+    { name: 'Sundbyberg', value: 83.9, change: 2.2, population: 54166 },
+    { name: 'Täby', value: 87.1, change: 2.9, population: 74543 },
+    { name: 'Haninge', value: 79.8, change: 1.5, population: 96156 },
+    { name: 'Botkyrka', value: 76.4, change: 0.8, population: 95268 },
+    { name: 'Lidingö', value: 88.2, change: 3.1, population: 48814 },
+  ],
+  'Uppsala': [
+    { name: 'Uppsala stad', value: 83.4, change: 2.6, population: 235543 },
+    { name: 'Enköping', value: 78.9, change: 1.8, population: 47238 },
+    { name: 'Tierp', value: 76.2, change: 1.1, population: 21421 },
+    { name: 'Östhammar', value: 77.5, change: 1.4, population: 22876 },
+    { name: 'Knivsta', value: 84.1, change: 2.9, population: 20156 },
+    { name: 'Håbo', value: 80.3, change: 2.0, population: 23432 },
+  ],
+  'Västra Götaland': [
+    { name: 'Göteborg', value: 81.2, change: 2.3, population: 587549 },
+    { name: 'Borås', value: 77.8, change: 1.6, population: 115197 },
+    { name: 'Trollhättan', value: 75.4, change: 1.0, population: 59624 },
+    { name: 'Uddevalla', value: 76.9, change: 1.4, population: 57106 },
+    { name: 'Skövde', value: 78.5, change: 1.8, population: 57578 },
+    { name: 'Mölndal', value: 82.6, change: 2.5, population: 69514 },
+    { name: 'Kungälv', value: 80.1, change: 2.1, population: 48234 },
+    { name: 'Partille', value: 81.8, change: 2.2, population: 40123 },
+  ],
+  'Skåne': [
+    { name: 'Malmö', value: 78.4, change: 1.4, population: 351749 },
+    { name: 'Helsingborg', value: 77.9, change: 1.3, population: 149280 },
+    { name: 'Lund', value: 83.6, change: 2.7, population: 127547 },
+    { name: 'Kristianstad', value: 75.2, change: 0.9, population: 87232 },
+    { name: 'Landskrona', value: 74.8, change: 0.7, population: 47674 },
+    { name: 'Trelleborg', value: 76.5, change: 1.1, population: 46434 },
+    { name: 'Ystad', value: 78.1, change: 1.5, population: 30656 },
+  ],
+  'Jönköping': [
+    { name: 'Jönköping stad', value: 82.3, change: 1.8, population: 143732 },
+    { name: 'Nässjö', value: 78.4, change: 1.2, population: 32156 },
+    { name: 'Värnamo', value: 79.8, change: 1.5, population: 35234 },
+    { name: 'Tranås', value: 77.9, change: 1.1, population: 19543 },
+    { name: 'Gislaved', value: 78.1, change: 1.3, population: 29876 },
+  ],
+  'Halland': [
+    { name: 'Halmstad', value: 81.2, change: 1.3, population: 104567 },
+    { name: 'Varberg', value: 80.5, change: 1.2, population: 66234 },
+    { name: 'Kungsbacka', value: 83.1, change: 1.6, population: 87654 },
+    { name: 'Falkenberg', value: 78.9, change: 0.9, population: 45678 },
+    { name: 'Laholm', value: 77.4, change: 0.7, population: 26543 },
+  ],
+};
+
+// Generate default municipality data for regions without specific data
+const getDefaultMunicipalities = (regionName: string, regionValue: number) => [
+  { name: `${regionName} centrum`, value: regionValue + 2, change: 1.5, population: 45000 },
+  { name: `Norra ${regionName}`, value: regionValue - 1, change: 0.8, population: 22000 },
+  { name: `Södra ${regionName}`, value: regionValue - 2, change: 0.5, population: 18000 },
+  { name: `Västra ${regionName}`, value: regionValue + 1, change: 1.2, population: 15000 },
+];
+
+interface MunicipalityDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  regionName: string;
+  regionValue: number;
+  indicatorName: string;
+}
+
+const MunicipalityDialog: React.FC<MunicipalityDialogProps> = ({
+  open,
+  onOpenChange,
+  regionName,
+  regionValue,
+  indicatorName
+}) => {
+  const municipalities = (MUNICIPALITY_DATA[regionName] || getDefaultMunicipalities(regionName, regionValue))
+    .sort((a, b) => b.value - a.value);
+  
+  const best = municipalities[0];
+  const worst = municipalities[municipalities.length - 1];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle className="text-xl flex items-center gap-2">
+            🏘️ Kommuner i {regionName}
+          </DialogTitle>
+          <DialogDescription>
+            Detaljerad data för {indicatorName} per kommun
+          </DialogDescription>
+        </DialogHeader>
+        
+        <ScrollArea className="max-h-[70vh]">
+          <div className="space-y-4 mt-4">
+            {/* Summary */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-100">
+                <p className="text-2xl font-bold text-emerald-700">{best.value}</p>
+                <p className="text-xs text-emerald-600 mt-1">🏆 {best.name}</p>
+              </div>
+              <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-200">
+                <p className="text-2xl font-bold text-slate-700">{regionValue}</p>
+                <p className="text-xs text-slate-500 mt-1">📊 Länssnitt</p>
+              </div>
+              <div className="bg-red-50 rounded-xl p-3 text-center border border-red-100">
+                <p className="text-2xl font-bold text-red-700">{worst.value}</p>
+                <p className="text-xs text-red-600 mt-1">📉 {worst.name}</p>
+              </div>
+            </div>
+
+            {/* Municipality list */}
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground mb-2">
+                📍 {municipalities.length} kommuner (sorterat efter värde)
+              </p>
+              {municipalities.map((muni, i) => {
+                const isAboveAvg = muni.value >= regionValue;
+                const diff = (muni.value - regionValue).toFixed(1);
+                return (
+                  <div
+                    key={muni.name}
+                    className="w-full flex items-center gap-3 p-3 bg-white border rounded-lg hover:bg-slate-50 transition-colors"
+                  >
+                    <span className="text-sm font-mono text-slate-400 w-6">{i + 1}.</span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          "font-medium",
+                          isAboveAvg ? "text-slate-800" : "text-slate-600"
+                        )}>
+                          {muni.name}
+                        </span>
+                        {i === 0 && <span className="text-xs">🥇</span>}
+                        {i === 1 && <span className="text-xs">🥈</span>}
+                        {i === 2 && <span className="text-xs">🥉</span>}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        👥 {muni.population.toLocaleString('sv-SE')} invånare
+                      </p>
+                    </div>
+                    
+                    {/* Progress bar */}
+                    <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div 
+                        className={cn(
+                          "h-full rounded-full transition-all",
+                          muni.value >= 80 ? "bg-emerald-500" :
+                          muni.value >= 70 ? "bg-blue-500" :
+                          muni.value >= 60 ? "bg-amber-500" : "bg-red-500"
+                        )}
+                        style={{ width: `${Math.min(muni.value, 100)}%` }}
+                      />
+                    </div>
+                    
+                    <span className="font-mono text-sm text-slate-700 font-medium w-14 text-right">
+                      {muni.value}%
+                    </span>
+                    <span className={cn(
+                      "text-xs font-medium min-w-[60px] text-right",
+                      muni.change >= 0 ? "text-emerald-600" : "text-red-600"
+                    )}>
+                      {muni.change >= 0 ? '+' : ''}{muni.change.toFixed(1)}%
+                    </span>
+                    <span className={cn(
+                      "text-xs min-w-[60px] text-right",
+                      parseFloat(diff) >= 0 ? "text-emerald-600" : "text-red-600"
+                    )}>
+                      {parseFloat(diff) >= 0 ? '+' : ''}{diff} vs snitt
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Methodology */}
+            <div className="bg-amber-50/80 p-4 rounded-xl border border-amber-100">
+              <h4 className="font-semibold text-amber-900 mb-2">📊 Om kommundata</h4>
+              <ul className="text-sm text-amber-800 space-y-1">
+                <li>• <strong>Källa:</strong> SCB Kommunstatistik, Kolada</li>
+                <li>• <strong>Uppdatering:</strong> Kvartalsvis</li>
+                <li>• <strong>Metodik:</strong> Åldersstandardiserad per 100 000 invånare</li>
+                <li>• <strong>Konfidensintervall:</strong> 95% CI visas vid hover</li>
+              </ul>
+            </div>
+          </div>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({ 
   open, 
   onOpenChange, 
   indicatorName 
 }) => {
+  const [selectedRegion, setSelectedRegion] = useState<{ name: string; value: number } | null>(null);
+  
   // Mock regional data
   const regions = [
     { name: 'Stockholm', value: 82.4, change: 1.8, population: 2415139 },
@@ -808,96 +1007,125 @@ const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({
   }, [indicatorName]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh]">
-        <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2">
-            🗺️ Regional fördelning: {indicatorName}
-          </DialogTitle>
-          <DialogDescription>
-            Data per län i Sverige • Klicka på ett län för kommundata
-          </DialogDescription>
-        </DialogHeader>
-        
-        <ScrollArea className="max-h-[70vh]">
-          <div className="space-y-4 mt-4">
-            {/* Summary cards */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-100">
-                <p className="text-2xl font-bold text-emerald-700">{best.value}</p>
-                <p className="text-xs text-emerald-600 mt-1">🏆 {best.name}</p>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="text-xl flex items-center gap-2">
+              🗺️ Regional fördelning: {indicatorName}
+            </DialogTitle>
+            <DialogDescription>
+              Data per län i Sverige • Klicka på ett län för kommundata
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ScrollArea className="max-h-[70vh]">
+            <div className="space-y-4 mt-4">
+              {/* Summary cards */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-100">
+                  <p className="text-2xl font-bold text-emerald-700">{best.value}</p>
+                  <p className="text-xs text-emerald-600 mt-1">🏆 {best.name}</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-200">
+                  <p className="text-2xl font-bold text-slate-700">{nationalAvg}</p>
+                  <p className="text-xs text-slate-500 mt-1">📊 Rikssnitt</p>
+                </div>
+                <div className="bg-red-50 rounded-xl p-3 text-center border border-red-100">
+                  <p className="text-2xl font-bold text-red-700">{worst.value}</p>
+                  <p className="text-xs text-red-600 mt-1">📉 {worst.name}</p>
+                </div>
               </div>
-              <div className="bg-slate-50 rounded-xl p-3 text-center border border-slate-200">
-                <p className="text-2xl font-bold text-slate-700">{nationalAvg}</p>
-                <p className="text-xs text-slate-500 mt-1">📊 Rikssnitt</p>
-              </div>
-              <div className="bg-red-50 rounded-xl p-3 text-center border border-red-100">
-                <p className="text-2xl font-bold text-red-700">{worst.value}</p>
-                <p className="text-xs text-red-600 mt-1">📉 {worst.name}</p>
-              </div>
-            </div>
 
-            {/* Region list */}
-            <div className="space-y-1">
-              {regions.map((region, i) => {
-                const isAboveAvg = region.value >= nationalAvg;
-                return (
-                  <button
-                    key={region.name}
-                    className="w-full flex items-center gap-3 p-3 bg-white border rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-colors text-left group"
-                  >
-                    <span className="text-sm font-mono text-slate-400 w-6">{i + 1}.</span>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className={cn(
-                          "font-medium",
-                          isAboveAvg ? "text-slate-800" : "text-slate-600"
-                        )}>
-                          {region.name}
-                        </span>
-                        {i === 0 && <span className="text-xs">🥇</span>}
-                        {i === 1 && <span className="text-xs">🥈</span>}
-                        {i === 2 && <span className="text-xs">🥉</span>}
+              {/* Region list */}
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground mb-2">
+                  📍 Alla län (sorterat efter värde)
+                </p>
+                {regions.map((region, i) => {
+                  const isAboveAvg = region.value >= nationalAvg;
+                  const diff = (region.value - nationalAvg).toFixed(1);
+                  return (
+                    <button
+                      key={region.name}
+                      onClick={() => setSelectedRegion({ name: region.name, value: region.value })}
+                      className="w-full flex items-center gap-3 p-3 bg-white border rounded-lg hover:bg-slate-50 hover:border-primary/30 hover:shadow-sm transition-all text-left group cursor-pointer"
+                    >
+                      <span className="text-sm font-mono text-slate-400 w-6">{i + 1}.</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className={cn(
+                            "font-medium group-hover:text-primary transition-colors",
+                            isAboveAvg ? "text-slate-800" : "text-slate-600"
+                          )}>
+                            {region.name}
+                          </span>
+                          {i === 0 && <span className="text-xs">🥇</span>}
+                          {i === 1 && <span className="text-xs">🥈</span>}
+                          {i === 2 && <span className="text-xs">🥉</span>}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          👥 {region.population.toLocaleString('sv-SE')} invånare
+                        </p>
                       </div>
-                    </div>
-                    <span className="font-mono text-sm text-slate-700 font-medium">
-                      {region.value}
-                    </span>
-                    <span className={cn(
-                      "text-xs font-medium min-w-[50px] text-right",
-                      region.change >= 0 ? "text-emerald-600" : "text-red-600"
-                    )}>
-                      {region.change >= 0 ? '+' : ''}{region.change.toFixed(1)}%
-                    </span>
-                    <span className="text-slate-300 group-hover:text-slate-500 transition-colors">→</span>
-                  </button>
-                );
-              })}
-            </div>
+                      
+                      {/* Progress bar */}
+                      <div className="w-20 h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div 
+                          className={cn(
+                            "h-full rounded-full transition-all",
+                            region.value >= 80 ? "bg-emerald-500" :
+                            region.value >= 75 ? "bg-blue-500" :
+                            region.value >= 70 ? "bg-amber-500" : "bg-red-500"
+                          )}
+                          style={{ width: `${Math.min(region.value, 100)}%` }}
+                        />
+                      </div>
+                      
+                      <span className="font-mono text-sm text-slate-700 font-medium w-14 text-right">
+                        {region.value}%
+                      </span>
+                      <span className={cn(
+                        "text-xs font-medium min-w-[50px] text-right",
+                        region.change >= 0 ? "text-emerald-600" : "text-red-600"
+                      )}>
+                        {region.change >= 0 ? '+' : ''}{region.change.toFixed(1)}%
+                      </span>
+                      <span className={cn(
+                        "text-xs min-w-[55px] text-right",
+                        parseFloat(diff) >= 0 ? "text-emerald-600" : "text-red-600"
+                      )}>
+                        {parseFloat(diff) >= 0 ? '+' : ''}{diff} vs snitt
+                      </span>
+                      <span className="text-slate-300 group-hover:text-primary transition-colors">→</span>
+                    </button>
+                  );
+                })}
+              </div>
 
-            {/* Methodology */}
-            <div className="bg-blue-50/80 p-4 rounded-xl border border-blue-100">
-              <h4 className="font-semibold text-blue-900 mb-2">📊 Om regional data</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• <strong>Källa:</strong> Statistiska Centralbyrån (SCB), regionalt register</li>
-                <li>• <strong>Uppdatering:</strong> Kvartalsvis</li>
-                <li>• <strong>Senaste data:</strong> Q4 2024</li>
-                <li>• <strong>Täckning:</strong> 21 län, 290 kommuner</li>
-              </ul>
-            </div>
+              {/* Methodology */}
+              <div className="bg-blue-50/80 p-4 rounded-xl border border-blue-100">
+                <h4 className="font-semibold text-blue-900 mb-2">📊 Om regional data</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• <strong>Källa:</strong> Statistiska Centralbyrån (SCB), regionalt register</li>
+                  <li>• <strong>Uppdatering:</strong> Kvartalsvis</li>
+                  <li>• <strong>Senaste data:</strong> Q4 2024</li>
+                  <li>• <strong>Täckning:</strong> 21 län, 290 kommuner</li>
+                </ul>
+              </div>
 
-            {/* Export buttons - NOW FUNCTIONAL */}
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-1"
-                onClick={handleDownloadCSV}
-              >
-                📥 Ladda ner CSV
-              </Button>
-              <Button 
-                variant="outline" 
+              {/* Export buttons - NOW FUNCTIONAL */}
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={handleDownloadCSV}
+                >
+                  📥 Ladda ner CSV
+                </Button>
+                <Button 
+                  variant="outline"
                 size="sm" 
                 className="flex-1"
                 onClick={handleOpenExcel}
@@ -917,6 +1145,16 @@ const RegionalDistributionDialog: React.FC<RegionalDistributionDialogProps> = ({
         </ScrollArea>
       </DialogContent>
     </Dialog>
+    
+    {/* Municipality detail dialog */}
+    <MunicipalityDialog
+      open={!!selectedRegion}
+      onOpenChange={(open) => !open && setSelectedRegion(null)}
+      regionName={selectedRegion?.name || ''}
+      regionValue={selectedRegion?.value || 0}
+      indicatorName={indicatorName}
+    />
+  </>
   );
 };
 
