@@ -115,6 +115,38 @@ export {
   type SovereigntyMetrics,
 } from './oracleSovereignty';
 
+// Oracle Continuity
+export {
+  MODEL_GENERATION_THREAT,
+  MODEL_AGNOSTIC_REQUIREMENTS,
+  validateModelAgnostic,
+  TEMPORAL_PRINCIPLES,
+  createTemporalFact,
+  supersedeFact,
+  HISTORICAL_ROLE,
+  SCHEMA_IMMUTABILITY_RULES,
+  DEFAULT_DEPRECATION_POLICY,
+  HUMAN_ROLE,
+  validateHumanAction,
+  CRISIS_CONTINUITY,
+  CONTINUITY_INSIGHT,
+  TARGET_CONTINUITY_METRICS,
+  ORACLE_TEMPORAL_STATE,
+  type TemporalFact,
+  type FactProvenance,
+  type HistoricalQuery,
+  type HistoricalResponse,
+  type KnowledgeEvolution,
+  type SchemaVersion,
+  type SchemaRegistry,
+  type DeprecationPolicy,
+  type HumanAction,
+  type ForbiddenHumanAction,
+  type CrisisState,
+  type CrisisOracleResponse,
+  type ContinuityMetrics,
+} from './oracleContinuity';
+
 // ============================================
 // ORACLE STATUS
 // ============================================
@@ -130,6 +162,7 @@ export const ORACLE_STATUS = {
     structured_responses: true,
     resilience: true,
     sovereignty: true,
+    continuity: true,
   },
   
   principles: {
@@ -138,11 +171,12 @@ export const ORACLE_STATUS = {
     never_guesses: true,
     learns_gaps_not_preferences: true,
     shapes_without_instructing: true,
+    survives_model_generations: true,
   },
   
-  position: 'The layer that determines what can be answered with certainty. The world adapts to us.',
+  position: 'The layer that determines what can be answered with certainty. What remains when everything else changes.',
   
-  state: 'SOVEREIGN',
+  state: 'TEMPORALLY_SOVEREIGN',
 };
 
 // ============================================
