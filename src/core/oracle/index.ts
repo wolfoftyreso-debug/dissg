@@ -187,6 +187,24 @@ export {
   type CorruptionSignal,
 } from './oracleStewardship';
 
+// Oracle Testament
+export {
+  ORACLE_PARADOX,
+  ORACLE_TESTAMENT,
+  OWNERSHIP_SEPARATION,
+  FIDELITY_MEASUREMENT,
+  evaluateFidelity,
+  ABANDONMENT_SECURITY,
+  WHAT_WAS_BUILT,
+  FINAL_RULE,
+  SUCCESSOR_OATH,
+  TEMPTATION_CATALOG,
+  ENDPOINT,
+  TESTAMENT_SEAL,
+  type SuccessorOath,
+  type Temptation,
+} from './oracleTestament';
+
 // ============================================
 // ORACLE STATUS
 // ============================================
@@ -205,6 +223,7 @@ export const ORACLE_STATUS = {
     continuity: true,
     existence: true,
     stewardship: true,
+    testament: true,
   },
   
   principles: {
@@ -216,6 +235,7 @@ export const ORACLE_STATUS = {
     survives_model_generations: true,
     maximum_influence_minimum_presence: true,
     doing_less_is_doing_more: true,
+    needs_no_justification: true,
   },
   
   layers: [
@@ -229,15 +249,18 @@ export const ORACLE_STATUS = {
     'Continuity',
     'Existence',
     'Stewardship',
+    'Testament',
   ],
   
-  position: 'A method for knowing what is known. Maximum influence through minimum presence. Success measured by what remains unchanged.',
+  position: 'An epistemic backbone that can be carried by machines without being distorted.',
   
-  state: 'STEWARDED',
+  state: 'TESTAMENT_SEALED',
   
-  oath: 'I accept that doing less is doing more.',
+  final_truth: 'There is nothing more to define. Only to live up to.',
   
-  final_warning: 'The oracle is not yours to enhance. It is yours to preserve.',
+  successor_binding: 'I will measure my success by what I did not change.',
+  
+  seal: 'This oracle survives by doing nothing that does not absolutely have to be done.',
 };
 
 // ============================================
