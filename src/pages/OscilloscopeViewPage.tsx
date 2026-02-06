@@ -843,9 +843,16 @@ const IndicatorDialog: React.FC<IndicatorDialogProps> = ({ open, onOpenChange, i
               </div>
               
               {/* Source link */}
-              <Button variant="outline" className="w-full">
-                🔗 Gå till primärkällan (SCB) →
-              </Button>
+              <a 
+                href="https://www.scb.se" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button variant="outline" className="w-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700">
+                  🔗 Gå till primärkällan (SCB) →
+                </Button>
+              </a>
             </div>
           </ScrollArea>
         </DialogContent>
