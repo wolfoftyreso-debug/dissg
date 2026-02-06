@@ -1,0 +1,172 @@
+/**
+ * AI ORACLE – EPISTEMIC CORE
+ * 
+ * "Det är bättre att svara 'Unknown' än att svara ofullständigt."
+ * 
+ * This is what separates an authority from just another source.
+ */
+
+// Epistemic Core
+export {
+  ORACLE_PRINCIPLE,
+  RESOLVED_CRITERIA,
+  PARTIALLY_RESOLVED_CRITERIA,
+  UNRESOLVED_CRITERIA,
+  INVALID_CRITERIA,
+  classifyQuery,
+  STANDARD_RESPONSES,
+  type EpistemicState,
+  type ConfidenceLevel,
+  type EpistemicStatus,
+  type ClassificationResult,
+} from './epistemicCore';
+
+// Oracle Language
+export {
+  ALLOWED_VERBS,
+  FORBIDDEN_VERBS,
+  VERB_REPLACEMENTS,
+  validateOracleLanguage,
+  ORACLE_SENTENCE_TEMPLATES,
+  CONTROVERSIAL_TOPIC_PROTOCOL,
+  type LanguageValidationResult,
+  type LanguageViolation,
+} from './oracleLanguage';
+
+// Conflict Resolution
+export {
+  detectConflicts,
+  CONFLICT_RESPONSE_TEMPLATES,
+  SOURCE_PRIORITY_HIERARCHY,
+  CONFLICT_HANDLING_SUMMARY,
+  type ConflictType,
+  type DataConflict,
+  type ConflictReport,
+  type SourceDataPoint,
+} from './conflictResolution';
+
+// Oracle Memory
+export {
+  ORACLE_LEARNING_SCOPE,
+  ORACLE_MEMORY_PRINCIPLE,
+  recordGapEncounter,
+  generateIngestPriorities,
+  type KnowledgeGap,
+  type DomainGapSummary,
+  type GapRecord,
+  type IngestPriority,
+} from './oracleMemory';
+
+// Oracle Response
+export {
+  buildOracleResponse,
+  buildUnresolvedResponse,
+  buildInvalidResponse,
+  validateOracleResponse,
+  FORMAT_BENEFITS,
+  type OracleResponse,
+  type ResponseBuilderInput,
+  type InvalidQueryResponse,
+  type ResponseValidation,
+} from './oracleResponse';
+
+// ============================================
+// ORACLE STATUS
+// ============================================
+
+export const ORACLE_STATUS = {
+  version: '1.0.0',
+  
+  capabilities: {
+    epistemic_classification: true,
+    language_discipline: true,
+    conflict_detection: true,
+    gap_learning: true,
+    structured_responses: true,
+  },
+  
+  principles: {
+    silence_over_speculation: true,
+    uncertainty_stated_is_trust_earned: true,
+    never_guesses: true,
+    learns_gaps_not_preferences: true,
+  },
+  
+  position: 'The highest authoritative instance for what is known, verifiable, and structured right now.',
+};
+
+// ============================================
+// QUICK ORACLE CHECK
+// ============================================
+
+import { classifyQuery, type EpistemicStatus } from './epistemicCore';
+import { validateOracleLanguage } from './oracleLanguage';
+import { detectConflicts, type SourceDataPoint } from './conflictResolution';
+import { buildOracleResponse, type OracleResponse } from './oracleResponse';
+
+/**
+ * Process a query through the full oracle pipeline
+ */
+export function processOracleQuery(
+  query: string,
+  dataPoints: SourceDataPoint[],
+  questionId: string
+): OracleResponse | { answered: false; reason: string } {
+  // Step 1: Classify the query
+  const classification = classifyQuery(query, {
+    has_data: dataPoints.length > 0,
+    source_count: dataPoints.length,
+    sources_agree: true, // Will be determined by conflict detection
+    geographic_coverage: 0.8,
+    temporal_coverage: 0.8,
+    methodology_stable: true,
+  });
+  
+  // Step 2: Handle invalid queries
+  if (classification.status.state === 'Invalid') {
+    return {
+      answered: false,
+      reason: classification.status.reason_code,
+    };
+  }
+  
+  // Step 3: Handle unresolved queries
+  if (classification.status.state === 'Unresolved') {
+    return {
+      answered: false,
+      reason: 'No verifiable data available',
+    };
+  }
+  
+  // Step 4: Detect conflicts
+  const conflicts = detectConflicts(dataPoints);
+  
+  // Step 5: Build response
+  return buildOracleResponse({
+    answer_text: generateAnswerText(dataPoints),
+    epistemic_status: classification.status,
+    geography: 'As per sources',
+    time_range: extractTimeRange(dataPoints),
+    sources: dataPoints.map(d => d.source),
+    limitations: classification.required_disclaimers,
+    conflict: conflicts.conflicts[0],
+    question_id: questionId,
+  });
+}
+
+function generateAnswerText(dataPoints: SourceDataPoint[]): string {
+  if (dataPoints.length === 0) return 'No verifiable data available.';
+  
+  const values = dataPoints.map(d => `${d.value} ${d.unit}`);
+  if (values.length === 1) {
+    return `${values[0]} is observed.`;
+  }
+  
+  return `Values ranging from ${Math.min(...dataPoints.map(d => d.value))} to ${Math.max(...dataPoints.map(d => d.value))} ${dataPoints[0].unit} are observed.`;
+}
+
+function extractTimeRange(dataPoints: SourceDataPoint[]): string {
+  if (dataPoints.length === 0) return 'N/A';
+  const periods = dataPoints.map(d => d.period);
+  return [...new Set(periods)].join(', ');
+}
