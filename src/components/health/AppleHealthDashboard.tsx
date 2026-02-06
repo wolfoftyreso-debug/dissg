@@ -104,6 +104,13 @@ interface IndicatorData {
   status: 'excellent' | 'good' | 'attention' | 'critical';
   explanation: string;
   lastUpdated: string;
+  // Extended pedagogical fields
+  whatItMeasures?: string;
+  howItsMeasured?: string;
+  whyItMatters?: string;
+  exampleInPractice?: string;
+  source?: string;
+  sourceUrl?: string;
 }
 
 interface CategoryCardProps {
@@ -335,13 +342,13 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[85vh]">
-        <DialogHeader>
+      <DialogContent className="max-w-lg max-h-[90vh]">
+        <DialogHeader className="pb-3 border-b">
           <DialogTitle className="text-xl">{indicator.name}</DialogTitle>
-          <DialogDescription>{indicator.explanation}</DialogDescription>
+          <DialogDescription className="text-base">{indicator.explanation}</DialogDescription>
         </DialogHeader>
         
-        <ScrollArea className="max-h-[60vh]">
+        <ScrollArea className="max-h-[70vh]">
           <div className="space-y-4 py-4">
             {/* Big value display */}
             <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl">
@@ -356,44 +363,123 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
                 {indicator.trend >= 0 ? '↑' : '↓'} {Math.abs(indicator.trend).toFixed(1)}% senaste året
               </p>
             </div>
+
+            {/* PEDAGOGICAL EXPLANATION - What does this measure? */}
+            {indicator.whatItMeasures && (
+              <Card className="bg-blue-50 border-blue-200">
+                <CardContent className="p-4">
+                  <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                    <span className="text-lg">📖</span> Vad mäter detta?
+                  </h4>
+                  <p className="text-sm text-blue-800 leading-relaxed">
+                    {indicator.whatItMeasures}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* How is it measured? */}
+            {indicator.howItsMeasured && (
+              <Card className="bg-slate-50 border-slate-200">
+                <CardContent className="p-4">
+                  <h4 className="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                    <span className="text-lg">🔬</span> Hur mäts det?
+                  </h4>
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    {indicator.howItsMeasured}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Why does it matter? */}
+            {indicator.whyItMatters && (
+              <Card className="bg-emerald-50 border-emerald-200">
+                <CardContent className="p-4">
+                  <h4 className="font-bold text-emerald-900 mb-2 flex items-center gap-2">
+                    <span className="text-lg">💡</span> Varför är det viktigt?
+                  </h4>
+                  <p className="text-sm text-emerald-800 leading-relaxed">
+                    {indicator.whyItMatters}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Practical example */}
+            {indicator.exampleInPractice && (
+              <Card className="bg-purple-50 border-purple-200">
+                <CardContent className="p-4">
+                  <h4 className="font-bold text-purple-900 mb-2 flex items-center gap-2">
+                    <span className="text-lg">🏠</span> Konkret exempel
+                  </h4>
+                  <p className="text-sm text-purple-800 leading-relaxed italic">
+                    "{indicator.exampleInPractice}"
+                  </p>
+                </CardContent>
+              </Card>
+            )}
             
-            {/* Info cards */}
+            {/* Meta info */}
             <Card>
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">📅 Senast uppdaterad</span>
+                  <span className="text-sm text-slate-600 flex items-center gap-2">
+                    <span>📅</span> Senast uppdaterad
+                  </span>
                   <span className="font-medium">{indicator.lastUpdated}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">📍 Geografiskt område</span>
+                  <span className="text-sm text-slate-600 flex items-center gap-2">
+                    <span>📍</span> Geografiskt område
+                  </span>
                   <span className="font-medium">Sverige, nationellt</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">🔄 Uppdateringsfrekvens</span>
+                  <span className="text-sm text-slate-600 flex items-center gap-2">
+                    <span>🔄</span> Uppdateringsfrekvens
+                  </span>
                   <span className="font-medium">Månadsvis</span>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-amber-50 border-amber-100">
+            {/* What this does NOT show */}
+            <Card className="bg-amber-50 border-amber-200">
               <CardContent className="p-4">
-                <h4 className="font-semibold text-amber-900 mb-2">⚠️ Vad detta inte visar</h4>
-                <p className="text-sm text-amber-800">
-                  Detta mätvärde visar bara det som går att mäta statistiskt. 
-                  Bakomliggande orsaker, individuella variationer och regionala 
-                  skillnader kräver djupare analys.
-                </p>
+                <h4 className="font-bold text-amber-900 mb-2 flex items-center gap-2">
+                  <span className="text-lg">⚠️</span> Vad detta INTE visar
+                </h4>
+                <ul className="text-sm text-amber-800 space-y-1.5">
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-600">•</span>
+                    <span>Bakomliggande orsaker till förändringen</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-600">•</span>
+                    <span>Individuella variationer mellan grupper</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-600">•</span>
+                    <span>Regionala skillnader inom landet</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-amber-600">•</span>
+                    <span>Kvalitativa aspekter som inte kan mätas numeriskt</span>
+                  </li>
+                </ul>
               </CardContent>
             </Card>
             
+            {/* Source link */}
             <a 
-              href="https://www.scb.se" 
+              href={indicator.sourceUrl || "https://www.scb.se"} 
               target="_blank" 
               rel="noopener noreferrer"
               className="block"
             >
               <Button variant="outline" className="w-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700">
-                🔗 Gå till primärkällan (SCB) →
+                🔗 Gå till primärkällan ({indicator.source || 'SCB'}) →
               </Button>
             </a>
           </div>
@@ -639,9 +725,33 @@ export const AppleHealthDashboard: React.FC<AppleHealthDashboardProps> = ({ clas
       status: 'good',
       description: 'Livslängd, sjukvård och allmän folkhälsa',
       indicators: [
-        { id: '1', name: 'Förväntad livslängd', value: '83.1', unit: 'år', trend: 0.12, status: 'excellent', explanation: 'Genomsnittlig förväntad livslängd vid födseln', lastUpdated: '2025-01-15' },
-        { id: '2', name: 'Överdödlighet', value: '4.2', unit: '%', trend: 10.5, status: 'attention', explanation: 'Dödlighet över förväntad baslinjen', lastUpdated: '2025-01-15' },
-        { id: '3', name: 'Vårdkötid', value: '89', unit: 'dagar', trend: 5.3, status: 'attention', explanation: 'Medianväntetid för specialistvård', lastUpdated: '2025-01-15' },
+        { 
+          id: '1', name: 'Förväntad livslängd', value: '83.1', unit: 'år', trend: 0.12, status: 'excellent', 
+          explanation: 'Genomsnittlig förväntad livslängd vid födseln', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Detta mäter hur många år en person som föds idag statistiskt kan förväntas leva, baserat på nuvarande dödlighetstal i olika åldersgrupper.',
+          howItsMeasured: 'SCB samlar in data om alla dödsfall i Sverige och beräknar sannolikheten att dö i varje åldersgrupp. Dessa sannolikheter summeras sedan till en förväntad livslängd.',
+          whyItMatters: 'Förväntad livslängd är en av de viktigaste indikatorerna på ett samhälles övergripande hälsa. Den påverkas av sjukvårdens kvalitet, levnadsvanor, miljö och socioekonomiska faktorer.',
+          exampleInPractice: 'Om du föds i Sverige 2025 kan du statistiskt förvänta dig att leva till 83 år. Men detta är ett genomsnitt – din faktiska livslängd beror på dina livsval och omständigheter.',
+          source: 'SCB', sourceUrl: 'https://www.scb.se/hitta-statistik/statistik-efter-amne/befolkning/befolkningens-sammansattning/befolkningsstatistik/'
+        },
+        { 
+          id: '2', name: 'Överdödlighet', value: '4.2', unit: '%', trend: 10.5, status: 'attention', 
+          explanation: 'Dödlighet över förväntad baslinje', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Överdödlighet visar hur många fler personer som dött jämfört med vad som är "normalt" baserat på historiska mönster.',
+          howItsMeasured: 'Man jämför faktiska dödsfall med en förväntad nivå beräknad från de senaste 5 årens genomsnitt, justerat för åldersfördelning och säsongsvariationer.',
+          whyItMatters: 'Överdödlighet fungerar som en "varningsklocka" för folkhälsan. Ökad överdödlighet kan signalera pandemier, värmeböljor, eller försämrad sjukvård.',
+          exampleInPractice: 'Om överdödligheten är 4.2% betyder det att 4.2% fler människor har dött än förväntat. I ett land med 100 000 förväntade dödsfall per år motsvarar det 4 200 extra dödsfall.',
+          source: 'Socialstyrelsen', sourceUrl: 'https://www.socialstyrelsen.se/'
+        },
+        { 
+          id: '3', name: 'Vårdkötid', value: '89', unit: 'dagar', trend: 5.3, status: 'attention', 
+          explanation: 'Medianväntetid för specialistvård', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Detta mäter hur länge patienter i genomsnitt väntar på att få träffa en specialist efter remiss från vårdcentral.',
+          howItsMeasured: 'Regionerna rapporterar väntetider för alla patienter i kö till specialistvård. Medianen beräknas – alltså den tid där hälften väntat kortare och hälften längre.',
+          whyItMatters: 'Långa vårdköer kan leda till att sjukdomar förvärras, ökad smärta och lidande, samt i värsta fall att behandling kommer för sent.',
+          exampleInPractice: 'Om du behöver träffa en ortoped för en knäskada tar det i genomsnitt 89 dagar från remiss till första besök. Under denna tid kan du behöva hantera smärta och begränsad rörlighet.',
+          source: 'SKR', sourceUrl: 'https://www.vantetider.se/'
+        },
       ]
     },
     {
@@ -653,9 +763,33 @@ export const AppleHealthDashboard: React.FC<AppleHealthDashboardProps> = ({ clas
       status: 'attention',
       description: 'Sysselsättning, inkomster och ekonomisk stabilitet',
       indicators: [
-        { id: '4', name: 'Arbetslöshet', value: '7.8', unit: '%', trend: 1.2, status: 'attention', explanation: 'Andel arbetslösa av arbetskraften', lastUpdated: '2025-01-15' },
-        { id: '5', name: 'Medianinkomst', value: '32,400', unit: 'kr', trend: 2.1, status: 'good', explanation: 'Median månadslön före skatt', lastUpdated: '2025-01-15' },
-        { id: '6', name: 'BNP-tillväxt', value: '1.2', unit: '%', trend: -0.5, status: 'attention', explanation: 'Årlig ekonomisk tillväxt', lastUpdated: '2025-01-15' },
+        { 
+          id: '4', name: 'Arbetslöshet', value: '7.8', unit: '%', trend: 1.2, status: 'attention', 
+          explanation: 'Andel arbetslösa av arbetskraften', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andelen personer som aktivt söker arbete men inte har ett jobb, av alla som antingen arbetar eller söker arbete.',
+          howItsMeasured: 'SCB genomför månatliga arbetskraftsundersökningar (AKU) där ett urval av befolkningen intervjuas om sin arbetsmarknadsstatus.',
+          whyItMatters: 'Arbetslöshet påverkar individers ekonomi, psykiska hälsa och samhällets skatteintäkter. Hög arbetslöshet kan leda till ökade sociala problem.',
+          exampleInPractice: 'Av 100 personer som vill arbeta har 7-8 stycken inget jobb just nu trots att de aktivt söker. Detta inkluderar inte de som gett upp att söka.',
+          source: 'SCB', sourceUrl: 'https://www.scb.se/hitta-statistik/statistik-efter-amne/arbetsmarknad/'
+        },
+        { 
+          id: '5', name: 'Medianinkomst', value: '32,400', unit: 'kr', trend: 2.1, status: 'good', 
+          explanation: 'Median månadslön före skatt', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Den månadslön där hälften av alla anställda tjänar mer och hälften tjänar mindre. Visar vad en "typisk" person tjänar.',
+          howItsMeasured: 'Arbetsgivare rapporterar alla löner till Skatteverket. SCB beräknar sedan medianen för alla heltidsanställda.',
+          whyItMatters: 'Medianinkomsten visar den ekonomiska standarden för vanliga människor bättre än genomsnittslön, eftersom extremt höga löner inte snedvrider resultatet.',
+          exampleInPractice: 'Om medianinkomsten är 32 400 kr betyder det att en "vanlig" svensk tjänar ungefär detta före skatt. Efter skatt blir det cirka 25 000-26 000 kr.',
+          source: 'SCB', sourceUrl: 'https://www.scb.se/hitta-statistik/statistik-efter-amne/arbetsmarknad/loner-och-arbetskostnader/'
+        },
+        { 
+          id: '6', name: 'BNP-tillväxt', value: '1.2', unit: '%', trend: -0.5, status: 'attention', 
+          explanation: 'Årlig ekonomisk tillväxt', lastUpdated: '2025-01-15',
+          whatItMeasures: 'BNP (Bruttonationalprodukt) mäter det totala värdet av alla varor och tjänster som produceras i landet under ett år. Tillväxten visar hur mycket detta ökat jämfört med förra året.',
+          howItsMeasured: 'SCB samlar in data från företag, myndigheter och hushåll om produktion, konsumtion, investeringar, export och import. Allt summeras och jämförs med föregående år.',
+          whyItMatters: 'BNP-tillväxt indikerar om ekonomin expanderar eller krymper. Positiv tillväxt betyder oftast fler jobb och högre inkomster, men säger inget om hur välståndet fördelas.',
+          exampleInPractice: 'Om BNP växer 1.2% och förra årets BNP var 5 000 miljarder kr, har ekonomin vuxit med 60 miljarder kr. Det motsvarar ungefär värdet av all svensk möbelproduktion.',
+          source: 'SCB', sourceUrl: 'https://www.scb.se/hitta-statistik/statistik-efter-amne/nationalrakenskaper/'
+        },
       ]
     },
     {
@@ -667,8 +801,24 @@ export const AppleHealthDashboard: React.FC<AppleHealthDashboardProps> = ({ clas
       status: 'good',
       description: 'Skolresultat, utbildningsnivå och kompetens',
       indicators: [
-        { id: '7', name: 'Gymnasiebehörighet', value: '84.2', unit: '%', trend: -0.3, status: 'good', explanation: 'Andel elever som uppnår gymnasiebehörighet', lastUpdated: '2025-01-15' },
-        { id: '8', name: 'Högskoleutbildade', value: '43.1', unit: '%', trend: 0.8, status: 'good', explanation: 'Andel av befolkningen med eftergymnasial utbildning', lastUpdated: '2025-01-15' },
+        { 
+          id: '7', name: 'Gymnasiebehörighet', value: '84.2', unit: '%', trend: -0.3, status: 'good', 
+          explanation: 'Andel elever som uppnår gymnasiebehörighet', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andelen niondeklassare som har tillräckligt höga betyg för att bli antagna till ett nationellt gymnasieprogram.',
+          howItsMeasured: 'Skolverket samlar in slutbetygen från alla grundskolor. För gymnasiebehörighet krävs godkänt i svenska, engelska, matematik och minst fem andra ämnen.',
+          whyItMatters: 'Elever utan gymnasiebehörighet har svårare att få jobb och löper högre risk för arbetslöshet och utanförskap senare i livet.',
+          exampleInPractice: 'I en klass med 30 elever når 25-26 stycken gymnasiebehörighet. De 4-5 som inte gör det behöver gå introduktionsprogram innan de kan börja ett vanligt gymnasieprogram.',
+          source: 'Skolverket', sourceUrl: 'https://www.skolverket.se/'
+        },
+        { 
+          id: '8', name: 'Högskoleutbildade', value: '43.1', unit: '%', trend: 0.8, status: 'good', 
+          explanation: 'Andel av befolkningen med eftergymnasial utbildning', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andelen vuxna (25-64 år) som har genomfört minst två års högskoleutbildning eller motsvarande.',
+          howItsMeasured: 'SCB registrerar alla examina och utbildningar och beräknar andelen av befolkningen i arbetsför ålder med eftergymnasial utbildning.',
+          whyItMatters: 'Utbildningsnivån påverkar innovation, produktivitet och konkurrenskraft. Högutbildade har generellt högre inkomster och lägre arbetslöshet.',
+          exampleInPractice: 'Av 10 vuxna svenskar har ungefär 4 stycken en högskoleexamen eller liknande. Detta är en av de högsta andelarna i världen.',
+          source: 'SCB', sourceUrl: 'https://www.scb.se/hitta-statistik/statistik-efter-amne/utbildning-och-forskning/'
+        },
       ]
     },
     {
@@ -680,8 +830,24 @@ export const AppleHealthDashboard: React.FC<AppleHealthDashboardProps> = ({ clas
       status: 'attention',
       description: 'Utsläpp, förnybar energi och naturresurser',
       indicators: [
-        { id: '9', name: 'CO2-utsläpp', value: '4.2', unit: 'ton/capita', trend: -3.2, status: 'good', explanation: 'Årliga koldioxidutsläpp per person', lastUpdated: '2025-01-15' },
-        { id: '10', name: 'Förnybar energi', value: '56.4', unit: '%', trend: 2.1, status: 'excellent', explanation: 'Andel energi från förnybara källor', lastUpdated: '2025-01-15' },
+        { 
+          id: '9', name: 'CO2-utsläpp', value: '4.2', unit: 'ton/capita', trend: -3.2, status: 'good', 
+          explanation: 'Årliga koldioxidutsläpp per person', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Den genomsnittliga mängden koldioxid som varje invånare orsakar genom transport, uppvärmning, konsumtion och industri.',
+          howItsMeasured: 'Naturvårdsverket samlar in data om bränsleförbrukning, industriutsläpp och energianvändning. Totala utsläpp delas med befolkningen.',
+          whyItMatters: 'Koldioxid är den viktigaste växthusgasen som driver klimatförändringarna. Minskade utsläpp är nödvändigt för att uppnå klimatmålen.',
+          exampleInPractice: '4.2 ton CO2 motsvarar ungefär att köra 20 000 km med en bensinbil, eller 8 flygresor Stockholm-London tur och retur.',
+          source: 'Naturvårdsverket', sourceUrl: 'https://www.naturvardsverket.se/'
+        },
+        { 
+          id: '10', name: 'Förnybar energi', value: '56.4', unit: '%', trend: 2.1, status: 'excellent', 
+          explanation: 'Andel energi från förnybara källor', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andelen av Sveriges totala energiförbrukning som kommer från förnybara källor som vattenkraft, vindkraft, sol och biobränslen.',
+          howItsMeasured: 'Energimyndigheten samlar in data om all energiproduktion och -konsumtion i Sverige och beräknar andelen från förnybara källor.',
+          whyItMatters: 'Förnybar energi minskar beroendet av fossila bränslen, reducerar utsläpp och stärker energisäkerheten.',
+          exampleInPractice: 'Av elen du använder hemma kommer mer än hälften från vattenkraft, vindkraft eller sol. Resten kommer främst från kärnkraft.',
+          source: 'Energimyndigheten', sourceUrl: 'https://www.energimyndigheten.se/'
+        },
       ]
     },
     {
@@ -693,8 +859,24 @@ export const AppleHealthDashboard: React.FC<AppleHealthDashboardProps> = ({ clas
       status: 'attention',
       description: 'Brottslighet, rättsväsende och social trygghet',
       indicators: [
-        { id: '11', name: 'Anmälda brott', value: '14,200', unit: 'per 100k', trend: 3.5, status: 'attention', explanation: 'Antal anmälda brott per 100 000 invånare', lastUpdated: '2025-01-15' },
-        { id: '12', name: 'Uppklarade brott', value: '18.2', unit: '%', trend: -1.2, status: 'critical', explanation: 'Andel brott som leder till åtal', lastUpdated: '2025-01-15' },
+        { 
+          id: '11', name: 'Anmälda brott', value: '14,200', unit: 'per 100k', trend: 3.5, status: 'attention', 
+          explanation: 'Antal anmälda brott per 100 000 invånare', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Antalet brott som anmäls till polisen per 100 000 invånare under ett år.',
+          howItsMeasured: 'Brå (Brottsförebyggande rådet) sammanställer alla polisanmälningar och normaliserar per capita för att kunna jämföra mellan regioner och över tid.',
+          whyItMatters: 'Anmälda brott ger en bild av brottsligheten, men visar inte hela sanningen eftersom många brott aldrig anmäls (mörkertal).',
+          exampleInPractice: 'I en stad med 100 000 invånare anmäls ungefär 14 200 brott per år – cirka 40 per dag. Detta inkluderar allt från cykelstölder till grova våldsbrott.',
+          source: 'Brå', sourceUrl: 'https://www.bra.se/'
+        },
+        { 
+          id: '12', name: 'Uppklarade brott', value: '18.2', unit: '%', trend: -1.2, status: 'critical', 
+          explanation: 'Andel brott som leder till åtal', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andelen av alla anmälda brott där någon identifieras, åtalas och döms eller får annan påföljd.',
+          howItsMeasured: 'Brå följer alla anmälningar och registrerar hur många som leder till att ärendet "klaras upp" genom lagföring, åtalsunderlåtelse eller nedläggning.',
+          whyItMatters: 'Låg uppklaringsgrad kan minska förtroendet för rättssystemet och signalera att det "lönar sig" att begå brott.',
+          exampleInPractice: 'Av 100 anmälda brott leder bara 18 till att någon ställs till svars. 82 brott förblir outredda – ofta för att det saknas bevis eller vittnen.',
+          source: 'Brå', sourceUrl: 'https://www.bra.se/'
+        },
       ]
     },
     {
@@ -706,8 +888,24 @@ export const AppleHealthDashboard: React.FC<AppleHealthDashboardProps> = ({ clas
       status: 'excellent',
       description: 'Politiskt deltagande, förtroende och medborgarskap',
       indicators: [
-        { id: '13', name: 'Valdeltagande', value: '87.2', unit: '%', trend: 0.5, status: 'excellent', explanation: 'Andel röstande i senaste riksdagsvalet', lastUpdated: '2025-01-15' },
-        { id: '14', name: 'Institutionsförtroende', value: '62.3', unit: '%', trend: -1.8, status: 'good', explanation: 'Andel med förtroende för offentliga institutioner', lastUpdated: '2025-01-15' },
+        { 
+          id: '13', name: 'Valdeltagande', value: '87.2', unit: '%', trend: 0.5, status: 'excellent', 
+          explanation: 'Andel röstande i senaste riksdagsvalet', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andelen röstberättigade som faktiskt röstar i riksdagsvalet.',
+          howItsMeasured: 'Valmyndigheten räknar alla giltiga röster och jämför med antalet röstberättigade medborgare.',
+          whyItMatters: 'Högt valdeltagande stärker demokratins legitimitet. När många röstar representerar de folkvalda en bredare del av befolkningen.',
+          exampleInPractice: 'Av 100 röstberättigade svenskar går 87 och röstar. Detta är ett av de högsta valdeltagandena i världen.',
+          source: 'Valmyndigheten', sourceUrl: 'https://www.val.se/'
+        },
+        { 
+          id: '14', name: 'Institutionsförtroende', value: '62.3', unit: '%', trend: -1.8, status: 'good', 
+          explanation: 'Andel med förtroende för offentliga institutioner', lastUpdated: '2025-01-15',
+          whatItMeasures: 'Andelen befolkning som uppger att de har stort eller ganska stort förtroende för institutioner som riksdag, regering, polis och domstolar.',
+          howItsMeasured: 'SOM-institutet vid Göteborgs universitet genomför årliga enkätundersökningar med ett representativt urval av befolkningen.',
+          whyItMatters: 'Förtroende för institutioner är grunden för ett fungerande samhälle. Lågt förtroende kan leda till minskad följsamhet av lagar och ökad polarisering.',
+          exampleInPractice: 'Av 10 svenskar har 6 stycken förtroende för våra myndigheter och institutioner. 4 har lågt eller inget förtroende.',
+          source: 'SOM-institutet', sourceUrl: 'https://www.gu.se/som-institutet'
+        },
       ]
     },
   ];
