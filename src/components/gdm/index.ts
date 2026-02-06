@@ -37,6 +37,33 @@ export {
   type LegalStatus,
   type LegalInfo
 } from './LegalStatusIndicator';
+export {
+  POLITICAL_DATA,
+  getPoliticalColor,
+  getPoliticalInfo,
+  PoliticalLegend,
+  PoliticalDialog,
+  type PoliticalOrientation,
+  type PoliticalInfo
+} from './PoliticalOrientationIndicator';
+export {
+  ECONOMIC_DATA,
+  getEconomicColor,
+  getEconomicTier,
+  EconomicLegend,
+  EconomicDialog,
+  type EconomicTier,
+  type EconomicInfo
+} from './EconomicIndicator';
+export {
+  MILITARY_DATA,
+  getMilitaryColor,
+  getMilitaryTier,
+  MilitaryLegend,
+  MilitaryDialog,
+  type MilitaryTier,
+  type MilitaryInfo
+} from './MilitaryIndicator';
 
 // Legacy components (kept for compatibility)
 export { GlobalStatusBar } from './GlobalStatusBar';
