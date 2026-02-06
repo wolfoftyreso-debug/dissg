@@ -17,6 +17,8 @@ export interface SubIndicator {
   name: string;
   description: string;
   icon: string;
+  /** Whether higher raw values are better (true) or worse (false) */
+  higherIsBetter?: boolean;
 }
 
 export interface CityIndicator {
@@ -27,6 +29,10 @@ export interface CityIndicator {
   color: string;
   category: 'health' | 'economy' | 'environment' | 'social' | 'infrastructure' | 'safety' | 'demographics' | 'culture';
   subIndicators?: SubIndicator[];
+  /** Whether higher raw values are better (true) or worse (false) - affects benchmark calculation */
+  higherIsBetter?: boolean;
+  /** Unit of measurement for display */
+  unit?: string;
 }
 
 export const CITY_INDICATORS: CityIndicator[] = [
@@ -250,6 +256,12 @@ export function CityIndicatorSelector({
               >
                 {selectedIndicators.length === CITY_INDICATORS.length ? 'Avmarkera alla' : 'Välj alla'}
               </Button>
+            </div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-full font-mono">
+                📊 100 = Globalt snitt
+              </span>
+              <span className="text-[10px] text-slate-400">Benchmark-normaliserat</span>
             </div>
             <p className="text-xs text-slate-500">
               {totalIndicators} huvudindex · {totalSubIndicators} subindikatorer · Klicka [›] för detaljer
