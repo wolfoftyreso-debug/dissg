@@ -303,20 +303,85 @@ const CategoryDetailDialog: React.FC<CategoryDetailDialogProps> = ({
               </div>
             </div>
             
-            {/* What this shows */}
-            <Card className="bg-blue-50 border-blue-100">
-              <CardContent className="p-4">
-                <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
-                  💡 Vad visar detta?
-                </h4>
-                <p className="text-sm text-blue-800">
-                  Denna kategori sammanställer {category.indicators.length} olika mätvärden 
-                  för att ge en översiktlig bild av {category.name.toLowerCase()}. 
-                  Varje mätvärde kan klickas för att se detaljerad information, 
-                  historik och källhänvisningar.
-                </p>
-              </CardContent>
-            </Card>
+            {/* What this shows - CLICKABLE */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Card className="bg-blue-50 border-blue-100 cursor-pointer hover:bg-blue-100/80 hover:border-blue-200 transition-all group">
+                  <CardContent className="p-4">
+                    <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                      💡 Vad visar detta?
+                      <span className="ml-auto text-xs text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">Fördjupa →</span>
+                    </h4>
+                    <p className="text-sm text-blue-800">
+                      Denna kategori sammanställer {category.indicators.length} olika mätvärden 
+                      för att ge en översiktlig bild av {category.name.toLowerCase()}. 
+                      Varje mätvärde kan klickas för att se detaljerad information, 
+                      historik och källhänvisningar.
+                    </p>
+                  </CardContent>
+                </Card>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    {category.icon} Om {category.name}
+                  </DialogTitle>
+                  <DialogDescription>Fördjupad förklaring av kategorin</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div className="bg-blue-50 p-4 rounded-xl">
+                    <h4 className="font-semibold text-blue-900 mb-2">📖 Definition</h4>
+                    <p className="text-sm text-blue-800">
+                      {category.description}. Denna kategori omfattar {category.indicators.length} separata 
+                      indikatorer som tillsammans ger en sammansatt bild av {category.name.toLowerCase()}.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-slate-50 p-4 rounded-xl">
+                    <h4 className="font-semibold text-slate-800 mb-3">⚙️ Så beräknas poängen</h4>
+                    <div className="space-y-2 text-sm text-slate-700">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono bg-slate-200 px-2 py-0.5 rounded text-xs">1</span>
+                        <span>Varje ingående indikator normaliseras till 0-100 skala</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono bg-slate-200 px-2 py-0.5 rounded text-xs">2</span>
+                        <span>Viktat medelvärde beräknas baserat på relevans</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono bg-slate-200 px-2 py-0.5 rounded text-xs">3</span>
+                        <span>Konfidensintervall justeras för datatäckning</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-emerald-50 p-4 rounded-xl">
+                    <h4 className="font-semibold text-emerald-800 mb-2">📊 Ingående mätvärden</h4>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {category.indicators.slice(0, 5).map((ind) => (
+                        <Badge key={ind.id} variant="outline" className="bg-white text-xs">
+                          {ind.name}
+                        </Badge>
+                      ))}
+                      {category.indicators.length > 5 && (
+                        <Badge variant="outline" className="bg-white text-xs text-slate-500">
+                          +{category.indicators.length - 5} till
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-amber-50 p-4 rounded-xl">
+                    <h4 className="font-semibold text-amber-800 mb-2">⚠️ Begränsningar</h4>
+                    <ul className="text-sm text-amber-700 space-y-1">
+                      <li>• Sammansatta mått förenklar komplex verklighet</li>
+                      <li>• Viktningen påverkar slutresultatet</li>
+                      <li>• Se individuella indikatorer för fullständig bild</li>
+                    </ul>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </ScrollArea>
       </DialogContent>
