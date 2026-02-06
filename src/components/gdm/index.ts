@@ -14,6 +14,17 @@ export { CityInfoPanel } from './CityInfoPanel';
 export { CountryKeyMetrics, getCountryMetrics, type KeyMetric } from './CountryKeyMetrics';
 export { GeopoliticalContext, ALLIANCES, getCountryGeopolitics } from './GeopoliticalContext';
 export { IQ_DATA, getIQColor, getIQCategory, IQLegend, IQMethodologyDialog } from './IQIndicator';
+export { 
+  CONTINENTS, 
+  POLITICAL_BLOCS, 
+  ECONOMIC_ZONES, 
+  getRegionColor, 
+  getCountryRegion, 
+  RegionLegend, 
+  RegionTypeSelector,
+  type RegionType,
+  type RegionInfo
+} from './RegionIndicator';
 
 // Legacy components (kept for compatibility)
 export { GlobalStatusBar } from './GlobalStatusBar';
