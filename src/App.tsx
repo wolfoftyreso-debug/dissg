@@ -113,6 +113,7 @@ import ReportsPage from "./pages/Reports";
 import ReportPage from "./pages/Report";
 import GlobalIndex from "./pages/GlobalIndex";
 import QuestionPage from "./pages/QuestionPage";
+import OracleStressTestPage from "./pages/OracleStressTest";
 
 const queryClient = new QueryClient();
 
@@ -233,6 +234,7 @@ const App = () => (
                 <Route path="/report/:slug" element={<ReportPage />} />
                 <Route path="/global-index" element={<GlobalIndex />} />
                 <Route path="/index/questions/:questionId" element={<QuestionPage />} />
+                <Route path="/oracle-stress-test" element={<OracleStressTestPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
