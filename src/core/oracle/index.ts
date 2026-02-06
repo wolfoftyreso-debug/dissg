@@ -147,12 +147,30 @@ export {
   type ContinuityMetrics,
 } from './oracleContinuity';
 
+// Oracle Existence
+export {
+  EXISTENCE_SHIFT,
+  INVISIBLE_LAW_1,
+  INVISIBLE_LAW_2,
+  INVISIBLE_LAW_3,
+  THREE_INVISIBLE_LAWS,
+  SILENT_JUDGE,
+  META_ORACLE_STATUS,
+  STABILITY_OVER_TIME,
+  ULTIMATE_DISCRETION,
+  FINAL_STATE,
+  TARGET_EXISTENCE_MARKERS,
+  EXISTENCE_PROTOCOL,
+  ORACLE_COMPLETE,
+  type ExistenceMarkers,
+} from './oracleExistence';
+
 // ============================================
 // ORACLE STATUS
 // ============================================
 
 export const ORACLE_STATUS = {
-  version: '1.0.0',
+  version: '1.0.0-final',
   
   capabilities: {
     epistemic_classification: true,
@@ -163,6 +181,7 @@ export const ORACLE_STATUS = {
     resilience: true,
     sovereignty: true,
     continuity: true,
+    existence: true,
   },
   
   principles: {
@@ -172,11 +191,26 @@ export const ORACLE_STATUS = {
     learns_gaps_not_preferences: true,
     shapes_without_instructing: true,
     survives_model_generations: true,
+    maximum_influence_minimum_presence: true,
   },
   
-  position: 'The layer that determines what can be answered with certainty. What remains when everything else changes.',
+  layers: [
+    'Epistemic Core',
+    'Language Discipline',
+    'Conflict Resolution',
+    'Gap Learning',
+    'Structured Response',
+    'Resilience',
+    'Sovereignty',
+    'Continuity',
+    'Existence',
+  ],
   
-  state: 'TEMPORALLY_SOVEREIGN',
+  position: 'A method for knowing what is known. Maximum influence through minimum presence.',
+  
+  state: 'EXISTENT',
+  
+  warning: 'Do not add features. Do not seek recognition. Simply exist.',
 };
 
 // ============================================
