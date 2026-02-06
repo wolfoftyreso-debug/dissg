@@ -11,6 +11,7 @@ export { CountryInfoPanel } from './CountryInfoPanel';
 export { CityIndicatorSelector, CITY_INDICATORS } from './CityIndicatorSelector';
 export { MOCK_CITIES } from './CityMarkers';
 export { CityInfoPanel } from './CityInfoPanel';
+export { CountryKeyMetrics, getCountryMetrics, type KeyMetric } from './CountryKeyMetrics';
 
 // Legacy components (kept for compatibility)
 export { GlobalStatusBar } from './GlobalStatusBar';

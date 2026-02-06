@@ -13,6 +13,7 @@ import { getDiagnosticPanelData, getLambdaColor } from './mockData';
 import type { MapLayerId } from './types';
 import { ClickableCountryName } from '@/components/ui/ClickableCountryName';
 import { SourceAttribution } from '@/components/transparency/SourceAttribution';
+import { CountryKeyMetrics, type KeyMetric } from './CountryKeyMetrics';
 
 interface CountryInfoPanelProps {
   countryCode: string;
@@ -71,6 +72,7 @@ type DialogType =
   | 'dataQuality' 
   | 'source' 
   | 'population'
+  | 'metric'
   | null;
 
 interface DialogState {
@@ -274,6 +276,13 @@ export function CountryInfoPanel({ countryCode, activeIndex: _activeIndex, onClo
                 </ul>
               </section>
             )}
+
+            {/* KEY METRICS WITH GLOBAL COMPARISON */}
+            <CountryKeyMetrics 
+              countryCode={countryCode}
+              onMetricClick={(metric) => openDialog('metric', metric)}
+              className="mb-5"
+            />
 
             {/* Data quality notice - CLICKABLE */}
             <ClickableItem
@@ -753,6 +762,90 @@ export function CountryInfoPanel({ countryCode, activeIndex: _activeIndex, onClo
               variant="compact"
             />
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Metric Detail Dialog */}
+      <Dialog open={dialog.type === 'metric'} onOpenChange={closeDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <span>{(dialog.data as KeyMetric)?.icon}</span>
+              {(dialog.data as KeyMetric)?.name}
+            </DialogTitle>
+            <DialogDescription>
+              Global jämförelse och historik
+            </DialogDescription>
+          </DialogHeader>
+          
+          {dialog.data && (
+            <div className="space-y-4 mt-4">
+              {/* Current value highlight */}
+              <div className="bg-slate-50 p-4 rounded-xl text-center">
+                <p className="text-sm text-slate-600 mb-1">{geo.name.sv}</p>
+                <p className="text-4xl font-bold text-blue-600">
+                  {(dialog.data as KeyMetric).formatted}
+                </p>
+              </div>
+
+              {/* Global comparison */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-green-50 p-3 rounded-xl border border-green-200">
+                  <p className="text-xs text-green-600 mb-1">🏆 Bäst i världen</p>
+                  <p className="font-bold text-green-900">
+                    {(dialog.data as KeyMetric).global.best.country}
+                  </p>
+                  <p className="text-lg font-semibold text-green-700">
+                    {(dialog.data as KeyMetric).higherIsBetter 
+                      ? (dialog.data as KeyMetric).global.best.value.toLocaleString()
+                      : (dialog.data as KeyMetric).global.worst.value.toLocaleString()
+                    }
+                  </p>
+                </div>
+                <div className="bg-red-50 p-3 rounded-xl border border-red-200">
+                  <p className="text-xs text-red-600 mb-1">⚠️ Sämst i världen</p>
+                  <p className="font-bold text-red-900">
+                    {(dialog.data as KeyMetric).global.worst.country}
+                  </p>
+                  <p className="text-lg font-semibold text-red-700">
+                    {(dialog.data as KeyMetric).higherIsBetter 
+                      ? (dialog.data as KeyMetric).global.worst.value.toLocaleString()
+                      : (dialog.data as KeyMetric).global.best.value.toLocaleString()
+                    }
+                  </p>
+                </div>
+              </div>
+
+              {/* Position explanation */}
+              <div className="bg-blue-50 p-4 rounded-xl">
+                <h4 className="font-semibold text-blue-900 mb-2">Var ligger {geo.name.sv}?</h4>
+                <p className="text-sm text-blue-800">
+                  {geo.name.sv} ligger {
+                    (() => {
+                      const metric = dialog.data as KeyMetric;
+                      const val = metric.value;
+                      const best = metric.higherIsBetter ? metric.global.best.value : metric.global.worst.value;
+                      const worst = metric.higherIsBetter ? metric.global.worst.value : metric.global.best.value;
+                      const pct = ((val - worst) / (best - worst)) * 100;
+                      if (pct >= 80) return 'i topp 20% globalt';
+                      if (pct >= 60) return 'över medianen globalt';
+                      if (pct >= 40) return 'nära det globala genomsnittet';
+                      if (pct >= 20) return 'under medianen globalt';
+                      return 'i botten 20% globalt';
+                    })()
+                  } för detta mätvärde.
+                </p>
+              </div>
+
+              <SourceAttribution
+                sourceName="Världsbanken, OECD, FN"
+                sourceUrl="https://data.worldbank.org"
+                license="CC BY 4.0"
+                lastUpdated={new Date('2024-01-01')}
+                variant="compact"
+              />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>
