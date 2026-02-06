@@ -4,17 +4,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,49 +32,17 @@ export function LoginForm() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    setError(null);
-    setIsGoogleLoading(true);
-    const { error } = await signInWithGoogle();
-    
-    if (error) {
-      setError(error.message);
-      setIsGoogleLoading(false);
-    }
-  };
-
   return (
     <Card className="w-full max-w-md mx-auto font-mono">
       <CardHeader className="text-center">
         <CardTitle className="text-xl font-mono">LOGGA IN</CardTitle>
-        <CardDescription className="font-mono">
-          DISSG – Diagnostic Information System for Societal Governance
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {error && (
           <Alert variant="destructive">
-            <AlertDescription className="font-mono">[X] {error}</AlertDescription>
+            <AlertDescription className="font-mono">{error}</AlertDescription>
           </Alert>
         )}
-
-        <Button
-          variant="outline"
-          className="w-full font-mono"
-          onClick={handleGoogleSignIn}
-          disabled={isGoogleLoading}
-        >
-          {isGoogleLoading ? '[...] Ansluter' : '[GOOGLE] Logga in med Google'}
-        </Button>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <Separator className="w-full" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground font-mono">eller</span>
-          </div>
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
