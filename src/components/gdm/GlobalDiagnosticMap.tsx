@@ -17,6 +17,7 @@ import { CityIndicatorSelector } from './CityIndicatorSelector';
 import { CityInfoPanel } from './CityInfoPanel';
 import { IQLegend } from './IQIndicator';
 import { RegionTypeSelector, RegionLegend, type RegionType } from './RegionIndicator';
+import { LegalTopicSelector, LegalLegend, type LegalTopic } from './LegalStatusIndicator';
 import type { MapLayerId, MapMode } from './types';
 
 /** Schema.org JSON-LD for machine readability */
@@ -44,6 +45,9 @@ export function GlobalDiagnosticMap() {
 
   // Region visualization state
   const [activeRegionType, setActiveRegionType] = useState<RegionType | null>(null);
+
+  // Legal status visualization state
+  const [activeLegalTopic, setActiveLegalTopic] = useState<LegalTopic | null>(null);
 
   // Time animation
   useEffect(() => {
@@ -101,6 +105,7 @@ export function GlobalDiagnosticMap() {
             onSelectCity={setSelectedCity}
             selectedCity={selectedCity}
             activeRegionType={activeRegionType}
+            activeLegalTopic={activeLegalTopic}
           />
         </section>
 
@@ -129,10 +134,20 @@ export function GlobalDiagnosticMap() {
         />
 
         {/* Region Type Selector - top left below cities */}
-        <div className="absolute top-20 left-4 z-20">
+        <div className="absolute top-20 left-4 z-20 space-y-2">
           <RegionTypeSelector
             selected={activeRegionType}
-            onChange={setActiveRegionType}
+            onChange={(type) => {
+              setActiveRegionType(type);
+              if (type) setActiveLegalTopic(null); // Clear legal when region selected
+            }}
+          />
+          <LegalTopicSelector
+            selected={activeLegalTopic}
+            onChange={(topic) => {
+              setActiveLegalTopic(topic);
+              if (topic) setActiveRegionType(null); // Clear region when legal selected
+            }}
           />
         </div>
 
@@ -143,8 +158,15 @@ export function GlobalDiagnosticMap() {
           </div>
         )}
 
+        {/* Legal Legend - show when legal topic is active */}
+        {activeLegalTopic && (
+          <div className="absolute bottom-24 right-4 z-20">
+            <LegalLegend topic={activeLegalTopic} />
+          </div>
+        )}
+
         {/* IQ Legend - show when IQ layer is active */}
-        {activeIndex === 'iq' && !activeRegionType && (
+        {activeIndex === 'iq' && !activeRegionType && !activeLegalTopic && (
           <div className="absolute bottom-24 right-4 z-20">
             <IQLegend />
           </div>

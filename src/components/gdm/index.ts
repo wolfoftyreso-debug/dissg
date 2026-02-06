@@ -25,6 +25,18 @@ export {
   type RegionType,
   type RegionInfo
 } from './RegionIndicator';
+export {
+  LEGAL_TOPICS,
+  CANNABIS_STATUS,
+  getLegalStatus,
+  getLegalColor,
+  LegalLegend,
+  LegalTopicSelector,
+  LegalStatusDialog,
+  type LegalTopic,
+  type LegalStatus,
+  type LegalInfo
+} from './LegalStatusIndicator';
 
 // Legacy components (kept for compatibility)
 export { GlobalStatusBar } from './GlobalStatusBar';
