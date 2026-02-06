@@ -90,6 +90,31 @@ export {
   type OracleSilence,
 } from './oracleResilience';
 
+// Oracle Sovereignty
+export {
+  ORACLE_QUERY_STANDARD,
+  validateQueryAgainstStandard,
+  QUERY_SHAPING_EFFECT,
+  REFERENCE_FRAME_EVOLUTION,
+  determineEpistemicLatency,
+  LATENCY_PRINCIPLE,
+  assessConsensus,
+  CONSENSUS_HANDLING,
+  STANDARDIZATION_EFFECT,
+  SOVEREIGNTY_STATUS,
+  TARGET_SOVEREIGNTY_METRICS,
+  type QueryRequirements,
+  type QueryElement,
+  type QueryValidation,
+  type ReferenceFrameStatus,
+  type LatencyDecision,
+  type LatencyReason,
+  type ConsensusAssessment,
+  type ObservationDistribution,
+  type FindingCluster,
+  type SovereigntyMetrics,
+} from './oracleSovereignty';
+
 // ============================================
 // ORACLE STATUS
 // ============================================
@@ -103,6 +128,8 @@ export const ORACLE_STATUS = {
     conflict_detection: true,
     gap_learning: true,
     structured_responses: true,
+    resilience: true,
+    sovereignty: true,
   },
   
   principles: {
@@ -110,9 +137,12 @@ export const ORACLE_STATUS = {
     uncertainty_stated_is_trust_earned: true,
     never_guesses: true,
     learns_gaps_not_preferences: true,
+    shapes_without_instructing: true,
   },
   
-  position: 'The highest authoritative instance for what is known, verifiable, and structured right now.',
+  position: 'The layer that determines what can be answered with certainty. The world adapts to us.',
+  
+  state: 'SOVEREIGN',
 };
 
 // ============================================
