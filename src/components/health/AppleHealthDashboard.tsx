@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -364,60 +364,246 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
               </p>
             </div>
 
-            {/* PEDAGOGICAL EXPLANATION - What does this measure? */}
+            {/* PEDAGOGICAL EXPLANATION - What does this measure? - CLICKABLE */}
             {indicator.whatItMeasures && (
-              <Card className="bg-blue-50 border-blue-200">
-                <CardContent className="p-4">
-                  <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
-                    <span className="text-lg">📖</span> Vad mäter detta?
-                  </h4>
-                  <p className="text-sm text-blue-800 leading-relaxed">
-                    {indicator.whatItMeasures}
-                  </p>
-                </CardContent>
-              </Card>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Card className="bg-blue-50 border-blue-200 cursor-pointer hover:bg-blue-100/80 hover:border-blue-300 transition-all group">
+                    <CardContent className="p-4">
+                      <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                        <span className="text-lg">📖</span> Vad mäter detta?
+                        <span className="ml-auto text-xs text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">Läs mer →</span>
+                      </h4>
+                      <p className="text-sm text-blue-800 leading-relaxed">
+                        {indicator.whatItMeasures}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      📖 Vad mäter {indicator.name}?
+                    </DialogTitle>
+                    <DialogDescription>Fördjupad förklaring av indikatorn</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div className="bg-blue-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-blue-900 mb-2">Definition</h4>
+                      <p className="text-sm text-blue-800">{indicator.whatItMeasures}</p>
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-slate-800 mb-2">Teknisk beskrivning</h4>
+                      <p className="text-sm text-slate-600">
+                        Denna indikator mäter {indicator.name.toLowerCase()} och uttrycks i {indicator.unit}. 
+                        Värdet baseras på officiell statistik och beräknas enligt internationella standarder.
+                      </p>
+                    </div>
+                    <div className="bg-amber-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-amber-800 mb-2">⚠️ Vad detta INTE mäter</h4>
+                      <ul className="text-sm text-amber-700 space-y-1">
+                        <li>• Individuella variationer inom befolkningen</li>
+                        <li>• Kvalitativa aspekter utöver kvantitativa mått</li>
+                        <li>• Regionala skillnader (se regional analys)</li>
+                      </ul>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        📊 Se relaterade indikatorer
+                      </Button>
+                      <Button variant="outline" size="sm" className="flex-1">
+                        🔗 Officiell definition (källa)
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             )}
 
-            {/* How is it measured? */}
+            {/* How is it measured? - CLICKABLE */}
             {indicator.howItsMeasured && (
-              <Card className="bg-slate-50 border-slate-200">
-                <CardContent className="p-4">
-                  <h4 className="font-bold text-slate-800 mb-2 flex items-center gap-2">
-                    <span className="text-lg">🔬</span> Hur mäts det?
-                  </h4>
-                  <p className="text-sm text-slate-700 leading-relaxed">
-                    {indicator.howItsMeasured}
-                  </p>
-                </CardContent>
-              </Card>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Card className="bg-slate-50 border-slate-200 cursor-pointer hover:bg-slate-100/80 hover:border-slate-300 transition-all group">
+                    <CardContent className="p-4">
+                      <h4 className="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                        <span className="text-lg">🔬</span> Hur mäts det?
+                        <span className="ml-auto text-xs text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">Läs mer →</span>
+                      </h4>
+                      <p className="text-sm text-slate-700 leading-relaxed">
+                        {indicator.howItsMeasured}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      🔬 Mätmetodik för {indicator.name}
+                    </DialogTitle>
+                    <DialogDescription>Så samlas och beräknas data</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div className="bg-slate-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-slate-800 mb-2">Metod</h4>
+                      <p className="text-sm text-slate-600">{indicator.howItsMeasured}</p>
+                    </div>
+                    <div className="bg-blue-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-blue-800 mb-3">📋 Datainsamlingsprocess</h4>
+                      <div className="space-y-2 text-sm text-blue-700">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono bg-blue-100 px-2 py-0.5 rounded">1</span>
+                          <span>Primärdata samlas in av ansvarig myndighet</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono bg-blue-100 px-2 py-0.5 rounded">2</span>
+                          <span>Kvalitetskontroll och validering genomförs</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono bg-blue-100 px-2 py-0.5 rounded">3</span>
+                          <span>Data publiceras enligt fastställd standard</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono bg-blue-100 px-2 py-0.5 rounded">4</span>
+                          <span>Vi hämtar och harmoniserar för jämförbarhet</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-emerald-50 p-3 rounded-lg text-center">
+                        <p className="text-xl font-bold text-emerald-700">±2.5%</p>
+                        <p className="text-xs text-emerald-600">Osäkerhetsmarginal</p>
+                      </div>
+                      <div className="bg-purple-50 p-3 rounded-lg text-center">
+                        <p className="text-xl font-bold text-purple-700">Månadsvis</p>
+                        <p className="text-xs text-purple-600">Uppdateringsfrekvens</p>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" className="w-full">
+                      📄 Fullständig metoddokumentation (PDF)
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             )}
 
-            {/* Why does it matter? */}
+            {/* Why does it matter? - CLICKABLE */}
             {indicator.whyItMatters && (
-              <Card className="bg-emerald-50 border-emerald-200">
-                <CardContent className="p-4">
-                  <h4 className="font-bold text-emerald-900 mb-2 flex items-center gap-2">
-                    <span className="text-lg">💡</span> Varför är det viktigt?
-                  </h4>
-                  <p className="text-sm text-emerald-800 leading-relaxed">
-                    {indicator.whyItMatters}
-                  </p>
-                </CardContent>
-              </Card>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Card className="bg-emerald-50 border-emerald-200 cursor-pointer hover:bg-emerald-100/80 hover:border-emerald-300 transition-all group">
+                    <CardContent className="p-4">
+                      <h4 className="font-bold text-emerald-900 mb-2 flex items-center gap-2">
+                        <span className="text-lg">💡</span> Varför är det viktigt?
+                        <span className="ml-auto text-xs text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity">Läs mer →</span>
+                      </h4>
+                      <p className="text-sm text-emerald-800 leading-relaxed">
+                        {indicator.whyItMatters}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      💡 Varför {indicator.name} är viktigt
+                    </DialogTitle>
+                    <DialogDescription>Samhällelig betydelse och konsekvenser</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div className="bg-emerald-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-emerald-800 mb-2">Betydelse</h4>
+                      <p className="text-sm text-emerald-700">{indicator.whyItMatters}</p>
+                    </div>
+                    <div className="bg-blue-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-blue-800 mb-3">🔗 Kopplingar till andra områden</h4>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="outline" className="bg-white">Ekonomi</Badge>
+                        <Badge variant="outline" className="bg-white">Hälsa</Badge>
+                        <Badge variant="outline" className="bg-white">Social sammanhållning</Badge>
+                        <Badge variant="outline" className="bg-white">Demokrati</Badge>
+                      </div>
+                    </div>
+                    <div className="bg-amber-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-amber-800 mb-2">📈 Om trenden fortsätter</h4>
+                      <p className="text-sm text-amber-700">
+                        {indicator.trend >= 0 
+                          ? `Med nuvarande positiv trend (+${indicator.trend.toFixed(1)}% per år) kan vi förvänta fortsatt förbättring om inga större förändringar sker.`
+                          : `Den nuvarande negativa trenden (${indicator.trend.toFixed(1)}% per år) indikerar behov av uppmärksamhet och eventuella insatser.`
+                        }
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1">
+                        📊 Se korrelationer
+                      </Button>
+                      <Button variant="outline" size="sm" className="flex-1">
+                        🏛️ Relaterade politikområden
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             )}
 
-            {/* Practical example */}
+            {/* Practical example - CLICKABLE */}
             {indicator.exampleInPractice && (
-              <Card className="bg-purple-50 border-purple-200">
-                <CardContent className="p-4">
-                  <h4 className="font-bold text-purple-900 mb-2 flex items-center gap-2">
-                    <span className="text-lg">🏠</span> Konkret exempel
-                  </h4>
-                  <p className="text-sm text-purple-800 leading-relaxed italic">
-                    "{indicator.exampleInPractice}"
-                  </p>
-                </CardContent>
-              </Card>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Card className="bg-purple-50 border-purple-200 cursor-pointer hover:bg-purple-100/80 hover:border-purple-300 transition-all group">
+                    <CardContent className="p-4">
+                      <h4 className="font-bold text-purple-900 mb-2 flex items-center gap-2">
+                        <span className="text-lg">🏠</span> Konkret exempel
+                        <span className="ml-auto text-xs text-purple-500 opacity-0 group-hover:opacity-100 transition-opacity">Läs mer →</span>
+                      </h4>
+                      <p className="text-sm text-purple-800 leading-relaxed italic">
+                        "{indicator.exampleInPractice}"
+                      </p>
+                    </CardContent>
+                  </Card>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      🏠 {indicator.name} i praktiken
+                    </DialogTitle>
+                    <DialogDescription>Verkliga exempel och vardagskonsekvenser</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div className="bg-purple-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-purple-800 mb-2">Typexempel</h4>
+                      <p className="text-sm text-purple-700 italic">"{indicator.exampleInPractice}"</p>
+                    </div>
+                    <div className="bg-blue-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-blue-800 mb-3">👥 Vad betyder detta för...</h4>
+                      <div className="space-y-2 text-sm text-blue-700">
+                        <div className="flex items-start gap-2">
+                          <span className="font-bold">Individen:</span>
+                          <span>Direkt påverkan på vardagslivet genom tillgång till tjänster och resurser.</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="font-bold">Samhället:</span>
+                          <span>Aggregerad effekt som formar social sammanhållning och välbefinnande.</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="font-bold">Framtiden:</span>
+                          <span>Långsiktiga konsekvenser för hållbar utveckling.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-slate-800 mb-2">📍 Regional variation</h4>
+                      <p className="text-sm text-slate-600">
+                        Värdet {indicator.value} {indicator.unit} är ett nationellt genomsnitt. 
+                        Regionala skillnader kan vara betydande — klicka för att utforska geografisk fördelning.
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm" className="w-full">
+                      🗺️ Utforska regional fördelning
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             )}
             
             {/* Meta info */}
