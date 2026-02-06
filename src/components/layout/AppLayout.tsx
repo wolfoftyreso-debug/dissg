@@ -14,7 +14,7 @@
  */
 
  import React, { useState, useEffect, useMemo } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { DiagnosticSidebar } from './DiagnosticSidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -182,12 +182,15 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                  </button>
                )}
                
-               {/* System name */}
-               <div className="px-3 border-r border-border h-12 flex items-center">
-                 <span className="text-sm font-semibold text-foreground tracking-tight font-mono">
-                   DISSG
-                 </span>
-               </div>
+                {/* System name - clickable home link */}
+                <Link 
+                  to="/" 
+                  className="px-3 border-r border-border h-12 flex items-center hover:bg-muted/50 transition-colors"
+                >
+                  <span className="text-sm font-semibold text-foreground tracking-tight font-mono">
+                    DISSG
+                  </span>
+                </Link>
              </div>
              
               {/* Center: Spacer */}
