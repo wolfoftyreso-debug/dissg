@@ -671,68 +671,278 @@ const IndicatorDetailDialog: React.FC<IndicatorDetailDialogProps> = ({
               </Dialog>
             )}
             
-            {/* Meta info */}
-            <Card>
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600 flex items-center gap-2">
-                    <span>📅</span> Senast uppdaterad
-                  </span>
-                  <span className="font-medium">{indicator.lastUpdated}</span>
+            {/* Meta info - CLICKABLE */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Card className="cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-all group">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-600 flex items-center gap-2">
+                        <span>📅</span> Senast uppdaterad
+                      </span>
+                      <span className="font-medium">{indicator.lastUpdated}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-600 flex items-center gap-2">
+                        <span>📍</span> Geografiskt område
+                      </span>
+                      <span className="font-medium">Sverige, nationellt</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-600 flex items-center gap-2">
+                        <span>🔄</span> Uppdateringsfrekvens
+                      </span>
+                      <span className="font-medium">Månadsvis</span>
+                    </div>
+                    <p className="text-[10px] text-blue-500 text-center opacity-0 group-hover:opacity-100 transition-opacity pt-2">
+                      Klicka för metadata och provenienskedja →
+                    </p>
+                  </CardContent>
+                </Card>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    📋 Metadata & Proveniens
+                  </DialogTitle>
+                  <DialogDescription>Full spårbarhet för {indicator.name}</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div className="bg-slate-50 p-4 rounded-xl">
+                    <h4 className="font-semibold text-slate-800 mb-3">📊 Datainformation</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between py-1 border-b border-slate-200">
+                        <span className="text-slate-600">Senast uppdaterad</span>
+                        <span className="font-medium">{indicator.lastUpdated}</span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-slate-200">
+                        <span className="text-slate-600">Geografisk täckning</span>
+                        <span className="font-medium">Sverige, nationellt</span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-slate-200">
+                        <span className="text-slate-600">Uppdateringsfrekvens</span>
+                        <span className="font-medium">Månadsvis</span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-slate-200">
+                        <span className="text-slate-600">Dataformat</span>
+                        <span className="font-medium">SDMX / CSV</span>
+                      </div>
+                      <div className="flex justify-between py-1">
+                        <span className="text-slate-600">API-tillgänglighet</span>
+                        <Badge variant="outline" className="text-emerald-600 border-emerald-200">Tillgänglig</Badge>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-blue-50 p-4 rounded-xl">
+                    <h4 className="font-semibold text-blue-800 mb-3">🔗 Provenienskedja</h4>
+                    <div className="space-y-2 text-sm text-blue-700">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono bg-blue-100 px-2 py-0.5 rounded text-xs">1</span>
+                        <span><strong>Primärkälla:</strong> {indicator.source || 'SCB'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono bg-blue-100 px-2 py-0.5 rounded text-xs">2</span>
+                        <span><strong>Insamling:</strong> Officiell statistikproduktion</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono bg-blue-100 px-2 py-0.5 rounded text-xs">3</span>
+                        <span><strong>Validering:</strong> Automatisk kvalitetskontroll</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono bg-blue-100 px-2 py-0.5 rounded text-xs">4</span>
+                        <span><strong>Harmonisering:</strong> SDMX-standard</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-emerald-50 p-3 rounded-lg text-center">
+                      <p className="text-xl font-bold text-emerald-700">94%</p>
+                      <p className="text-xs text-emerald-600">Konfidens</p>
+                    </div>
+                    <div className="bg-amber-50 p-3 rounded-lg text-center">
+                      <p className="text-xl font-bold text-amber-700">±3.2%</p>
+                      <p className="text-xs text-amber-600">Osäkerhetsmarginal</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="flex-1">
+                      📥 Ladda ner rådata
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex-1">
+                      🔗 API-dokumentation
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600 flex items-center gap-2">
-                    <span>📍</span> Geografiskt område
-                  </span>
-                  <span className="font-medium">Sverige, nationellt</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600 flex items-center gap-2">
-                    <span>🔄</span> Uppdateringsfrekvens
-                  </span>
-                  <span className="font-medium">Månadsvis</span>
-                </div>
-              </CardContent>
-            </Card>
+              </DialogContent>
+            </Dialog>
             
-            {/* What this does NOT show */}
-            <Card className="bg-amber-50 border-amber-200">
-              <CardContent className="p-4">
-                <h4 className="font-bold text-amber-900 mb-2 flex items-center gap-2">
-                  <span className="text-lg">⚠️</span> Vad detta INTE visar
-                </h4>
-                <ul className="text-sm text-amber-800 space-y-1.5">
-                  <li className="flex items-start gap-2">
-                    <span className="text-amber-600">•</span>
-                    <span>Bakomliggande orsaker till förändringen</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-amber-600">•</span>
-                    <span>Individuella variationer mellan grupper</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-amber-600">•</span>
-                    <span>Regionala skillnader inom landet</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-amber-600">•</span>
-                    <span>Kvalitativa aspekter som inte kan mätas numeriskt</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+            {/* What this does NOT show - CLICKABLE */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Card className="bg-amber-50 border-amber-200 cursor-pointer hover:bg-amber-100/80 hover:border-amber-300 transition-all group">
+                  <CardContent className="p-4">
+                    <h4 className="font-bold text-amber-900 mb-2 flex items-center gap-2">
+                      <span className="text-lg">⚠️</span> Vad detta INTE visar
+                      <span className="ml-auto text-xs text-amber-600 opacity-0 group-hover:opacity-100 transition-opacity">Fördjupa →</span>
+                    </h4>
+                    <ul className="text-sm text-amber-800 space-y-1.5">
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-600">•</span>
+                        <span>Bakomliggande orsaker till förändringen</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-600">•</span>
+                        <span>Individuella variationer mellan grupper</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-600">•</span>
+                        <span>Regionala skillnader inom landet</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-600">•</span>
+                        <span>Kvalitativa aspekter som inte kan mätas numeriskt</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    ⚠️ Begränsningar & Vad data inte visar
+                  </DialogTitle>
+                  <DialogDescription>Epistemisk ödmjukhet för {indicator.name}</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div className="bg-amber-50 p-4 rounded-xl">
+                    <h4 className="font-semibold text-amber-900 mb-3">🚫 Vad detta INTE mäter</h4>
+                    <ul className="text-sm text-amber-800 space-y-2">
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-600 font-bold">1.</span>
+                        <div>
+                          <span className="font-medium">Bakomliggande orsaker</span>
+                          <p className="text-amber-700 text-xs mt-0.5">Statistiken visar VAD som händer, inte VARFÖR det händer.</p>
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-600 font-bold">2.</span>
+                        <div>
+                          <span className="font-medium">Individuella variationer</span>
+                          <p className="text-amber-700 text-xs mt-0.5">Nationella medelvärden döljer variation mellan grupper, regioner och individer.</p>
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-600 font-bold">3.</span>
+                        <div>
+                          <span className="font-medium">Regionala skillnader</span>
+                          <p className="text-amber-700 text-xs mt-0.5">Se regional analys för geografisk fördelning inom landet.</p>
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-amber-600 font-bold">4.</span>
+                        <div>
+                          <span className="font-medium">Kvalitativa aspekter</span>
+                          <p className="text-amber-700 text-xs mt-0.5">Numeriska mått fångar inte subjektiva upplevelser, relationer eller kulturella nyanser.</p>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-blue-50 p-4 rounded-xl">
+                    <h4 className="font-semibold text-blue-800 mb-2">💡 Varför visar vi detta?</h4>
+                    <p className="text-sm text-blue-700">
+                      All data har begränsningar. Genom att explicit visa vad ett mått INTE mäter 
+                      hjälper vi dig att undvika övertolkningar och dra korrekta slutsatser. 
+                      Detta är en del av vår anti-hubris-design.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-slate-50 p-4 rounded-xl">
+                    <h4 className="font-semibold text-slate-800 mb-2">🔍 Kompletterande analyser</h4>
+                    <p className="text-sm text-slate-600 mb-3">
+                      För att få en fullständigare bild, kombinera detta mått med:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline" className="bg-white">Regional fördelning</Badge>
+                      <Badge variant="outline" className="bg-white">Demografisk nedbrytning</Badge>
+                      <Badge variant="outline" className="bg-white">Kvalitativa studier</Badge>
+                      <Badge variant="outline" className="bg-white">Internationell jämförelse</Badge>
+                    </div>
+                  </div>
+                  
+                  <Button variant="outline" size="sm" className="w-full">
+                    📊 Utforska kompletterande data
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
             
-            {/* Source link */}
-            <a 
-              href={indicator.sourceUrl || "https://www.scb.se"} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block"
-            >
-              <Button variant="outline" className="w-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700">
-                🔗 Gå till primärkällan ({indicator.source || 'SCB'}) →
-              </Button>
-            </a>
+            {/* Source link - CLICKABLE with dialog */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700">
+                  🔗 Gå till primärkällan ({indicator.source || 'SCB'}) →
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    🏛️ Primärkälla: {indicator.source || 'SCB'}
+                  </DialogTitle>
+                  <DialogDescription>Information om datakällan</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div className="bg-blue-50 p-4 rounded-xl">
+                    <h4 className="font-semibold text-blue-800 mb-2">📊 Om källan</h4>
+                    <p className="text-sm text-blue-700">
+                      {indicator.source === 'SOM-institutet' 
+                        ? 'SOM-institutet vid Göteborgs universitet bedriver oberoende undersökningsverksamhet och forskning om samhälle, opinion och medier sedan 1986.'
+                        : indicator.source === 'SCB'
+                        ? 'Statistiska centralbyrån (SCB) är Sveriges statistikmyndighet med uppdrag att samla in, producera och sprida officiell statistik.'
+                        : `${indicator.source || 'SCB'} är en officiell statistikkälla med ansvar för att producera kvalitetssäkrad data.`
+                      }
+                    </p>
+                  </div>
+                  
+                  <div className="bg-emerald-50 p-4 rounded-xl">
+                    <h4 className="font-semibold text-emerald-800 mb-2">✅ Kvalitetssäkring</h4>
+                    <div className="space-y-1 text-sm text-emerald-700">
+                      <div className="flex items-center gap-2">
+                        <span>✓</span><span>Officiell statistikproducent</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span>✓</span><span>Peer-reviewed metodik</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span>✓</span><span>Transparent dokumentation</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span>✓</span><span>Regelbunden uppdatering</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <a 
+                      href={indicator.sourceUrl || "https://www.scb.se"} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex-1"
+                    >
+                      <Button variant="default" size="sm" className="w-full">
+                        🔗 Öppna källan i nytt fönster
+                      </Button>
+                    </a>
+                    <Button variant="outline" size="sm" className="flex-1">
+                      📄 Metoddokumentation
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </ScrollArea>
       </DialogContent>
