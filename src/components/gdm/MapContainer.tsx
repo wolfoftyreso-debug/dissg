@@ -20,6 +20,9 @@ import {
 import { IQ_DATA, getIQColor } from './IQIndicator';
 import { getRegionColor, type RegionType } from './RegionIndicator';
 import { getLegalColor, type LegalTopic } from './LegalStatusIndicator';
+import { getPoliticalColor } from './PoliticalOrientationIndicator';
+import { getEconomicColor } from './EconomicIndicator';
+import { getMilitaryColor } from './MilitaryIndicator';
 import type { MapMode } from './types';
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
@@ -47,6 +50,8 @@ interface MapContainerProps {
   activeRegionType?: RegionType | null;
   // Legal status visualization
   activeLegalTopic?: LegalTopic | null;
+  // Thematic layers (political, economic, military)
+  activeThematicLayer?: 'political' | 'economic' | 'military' | null;
 }
 
 /**
@@ -96,6 +101,7 @@ export function MapContainer({
   selectedCity,
   activeRegionType = null,
   activeLegalTopic = null,
+  activeThematicLayer = null,
 }: MapContainerProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -172,13 +178,31 @@ export function MapContainer({
 
       const isSelected = selectedCountry === country.code;
       
-      // Determine score and color based on active layer, region type, or legal topic
+      // Determine score and color based on active layer, region type, legal topic, or thematic layer
       let score: number;
       let scoreColor: string;
       let scoreLabel: string;
       let showBadge = true;
       
-      if (activeLegalTopic) {
+      if (activeThematicLayer === 'political') {
+        // Color by political orientation
+        score = 0;
+        scoreColor = getPoliticalColor(country.code);
+        scoreLabel = country.name.sv;
+        showBadge = false;
+      } else if (activeThematicLayer === 'economic') {
+        // Color by economic status
+        score = 0;
+        scoreColor = getEconomicColor(country.code);
+        scoreLabel = country.name.sv;
+        showBadge = false;
+      } else if (activeThematicLayer === 'military') {
+        // Color by military strength
+        score = 0;
+        scoreColor = getMilitaryColor(country.code);
+        scoreLabel = country.name.sv;
+        showBadge = false;
+      } else if (activeLegalTopic) {
         // Color by legal status
         score = 0;
         scoreColor = getLegalColor(country.code, activeLegalTopic);
@@ -210,12 +234,13 @@ export function MapContainer({
       el.setAttribute('aria-label', `${country.name.sv}: ${scoreLabel}`);
       
       // Create flag marker with 3D styling
-      // Show score badge only when not in region/legal mode
+      // Show score badge only when not in region/legal/thematic mode
       const badgeContent = showBadge 
         ? `<div class="marker-score-badge" style="background: ${scoreColor}">${activeLayer === 'iq' ? (IQ_DATA[country.code]?.score || '—') : score}</div>`
         : '';
       
-      const borderStyle = (activeRegionType || activeLegalTopic) 
+      const hasThematicColoring = activeRegionType || activeLegalTopic || activeThematicLayer;
+      const borderStyle = hasThematicColoring
         ? `border: 3px solid ${scoreColor}; border-radius: 12px;` 
         : '';
       
@@ -288,7 +313,7 @@ export function MapContainer({
 
       markersRef.current.push(marker);
     });
-  }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear, activeRegionType, activeLegalTopic]);
+  }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear, activeRegionType, activeLegalTopic, activeThematicLayer]);
 
   // Add city markers when enabled (use hierarchical 3D style)
   useEffect(() => {

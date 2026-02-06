@@ -18,6 +18,9 @@ import { CityInfoPanel } from './CityInfoPanel';
 import { IQLegend } from './IQIndicator';
 import { RegionTypeSelector, RegionLegend, type RegionType } from './RegionIndicator';
 import { LegalTopicSelector, LegalLegend, type LegalTopic } from './LegalStatusIndicator';
+import { PoliticalLegend } from './PoliticalOrientationIndicator';
+import { EconomicLegend } from './EconomicIndicator';
+import { MilitaryLegend } from './MilitaryIndicator';
 import type { MapLayerId, MapMode } from './types';
 
 /** Schema.org JSON-LD for machine readability */
@@ -48,6 +51,9 @@ export function GlobalDiagnosticMap() {
 
   // Legal status visualization state
   const [activeLegalTopic, setActiveLegalTopic] = useState<LegalTopic | null>(null);
+
+  // New thematic layers
+  const [activeThematicLayer, setActiveThematicLayer] = useState<'political' | 'economic' | 'military' | null>(null);
 
   // Time animation
   useEffect(() => {
@@ -91,7 +97,6 @@ export function GlobalDiagnosticMap() {
         className="relative w-full h-full overflow-hidden bg-slate-50"
         style={{ minHeight: 'calc(100vh - 56px)' }}
       >
-        {/* Map */}
         <section className="absolute inset-0">
           <MapContainer
             theme="light"
@@ -106,6 +111,7 @@ export function GlobalDiagnosticMap() {
             selectedCity={selectedCity}
             activeRegionType={activeRegionType}
             activeLegalTopic={activeLegalTopic}
+            activeThematicLayer={activeThematicLayer}
           />
         </section>
 
@@ -139,16 +145,41 @@ export function GlobalDiagnosticMap() {
             selected={activeRegionType}
             onChange={(type) => {
               setActiveRegionType(type);
-              if (type) setActiveLegalTopic(null); // Clear legal when region selected
+              if (type) { setActiveLegalTopic(null); setActiveThematicLayer(null); }
             }}
           />
           <LegalTopicSelector
             selected={activeLegalTopic}
             onChange={(topic) => {
               setActiveLegalTopic(topic);
-              if (topic) setActiveRegionType(null); // Clear region when legal selected
+              if (topic) { setActiveRegionType(null); setActiveThematicLayer(null); }
             }}
           />
+          {/* New thematic layer buttons */}
+          <div className="flex flex-wrap gap-1">
+            {(['political', 'economic', 'military'] as const).map(layer => (
+              <button
+                key={layer}
+                onClick={() => {
+                  if (activeThematicLayer === layer) {
+                    setActiveThematicLayer(null);
+                  } else {
+                    setActiveThematicLayer(layer);
+                    setActiveRegionType(null);
+                    setActiveLegalTopic(null);
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  activeThematicLayer === layer 
+                    ? 'bg-slate-800 text-white shadow-md' 
+                    : 'bg-white/90 text-slate-700 hover:bg-white'
+                }`}
+              >
+                {layer === 'political' ? '🏛️ Politik' : 
+                 layer === 'economic' ? '💰 Ekonomi' : '⚔️ Försvar'}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Region Legend - show when region type is active */}
@@ -165,8 +196,25 @@ export function GlobalDiagnosticMap() {
           </div>
         )}
 
+        {/* Thematic Legends */}
+        {activeThematicLayer === 'political' && (
+          <div className="absolute bottom-24 right-4 z-20">
+            <PoliticalLegend />
+          </div>
+        )}
+        {activeThematicLayer === 'economic' && (
+          <div className="absolute bottom-24 right-4 z-20">
+            <EconomicLegend />
+          </div>
+        )}
+        {activeThematicLayer === 'military' && (
+          <div className="absolute bottom-24 right-4 z-20">
+            <MilitaryLegend />
+          </div>
+        )}
+
         {/* IQ Legend - show when IQ layer is active */}
-        {activeIndex === 'iq' && !activeRegionType && !activeLegalTopic && (
+        {activeIndex === 'iq' && !activeRegionType && !activeLegalTopic && !activeThematicLayer && (
           <div className="absolute bottom-24 right-4 z-20">
             <IQLegend />
           </div>
