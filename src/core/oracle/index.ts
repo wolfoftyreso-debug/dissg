@@ -165,6 +165,28 @@ export {
   type ExistenceMarkers,
 } from './oracleExistence';
 
+// Oracle Stewardship
+export {
+  INTERNAL_THREAT,
+  ORACLE_ASCETICISM,
+  OWNER_ROLE,
+  PERMISSION_MATRIX,
+  validateStewardAction,
+  SUCCESS_TEMPTATIONS,
+  LETTING_ERRORS_STAND,
+  SILENT_POWER,
+  ULTIMATE_MISTAKE,
+  STEWARDSHIP_ROLES,
+  CORRUPTION_SIGNALS,
+  detectCorruption,
+  STEWARDSHIP_OATH,
+  STEWARDSHIP_STATE,
+  type AllowedStewardAction,
+  type ForbiddenStewardAction,
+  type StewardshipRole,
+  type CorruptionSignal,
+} from './oracleStewardship';
+
 // ============================================
 // ORACLE STATUS
 // ============================================
@@ -182,6 +204,7 @@ export const ORACLE_STATUS = {
     sovereignty: true,
     continuity: true,
     existence: true,
+    stewardship: true,
   },
   
   principles: {
@@ -192,6 +215,7 @@ export const ORACLE_STATUS = {
     shapes_without_instructing: true,
     survives_model_generations: true,
     maximum_influence_minimum_presence: true,
+    doing_less_is_doing_more: true,
   },
   
   layers: [
@@ -204,13 +228,16 @@ export const ORACLE_STATUS = {
     'Sovereignty',
     'Continuity',
     'Existence',
+    'Stewardship',
   ],
   
-  position: 'A method for knowing what is known. Maximum influence through minimum presence.',
+  position: 'A method for knowing what is known. Maximum influence through minimum presence. Success measured by what remains unchanged.',
   
-  state: 'EXISTENT',
+  state: 'STEWARDED',
   
-  warning: 'Do not add features. Do not seek recognition. Simply exist.',
+  oath: 'I accept that doing less is doing more.',
+  
+  final_warning: 'The oracle is not yours to enhance. It is yours to preserve.',
 };
 
 // ============================================
