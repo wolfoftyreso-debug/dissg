@@ -19,6 +19,7 @@ import {
 } from './HierarchicalMarkers';
 import { IQ_DATA, getIQColor } from './IQIndicator';
 import { getRegionColor, type RegionType } from './RegionIndicator';
+import { getLegalColor, type LegalTopic } from './LegalStatusIndicator';
 import type { MapMode } from './types';
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
@@ -44,6 +45,8 @@ interface MapContainerProps {
   selectedCity?: string | null;
   // Region visualization
   activeRegionType?: RegionType | null;
+  // Legal status visualization
+  activeLegalTopic?: LegalTopic | null;
 }
 
 /**
@@ -92,6 +95,7 @@ export function MapContainer({
   onSelectCity,
   selectedCity,
   activeRegionType = null,
+  activeLegalTopic = null,
 }: MapContainerProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -168,16 +172,24 @@ export function MapContainer({
 
       const isSelected = selectedCountry === country.code;
       
-      // Determine score and color based on active layer or region type
+      // Determine score and color based on active layer, region type, or legal topic
       let score: number;
       let scoreColor: string;
       let scoreLabel: string;
+      let showBadge = true;
       
-      if (activeRegionType) {
+      if (activeLegalTopic) {
+        // Color by legal status
+        score = 0;
+        scoreColor = getLegalColor(country.code, activeLegalTopic);
+        scoreLabel = country.name.sv;
+        showBadge = false;
+      } else if (activeRegionType) {
         // Color by region type
         score = 0; // Not used for regions
         scoreColor = getRegionColor(country.code, activeRegionType);
         scoreLabel = country.name.sv;
+        showBadge = false;
       } else if (activeLayer === 'iq') {
         const iqInfo = IQ_DATA[country.code];
         score = iqInfo?.score || 0;
@@ -198,13 +210,17 @@ export function MapContainer({
       el.setAttribute('aria-label', `${country.name.sv}: ${scoreLabel}`);
       
       // Create flag marker with 3D styling
-      // Show score badge only when not in region mode
-      const badgeContent = activeRegionType 
-        ? '' 
-        : `<div class="marker-score-badge" style="background: ${scoreColor}">${activeLayer === 'iq' ? (IQ_DATA[country.code]?.score || '—') : score}</div>`;
+      // Show score badge only when not in region/legal mode
+      const badgeContent = showBadge 
+        ? `<div class="marker-score-badge" style="background: ${scoreColor}">${activeLayer === 'iq' ? (IQ_DATA[country.code]?.score || '—') : score}</div>`
+        : '';
+      
+      const borderStyle = (activeRegionType || activeLegalTopic) 
+        ? `border: 3px solid ${scoreColor}; border-radius: 12px;` 
+        : '';
       
       el.innerHTML = `
-        <div class="marker-container marker-country ${isSelected ? 'marker-selected' : ''}" style="${isSelected ? `box-shadow: 0 0 0 3px white, 0 0 0 5px ${scoreColor};` : ''}; ${activeRegionType ? `border: 3px solid ${scoreColor}; border-radius: 12px;` : ''}">
+        <div class="marker-container marker-country ${isSelected ? 'marker-selected' : ''}" style="${isSelected ? `box-shadow: 0 0 0 3px white, 0 0 0 5px ${scoreColor};` : ''}; ${borderStyle}">
           <div class="marker-flag-large">${flag}</div>
           ${badgeContent}
         </div>
@@ -272,7 +288,7 @@ export function MapContainer({
 
       markersRef.current.push(marker);
     });
-  }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear, activeRegionType]);
+  }, [isLoaded, selectedCountry, onSelectCountry, activeLayer, timeYear, activeRegionType, activeLegalTopic]);
 
   // Add city markers when enabled (use hierarchical 3D style)
   useEffect(() => {
