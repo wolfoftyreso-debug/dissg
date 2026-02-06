@@ -52,6 +52,9 @@ export * from './domains/expanded-domain-registry';
 // Data Source Registry
 export * from './sources/data-source-registry';
 
+// META-QUERY EXPANSION LAYER (STEG 17)
+export * from './meta';
+
 /**
  * EXPANSION PRINCIPLES (LOCKED)
  */
