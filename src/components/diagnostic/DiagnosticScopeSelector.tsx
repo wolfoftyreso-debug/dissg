@@ -8,7 +8,7 @@
  * - City/Municipality
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -16,10 +16,9 @@ import { Input } from '@/components/ui/input';
 import { 
   CONTINENTS, 
   COUNTRIES, 
-  getCountriesByContinent, 
-  searchCountries,
   getTotalCountryCount 
 } from '@/lib/geo/countries';
+import { ALL_CITIES } from '@/data/cities';
 
 // =============================================================================
 // TYPES
@@ -44,27 +43,6 @@ interface ScopeLevelOption {
   description: string;
   available: boolean;
 }
-
-// =============================================================================
-// CITIES DATA (subset - metropolitan areas with available data)
-// =============================================================================
-
-const CITIES = [
-  // Global cities
-  { code: 'NYC', name: 'New York', country: 'US', dataCoverage: 88, indicatorCount: 156 },
-  { code: 'LON', name: 'London', country: 'GB', dataCoverage: 87, indicatorCount: 154 },
-  { code: 'TKY', name: 'Tokyo', country: 'JP', dataCoverage: 86, indicatorCount: 152 },
-  { code: 'PAR', name: 'Paris', country: 'FR', dataCoverage: 85, indicatorCount: 150 },
-  { code: 'BER', name: 'Berlin', country: 'DE', dataCoverage: 86, indicatorCount: 152 },
-  { code: 'SIN', name: 'Singapore', country: 'SG', dataCoverage: 89, indicatorCount: 158 },
-  { code: 'SYD', name: 'Sydney', country: 'AU', dataCoverage: 84, indicatorCount: 148 },
-  { code: 'STO', name: 'Stockholm', country: 'SE', dataCoverage: 88, indicatorCount: 156 },
-  { code: 'CPH', name: 'Köpenhamn', country: 'DK', dataCoverage: 86, indicatorCount: 152 },
-  { code: 'AMS', name: 'Amsterdam', country: 'NL', dataCoverage: 85, indicatorCount: 150 },
-  { code: 'SHA', name: 'Shanghai', country: 'CN', dataCoverage: 76, indicatorCount: 134 },
-  { code: 'MUM', name: 'Mumbai', country: 'IN', dataCoverage: 68, indicatorCount: 120 },
-  { code: 'SPO', name: 'São Paulo', country: 'BR', dataCoverage: 78, indicatorCount: 138 },
-];
 
 // =============================================================================
 // SCOPE LEVEL SELECTOR
@@ -384,10 +362,11 @@ function EntitySelector({ level, onSelectEntity, onBack }: EntitySelectorProps) 
 
   // For city selection
   if (level === 'city') {
-    const filteredCities = CITIES.filter(c => 
+    const filteredCities = ALL_CITIES.filter(c => 
       c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.code.toLowerCase().includes(search.toLowerCase())
-    );
+      c.code.toLowerCase().includes(search.toLowerCase()) ||
+      c.region?.toLowerCase().includes(search.toLowerCase())
+    ).slice(0, 100); // Limit initial display
 
     return (
       <div className="space-y-4">
@@ -403,34 +382,43 @@ function EntitySelector({ level, onSelectEntity, onBack }: EntitySelectorProps) 
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Sök stad..."
+            placeholder="Sök stad, kommun eller region..."
             className="pl-16 font-mono"
           />
         </div>
 
-        <ScrollArea className="h-[400px]">
+        <ScrollArea className="h-[500px]">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredCities.map((city) => {
               const country = COUNTRIES.find(c => c.code === city.country);
+              const qualityColor = city.dataQuality === 'A' ? 'text-green-600' : city.dataQuality === 'B' ? 'text-blue-600' : city.dataQuality === 'C' ? 'text-yellow-600' : 'text-red-600';
               return (
                 <button
-                  key={city.code}
+                  key={`${city.code}-${city.country}`}
                   onClick={() => onSelectEntity({
                     level: 'city',
                     code: city.code,
                     name: city.name,
                     dataCoverage: city.dataCoverage,
                     indicatorCount: city.indicatorCount,
-                    lastUpdate: '2024-11-15',
+                    lastUpdate: city.lastUpdate,
                   })}
                   className="p-3 rounded-lg border bg-card hover:border-primary hover:bg-primary/5 transition-all text-left"
                 >
-                  <div className="font-mono text-xs text-muted-foreground">{city.code}</div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs text-muted-foreground">{city.code}</span>
+                    <span className={`font-mono text-[10px] ${qualityColor}`}>[{city.dataQuality}]</span>
+                  </div>
                   <div className="font-semibold text-sm">{city.name}</div>
-                  <div className="text-xs text-muted-foreground">{country?.name}</div>
-                  <Badge variant="secondary" className="font-mono text-[10px] mt-2">
-                    {city.dataCoverage}%
-                  </Badge>
+                  <div className="text-xs text-muted-foreground">{city.region ? `${city.region}, ` : ''}{country?.name}</div>
+                  <div className="flex gap-1 mt-2">
+                    <Badge variant="secondary" className="font-mono text-[10px]">
+                      {city.dataCoverage}%
+                    </Badge>
+                    <Badge variant="outline" className="font-mono text-[10px]">
+                      {city.indicatorCount} ind.
+                    </Badge>
+                  </div>
                 </button>
               );
             })}
@@ -438,7 +426,7 @@ function EntitySelector({ level, onSelectEntity, onBack }: EntitySelectorProps) 
         </ScrollArea>
 
         <div className="text-xs text-muted-foreground text-center">
-          Visar {filteredCities.length} städer med tillgänglig diagnosdata
+          Visar {filteredCities.length} av {ALL_CITIES.length} städer och kommuner
         </div>
       </div>
     );
