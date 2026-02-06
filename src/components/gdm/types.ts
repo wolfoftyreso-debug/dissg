@@ -53,7 +53,8 @@ export type MapLayerId =
   | 'migration'
   | 'education'
   | 'energy'
-  | 'shadow_economy';
+  | 'shadow_economy'
+  | 'iq';
 
 export interface MapLayer {
   id: MapLayerId;
@@ -150,6 +151,15 @@ export const MAP_LAYERS: Record<MapLayerId, MapLayer> = {
     unit: '% av BNP',
     isComparable: false,
     proOnly: true,
+  },
+  iq: {
+    id: 'iq',
+    name: { sv: 'IQ / Kognition', en: 'IQ / Cognition' },
+    description: { sv: 'Genomsnittlig uppmätt intelligenskvot', en: 'Average measured intelligence quotient' },
+    icon: '[IQ]',
+    colorScale: ['#B91C1C', '#F59E0B', '#60A5FA', '#1E40AF'],
+    unit: 'poäng',
+    isComparable: true,
   },
 };
 
