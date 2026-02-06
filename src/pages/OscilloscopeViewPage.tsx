@@ -485,95 +485,219 @@ interface DomainDialogProps {
   };
 }
 
+// Domain-specific indicator configurations
+const DOMAIN_INDICATORS: Record<string, Array<{
+  id: string;
+  name: string;
+  description: string;
+  unit: string;
+  value: string;
+  change: number;
+  status: 'good' | 'warning' | 'bad';
+  source: string;
+  lastUpdated: string;
+}>> = {
+  'Boende & Integration': [
+    { id: 'housing-affordability', name: 'Bostadskostnadsandel', description: 'Andel av disponibel inkomst som går till boende', unit: '%', value: '28.4%', change: -1.2, status: 'warning', source: 'SCB', lastUpdated: '2024-Q3' },
+    { id: 'housing-queue-time', name: 'Bostadskö-tid (median)', description: 'Medianväntetid för hyresrätt i storstäder', unit: 'år', value: '9.2', change: 3.1, status: 'bad', source: 'Boverket', lastUpdated: '2024-Q2' },
+    { id: 'overcrowding-rate', name: 'Trångboddhet', description: 'Andel hushåll med fler än 2 personer per rum', unit: '%', value: '15.8%', change: -0.4, status: 'warning', source: 'SCB', lastUpdated: '2024-Q3' },
+    { id: 'segregation-index', name: 'Segregationsindex', description: 'Rumslig koncentration av socioekonomiska grupper', unit: 'index', value: '42.1', change: -2.3, status: 'warning', source: 'Delmos', lastUpdated: '2024-Q1' },
+    { id: 'social-trust', name: 'Social tillit (grannskap)', description: 'Andel som litar på sina grannar', unit: '%', value: '68.2%', change: 1.1, status: 'good', source: 'SOM-institutet', lastUpdated: '2024' },
+    { id: 'civic-participation', name: 'Föreningsdeltagande', description: 'Andel vuxna aktiva i föreningar', unit: '%', value: '52.4%', change: -0.8, status: 'good', source: 'SCB', lastUpdated: '2024' },
+  ],
+  'Hälsa': [
+    { id: 'life-expectancy', name: 'Förväntad livslängd', description: 'Genomsnittlig förväntad livslängd vid födseln', unit: 'år', value: '83.1', change: 0.2, status: 'good', source: 'Socialstyrelsen', lastUpdated: '2024' },
+    { id: 'healthy-life-years', name: 'Friska levnadsår', description: 'År i god hälsa efter 65', unit: 'år', value: '16.4', change: 0.5, status: 'good', source: 'Folkhälsomyndigheten', lastUpdated: '2024' },
+    { id: 'mental-health-youth', name: 'Psykisk ohälsa (ungdom)', description: 'Andel 16-24 år med psykiska besvär', unit: '%', value: '18.2%', change: 2.1, status: 'bad', source: 'Folkhälsomyndigheten', lastUpdated: '2024' },
+    { id: 'healthcare-waiting', name: 'Vårdkö (specialist)', description: 'Median väntetid till specialistvård', unit: 'dagar', value: '89', change: -5.2, status: 'warning', source: 'SKR', lastUpdated: '2024-Q3' },
+    { id: 'obesity-rate', name: 'Övervikt/fetma', description: 'Andel vuxna med BMI ≥25', unit: '%', value: '52.1%', change: 0.8, status: 'warning', source: 'Folkhälsomyndigheten', lastUpdated: '2024' },
+  ],
+  'Ekonomi': [
+    { id: 'gdp-per-capita', name: 'BNP per capita', description: 'Bruttonationalprodukt per invånare (PPP)', unit: 'USD', value: '58,200', change: 1.8, status: 'good', source: 'SCB/IMF', lastUpdated: '2024-Q3' },
+    { id: 'employment-rate', name: 'Sysselsättningsgrad', description: 'Andel 20-64 år i arbete', unit: '%', value: '78.4%', change: -0.3, status: 'good', source: 'SCB', lastUpdated: '2024-Q3' },
+    { id: 'youth-unemployment', name: 'Ungdomsarbetslöshet', description: 'Arbetslöshet 15-24 år', unit: '%', value: '22.1%', change: 1.4, status: 'bad', source: 'SCB', lastUpdated: '2024-Q3' },
+    { id: 'gini-coefficient', name: 'Gini-koefficient', description: 'Inkomstojämlikhet (0=jämn, 1=ojämn)', unit: 'index', value: '0.28', change: 0.5, status: 'warning', source: 'SCB', lastUpdated: '2024' },
+    { id: 'inflation-rate', name: 'Inflation (KPIF)', description: 'Konsumentprisindex med fast ränta', unit: '%', value: '2.1%', change: -4.2, status: 'good', source: 'Riksbanken', lastUpdated: '2024-11' },
+  ],
+  'Utbildning': [
+    { id: 'pisa-reading', name: 'PISA Läsförståelse', description: 'Genomsnittlig poäng i PISA läsning', unit: 'poäng', value: '506', change: 1.2, status: 'good', source: 'Skolverket', lastUpdated: '2022' },
+    { id: 'graduation-rate', name: 'Gymnasieexamen', description: 'Andel som slutför gymnasium inom 4 år', unit: '%', value: '78.2%', change: 0.8, status: 'warning', source: 'Skolverket', lastUpdated: '2024' },
+    { id: 'tertiary-education', name: 'Högskoleutbildade', description: 'Andel 25-64 med högskoleutbildning', unit: '%', value: '45.8%', change: 1.1, status: 'good', source: 'SCB', lastUpdated: '2024' },
+    { id: 'neet-rate', name: 'NEET-andel', description: 'Unga varken i arbete, utbildning eller praktik', unit: '%', value: '7.2%', change: -0.5, status: 'warning', source: 'SCB', lastUpdated: '2024-Q3' },
+  ],
+  'Miljö': [
+    { id: 'co2-emissions', name: 'CO₂-utsläpp per capita', description: 'Territoriella utsläpp per invånare', unit: 'ton/år', value: '3.8', change: -4.2, status: 'good', source: 'Naturvårdsverket', lastUpdated: '2023' },
+    { id: 'renewable-energy', name: 'Förnybar energi', description: 'Andel förnybar energi av total energiförbrukning', unit: '%', value: '62.4%', change: 2.1, status: 'good', source: 'Energimyndigheten', lastUpdated: '2024' },
+    { id: 'air-quality', name: 'Luftkvalitet (PM2.5)', description: 'Genomsnittlig koncentration av fina partiklar', unit: 'µg/m³', value: '5.8', change: -3.1, status: 'good', source: 'Naturvårdsverket', lastUpdated: '2024' },
+    { id: 'recycling-rate', name: 'Återvinningsgrad', description: 'Andel avfall som materialåtervinns', unit: '%', value: '38.2%', change: 1.4, status: 'warning', source: 'Naturvårdsverket', lastUpdated: '2023' },
+  ],
+  'Trygghet': [
+    { id: 'crime-rate', name: 'Anmälda brott per 100k', description: 'Totalt antal anmälda brott per 100 000 invånare', unit: 'antal', value: '14,200', change: -2.1, status: 'warning', source: 'BRÅ', lastUpdated: '2024-Q3' },
+    { id: 'perceived-safety', name: 'Upplevd trygghet', description: 'Andel som känner sig trygga i sitt bostadsområde', unit: '%', value: '72.4%', change: -1.8, status: 'warning', source: 'BRÅ/NTU', lastUpdated: '2024' },
+    { id: 'violent-crime', name: 'Våldsbrott per 100k', description: 'Anmälda våldsbrott per 100 000 invånare', unit: 'antal', value: '892', change: 1.2, status: 'bad', source: 'BRÅ', lastUpdated: '2024-Q3' },
+    { id: 'trust-police', name: 'Förtroende för polisen', description: 'Andel med högt förtroende för polisen', unit: '%', value: '58.1%', change: -2.4, status: 'warning', source: 'SOM-institutet', lastUpdated: '2024' },
+  ],
+};
+
 const DomainDialog: React.FC<DomainDialogProps> = ({ open, onOpenChange, domain }) => {
-  const mockIndicators = [
-    { name: 'Huvudindikator 1', value: '78.2%', change: 2.3, status: 'good' as const },
-    { name: 'Huvudindikator 2', value: '65.1', change: -1.4, status: 'warning' as const },
-    { name: 'Huvudindikator 3', value: '42.8', change: -3.2, status: 'bad' as const },
-    { name: 'Stödindikator A', value: '91%', change: 0.8, status: 'good' as const },
-    { name: 'Stödindikator B', value: '3.2', change: 5.1, status: 'warning' as const },
-  ];
+  const [selectedIndicator, setSelectedIndicator] = useState<typeof indicators[0] | null>(null);
+  
+  // Get domain-specific indicators or fallback
+  const indicators = DOMAIN_INDICATORS[domain.name] || DOMAIN_INDICATORS['Boende & Integration'];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-2xl flex items-center gap-3">
-            <span className="text-3xl">{domain.icon}</span>
-            {domain.name}
-          </DialogTitle>
-          <DialogDescription>{domain.description}</DialogDescription>
-        </DialogHeader>
-        
-        <ScrollArea className="max-h-[70vh]">
-          <div className="space-y-6 mt-4">
-            {/* Summary stats */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-slate-50 rounded-xl p-4 text-center">
-                <p className="text-3xl font-bold text-slate-900">{domain.value}</p>
-                <p className="text-xs text-slate-500 mt-1">Poäng av 100</p>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl flex items-center gap-3">
+              <span className="text-3xl">{domain.icon}</span>
+              {domain.name}
+            </DialogTitle>
+            <DialogDescription>{domain.description}</DialogDescription>
+          </DialogHeader>
+          
+          <ScrollArea className="max-h-[70vh]">
+            <div className="space-y-6 mt-4">
+              {/* Summary stats */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-slate-50 rounded-xl p-4 text-center">
+                  <p className="text-3xl font-bold text-slate-900">{domain.value}</p>
+                  <p className="text-xs text-slate-500 mt-1">Poäng av 100</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-4 text-center">
+                  <p className={cn(
+                    "text-3xl font-bold",
+                    domain.change >= 0 ? "text-emerald-600" : "text-red-600"
+                  )}>
+                    {domain.change >= 0 ? '+' : ''}{domain.change.toFixed(1)}%
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">Förändring</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-4 text-center">
+                  <p className="text-3xl font-bold text-slate-900">{indicators.length}</p>
+                  <p className="text-xs text-slate-500 mt-1">Mätpunkter</p>
+                </div>
               </div>
-              <div className="bg-slate-50 rounded-xl p-4 text-center">
-                <p className={cn(
-                  "text-3xl font-bold",
-                  domain.change >= 0 ? "text-emerald-600" : "text-red-600"
-                )}>
-                  {domain.change >= 0 ? '+' : ''}{domain.change.toFixed(1)}%
+              
+              {/* Indicators list - ALL CLICKABLE */}
+              <div>
+                <h4 className="font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                  📊 Alla mätpunkter i {domain.name.toLowerCase()}
+                  <span className="text-xs font-normal text-slate-400">Klicka för detaljer</span>
+                </h4>
+                <div className="space-y-2">
+                  {indicators.map((ind) => (
+                    <button
+                      key={ind.id}
+                      onClick={() => setSelectedIndicator(ind)}
+                      className="w-full flex items-center gap-3 p-3 bg-white border rounded-lg hover:bg-slate-50 hover:border-blue-300 hover:shadow-sm transition-all text-left group cursor-pointer"
+                    >
+                      <span className="text-sm">
+                        {ind.status === 'good' ? '🟢' : ind.status === 'warning' ? '🟡' : '🔴'}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-slate-800 group-hover:text-blue-600 transition-colors">
+                          {ind.name}
+                        </p>
+                        <p className="text-xs text-slate-400 truncate">{ind.description}</p>
+                      </div>
+                      <span className="font-mono text-sm text-slate-600 shrink-0">{ind.value}</span>
+                      <span className={cn(
+                        "text-sm font-medium min-w-[60px] text-right shrink-0",
+                        ind.change >= 0 ? "text-emerald-600" : "text-red-600"
+                      )}>
+                        {ind.change >= 0 ? '+' : ''}{ind.change.toFixed(1)}%
+                      </span>
+                      <span className="text-slate-300 group-hover:text-blue-500 transition-colors shrink-0">→</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Methodology link */}
+              <div className="bg-blue-50 rounded-xl p-4">
+                <h4 className="font-semibold text-blue-900 mb-2">🔬 Hur beräknas {domain.name.toLowerCase()}?</h4>
+                <p className="text-sm text-blue-800 mb-3">
+                  Poängen beräknas genom att väga samman {indicators.length} olika mätningar. 
+                  Vikterna baseras på internationell forskning och svenska förhållanden.
                 </p>
-                <p className="text-xs text-slate-500 mt-1">Förändring</p>
-              </div>
-              <div className="bg-slate-50 rounded-xl p-4 text-center">
-                <p className="text-3xl font-bold text-slate-900">{domain.indicatorCount}</p>
-                <p className="text-xs text-slate-500 mt-1">Mätpunkter</p>
+                <Button variant="outline" size="sm" className="bg-white">
+                  Se fullständig metodik →
+                </Button>
               </div>
             </div>
-            
-            {/* Indicators list - ALL CLICKABLE */}
-            <div>
-              <h4 className="font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                📊 Alla mätpunkter i {domain.name.toLowerCase()}
-                <span className="text-xs font-normal text-slate-400">Klicka för detaljer</span>
-              </h4>
-              <div className="space-y-2">
-                {mockIndicators.map((ind, i) => (
-                  <button
-                    key={i}
-                    className="w-full flex items-center gap-3 p-3 bg-white border rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-colors text-left group"
-                  >
-                    <span className="text-sm">
-                      {ind.status === 'good' ? '🟢' : ind.status === 'warning' ? '🟡' : '🔴'}
-                    </span>
-                    <div className="flex-1">
-                      <p className="font-medium text-slate-800 group-hover:text-blue-600">{ind.name}</p>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* Indicator Detail Dialog */}
+      <Dialog open={!!selectedIndicator} onOpenChange={() => setSelectedIndicator(null)}>
+        <DialogContent className="max-w-lg">
+          {selectedIndicator && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <span>
+                    {selectedIndicator.status === 'good' ? '🟢' : selectedIndicator.status === 'warning' ? '🟡' : '🔴'}
+                  </span>
+                  {selectedIndicator.name}
+                </DialogTitle>
+                <DialogDescription>{selectedIndicator.description}</DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 mt-4">
+                {/* Current value */}
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <div className="flex items-baseline justify-between">
+                    <div>
+                      <p className="text-3xl font-bold text-slate-900">{selectedIndicator.value}</p>
+                      <p className="text-xs text-slate-500 mt-1">{selectedIndicator.unit}</p>
                     </div>
-                    <span className="font-mono text-sm text-slate-600">{ind.value}</span>
-                    <span className={cn(
-                      "text-sm font-medium min-w-[60px] text-right",
-                      ind.change >= 0 ? "text-emerald-600" : "text-red-600"
+                    <div className={cn(
+                      "text-right",
+                      selectedIndicator.change >= 0 ? "text-emerald-600" : "text-red-600"
                     )}>
-                      {ind.change >= 0 ? '+' : ''}{ind.change.toFixed(1)}%
-                    </span>
-                    <span className="text-slate-300 group-hover:text-slate-500">→</span>
-                  </button>
-                ))}
+                      <p className="text-xl font-bold">
+                        {selectedIndicator.change >= 0 ? '+' : ''}{selectedIndicator.change.toFixed(1)}%
+                      </p>
+                      <p className="text-xs text-slate-500">förändring</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Metadata */}
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <p className="text-xs text-slate-500 uppercase tracking-wide">Källa</p>
+                    <p className="font-medium text-slate-700 mt-1">{selectedIndicator.source}</p>
+                  </div>
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <p className="text-xs text-slate-500 uppercase tracking-wide">Senast uppdaterad</p>
+                    <p className="font-medium text-slate-700 mt-1">{selectedIndicator.lastUpdated}</p>
+                  </div>
+                </div>
+
+                {/* Placeholder for chart */}
+                <div className="bg-slate-100 rounded-xl p-6 text-center">
+                  <p className="text-slate-400 text-sm">📈 Historisk trend (kommer snart)</p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    📊 Se regional fördelning
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1">
+                    🔗 Gå till källa
+                  </Button>
+                </div>
               </div>
-            </div>
-            
-            {/* Methodology link */}
-            <div className="bg-blue-50 rounded-xl p-4">
-              <h4 className="font-semibold text-blue-900 mb-2">🔬 Hur beräknas {domain.name.toLowerCase()}?</h4>
-              <p className="text-sm text-blue-800 mb-3">
-                Poängen beräknas genom att väga samman {domain.indicatorCount} olika mätningar. 
-                Vikterna baseras på internationell forskning och svenska förhållanden.
-              </p>
-              <Button variant="outline" size="sm" className="bg-white">
-                Se fullständig metodik →
-              </Button>
-            </div>
-          </div>
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
