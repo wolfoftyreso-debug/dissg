@@ -4,6 +4,7 @@
  * Clean, Snapchat-inspired interface for civilizational diagnostics.
  * Simple, beautiful, and pedagogical.
  * NEW: City-level view with selectable indicators.
+ * NEW: Energy layer showing energy mix per country.
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
@@ -21,6 +22,7 @@ import { LegalTopicSelector, LegalLegend, type LegalTopic } from './LegalStatusI
 import { PoliticalLegend } from './PoliticalOrientationIndicator';
 import { EconomicLegend } from './EconomicIndicator';
 import { MilitaryLegend } from './MilitaryIndicator';
+import { EnergyLegend } from './EnergyIndicator';
 import type { MapLayerId, MapMode } from './types';
 
 /** Schema.org JSON-LD for machine readability */
@@ -32,6 +34,9 @@ const GDM_SCHEMA = {
   "description": "Visualisering av samhällsdata globalt. Se hur olika länder mår inom hälsa, ekonomi, miljö och mer.",
   "applicationCategory": "DataVisualization",
 };
+
+// Thematic layer types including energy
+type ThematicLayer = 'political' | 'economic' | 'military' | 'energy';
 
 export function GlobalDiagnosticMap() {
   // State
@@ -52,8 +57,8 @@ export function GlobalDiagnosticMap() {
   // Legal status visualization state
   const [activeLegalTopic, setActiveLegalTopic] = useState<LegalTopic | null>(null);
 
-  // New thematic layers
-  const [activeThematicLayer, setActiveThematicLayer] = useState<'political' | 'economic' | 'military' | null>(null);
+  // New thematic layers (including energy)
+  const [activeThematicLayer, setActiveThematicLayer] = useState<ThematicLayer | null>(null);
 
   // Time animation
   useEffect(() => {
@@ -157,7 +162,7 @@ export function GlobalDiagnosticMap() {
           />
           {/* New thematic layer buttons */}
           <div className="flex flex-wrap gap-1">
-            {(['political', 'economic', 'military'] as const).map(layer => (
+            {(['political', 'economic', 'military', 'energy'] as const).map(layer => (
               <button
                 key={layer}
                 onClick={() => {
@@ -176,7 +181,9 @@ export function GlobalDiagnosticMap() {
                 }`}
               >
                 {layer === 'political' ? '🏛️ Politik' : 
-                 layer === 'economic' ? '💰 Ekonomi' : '⚔️ Försvar'}
+                 layer === 'economic' ? '💰 Ekonomi' : 
+                 layer === 'military' ? '⚔️ Försvar' :
+                 '⚡ Energi'}
               </button>
             ))}
           </div>
@@ -210,6 +217,11 @@ export function GlobalDiagnosticMap() {
         {activeThematicLayer === 'military' && (
           <div className="absolute bottom-24 right-4 z-20">
             <MilitaryLegend />
+          </div>
+        )}
+        {activeThematicLayer === 'energy' && (
+          <div className="absolute bottom-24 right-4 z-20">
+            <EnergyLegend />
           </div>
         )}
 
