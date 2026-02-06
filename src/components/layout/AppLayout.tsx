@@ -17,7 +17,6 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { DiagnosticSidebar } from './DiagnosticSidebar';
-import { UniversalBreadcrumb } from '@/components/navigation/UniversalBreadcrumb';
 import { useIsMobile } from '@/hooks/use-mobile';
  import { UserMenu } from '@/components/auth/UserMenu';
 import type { BreadcrumbItem } from '@/lib/link-registry';
@@ -191,14 +190,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                </div>
              </div>
              
-             {/* Center: Breadcrumb navigation */}
-             <div className="flex-1 min-w-0 h-12 flex items-center">
-               <UniversalBreadcrumb
-                 contextItems={routeContext}
-                 showDataTier={!isMobile}
-                 className="border-none"
-               />
-             </div>
+              {/* Center: Spacer */}
+              <div className="flex-1 min-w-0 h-12 flex items-center">
+                {/* Breadcrumb removed - geo scope selector in each page handles navigation */}
+              </div>
              
              {/* Right section: Date, notifications, user */}
              <div className="flex items-center gap-2 px-3">
