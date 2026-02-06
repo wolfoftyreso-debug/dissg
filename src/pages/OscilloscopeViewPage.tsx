@@ -1168,9 +1168,10 @@ interface IndicatorDialogProps {
     change: number;
     explanation: string;
   };
+  countryName?: string; // Add country name prop
 }
 
-const IndicatorDialog: React.FC<IndicatorDialogProps> = ({ open, onOpenChange, indicator }) => {
+const IndicatorDialog: React.FC<IndicatorDialogProps> = ({ open, onOpenChange, indicator, countryName = 'Sverige' }) => {
   const [regionalOpen, setRegionalOpen] = useState(false);
   
   return (
@@ -1199,9 +1200,9 @@ const IndicatorDialog: React.FC<IndicatorDialogProps> = ({ open, onOpenChange, i
               <div className="bg-amber-50 rounded-xl p-4">
                 <h4 className="font-semibold text-amber-900 mb-2">📍 Var mäts detta?</h4>
                 <ul className="text-sm text-amber-800 space-y-1">
-                  <li>• <strong>Geografiskt område:</strong> Hela Sverige, nationell nivå</li>
-                  <li>• <strong>Regional data finns:</strong> Ja, per län och kommun</li>
-                  <li>• <strong>Jämförbar internationellt:</strong> Ja, Eurostat-standard</li>
+                  <li>• <strong>Geografiskt område:</strong> Hela {countryName}, nationell nivå</li>
+                  <li>• <strong>Regional data finns:</strong> Ja, per region</li>
+                  <li>• <strong>Jämförbar internationellt:</strong> Ja, harmoniserad standard</li>
                 </ul>
                 <Button 
                   variant="outline" 
@@ -1464,6 +1465,7 @@ interface IndicatorRowProps {
   value: string;
   change: number;
   explanation: string;
+  countryName?: string;
 }
 
 const IndicatorRow: React.FC<IndicatorRowProps> = ({
@@ -1472,6 +1474,7 @@ const IndicatorRow: React.FC<IndicatorRowProps> = ({
   value,
   change,
   explanation,
+  countryName = 'Sverige',
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const statusEmoji = status === 'good' ? '🟢' : status === 'warning' ? '🟡' : '🔴';
@@ -1501,6 +1504,7 @@ const IndicatorRow: React.FC<IndicatorRowProps> = ({
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         indicator={{ name, value, change, explanation }}
+        countryName={countryName}
       />
     </>
   );
@@ -1943,6 +1947,7 @@ export default function OscilloscopeViewPage() {
                       value={indicator.value}
                       change={indicator.change}
                       explanation={indicator.explanation}
+                      countryName={countryData.name}
                     />
                   ))}
                 </div>
@@ -1966,6 +1971,7 @@ export default function OscilloscopeViewPage() {
                       value={indicator.value}
                       change={indicator.change}
                       explanation={indicator.explanation}
+                      countryName={countryData.name}
                     />
                   ))}
                 </div>
