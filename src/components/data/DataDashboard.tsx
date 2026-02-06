@@ -17,6 +17,27 @@ import {
   IndicatorsDrilldown, 
   TablesDrilldown 
 } from './StatDrilldown';
+import { Globe, ChevronDown, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+
+// Country context with flag emoji
+const COUNTRY_OPTIONS = [
+  { code: 'SE', name: 'Sverige', flag: '🇸🇪', local: 'Sverige' },
+  { code: 'NO', name: 'Norge', flag: '🇳🇴', local: 'Norge' },
+  { code: 'DK', name: 'Danmark', flag: '🇩🇰', local: 'Danmark' },
+  { code: 'FI', name: 'Finland', flag: '🇫🇮', local: 'Suomi' },
+  { code: 'DE', name: 'Tyskland', flag: '🇩🇪', local: 'Deutschland' },
+  { code: 'EU', name: 'EU-27', flag: '🇪🇺', local: 'European Union' },
+  { code: 'GLOBAL', name: 'Globalt', flag: '🌍', local: 'Global' },
+];
 
 // Stat card component
 const StatCard: React.FC<{
@@ -33,12 +54,73 @@ const StatCard: React.FC<{
   </button>
 );
 
+// Country Context Header
+const CountryContextHeader: React.FC<{
+  currentCountry: typeof COUNTRY_OPTIONS[0];
+  onCountryChange: (country: typeof COUNTRY_OPTIONS[0]) => void;
+}> = ({ currentCountry, onCountryChange }) => (
+  <div className="flex items-center justify-between mb-6 p-4 bg-muted/30 rounded-lg border">
+    <div className="flex items-center gap-4">
+      <div className="text-4xl">{currentCountry.flag}</div>
+      <div>
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold">{currentCountry.name}</h2>
+          <Badge variant="outline" className="font-mono text-xs">
+            {currentCountry.code}
+          </Badge>
+        </div>
+        <p className="text-sm text-muted-foreground flex items-center gap-1">
+          <MapPin className="h-3 w-3" />
+          {currentCountry.code === 'GLOBAL' 
+            ? 'Visar global data' 
+            : currentCountry.code === 'EU'
+            ? 'Visar aggregerad EU-27 data'
+            : `Visar data för ${currentCountry.name}`}
+        </p>
+      </div>
+    </div>
+    
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="gap-2">
+          <Globe className="h-4 w-4" />
+          Byt land
+          <ChevronDown className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+          Välj geografiskt fokus
+        </div>
+        <DropdownMenuSeparator />
+        {COUNTRY_OPTIONS.map((country) => (
+          <DropdownMenuItem
+            key={country.code}
+            onClick={() => onCountryChange(country)}
+            className={cn(
+              "flex items-center gap-2 cursor-pointer",
+              currentCountry.code === country.code && "bg-primary/10"
+            )}
+          >
+            <span className="text-lg">{country.flag}</span>
+            <span>{country.name}</span>
+            <span className="ml-auto font-mono text-xs text-muted-foreground">
+              {country.code}
+            </span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </div>
+);
+
 export const DataDashboard: React.FC<{ className?: string }> = ({ className }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const [countriesOpen, setCountriesOpen] = useState(false);
   const [indicatorsOpen, setIndicatorsOpen] = useState(false);
   const [tablesOpen, setTablesOpen] = useState(false);
+  const [currentCountry, setCurrentCountry] = useState(COUNTRY_OPTIONS[0]); // Default: Sweden
 
   const { data: stats } = useQuery({
     queryKey: ['data-dashboard-stats'],
@@ -68,6 +150,11 @@ export const DataDashboard: React.FC<{ className?: string }> = ({ className }) =
 
       <ScrollArea className="flex-1">
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
+          {/* Country Context Header - Always visible */}
+          <CountryContextHeader 
+            currentCountry={currentCountry} 
+            onCountryChange={setCurrentCountry}
+          />
           {/* Stats Row */}
           <div className="flex gap-2 md:gap-4 mb-6">
             <StatCard 
