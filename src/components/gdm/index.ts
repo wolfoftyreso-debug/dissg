@@ -8,6 +8,9 @@ export { MapModeSelector } from './MapModeSelector';
 export { IndexPills } from './IndexPills';
 export { SimpleTimeSlider } from './SimpleTimeSlider';
 export { CountryInfoPanel } from './CountryInfoPanel';
+export { CityIndicatorSelector, CITY_INDICATORS } from './CityIndicatorSelector';
+export { MOCK_CITIES } from './CityMarkers';
+export { CityInfoPanel } from './CityInfoPanel';
 
 // Legacy components (kept for compatibility)
 export { GlobalStatusBar } from './GlobalStatusBar';

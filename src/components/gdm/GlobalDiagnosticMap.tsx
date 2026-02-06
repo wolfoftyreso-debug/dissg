@@ -3,6 +3,7 @@
  * 
  * Clean, Snapchat-inspired interface for civilizational diagnostics.
  * Simple, beautiful, and pedagogical.
+ * NEW: City-level view with selectable indicators.
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
@@ -12,6 +13,8 @@ import { IndexPills } from './IndexPills';
 import { MapModeSelector } from './MapModeSelector';
 import { SimpleTimeSlider } from './SimpleTimeSlider';
 import { CountryInfoPanel } from './CountryInfoPanel';
+import { CityIndicatorSelector } from './CityIndicatorSelector';
+import { CityInfoPanel } from './CityInfoPanel';
 import type { MapLayerId, MapMode } from './types';
 
 /** Schema.org JSON-LD for machine readability */
@@ -31,6 +34,11 @@ export function GlobalDiagnosticMap() {
   const [activeIndex, setActiveIndex] = useState<MapLayerId>('lambda');
   const [timeYear, setTimeYear] = useState(2024);
   const [isPlaying, setIsPlaying] = useState(false);
+  
+  // City layer state
+  const [showCitySelector, setShowCitySelector] = useState(false);
+  const [selectedCityIndicators, setSelectedCityIndicators] = useState<string[]>(['life_expectancy', 'median_income']);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
   // Time animation
   useEffect(() => {
@@ -52,6 +60,13 @@ export function GlobalDiagnosticMap() {
   const handleClosePanel = useCallback(() => {
     setSelectedCountry(null);
   }, []);
+
+  const handleCloseCityPanel = useCallback(() => {
+    setSelectedCity(null);
+  }, []);
+
+  // Show cities when indicators are selected
+  const showCities = selectedCityIndicators.length > 0;
 
   return (
     <>
@@ -76,6 +91,10 @@ export function GlobalDiagnosticMap() {
             selectedCountry={selectedCountry}
             activeLayer={activeIndex}
             timeYear={timeYear}
+            showCities={showCities}
+            selectedCityIndicators={selectedCityIndicators}
+            onSelectCity={setSelectedCity}
+            selectedCity={selectedCity}
           />
         </section>
 
@@ -95,6 +114,14 @@ export function GlobalDiagnosticMap() {
           />
         </nav>
 
+        {/* Left: City Indicator Selector */}
+        <CityIndicatorSelector
+          selectedIndicators={selectedCityIndicators}
+          onSelectionChange={setSelectedCityIndicators}
+          isOpen={showCitySelector}
+          onToggle={() => setShowCitySelector(!showCitySelector)}
+        />
+
         {/* Bottom: Time Slider */}
         <footer className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
           <SimpleTimeSlider
@@ -106,11 +133,20 @@ export function GlobalDiagnosticMap() {
         </footer>
 
         {/* Country Info Panel (slide in from right) */}
-        {selectedCountry && (
+        {selectedCountry && !selectedCity && (
           <CountryInfoPanel
             countryCode={selectedCountry}
             activeIndex={activeIndex}
             onClose={handleClosePanel}
+          />
+        )}
+
+        {/* City Info Panel (slide in from right) */}
+        {selectedCity && (
+          <CityInfoPanel
+            cityId={selectedCity}
+            selectedIndicators={selectedCityIndicators}
+            onClose={handleCloseCityPanel}
           />
         )}
 
