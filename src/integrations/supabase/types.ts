@@ -1212,6 +1212,89 @@ export type Database = {
           },
         ]
       }
+      canonical_answers: {
+        Row: {
+          answer_blob: string
+          answer_format: string | null
+          confidence_score: number | null
+          created_at: string | null
+          data_completeness: number | null
+          id: string
+          is_current: boolean | null
+          last_verified_at: string | null
+          methodology_text: string | null
+          methodology_version: string | null
+          previous_version_id: string | null
+          primary_source: string
+          question_id: string | null
+          retrieved_at: string | null
+          source_dataset_ids: string[] | null
+          structured_data: Json | null
+          summary_for_embedding: string
+          updated_at: string | null
+          valid_from: string
+          valid_until: string | null
+          verification_note: string | null
+          version: number | null
+        }
+        Insert: {
+          answer_blob: string
+          answer_format?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          data_completeness?: number | null
+          id?: string
+          is_current?: boolean | null
+          last_verified_at?: string | null
+          methodology_text?: string | null
+          methodology_version?: string | null
+          previous_version_id?: string | null
+          primary_source: string
+          question_id?: string | null
+          retrieved_at?: string | null
+          source_dataset_ids?: string[] | null
+          structured_data?: Json | null
+          summary_for_embedding: string
+          updated_at?: string | null
+          valid_from: string
+          valid_until?: string | null
+          verification_note?: string | null
+          version?: number | null
+        }
+        Update: {
+          answer_blob?: string
+          answer_format?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          data_completeness?: number | null
+          id?: string
+          is_current?: boolean | null
+          last_verified_at?: string | null
+          methodology_text?: string | null
+          methodology_version?: string | null
+          previous_version_id?: string | null
+          primary_source?: string
+          question_id?: string | null
+          retrieved_at?: string | null
+          source_dataset_ids?: string[] | null
+          structured_data?: Json | null
+          summary_for_embedding?: string
+          updated_at?: string | null
+          valid_from?: string
+          valid_until?: string | null
+          verification_note?: string | null
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "canonical_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "global_index_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       canonical_facts: {
         Row: {
           created_at: string
@@ -2276,6 +2359,68 @@ export type Database = {
             columns: ["observation_id"]
             isOneToOne: false
             referencedRelation: "observations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      data_provenance: {
+        Row: {
+          answer_id: string | null
+          confidence: string | null
+          created_at: string | null
+          geo_code: string | null
+          geo_level: string | null
+          id: string
+          is_preliminary: boolean | null
+          retrieved_at: string | null
+          revision_number: number | null
+          source_dataset_id: string
+          source_org: string
+          source_url: string | null
+          unit: string
+          valid_for_period: string
+          value: number
+        }
+        Insert: {
+          answer_id?: string | null
+          confidence?: string | null
+          created_at?: string | null
+          geo_code?: string | null
+          geo_level?: string | null
+          id?: string
+          is_preliminary?: boolean | null
+          retrieved_at?: string | null
+          revision_number?: number | null
+          source_dataset_id: string
+          source_org: string
+          source_url?: string | null
+          unit: string
+          valid_for_period: string
+          value: number
+        }
+        Update: {
+          answer_id?: string | null
+          confidence?: string | null
+          created_at?: string | null
+          geo_code?: string | null
+          geo_level?: string | null
+          id?: string
+          is_preliminary?: boolean | null
+          retrieved_at?: string | null
+          revision_number?: number | null
+          source_dataset_id?: string
+          source_org?: string
+          source_url?: string | null
+          unit?: string
+          valid_for_period?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_provenance_answer_id_fkey"
+            columns: ["answer_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_answers"
             referencedColumns: ["id"]
           },
         ]
@@ -4561,17 +4706,22 @@ export type Database = {
           ai_retrieval_tags: string[]
           answer_count: number | null
           answer_type: Database["public"]["Enums"]["answer_type"]
+          canonical_answer_id: string | null
+          certainty_level: string | null
           created_at: string | null
           created_by: string | null
           cross_reference_domains: string[] | null
           data_coverage_percent: number | null
           data_quality: Database["public"]["Enums"]["data_quality_grade"] | null
+          definition_pointers: string[] | null
           domain_code: string
           id: string
           intent_layer: Database["public"]["Enums"]["intent_layer"] | null
           is_answerable: boolean | null
           is_published: boolean | null
           last_answered_at: string | null
+          last_verified_at: string | null
+          methodology_pointer: string | null
           misinterpretation_risk:
             | Database["public"]["Enums"]["misinterpretation_risk"]
             | null
@@ -4583,18 +4733,22 @@ export type Database = {
           question_sv: string
           question_variants: string[] | null
           related_question_ids: string[] | null
+          retrieval_priority: number | null
           scope: Database["public"]["Enums"]["question_scope"]
           search_volume_estimate: number | null
           secondary_ai_agents:
             | Database["public"]["Enums"]["ai_agent_class"][]
             | null
           seo_priority: number | null
+          source_pointers: string[] | null
           subdomain_code: string | null
           time_dimension: Database["public"]["Enums"]["time_dimension"]
+          token_cost_estimate: number | null
           update_frequency:
             | Database["public"]["Enums"]["question_update_frequency"]
             | null
           updated_at: string | null
+          verification_status: string | null
           version: number | null
           view_count: number | null
         }
@@ -4603,6 +4757,8 @@ export type Database = {
           ai_retrieval_tags?: string[]
           answer_count?: number | null
           answer_type?: Database["public"]["Enums"]["answer_type"]
+          canonical_answer_id?: string | null
+          certainty_level?: string | null
           created_at?: string | null
           created_by?: string | null
           cross_reference_domains?: string[] | null
@@ -4610,12 +4766,15 @@ export type Database = {
           data_quality?:
             | Database["public"]["Enums"]["data_quality_grade"]
             | null
+          definition_pointers?: string[] | null
           domain_code: string
           id?: string
           intent_layer?: Database["public"]["Enums"]["intent_layer"] | null
           is_answerable?: boolean | null
           is_published?: boolean | null
           last_answered_at?: string | null
+          last_verified_at?: string | null
+          methodology_pointer?: string | null
           misinterpretation_risk?:
             | Database["public"]["Enums"]["misinterpretation_risk"]
             | null
@@ -4629,18 +4788,22 @@ export type Database = {
           question_sv: string
           question_variants?: string[] | null
           related_question_ids?: string[] | null
+          retrieval_priority?: number | null
           scope?: Database["public"]["Enums"]["question_scope"]
           search_volume_estimate?: number | null
           secondary_ai_agents?:
             | Database["public"]["Enums"]["ai_agent_class"][]
             | null
           seo_priority?: number | null
+          source_pointers?: string[] | null
           subdomain_code?: string | null
           time_dimension?: Database["public"]["Enums"]["time_dimension"]
+          token_cost_estimate?: number | null
           update_frequency?:
             | Database["public"]["Enums"]["question_update_frequency"]
             | null
           updated_at?: string | null
+          verification_status?: string | null
           version?: number | null
           view_count?: number | null
         }
@@ -4649,6 +4812,8 @@ export type Database = {
           ai_retrieval_tags?: string[]
           answer_count?: number | null
           answer_type?: Database["public"]["Enums"]["answer_type"]
+          canonical_answer_id?: string | null
+          certainty_level?: string | null
           created_at?: string | null
           created_by?: string | null
           cross_reference_domains?: string[] | null
@@ -4656,12 +4821,15 @@ export type Database = {
           data_quality?:
             | Database["public"]["Enums"]["data_quality_grade"]
             | null
+          definition_pointers?: string[] | null
           domain_code?: string
           id?: string
           intent_layer?: Database["public"]["Enums"]["intent_layer"] | null
           is_answerable?: boolean | null
           is_published?: boolean | null
           last_answered_at?: string | null
+          last_verified_at?: string | null
+          methodology_pointer?: string | null
           misinterpretation_risk?:
             | Database["public"]["Enums"]["misinterpretation_risk"]
             | null
@@ -4675,22 +4843,33 @@ export type Database = {
           question_sv?: string
           question_variants?: string[] | null
           related_question_ids?: string[] | null
+          retrieval_priority?: number | null
           scope?: Database["public"]["Enums"]["question_scope"]
           search_volume_estimate?: number | null
           secondary_ai_agents?:
             | Database["public"]["Enums"]["ai_agent_class"][]
             | null
           seo_priority?: number | null
+          source_pointers?: string[] | null
           subdomain_code?: string | null
           time_dimension?: Database["public"]["Enums"]["time_dimension"]
+          token_cost_estimate?: number | null
           update_frequency?:
             | Database["public"]["Enums"]["question_update_frequency"]
             | null
           updated_at?: string | null
+          verification_status?: string | null
           version?: number | null
           view_count?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_canonical_answer"
+            columns: ["canonical_answer_id"]
+            isOneToOne: false
+            referencedRelation: "canonical_answers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "global_index_questions_domain_code_fkey"
             columns: ["domain_code"]
@@ -8788,6 +8967,53 @@ export type Database = {
           uncertainty_template?: string | null
         }
         Relationships: []
+      }
+      question_embeddings: {
+        Row: {
+          created_at: string | null
+          embedding_checksum: string | null
+          embedding_model: string | null
+          embedding_text: string
+          hit_count: number | null
+          id: string
+          last_retrieved_at: string | null
+          question_id: string | null
+          retrieval_score: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          embedding_checksum?: string | null
+          embedding_model?: string | null
+          embedding_text: string
+          hit_count?: number | null
+          id?: string
+          last_retrieved_at?: string | null
+          question_id?: string | null
+          retrieval_score?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          embedding_checksum?: string | null
+          embedding_model?: string | null
+          embedding_text?: string
+          hit_count?: number | null
+          id?: string
+          last_retrieved_at?: string | null
+          question_id?: string | null
+          retrieval_score?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_embeddings_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: true
+            referencedRelation: "global_index_questions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       question_search_log: {
         Row: {
