@@ -17,6 +17,7 @@ import {
   MOCK_STATES, 
   MOCK_CITIES_HIERARCHICAL,
 } from './HierarchicalMarkers';
+import { IQ_DATA, getIQColor } from './IQIndicator';
 import type { MapMode } from './types';
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
@@ -162,21 +163,36 @@ export function MapContainer({
       if (!lambdaData) return;
 
       const isSelected = selectedCountry === country.code;
-      const score = Math.round(lambdaData.lambda * 100);
-      const scoreColor = getHierarchicalScoreColor(score);
+      
+      // Determine score and color based on active layer
+      let score: number;
+      let scoreColor: string;
+      let scoreLabel: string;
+      
+      if (activeLayer === 'iq') {
+        const iqInfo = IQ_DATA[country.code];
+        score = iqInfo?.score || 0;
+        scoreColor = iqInfo ? getIQColor(iqInfo.score) : '#9CA3AF';
+        scoreLabel = iqInfo ? `IQ: ${iqInfo.score}` : 'Ingen data';
+      } else {
+        score = Math.round(lambdaData.lambda * 100);
+        scoreColor = getHierarchicalScoreColor(score);
+        scoreLabel = `${score} poäng`;
+      }
+      
       const flag = getFlag(country.code);
       
       const el = document.createElement('div');
       el.className = 'country-marker-wrapper';
       el.setAttribute('role', 'button');
       el.setAttribute('tabindex', '0');
-      el.setAttribute('aria-label', `${country.name.sv}: ${score} poäng`);
+      el.setAttribute('aria-label', `${country.name.sv}: ${scoreLabel}`);
       
       // Create flag marker with 3D styling
       el.innerHTML = `
         <div class="marker-container marker-country ${isSelected ? 'marker-selected' : ''}" style="${isSelected ? `box-shadow: 0 0 0 3px white, 0 0 0 5px ${scoreColor};` : ''}">
           <div class="marker-flag-large">${flag}</div>
-          <div class="marker-score-badge" style="background: ${scoreColor}">${score}</div>
+          <div class="marker-score-badge" style="background: ${scoreColor}">${activeLayer === 'iq' ? (IQ_DATA[country.code]?.score || '—') : score}</div>
         </div>
       `;
 

@@ -69,6 +69,15 @@ const INDICES: IndexInfo[] = [
     whatItMeasures: 'PISA-resultat, andel som går klart skolan',
     color: 'bg-violet-500'
   },
+  { 
+    id: 'iq', 
+    icon: '🧠', 
+    label: 'IQ / Kognition',
+    shortLabel: 'IQ',
+    description: 'Genomsnittlig uppmätt intelligenskvot',
+    whatItMeasures: 'PISA-härledda IQ-uppskattningar, standardiserade tester',
+    color: 'bg-indigo-500'
+  },
 ];
 
 export function IndexPills({ activeIndex, onSelectIndex }: IndexPillsProps) {

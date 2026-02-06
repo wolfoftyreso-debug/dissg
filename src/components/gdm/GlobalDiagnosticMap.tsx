@@ -15,6 +15,7 @@ import { SimpleTimeSlider } from './SimpleTimeSlider';
 import { CountryInfoPanel } from './CountryInfoPanel';
 import { CityIndicatorSelector } from './CityIndicatorSelector';
 import { CityInfoPanel } from './CityInfoPanel';
+import { IQLegend } from './IQIndicator';
 import type { MapLayerId, MapMode } from './types';
 
 /** Schema.org JSON-LD for machine readability */
@@ -121,6 +122,13 @@ export function GlobalDiagnosticMap() {
           isOpen={showCitySelector}
           onToggle={() => setShowCitySelector(!showCitySelector)}
         />
+
+        {/* IQ Legend - show when IQ layer is active */}
+        {activeIndex === 'iq' && (
+          <div className="absolute bottom-24 right-4 z-20">
+            <IQLegend />
+          </div>
+        )}
 
         {/* Bottom: Time Slider */}
         <footer className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">

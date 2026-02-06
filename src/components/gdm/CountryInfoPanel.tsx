@@ -15,6 +15,7 @@ import { ClickableCountryName } from '@/components/ui/ClickableCountryName';
 import { SourceAttribution } from '@/components/transparency/SourceAttribution';
 import { CountryKeyMetrics, type KeyMetric } from './CountryKeyMetrics';
 import { GeopoliticalContext } from './GeopoliticalContext';
+import { IQ_DATA, getIQColor, getIQCategory, IQMethodologyDialog } from './IQIndicator';
 
 interface CountryInfoPanelProps {
   countryCode: string;
@@ -74,6 +75,7 @@ type DialogType =
   | 'source' 
   | 'population'
   | 'metric'
+  | 'iq'
   | null;
 
 interface DialogState {
@@ -81,9 +83,10 @@ interface DialogState {
   data?: any;
 }
 
-export function CountryInfoPanel({ countryCode, activeIndex: _activeIndex, onClose }: CountryInfoPanelProps) {
+export function CountryInfoPanel({ countryCode, activeIndex, onClose }: CountryInfoPanelProps) {
   const data = getDiagnosticPanelData(countryCode);
   const [dialog, setDialog] = useState<DialogState>({ type: null });
+  const iqData = IQ_DATA[countryCode];
   
   if (!data) {
     return (
@@ -284,6 +287,41 @@ export function CountryInfoPanel({ countryCode, activeIndex: _activeIndex, onClo
               onMetricClick={(metric) => openDialog('metric', metric)}
               className="mb-5"
             />
+
+            {/* IQ SECTION - when IQ layer is active or always show as card */}
+            {(activeIndex === 'iq' || iqData) && (
+              <ClickableItem
+                onClick={() => openDialog('iq')}
+                ariaLabel="Visa detaljerad IQ-metodinformation"
+              >
+                <section className="bg-indigo-50 rounded-xl p-4 mb-5 border border-indigo-200">
+                  <h3 className="text-sm font-semibold text-indigo-900 flex items-center gap-2 mb-3">
+                    <span>🧠</span> IQ / Kognitiv nivå
+                  </h3>
+                  {iqData ? (
+                    <div className="flex items-center gap-4">
+                      <div 
+                        className="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg"
+                        style={{ backgroundColor: getIQColor(iqData.score) }}
+                      >
+                        {iqData.score}
+                      </div>
+                      <div>
+                        <p className="text-lg font-semibold text-indigo-800">{getIQCategory(iqData.score)}</p>
+                        <p className="text-xs text-indigo-600">
+                          Konfidens: {iqData.confidence}% • {iqData.year}
+                        </p>
+                        <p className="text-[10px] text-indigo-500 mt-1">
+                          📊 Klicka för metodik & källor
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-indigo-600">Ingen IQ-data tillgänglig för detta land.</p>
+                  )}
+                </section>
+              </ClickableItem>
+            )}
 
             {/* GEOPOLITICAL CONTEXT */}
             <GeopoliticalContext 
@@ -856,6 +894,14 @@ export function CountryInfoPanel({ countryCode, activeIndex: _activeIndex, onClo
           )}
         </DialogContent>
       </Dialog>
+
+      {/* IQ Methodology Dialog */}
+      <IQMethodologyDialog
+        open={dialog.type === 'iq'}
+        onOpenChange={() => closeDialog()}
+        countryCode={countryCode}
+        countryName={geo.name.sv}
+      />
     </>
   );
 }
