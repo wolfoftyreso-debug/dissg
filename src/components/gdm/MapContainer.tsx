@@ -23,6 +23,7 @@ import { getLegalColor, type LegalTopic } from './LegalStatusIndicator';
 import { getPoliticalColor } from './PoliticalOrientationIndicator';
 import { getEconomicColor } from './EconomicIndicator';
 import { getMilitaryColor } from './MilitaryIndicator';
+import { getEnergyColor, getCountryEnergy } from './EnergyIndicator';
 import type { MapMode } from './types';
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
@@ -50,8 +51,8 @@ interface MapContainerProps {
   activeRegionType?: RegionType | null;
   // Legal status visualization
   activeLegalTopic?: LegalTopic | null;
-  // Thematic layers (political, economic, military)
-  activeThematicLayer?: 'political' | 'economic' | 'military' | null;
+  // Thematic layers (political, economic, military, energy)
+  activeThematicLayer?: 'political' | 'economic' | 'military' | 'energy' | null;
 }
 
 /**
@@ -215,6 +216,13 @@ export function MapContainer({
         score = 0;
         scoreColor = getMilitaryColor(country.code);
         scoreLabel = country.name.sv;
+        showBadge = false;
+      } else if (activeThematicLayer === 'energy') {
+        // Color by dominant energy source
+        const energyData = getCountryEnergy(country.code);
+        score = 0;
+        scoreColor = energyData ? getEnergyColor(energyData.dominant) : '#9CA3AF';
+        scoreLabel = energyData ? `${energyData.renewablePercent}% förnybart` : 'Ingen data';
         showBadge = false;
       } else if (activeLegalTopic) {
         // Color by legal status

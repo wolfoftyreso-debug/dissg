@@ -64,6 +64,20 @@ export {
   type MilitaryTier,
   type MilitaryInfo
 } from './MilitaryIndicator';
+export {
+  ENERGY_DATA,
+  ENERGY_SOURCES,
+  getEnergyColor,
+  getCountryEnergy,
+  getRenewableCategory,
+  getCarbonCategory,
+  EnergyBar,
+  EnergyLegend,
+  EnergyDialog,
+  type EnergySource,
+  type EnergyMix,
+  type CountryEnergy
+} from './EnergyIndicator';
 
 // Legacy components (kept for compatibility)
 export { GlobalStatusBar } from './GlobalStatusBar';
