@@ -88,6 +88,51 @@ export {
   AGENT_ROUTING_PRINCIPLES,
 } from './agent-query-profiles';
 
+// STEG 18: Query Intent Matrix
+export type {
+  InformationType,
+  CognitiveLoad,
+  ActorType,
+  RiskLevel,
+  QueryIntentSignature,
+  QueryIntentMatrixEntry,
+  QueryExposure,
+  LanguageStrictness,
+  SemanticFingerprint,
+} from './query-intent-matrix';
+
+export {
+  createSignatureCode,
+  calculateExpansionLimits,
+  calculateExposure,
+  determineLanguageStrictness,
+  createMatrixEntry,
+  createSemanticFingerprint,
+  getMatrixStatistics,
+  QUERY_INTENT_MATRIX_PRINCIPLES,
+} from './query-intent-matrix';
+
+// STEG 18: Query Template DSL
+export type {
+  DSLTemplate,
+  DSLApplyRules,
+  DSLExpandRules,
+  DSLVariableExpansion,
+  DSLEntityExpansion,
+  DSLTimeExpansion,
+  DSLOutputRules,
+  GeneratedQuery,
+  DSLCompilationStats,
+} from './query-template-dsl';
+
+export {
+  DSL_TEMPLATES,
+  DSLCompiler,
+  compileAllTemplates,
+  getDSLStats,
+  DSL_PRINCIPLES,
+} from './query-template-dsl';
+
 /**
  * META-LAYER MATHEMATICS
  * 
@@ -144,6 +189,37 @@ export const META_LAYER_OUTCOMES = {
     trust_your_answers: true,
   },
   you_become: 'question_generator_and_answer_guarantor',
+} as const;
+
+/**
+ * STEG 18: QUERY INTENT MATRIX OUTCOMES
+ * 
+ * After this step you have:
+ * - A coordinate system for all questions
+ * - A language that generates 10M questions without chaos
+ * - Total control over how questions are exposed
+ * - Zero risk of semantic divergence
+ * 
+ * This separates:
+ * - Large databases
+ * - From epistemic engines
+ */
+export const STEG_18_OUTCOMES = {
+  coordinate_system_for_all_queries: true,
+  deterministic_generation_language: true,
+  total_exposure_control: true,
+  zero_semantic_divergence_risk: true,
+  
+  differentiates: {
+    from: 'large_databases',
+    to: 'epistemic_engines',
+  },
+  
+  query_exposure_control: {
+    search_engines: 180,  // Crawl-yta
+    ai_agents: 250,       // Agent-precision
+    human_ui: 40,         // Minimal cognitive overload
+  },
 } as const;
 
 /**
