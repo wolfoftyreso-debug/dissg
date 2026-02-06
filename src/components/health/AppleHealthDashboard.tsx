@@ -535,6 +535,70 @@ const LEVEL_LABELS: Record<GeoLevel, { icon: string; label: string }> = {
   region: { icon: '📍', label: 'Region' },
 };
 
+// Data sources by geo scope
+const GEO_DATA_SOURCES: Record<string, { sources: string[]; note: string }> = {
+  'global': { 
+    sources: ['World Bank', 'WHO', 'UN Statistics', 'IMF', 'OECD'],
+    note: 'Globala aggregat baserade på nationella rapporter'
+  },
+  'europe': { 
+    sources: ['Eurostat', 'OECD', 'European Commission', 'WHO Europe'],
+    note: 'Europeiska aggregat med harmoniserad metodik'
+  },
+  'americas': { 
+    sources: ['US Census Bureau', 'BLS', 'PAHO', 'World Bank', 'ECLAC'],
+    note: 'Data från nord- och sydamerikanska statistikbyråer'
+  },
+  'asia': { 
+    sources: ['World Bank', 'Asian Development Bank', 'UN ESCAP', 'WHO WPRO'],
+    note: 'Asiatiska aggregat med varierande datatäckning'
+  },
+  'africa': { 
+    sources: ['African Development Bank', 'UN ECA', 'World Bank', 'WHO AFRO'],
+    note: 'Afrikanska aggregat – notera varierande datakvalitet'
+  },
+  'SE': { 
+    sources: ['SCB', 'Socialstyrelsen', 'Brå', 'Skolverket', 'Naturvårdsverket'],
+    note: 'Svenska officiella statistikbyråer'
+  },
+  'NO': { 
+    sources: ['SSB', 'Folkehelseinstituttet', 'Utdanningsdirektoratet'],
+    note: 'Norska officiella statistikbyråer'
+  },
+  'DK': { 
+    sources: ['Danmarks Statistik', 'Sundhedsdatastyrelsen'],
+    note: 'Danska officiella statistikbyråer'
+  },
+  'FI': { 
+    sources: ['Statistics Finland', 'THL', 'Finnish Education Evaluation Centre'],
+    note: 'Finska officiella statistikbyråer'
+  },
+  'DE': { 
+    sources: ['Destatis', 'Robert Koch Institut', 'Bundesagentur für Arbeit'],
+    note: 'Tyska officiella statistikbyråer'
+  },
+  'FR': { 
+    sources: ['INSEE', 'Santé Publique France', 'Ministère de l\'Éducation'],
+    note: 'Franska officiella statistikbyråer'
+  },
+  'GB': { 
+    sources: ['ONS', 'NHS Digital', 'Department for Education'],
+    note: 'Brittiska officiella statistikbyråer'
+  },
+  'US': { 
+    sources: ['US Census Bureau', 'BLS', 'CDC', 'EPA', 'Department of Education'],
+    note: 'Amerikanska federala statistikbyråer'
+  },
+  'CN': { 
+    sources: ['National Bureau of Statistics of China', 'WHO', 'World Bank'],
+    note: 'Kinesiska officiella källor – notera begränsad oberoende verifiering'
+  },
+  'JP': { 
+    sources: ['Statistics Bureau of Japan', 'MHLW', 'MEXT'],
+    note: 'Japanska officiella statistikbyråer'
+  },
+};
+
 // ============================================
 // GEO SCOPE SELECTOR COMPONENT
 // ============================================
@@ -1006,18 +1070,25 @@ export const AppleHealthDashboard: React.FC<AppleHealthDashboardProps> = ({ clas
           ))}
         </div>
         
-        {/* Footer info */}
-        <Card className="mt-6 bg-slate-100 border-slate-200">
-          <CardContent className="p-4 text-center">
-            <p className="text-sm text-slate-600">
-              📊 Data från Statistiska Centralbyrån (SCB), 
-              Socialstyrelsen, Brottsförebyggande rådet m.fl.
-            </p>
-            <p className="text-xs text-slate-500 mt-2">
-              Senast uppdaterad: {new Date().toLocaleDateString('sv-SE')}
-            </p>
-          </CardContent>
-        </Card>
+        {/* Footer info - Dynamic based on geo scope */}
+        {(() => {
+          const dataSources = GEO_DATA_SOURCES[currentGeoScope] || GEO_DATA_SOURCES['global'];
+          return (
+            <Card className="mt-6 bg-slate-100 border-slate-200">
+              <CardContent className="p-4 text-center">
+                <p className="text-sm text-slate-600">
+                  📊 Data från {dataSources.sources.join(', ')}
+                </p>
+                <p className="text-xs text-slate-500 mt-1 italic">
+                  {dataSources.note}
+                </p>
+                <p className="text-xs text-slate-400 mt-2">
+                  Senast uppdaterad: {new Date().toLocaleDateString('sv-SE')}
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })()}
       </div>
       
       {/* Dialogs */}
