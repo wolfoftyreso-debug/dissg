@@ -1953,6 +1953,253 @@ export type Database = {
           },
         ]
       }
+      claim_conflicts: {
+        Row: {
+          claim_a_confidence: number | null
+          claim_a_id: string
+          claim_b_confidence: number | null
+          claim_b_id: string
+          conflict_type: string
+          created_at: string
+          description: string
+          id: string
+          resolution_rationale: string | null
+          resolution_status: string
+          resolved_at: string | null
+        }
+        Insert: {
+          claim_a_confidence?: number | null
+          claim_a_id: string
+          claim_b_confidence?: number | null
+          claim_b_id: string
+          conflict_type: string
+          created_at?: string
+          description: string
+          id?: string
+          resolution_rationale?: string | null
+          resolution_status?: string
+          resolved_at?: string | null
+        }
+        Update: {
+          claim_a_confidence?: number | null
+          claim_a_id?: string
+          claim_b_confidence?: number | null
+          claim_b_id?: string
+          conflict_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          resolution_rationale?: string | null
+          resolution_status?: string
+          resolved_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_conflicts_claim_a_id_fkey"
+            columns: ["claim_a_id"]
+            isOneToOne: false
+            referencedRelation: "universal_claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_conflicts_claim_b_id_fkey"
+            columns: ["claim_b_id"]
+            isOneToOne: false
+            referencedRelation: "universal_claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_discovery_log: {
+        Row: {
+          confidence: number
+          created_at: string
+          discovery_type: string
+          id: string
+          inferred_relationship:
+            | Database["public"]["Enums"]["uce_relationship_type"]
+            | null
+          inferred_statement: string
+          method: string
+          promoted_claim_id: string | null
+          reviewed_at: string | null
+          source_claims: string[]
+          status: string
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          discovery_type: string
+          id?: string
+          inferred_relationship?:
+            | Database["public"]["Enums"]["uce_relationship_type"]
+            | null
+          inferred_statement: string
+          method: string
+          promoted_claim_id?: string | null
+          reviewed_at?: string | null
+          source_claims: string[]
+          status?: string
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          discovery_type?: string
+          id?: string
+          inferred_relationship?:
+            | Database["public"]["Enums"]["uce_relationship_type"]
+            | null
+          inferred_statement?: string
+          method?: string
+          promoted_claim_id?: string | null
+          reviewed_at?: string | null
+          source_claims?: string[]
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_discovery_log_promoted_claim_id_fkey"
+            columns: ["promoted_claim_id"]
+            isOneToOne: false
+            referencedRelation: "universal_claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_evidence: {
+        Row: {
+          bias_flags: string[] | null
+          claim_id: string
+          created_at: string
+          effect_reported: number | null
+          evidence_type: Database["public"]["Enums"]["uce_evidence_type"]
+          id: string
+          link_type: string
+          methodology_notes: string | null
+          p_value: number | null
+          replication_weight: number
+          sample_size: number | null
+          source_authors: string | null
+          source_dataset_id: string | null
+          source_doi: string | null
+          source_journal: string | null
+          source_organization: string | null
+          source_title: string
+          source_url: string | null
+          source_year: number | null
+          strength: number
+        }
+        Insert: {
+          bias_flags?: string[] | null
+          claim_id: string
+          created_at?: string
+          effect_reported?: number | null
+          evidence_type: Database["public"]["Enums"]["uce_evidence_type"]
+          id?: string
+          link_type: string
+          methodology_notes?: string | null
+          p_value?: number | null
+          replication_weight?: number
+          sample_size?: number | null
+          source_authors?: string | null
+          source_dataset_id?: string | null
+          source_doi?: string | null
+          source_journal?: string | null
+          source_organization?: string | null
+          source_title: string
+          source_url?: string | null
+          source_year?: number | null
+          strength?: number
+        }
+        Update: {
+          bias_flags?: string[] | null
+          claim_id?: string
+          created_at?: string
+          effect_reported?: number | null
+          evidence_type?: Database["public"]["Enums"]["uce_evidence_type"]
+          id?: string
+          link_type?: string
+          methodology_notes?: string | null
+          p_value?: number | null
+          replication_weight?: number
+          sample_size?: number | null
+          source_authors?: string | null
+          source_dataset_id?: string | null
+          source_doi?: string | null
+          source_journal?: string | null
+          source_organization?: string | null
+          source_title?: string
+          source_url?: string | null
+          source_year?: number | null
+          strength?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_evidence_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "universal_claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_graph_edges: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          edge_type: string
+          id: string
+          inference_method: string | null
+          is_inferred: boolean
+          mechanism_description: string | null
+          shared_entity: string | null
+          source_claim_id: string
+          strength: number | null
+          target_claim_id: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          edge_type: string
+          id?: string
+          inference_method?: string | null
+          is_inferred?: boolean
+          mechanism_description?: string | null
+          shared_entity?: string | null
+          source_claim_id: string
+          strength?: number | null
+          target_claim_id: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          edge_type?: string
+          id?: string
+          inference_method?: string | null
+          is_inferred?: boolean
+          mechanism_description?: string | null
+          shared_entity?: string | null
+          source_claim_id?: string
+          strength?: number | null
+          target_claim_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_graph_edges_source_claim_id_fkey"
+            columns: ["source_claim_id"]
+            isOneToOne: false
+            referencedRelation: "universal_claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_graph_edges_target_claim_id_fkey"
+            columns: ["target_claim_id"]
+            isOneToOne: false
+            referencedRelation: "universal_claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       countries: {
         Row: {
           bloc: string | null
@@ -12426,6 +12673,122 @@ export type Database = {
         }
         Relationships: []
       }
+      universal_claims: {
+        Row: {
+          claim_code: string
+          confidence_score: number
+          created_at: string
+          created_by: string | null
+          domain: string
+          effect_size: number | null
+          effect_size_ci_lower: number | null
+          effect_size_ci_upper: number | null
+          effect_size_unit: string | null
+          evidence_quality: string
+          geo_code: string | null
+          geographic_scope: string | null
+          id: string
+          limitations: string[] | null
+          population_scope: string | null
+          population_size: number | null
+          relationship_type: Database["public"]["Enums"]["uce_relationship_type"]
+          statement: string
+          statement_local: Json | null
+          status: Database["public"]["Enums"]["uce_claim_status"]
+          subject_entity: string
+          subject_entity_code: string | null
+          superseded_by: string | null
+          target_outcome: string
+          target_outcome_code: string | null
+          time_observed_end: string | null
+          time_observed_start: string | null
+          time_scale: string | null
+          uncertainty_description: string | null
+          updated_at: string
+          variable_code: string | null
+          variable_or_intervention: string
+          version: number
+        }
+        Insert: {
+          claim_code: string
+          confidence_score?: number
+          created_at?: string
+          created_by?: string | null
+          domain: string
+          effect_size?: number | null
+          effect_size_ci_lower?: number | null
+          effect_size_ci_upper?: number | null
+          effect_size_unit?: string | null
+          evidence_quality?: string
+          geo_code?: string | null
+          geographic_scope?: string | null
+          id?: string
+          limitations?: string[] | null
+          population_scope?: string | null
+          population_size?: number | null
+          relationship_type: Database["public"]["Enums"]["uce_relationship_type"]
+          statement: string
+          statement_local?: Json | null
+          status?: Database["public"]["Enums"]["uce_claim_status"]
+          subject_entity: string
+          subject_entity_code?: string | null
+          superseded_by?: string | null
+          target_outcome: string
+          target_outcome_code?: string | null
+          time_observed_end?: string | null
+          time_observed_start?: string | null
+          time_scale?: string | null
+          uncertainty_description?: string | null
+          updated_at?: string
+          variable_code?: string | null
+          variable_or_intervention: string
+          version?: number
+        }
+        Update: {
+          claim_code?: string
+          confidence_score?: number
+          created_at?: string
+          created_by?: string | null
+          domain?: string
+          effect_size?: number | null
+          effect_size_ci_lower?: number | null
+          effect_size_ci_upper?: number | null
+          effect_size_unit?: string | null
+          evidence_quality?: string
+          geo_code?: string | null
+          geographic_scope?: string | null
+          id?: string
+          limitations?: string[] | null
+          population_scope?: string | null
+          population_size?: number | null
+          relationship_type?: Database["public"]["Enums"]["uce_relationship_type"]
+          statement?: string
+          statement_local?: Json | null
+          status?: Database["public"]["Enums"]["uce_claim_status"]
+          subject_entity?: string
+          subject_entity_code?: string | null
+          superseded_by?: string | null
+          target_outcome?: string
+          target_outcome_code?: string | null
+          time_observed_end?: string | null
+          time_observed_start?: string | null
+          time_scale?: string | null
+          uncertainty_description?: string | null
+          updated_at?: string
+          variable_code?: string | null
+          variable_or_intervention?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "universal_claims_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "universal_claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_access: {
         Row: {
           created_at: string | null
@@ -13062,6 +13425,38 @@ export type Database = {
         | "structure_change"
         | "bug_fix"
         | "deprecation"
+      uce_claim_status:
+        | "hypothesized"
+        | "proposed"
+        | "under_review"
+        | "supported"
+        | "contested"
+        | "refuted"
+        | "superseded"
+        | "retracted"
+      uce_evidence_type:
+        | "systematic_review"
+        | "meta_analysis"
+        | "rct"
+        | "cohort_study"
+        | "case_control"
+        | "cross_sectional"
+        | "case_report"
+        | "expert_opinion"
+        | "statistical_dataset"
+        | "observational_report"
+        | "simulation"
+      uce_relationship_type:
+        | "increases"
+        | "decreases"
+        | "causes"
+        | "prevents"
+        | "correlates_with"
+        | "modulates"
+        | "mediates"
+        | "confounds"
+        | "no_effect"
+        | "unknown"
       update_frequency:
         | "realtime"
         | "daily"
@@ -13403,6 +13798,41 @@ export const Constants = {
         "structure_change",
         "bug_fix",
         "deprecation",
+      ],
+      uce_claim_status: [
+        "hypothesized",
+        "proposed",
+        "under_review",
+        "supported",
+        "contested",
+        "refuted",
+        "superseded",
+        "retracted",
+      ],
+      uce_evidence_type: [
+        "systematic_review",
+        "meta_analysis",
+        "rct",
+        "cohort_study",
+        "case_control",
+        "cross_sectional",
+        "case_report",
+        "expert_opinion",
+        "statistical_dataset",
+        "observational_report",
+        "simulation",
+      ],
+      uce_relationship_type: [
+        "increases",
+        "decreases",
+        "causes",
+        "prevents",
+        "correlates_with",
+        "modulates",
+        "mediates",
+        "confounds",
+        "no_effect",
+        "unknown",
       ],
       update_frequency: [
         "realtime",
