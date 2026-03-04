@@ -6,10 +6,9 @@
  */
 
 import type {
-  OCAObjectType, OCADomain, OCAValidationStatus,
-  OCARegistryEntry, OCAConflict, OCAConflictType,
+  OCAObjectType, OCADomain,
+  OCARegistryEntry, OCAConflict,
   OCAGovernanceEntry, OCAGovernanceAction, OCAHealthMetrics,
-  OCAVariable, OCAEntity, OCARelationship,
 } from './types';
 import { OCA_SEED_REGISTRY, OCA_SEED_RELATIONSHIPS } from './seed-data';
 

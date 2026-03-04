@@ -19,7 +19,7 @@ import {
   runFullConflictScan, getActiveConflicts, getGovernanceLog,
 } from '@/core/oca/engine';
 import { OCA_SEED_RELATIONSHIPS } from '@/core/oca/seed-data';
-import type { OCARegistryEntry, OCAConflict, OCARelationship, OCAObjectType } from '@/core/oca/types';
+import type { OCARegistryEntry, OCAConflict, OCAObjectType } from '@/core/oca/types';
 
 const TYPE_ICONS: Record<OCAObjectType, React.ReactNode> = {
   entity: <Database className="h-4 w-4" />,
