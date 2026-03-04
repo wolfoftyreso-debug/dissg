@@ -11,18 +11,18 @@ import {
   Globe, AlertTriangle, Zap, TrendingUp, BookOpen, Shield,
   ArrowRight, ChevronDown, ChevronUp, Link2, Eye, Activity,
   Users, Target, Heart, Leaf, GraduationCap, DollarSign,
-  Factory, Scale,
+  Factory, Scale, BarChart3, GitBranch, Crown, Crosshair,
 } from 'lucide-react';
 import {
   SEED_PROBLEMS, SEED_INTERVENTIONS, SEED_CAUSAL_LINKS,
   SEED_SOURCES, SEED_VARIABLES, SEED_CLAIMS,
 } from '@/core/gdis';
-import { rankInterventionsForProblem } from '@/core/gdis/engine';
-import type { GlobalProblem, VariableDomain } from '@/core/gdis';
+import { rankInterventionsForProblem, rankAllInterventions, findRootCauses, findLeveragePoints } from '@/core/gdis/engine';
+import type { GlobalProblem } from '@/core/gdis';
 
 // ─── Helpers ───
 
-const DOMAIN_ICONS: Record<VariableDomain, any> = {
+const DOMAIN_ICONS: Record<string, any> = {
   health: Heart, climate: Leaf, economy: DollarSign,
   education: GraduationCap, environment: Factory,
   governance: Scale, security: Shield,
@@ -59,6 +59,128 @@ function StatCard({ icon: Icon, label, value, sub }: { icon: any; label: string;
   );
 }
 
+// ─── Global Dashboard Tab ───
+
+function GlobalDashboardTab() {
+  const sortedProblems = [...SEED_PROBLEMS].sort((a, b) => b.dalysOrEquivalent - a.dalysOrEquivalent);
+  const rankedInterventions = useMemo(() => rankAllInterventions(SEED_INTERVENTIONS, SEED_PROBLEMS), []);
+  const maxDaly = sortedProblems[0]?.dalysOrEquivalent || 1;
+  const maxPriority = rankedInterventions[0]?.priorityScore || 1;
+
+  const domainCounts = SEED_PROBLEMS.reduce((acc, p) => {
+    acc[p.domain] = (acc[p.domain] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <StatCard icon={AlertTriangle} label="Problems Mapped" value={SEED_PROBLEMS.length} />
+        <StatCard icon={Zap} label="Interventions" value={SEED_INTERVENTIONS.length} />
+        <StatCard icon={Users} label="People Affected" value={formatNumber(SEED_PROBLEMS.reduce((s, p) => s + p.populationAffected, 0))} />
+        <StatCard icon={Activity} label="Critical" value={SEED_PROBLEMS.filter(p => p.severity === 'critical').length} />
+        <StatCard icon={TrendingUp} label="Worsening" value={SEED_PROBLEMS.filter(p => p.trendDirection === 'worsening').length} />
+      </div>
+
+      {/* Domain distribution */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2"><BarChart3 className="h-4 w-4" /> Problem Distribution by Domain</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-3">
+            {Object.entries(domainCounts).sort((a, b) => b[1] - a[1]).map(([domain, count]) => {
+              const Icon = DOMAIN_ICONS[domain] || Globe;
+              return (
+                <div key={domain} className="flex items-center gap-2 bg-muted/40 rounded-lg px-3 py-2">
+                  <Icon className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium capitalize">{domain}</span>
+                  <Badge variant="outline" className="text-xs">{count}</Badge>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Top Problems */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Crown className="h-4 w-4 text-red-500" /> Top Global Problems
+            </CardTitle>
+            <CardDescription className="text-xs">Ranked by DALYs / burden equivalent</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ScrollArea className="h-[400px]">
+              {sortedProblems.map((p, i) => {
+                const Icon = DOMAIN_ICONS[p.domain] || Globe;
+                return (
+                  <div key={p.id} className="px-4 py-3 border-b last:border-0">
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg font-bold text-muted-foreground w-7 text-right">{i + 1}</span>
+                      <Icon className="h-4 w-4 text-primary shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm">{p.title}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <Badge className={`text-xs border ${SEVERITY_COLORS[p.severity]}`}>{p.severity}</Badge>
+                          <span className="text-xs text-muted-foreground">{formatNumber(p.populationAffected)} affected</span>
+                          {p.trendDirection === 'worsening' && (
+                            <Badge className="text-xs bg-red-500/10 text-red-600 border-red-500/20">↑ worsening</Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-bold">{formatNumber(p.dalysOrEquivalent)}</p>
+                        <p className="text-xs text-muted-foreground">DALYs</p>
+                      </div>
+                    </div>
+                    <Progress value={(p.dalysOrEquivalent / maxDaly) * 100} className="h-1 mt-2 ml-10" />
+                  </div>
+                );
+              })}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        {/* Top Interventions */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Zap className="h-4 w-4 text-green-500" /> Top Interventions
+            </CardTitle>
+            <CardDescription className="text-xs">Ranked by priority score = (Impact × Evidence × Scale × Cost⁻¹) / 1000</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ScrollArea className="h-[400px]">
+              {rankedInterventions.map(s => {
+                const Icon = DOMAIN_ICONS[s.domain] || Globe;
+                return (
+                  <div key={s.interventionId} className="px-4 py-3 border-b last:border-0">
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg font-bold text-primary w-7 text-right">#{s.rank}</span>
+                      <Icon className="h-4 w-4 text-primary shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm">{s.interventionName}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{s.rationale}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-lg font-bold">{s.priorityScore}</p>
+                        <Progress value={(s.priorityScore / maxPriority) * 100} className="w-16 h-1.5 mt-1" />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 // ─── Problem Map Tab ───
 
 function ProblemMapTab() {
@@ -67,18 +189,11 @@ function ProblemMapTab() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard icon={AlertTriangle} label="Global Problems" value={SEED_PROBLEMS.length} />
-        <StatCard icon={Users} label="People Affected" value={formatNumber(SEED_PROBLEMS.reduce((s, p) => s + p.populationAffected, 0))} />
-        <StatCard icon={Activity} label="Critical" value={SEED_PROBLEMS.filter(p => p.severity === 'critical').length} />
-        <StatCard icon={TrendingUp} label="Worsening" value={SEED_PROBLEMS.filter(p => p.trendDirection === 'worsening').length} />
-      </div>
-
       <div className="grid md:grid-cols-3 gap-4">
         <Card className="md:col-span-1">
-          <CardHeader className="pb-2"><CardTitle className="text-sm">Problems by DALYs</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm">Problems by DALYs ({SEED_PROBLEMS.length})</CardTitle></CardHeader>
           <CardContent className="p-2">
-            <ScrollArea className="h-[450px]">
+            <ScrollArea className="h-[500px]">
               {sorted.map(p => {
                 const Icon = DOMAIN_ICONS[p.domain] || Globe;
                 return (
@@ -110,7 +225,6 @@ function ProblemMapTab() {
             {selected ? (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">{selected.description}</p>
-
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-muted/30 rounded-lg p-3">
                     <p className="text-xs text-muted-foreground">Population Affected</p>
@@ -121,16 +235,13 @@ function ProblemMapTab() {
                     <p className="text-lg font-bold">{formatNumber(selected.dalysOrEquivalent)}</p>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">Trend:</span>
                   <Badge variant="outline" className="text-xs">{selected.trendDirection}</Badge>
                   <span className="text-xs text-muted-foreground">Scope:</span>
                   <Badge variant="outline" className="text-xs">{selected.geographicScope}</Badge>
                 </div>
-
                 <Separator />
-
                 <div>
                   <p className="text-sm font-medium mb-2">Available Interventions</p>
                   {SEED_INTERVENTIONS.filter(i => i.targetProblems.includes(selected.id)).map(i => (
@@ -140,6 +251,9 @@ function ProblemMapTab() {
                       <Badge variant="outline" className="text-xs ml-auto">{i.status}</Badge>
                     </div>
                   ))}
+                  {SEED_INTERVENTIONS.filter(i => i.targetProblems.includes(selected.id)).length === 0 && (
+                    <p className="text-xs text-muted-foreground italic">No interventions mapped yet</p>
+                  )}
                 </div>
               </div>
             ) : (
@@ -148,6 +262,105 @@ function ProblemMapTab() {
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+// ─── Root Cause Tab ───
+
+function RootCauseTab() {
+  const [targetVar, setTargetVar] = useState('Cardiovascular disease');
+  const rootCauses = useMemo(() => findRootCauses(SEED_CAUSAL_LINKS, targetVar), [targetVar]);
+  const leveragePoints = useMemo(() => findLeveragePoints(SEED_CAUSAL_LINKS), []);
+
+  const targetOptions = useMemo(() => {
+    const vars = new Set<string>();
+    SEED_CAUSAL_LINKS.forEach(l => { vars.add(l.fromVariable); vars.add(l.toVariable); });
+    return [...vars].sort();
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      {/* Leverage Points */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Crosshair className="h-4 w-4" /> High-Leverage Intervention Points
+          </CardTitle>
+          <CardDescription className="text-xs">Variables that influence the most downstream outcomes</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            {leveragePoints.slice(0, 8).map((lp, i) => (
+              <div key={lp.variable} className="bg-muted/30 rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-primary">#{i + 1}</span>
+                  <span className="text-sm font-medium">{lp.variable}</span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Reaches {lp.reachableProblems} outcomes · Strength {Math.round(lp.avgStrength * 100)}%
+                </div>
+                <Progress value={lp.leverage * 20} className="h-1 mt-1.5" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Root Cause Analysis */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <GitBranch className="h-4 w-4" /> Root Cause Analysis
+          </CardTitle>
+          <CardDescription className="text-xs">Trace causal chains backward to find root causes</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {targetOptions.map(v => (
+              <Button
+                key={v}
+                variant={targetVar === v ? 'default' : 'outline'}
+                size="sm"
+                className="text-xs"
+                onClick={() => setTargetVar(v)}
+              >{v}</Button>
+            ))}
+          </div>
+
+          {rootCauses.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">No upstream causes found for "{targetVar}"</p>
+          ) : (
+            <div className="space-y-3">
+              {rootCauses.map((rc, i) => (
+                <div key={i} className="border rounded-lg p-3">
+                  <div className="flex items-center gap-2 flex-wrap mb-2">
+                    {rc.chain.map((step, j) => (
+                      <div key={j} className="flex items-center gap-1">
+                        <Badge
+                          variant={j === 0 && rc.isRootCause ? 'default' : 'outline'}
+                          className={`text-xs ${j === 0 && rc.isRootCause ? 'bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/30' : ''}`}
+                        >
+                          {j === 0 && rc.isRootCause && '⚡ '}
+                          {step}
+                        </Badge>
+                        {j < rc.chain.length - 1 && <ArrowRight className="h-3 w-3 text-muted-foreground" />}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span>Avg Strength: <strong>{Math.round(rc.totalStrength * 100)}%</strong></span>
+                    <span>Confidence: <strong>{Math.round(rc.avgConfidence * 100)}%</strong></span>
+                    <div className="flex gap-1 ml-auto">
+                      {rc.domains.map(d => <Badge key={d} variant="outline" className="text-xs">{d}</Badge>)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -257,12 +470,8 @@ function PriorityEngineTab() {
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm">
-            Ranked Interventions for: {selectedProblem.title}
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Score = (Impact × Evidence × Scalability × Cost⁻¹) / 1000
-          </CardDescription>
+          <CardTitle className="text-sm">Ranked Interventions for: {selectedProblem.title}</CardTitle>
+          <CardDescription className="text-xs">Score = (Impact × Evidence × Scalability × Cost⁻¹) / 1000</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {ranked.length === 0 && (
@@ -409,7 +618,7 @@ export function GDISExplorer() {
           Global Decision Intelligence System
         </h1>
         <p className="text-muted-foreground text-sm mt-1">
-          12-layer architecture: Map problems → Evaluate evidence → Prioritize interventions → Publish transparently
+          25 problems · 20 interventions · 20 causal links · Root cause analysis · Priority engine
         </p>
       </div>
 
@@ -437,18 +646,22 @@ export function GDISExplorer() {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="problems" className="space-y-4">
-        <TabsList className="grid grid-cols-5 w-full max-w-2xl">
+      <Tabs defaultValue="dashboard" className="space-y-4">
+        <TabsList className="grid grid-cols-7 w-full max-w-3xl">
+          <TabsTrigger value="dashboard" className="text-xs">Dashboard</TabsTrigger>
           <TabsTrigger value="problems" className="text-xs">Problems</TabsTrigger>
           <TabsTrigger value="interventions" className="text-xs">Interventions</TabsTrigger>
           <TabsTrigger value="priority" className="text-xs">Priority</TabsTrigger>
+          <TabsTrigger value="rootcause" className="text-xs">Root Cause</TabsTrigger>
           <TabsTrigger value="causal" className="text-xs">Causal</TabsTrigger>
           <TabsTrigger value="transparency" className="text-xs">Transparency</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="dashboard"><GlobalDashboardTab /></TabsContent>
         <TabsContent value="problems"><ProblemMapTab /></TabsContent>
         <TabsContent value="interventions"><InterventionLibraryTab /></TabsContent>
         <TabsContent value="priority"><PriorityEngineTab /></TabsContent>
+        <TabsContent value="rootcause"><RootCauseTab /></TabsContent>
         <TabsContent value="causal"><CausalNetworkTab /></TabsContent>
         <TabsContent value="transparency"><TransparencyTab /></TabsContent>
       </Tabs>
