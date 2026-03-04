@@ -11,11 +11,9 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   SEED_CLAIMS,
-  evaluateClaimEvidence,
   discoverChains,
   findCrossDomainLinks,
   detectConflicts,
-  SEED_EVIDENCE,
 } from '@/core/uce';
 import type { UniversalClaim, ChainDiscoveryResult, CrossDomainLink, ClaimConflict } from '@/core/uce';
 import { ArrowRight, GitBranch, AlertTriangle, Globe, Layers, Search, Zap, Brain } from 'lucide-react';
@@ -56,7 +54,7 @@ export default function UCEExplorer() {
   const conflicts = useMemo(() => detectConflicts(demoClaims), []);
 
   const domains = [...new Set(demoClaims.map(c => c.domain))];
-  const avgConfidence = demoClaims.reduce((s, c) => s + c.confidence_score, 0) / demoClaims.length;
+  const _avgConfidence = demoClaims.reduce((s, c) => s + c.confidence_score, 0) / demoClaims.length;
 
   return (
     <div className="space-y-6">

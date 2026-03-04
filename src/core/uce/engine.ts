@@ -267,7 +267,7 @@ export function findCrossDomainLinks(claims: readonly UniversalClaim[]): CrossDo
 export function generateGraphEdges(
   claims: readonly UniversalClaim[],
   chains: readonly ChainDiscoveryResult[],
-  crossLinks: readonly CrossDomainLink[]
+  _crossLinks: readonly CrossDomainLink[]
 ): Omit<ClaimGraphEdge, 'id'>[] {
   const edges: Omit<ClaimGraphEdge, 'id'>[] = [];
   const claimByCode = new Map(claims.map(c => [c.claim_code, c]));
