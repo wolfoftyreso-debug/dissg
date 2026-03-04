@@ -121,6 +121,7 @@ import KnowledgeModulesPage from "./pages/KnowledgeModules";
 import UCEPage from "./pages/UCEPage";
 import MetaLayerPage from "./pages/MetaLayerPage";
 import GRMPage from "./pages/GRMPage";
+import OCAPage from "./pages/OCAPage";
 
 const queryClient = new QueryClient();
 
@@ -249,6 +250,7 @@ const App = () => (
                 <Route path="/uce" element={<UCEPage />} />
                 <Route path="/meta-layer" element={<MetaLayerPage />} />
                 <Route path="/grm" element={<GRMPage />} />
+                <Route path="/ontology-core" element={<OCAPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
