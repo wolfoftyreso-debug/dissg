@@ -1,14 +1,13 @@
 /**
  * GDIS ENGINE
  * 
- * Priority scoring, causal traversal, and decision intelligence generation
+ * Priority scoring, causal traversal, root cause analysis, and decision intelligence
  */
 
 import type { PriorityScore, Intervention, GlobalProblem, CausalLink, DecisionRecommendation } from './types';
 
 // ─── Priority Formula ───
 // priority = (impact × evidence × scalability) / cost_inverse
-// where cost_inverse = 11 - cost_level_numeric
 
 export function calculateGDISPriority(
   impact: number,
@@ -60,6 +59,36 @@ export function rankInterventionsForProblem(
   return scored;
 }
 
+// ─── Global Rankings (all interventions across all problems) ───
+
+export function rankAllInterventions(
+  interventions: Intervention[],
+  problems: GlobalProblem[],
+): PriorityScore[] {
+  const allScores: PriorityScore[] = [];
+  const seen = new Set<string>();
+
+  for (const p of problems) {
+    const scores = rankInterventionsForProblem(interventions, p.id);
+    for (const s of scores) {
+      if (!seen.has(s.interventionId)) {
+        seen.add(s.interventionId);
+        allScores.push(s);
+      } else {
+        // Keep the highest score for each intervention
+        const existing = allScores.find(e => e.interventionId === s.interventionId);
+        if (existing && s.priorityScore > existing.priorityScore) {
+          Object.assign(existing, s);
+        }
+      }
+    }
+  }
+
+  allScores.sort((a, b) => b.priorityScore - a.priorityScore);
+  allScores.forEach((s, i) => { s.rank = i + 1; });
+  return allScores;
+}
+
 // ─── Causal Chain Traversal ───
 
 export function findCausalChains(
@@ -97,6 +126,142 @@ export function findCausalChains(
   return chains;
 }
 
+// ─── Root Cause Analysis ───
+
+export interface RootCauseChain {
+  chain: string[];
+  links: CausalLink[];
+  totalStrength: number;
+  avgConfidence: number;
+  domains: string[];
+  isRootCause: boolean; // true if first node has no incoming edges
+}
+
+export function findRootCauses(
+  links: CausalLink[],
+  targetVar: string,
+  maxDepth = 6,
+): RootCauseChain[] {
+  const results: RootCauseChain[] = [];
+  
+  // Build reverse adjacency (who causes what)
+  const reverseAdj = new Map<string, CausalLink[]>();
+  const allTargets = new Set<string>();
+  const allSources = new Set<string>();
+  
+  for (const link of links) {
+    const existing = reverseAdj.get(link.toVariable) || [];
+    existing.push(link);
+    reverseAdj.set(link.toVariable, existing);
+    allTargets.add(link.toVariable);
+    allSources.add(link.fromVariable);
+  }
+
+  // Root nodes: sources that are never targets
+  const rootNodes = new Set([...allSources].filter(s => !allTargets.has(s)));
+
+  function dfsReverse(current: string, path: string[], pathLinks: CausalLink[], visited: Set<string>) {
+    const incoming = reverseAdj.get(current) || [];
+    
+    if (incoming.length === 0 || path.length >= maxDepth) {
+      if (path.length > 1) {
+        const reversed = [...path].reverse();
+        const reversedLinks = [...pathLinks].reverse();
+        const allDomains = new Set<string>();
+        let totalStrength = 0;
+        let totalConf = 0;
+        
+        for (const l of reversedLinks) {
+          totalStrength += l.strength;
+          totalConf += l.confidence;
+          l.domains.forEach(d => allDomains.add(d));
+        }
+        
+        results.push({
+          chain: reversed,
+          links: reversedLinks,
+          totalStrength: totalStrength / reversedLinks.length,
+          avgConfidence: totalConf / reversedLinks.length,
+          domains: [...allDomains],
+          isRootCause: rootNodes.has(reversed[0]),
+        });
+      }
+      return;
+    }
+
+    for (const link of incoming) {
+      if (!visited.has(link.fromVariable)) {
+        visited.add(link.fromVariable);
+        path.push(link.fromVariable);
+        pathLinks.push(link);
+        dfsReverse(link.fromVariable, path, pathLinks, visited);
+        pathLinks.pop();
+        path.pop();
+        visited.delete(link.fromVariable);
+      }
+    }
+  }
+
+  const visited = new Set([targetVar]);
+  dfsReverse(targetVar, [targetVar], [], visited);
+  
+  // Sort by combined strength × confidence
+  results.sort((a, b) => (b.totalStrength * b.avgConfidence) - (a.totalStrength * a.avgConfidence));
+  return results;
+}
+
+// ─── Leverage Point Analysis ───
+
+export interface LeveragePoint {
+  variable: string;
+  outgoingChains: number;
+  reachableProblems: number;
+  avgStrength: number;
+  leverage: number; // outgoing × strength
+}
+
+export function findLeveragePoints(links: CausalLink[]): LeveragePoint[] {
+  const adjacency = new Map<string, CausalLink[]>();
+  for (const link of links) {
+    const existing = adjacency.get(link.fromVariable) || [];
+    existing.push(link);
+    adjacency.set(link.fromVariable, existing);
+  }
+
+  const points: LeveragePoint[] = [];
+  
+  for (const [variable, outLinks] of adjacency) {
+    // Count reachable nodes via DFS
+    const reachable = new Set<string>();
+    const stack = [variable];
+    const visited = new Set([variable]);
+    
+    while (stack.length > 0) {
+      const current = stack.pop()!;
+      const neighbors = adjacency.get(current) || [];
+      for (const n of neighbors) {
+        if (!visited.has(n.toVariable)) {
+          visited.add(n.toVariable);
+          reachable.add(n.toVariable);
+          stack.push(n.toVariable);
+        }
+      }
+    }
+
+    const avgStrength = outLinks.reduce((s, l) => s + l.strength, 0) / outLinks.length;
+
+    points.push({
+      variable,
+      outgoingChains: outLinks.length,
+      reachableProblems: reachable.size,
+      avgStrength,
+      leverage: reachable.size * avgStrength,
+    });
+  }
+
+  return points.sort((a, b) => b.leverage - a.leverage);
+}
+
 // ─── Decision Intelligence Generator ───
 
 export function generateRecommendation(
@@ -104,20 +269,17 @@ export function generateRecommendation(
   problems: GlobalProblem[],
   interventions: Intervention[],
 ): DecisionRecommendation {
-  // Find relevant problems
   const keywords = question.toLowerCase().split(/\s+/);
   const relevantProblems = problems.filter(p =>
     keywords.some(k => p.title.toLowerCase().includes(k) || p.domain.includes(k))
   );
 
-  // Rank interventions for all relevant problems
   let allScores: PriorityScore[] = [];
   for (const p of relevantProblems) {
     const scores = rankInterventionsForProblem(interventions, p.id);
     allScores.push(...scores);
   }
 
-  // Deduplicate and re-rank
   const seen = new Set<string>();
   allScores = allScores.filter(s => {
     if (seen.has(s.interventionId)) return false;

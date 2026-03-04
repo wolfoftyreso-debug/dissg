@@ -1,7 +1,7 @@
 /**
- * GDIS SEED DATA
+ * GDIS SEED DATA — Global Problem Atlas + Intervention Impact Engine
  * 
- * World's major problems, interventions, causal links
+ * 25 Global Problems, 20 Interventions, 20 Causal Links
  */
 
 import type {
@@ -15,6 +15,8 @@ export const SEED_SOURCES: DataSource[] = [
   { id: 'SRC-IHME', name: 'Institute for Health Metrics', category: 'health_data', organization: 'IHME', reliabilityScore: 0.92, updateFrequency: 'annual' },
   { id: 'SRC-UN', name: 'UN Statistics Division', category: 'statistics', organization: 'United Nations', reliabilityScore: 0.94, updateFrequency: 'annual' },
   { id: 'SRC-OECD', name: 'OECD Data', category: 'economic', organization: 'OECD', reliabilityScore: 0.93, updateFrequency: 'quarterly' },
+  { id: 'SRC-FAO', name: 'FAO Statistics', category: 'statistics', organization: 'FAO', reliabilityScore: 0.91, updateFrequency: 'annual' },
+  { id: 'SRC-UNICEF', name: 'UNICEF Data', category: 'health_data', organization: 'UNICEF', reliabilityScore: 0.92, updateFrequency: 'annual' },
 ];
 
 export const SEED_VARIABLES: GlobalVariable[] = [
@@ -26,7 +28,11 @@ export const SEED_VARIABLES: GlobalVariable[] = [
   { id: 'VAR-IMR', code: 'infant_mortality', name: 'Infant Mortality Rate', domain: 'health', unit: 'per 1000', direction: 'lower_better', globalCoverage: 0.96 },
   { id: 'VAR-UNE', code: 'unemployment', name: 'Unemployment Rate', domain: 'economy', unit: '%', direction: 'lower_better', globalCoverage: 0.93 },
   { id: 'VAR-FOOD', code: 'food_insecurity', name: 'Food Insecurity', domain: 'health', unit: '% population', direction: 'lower_better', globalCoverage: 0.89 },
+  { id: 'VAR-GINI', code: 'gini_index', name: 'Gini Index', domain: 'economy', unit: 'index', direction: 'lower_better', globalCoverage: 0.82 },
+  { id: 'VAR-WATER', code: 'safe_water_access', name: 'Safe Water Access', domain: 'health', unit: '% population', direction: 'higher_better', globalCoverage: 0.90 },
 ];
+
+// ─── 25 Global Problems ───
 
 export const SEED_PROBLEMS: GlobalProblem[] = [
   {
@@ -93,40 +99,179 @@ export const SEED_PROBLEMS: GlobalProblem[] = [
     relatedVariables: ['VAR-LE', 'VAR-IMR'], relatedClaims: [],
     geographicScope: 'Global',
   },
+  // ─── New problems ───
+  {
+    id: 'PROB-DM', code: 'diabetes', title: 'Diabetes Epidemic',
+    description: '~537M adults with diabetes globally, deaths and complications rising',
+    domain: 'health', severity: 'severe', populationAffected: 537_000_000,
+    dalysOrEquivalent: 67_000_000, trendDirection: 'worsening',
+    relatedVariables: ['VAR-LE', 'VAR-FOOD'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
+  {
+    id: 'PROB-OB', code: 'obesity', title: 'Global Obesity',
+    description: '~1B people obese worldwide, driver of CVD, diabetes, and cancer',
+    domain: 'health', severity: 'severe', populationAffected: 1_000_000_000,
+    dalysOrEquivalent: 148_000_000, trendDirection: 'worsening',
+    relatedVariables: ['VAR-LE', 'VAR-FOOD'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
+  {
+    id: 'PROB-MAL', code: 'malaria', title: 'Malaria',
+    description: '~249M cases and ~608K deaths in 2022, concentrated in Sub-Saharan Africa',
+    domain: 'health', severity: 'severe', populationAffected: 249_000_000,
+    dalysOrEquivalent: 46_000_000, trendDirection: 'stable',
+    relatedVariables: ['VAR-LE', 'VAR-IMR'], relatedClaims: [],
+    geographicScope: 'Sub-Saharan Africa',
+  },
+  {
+    id: 'PROB-TB', code: 'tuberculosis', title: 'Tuberculosis',
+    description: '~10.6M new cases annually, second leading infectious disease killer',
+    domain: 'health', severity: 'severe', populationAffected: 10_600_000,
+    dalysOrEquivalent: 44_000_000, trendDirection: 'improving',
+    relatedVariables: ['VAR-LE', 'VAR-IMR'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
+  {
+    id: 'PROB-WS', code: 'water_sanitation', title: 'Unsafe Water & Sanitation',
+    description: '~2.2B people lack safely managed drinking water, ~3.5B lack safe sanitation',
+    domain: 'health', severity: 'critical', populationAffected: 2_200_000_000,
+    dalysOrEquivalent: 85_000_000, trendDirection: 'improving',
+    relatedVariables: ['VAR-WATER', 'VAR-IMR'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
+  {
+    id: 'PROB-INEQ', code: 'income_inequality', title: 'Income Inequality',
+    description: 'Top 10% earn over 50% of global income, driving social instability',
+    domain: 'economy', severity: 'severe', populationAffected: 5_000_000_000,
+    dalysOrEquivalent: 100_000_000, trendDirection: 'worsening',
+    relatedVariables: ['VAR-GINI', 'VAR-GDP'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
+  {
+    id: 'PROB-BIO', code: 'biodiversity_loss', title: 'Biodiversity Loss',
+    description: '~1M species at risk of extinction, ecosystem services declining rapidly',
+    domain: 'environment', severity: 'critical', populationAffected: 8_000_000_000,
+    dalysOrEquivalent: 60_000_000, trendDirection: 'worsening',
+    relatedVariables: ['VAR-CO2'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
+  {
+    id: 'PROB-DEF', code: 'deforestation', title: 'Deforestation',
+    description: '~10M hectares of forest lost annually, driving climate change and biodiversity loss',
+    domain: 'environment', severity: 'severe', populationAffected: 1_600_000_000,
+    dalysOrEquivalent: 30_000_000, trendDirection: 'improving',
+    relatedVariables: ['VAR-CO2'], relatedClaims: [],
+    geographicScope: 'Tropical regions',
+  },
+  {
+    id: 'PROB-CAN', code: 'cancer', title: 'Cancer',
+    description: '~20M new cases and ~9.7M deaths in 2022, rising with aging populations',
+    domain: 'health', severity: 'critical', populationAffected: 20_000_000,
+    dalysOrEquivalent: 250_000_000, trendDirection: 'worsening',
+    relatedVariables: ['VAR-LE', 'VAR-PM25'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
+  {
+    id: 'PROB-CHILD', code: 'child_mortality', title: 'Child Mortality',
+    description: '~5M children under 5 die annually, mostly from preventable causes',
+    domain: 'health', severity: 'critical', populationAffected: 140_000_000,
+    dalysOrEquivalent: 170_000_000, trendDirection: 'improving',
+    relatedVariables: ['VAR-IMR', 'VAR-WATER'], relatedClaims: [],
+    geographicScope: 'Low-income countries',
+  },
+  {
+    id: 'PROB-MAT', code: 'maternal_mortality', title: 'Maternal Mortality',
+    description: '~287K maternal deaths annually, 95% in low/middle income countries',
+    domain: 'health', severity: 'severe', populationAffected: 140_000_000,
+    dalysOrEquivalent: 18_000_000, trendDirection: 'improving',
+    relatedVariables: ['VAR-IMR', 'VAR-LE'], relatedClaims: [],
+    geographicScope: 'Low-income countries',
+  },
+  {
+    id: 'PROB-CON', code: 'armed_conflict', title: 'Armed Conflict & Violence',
+    description: '~2B people in conflict-affected areas, rising displacement',
+    domain: 'security', severity: 'critical', populationAffected: 2_000_000_000,
+    dalysOrEquivalent: 75_000_000, trendDirection: 'worsening',
+    relatedVariables: ['VAR-LE', 'VAR-GDP'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
+  {
+    id: 'PROB-COR', code: 'corruption', title: 'Corruption & Weak Governance',
+    description: 'Estimated $2.6T lost annually to corruption, undermining development',
+    domain: 'governance', severity: 'severe', populationAffected: 6_000_000_000,
+    dalysOrEquivalent: 40_000_000, trendDirection: 'stable',
+    relatedVariables: ['VAR-GDP'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
+  {
+    id: 'PROB-OCEAN', code: 'ocean_degradation', title: 'Ocean Degradation',
+    description: 'Overfishing, acidification, plastic pollution threatening marine ecosystems',
+    domain: 'environment', severity: 'severe', populationAffected: 3_000_000_000,
+    dalysOrEquivalent: 20_000_000, trendDirection: 'worsening',
+    relatedVariables: ['VAR-CO2', 'VAR-FOOD'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
+  {
+    id: 'PROB-NCD', code: 'noncommunicable_diseases', title: 'Noncommunicable Diseases (Other)',
+    description: 'Chronic respiratory, kidney diseases — ~41M deaths/year from all NCDs combined',
+    domain: 'health', severity: 'critical', populationAffected: 3_500_000_000,
+    dalysOrEquivalent: 500_000_000, trendDirection: 'worsening',
+    relatedVariables: ['VAR-LE', 'VAR-PM25'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
+  {
+    id: 'PROB-ENERGY', code: 'energy_poverty', title: 'Energy Poverty',
+    description: '~675M people without electricity, 2.3B lack clean cooking fuels',
+    domain: 'economy', severity: 'severe', populationAffected: 2_300_000_000,
+    dalysOrEquivalent: 35_000_000, trendDirection: 'improving',
+    relatedVariables: ['VAR-GDP'], relatedClaims: [],
+    geographicScope: 'Sub-Saharan Africa, South Asia',
+  },
+  {
+    id: 'PROB-GENDER', code: 'gender_inequality', title: 'Gender Inequality',
+    description: 'Persistent gaps in education, income, political representation affecting billions',
+    domain: 'governance', severity: 'severe', populationAffected: 4_000_000_000,
+    dalysOrEquivalent: 55_000_000, trendDirection: 'improving',
+    relatedVariables: ['VAR-LIT', 'VAR-GDP'], relatedClaims: [],
+    geographicScope: 'Global',
+  },
 ];
+
+// ─── 20 Interventions ───
 
 export const SEED_INTERVENTIONS: Intervention[] = [
   {
     id: 'INT-G01', name: 'Universal Childhood Vaccination', description: 'Complete childhood immunization programs',
-    domain: 'health', targetProblems: ['PROB-CVD', 'PROB-FI', 'PROB-AMR'], status: 'proven',
+    domain: 'health', targetProblems: ['PROB-CVD', 'PROB-FI', 'PROB-AMR', 'PROB-CHILD'], status: 'proven',
     costLevel: 'low', scalability: 'global', timeToEffect: '1–5 years', evidenceGrade: 'meta_analysis',
     effectSize: '85–95% disease reduction', population: 'Children 0–5',
     sideEffects: ['Minor adverse events (<1%)'], implementationBarriers: ['Cold chain logistics', 'Vaccine hesitancy'],
   },
   {
     id: 'INT-G02', name: 'Clean Energy Transition', description: 'Shift from fossil fuels to renewable energy',
-    domain: 'climate', targetProblems: ['PROB-CC', 'PROB-AP'], status: 'proven',
+    domain: 'climate', targetProblems: ['PROB-CC', 'PROB-AP', 'PROB-ENERGY'], status: 'proven',
     costLevel: 'high', scalability: 'global', timeToEffect: '5–20 years', evidenceGrade: 'systematic_review',
     effectSize: '40–80% emission reduction', population: 'Global',
     sideEffects: ['Short-term economic disruption'], implementationBarriers: ['Infrastructure investment', 'Political resistance'],
   },
   {
     id: 'INT-G03', name: 'Universal Primary Education', description: 'Ensure access to quality primary education for all',
-    domain: 'education', targetProblems: ['PROB-ED', 'PROB-POV'], status: 'proven',
+    domain: 'education', targetProblems: ['PROB-ED', 'PROB-POV', 'PROB-GENDER'], status: 'proven',
     costLevel: 'medium', scalability: 'global', timeToEffect: '5–15 years', evidenceGrade: 'systematic_review',
     effectSize: '10–15% income increase per year of schooling', population: 'Children 6–12',
     sideEffects: [], implementationBarriers: ['Teacher shortages', 'Funding gaps'],
   },
   {
     id: 'INT-G04', name: 'Air Quality Regulation', description: 'Strict PM2.5 and emissions standards',
-    domain: 'environment', targetProblems: ['PROB-AP', 'PROB-CVD'], status: 'proven',
+    domain: 'environment', targetProblems: ['PROB-AP', 'PROB-CVD', 'PROB-CAN'], status: 'proven',
     costLevel: 'medium', scalability: 'national', timeToEffect: '2–10 years', evidenceGrade: 'rct',
     effectSize: '15–30% reduction in respiratory mortality', population: 'Urban populations',
     sideEffects: ['Industry compliance costs'], implementationBarriers: ['Political will', 'Enforcement capacity'],
   },
   {
     id: 'INT-G05', name: 'School Feeding Programs', description: 'Provide nutritious meals in schools',
-    domain: 'health', targetProblems: ['PROB-FI', 'PROB-ED'], status: 'proven',
+    domain: 'health', targetProblems: ['PROB-FI', 'PROB-ED', 'PROB-CHILD'], status: 'proven',
     costLevel: 'low', scalability: 'national', timeToEffect: '6–12 months', evidenceGrade: 'rct',
     effectSize: '10% attendance increase, reduced stunting', population: 'Children 5–15',
     sideEffects: [], implementationBarriers: ['Supply chains', 'Local food systems'],
@@ -147,7 +292,7 @@ export const SEED_INTERVENTIONS: Intervention[] = [
   },
   {
     id: 'INT-G08', name: 'Cash Transfer Programs', description: 'Direct cash to extreme poor households',
-    domain: 'economy', targetProblems: ['PROB-POV', 'PROB-FI'], status: 'proven',
+    domain: 'economy', targetProblems: ['PROB-POV', 'PROB-FI', 'PROB-CHILD'], status: 'proven',
     costLevel: 'medium', scalability: 'national', timeToEffect: '3–12 months', evidenceGrade: 'meta_analysis',
     effectSize: '25–40% poverty reduction among recipients', population: 'Extreme poor',
     sideEffects: ['Dependency concerns (debated)'], implementationBarriers: ['Targeting accuracy', 'Digital infrastructure'],
@@ -161,12 +306,85 @@ export const SEED_INTERVENTIONS: Intervention[] = [
   },
   {
     id: 'INT-G10', name: 'Sustainable Agriculture', description: 'Climate-resilient farming practices',
-    domain: 'environment', targetProblems: ['PROB-FI', 'PROB-CC'], status: 'promising',
+    domain: 'environment', targetProblems: ['PROB-FI', 'PROB-CC', 'PROB-BIO'], status: 'promising',
     costLevel: 'low', scalability: 'global', timeToEffect: '1–5 years', evidenceGrade: 'cohort',
     effectSize: '20–30% yield resilience in drought conditions', population: 'Smallholder farmers',
     sideEffects: ['Transition period productivity dip'], implementationBarriers: ['Knowledge transfer', 'Access to inputs'],
   },
+  // ─── New interventions ───
+  {
+    id: 'INT-G11', name: 'Tobacco Control & Taxation', description: 'Taxation, advertising bans, plain packaging',
+    domain: 'health', targetProblems: ['PROB-CVD', 'PROB-CAN', 'PROB-NCD'], status: 'proven',
+    costLevel: 'very_low', scalability: 'global', timeToEffect: '1–5 years', evidenceGrade: 'meta_analysis',
+    effectSize: '20–40% smoking reduction', population: 'Smokers (1.3B)',
+    sideEffects: ['Illicit trade risk'], implementationBarriers: ['Tobacco industry lobbying'],
+  },
+  {
+    id: 'INT-G12', name: 'Clean Water & Sanitation Programs', description: 'Safe water supply and improved sanitation infrastructure',
+    domain: 'health', targetProblems: ['PROB-WS', 'PROB-CHILD', 'PROB-FI'], status: 'proven',
+    costLevel: 'medium', scalability: 'national', timeToEffect: '1–5 years', evidenceGrade: 'systematic_review',
+    effectSize: '35–50% diarrheal disease reduction', population: 'Underserved communities',
+    sideEffects: [], implementationBarriers: ['Infrastructure cost', 'Maintenance capacity'],
+  },
+  {
+    id: 'INT-G13', name: 'Insecticide-Treated Bed Nets', description: 'Mass distribution of ITNs in malaria-endemic areas',
+    domain: 'health', targetProblems: ['PROB-MAL', 'PROB-CHILD'], status: 'proven',
+    costLevel: 'very_low', scalability: 'regional', timeToEffect: '3–12 months', evidenceGrade: 'meta_analysis',
+    effectSize: '50–60% malaria incidence reduction', population: 'Sub-Saharan Africa',
+    sideEffects: ['Insecticide resistance'], implementationBarriers: ['Distribution logistics', 'User compliance'],
+  },
+  {
+    id: 'INT-G14', name: 'Skilled Birth Attendance', description: 'Ensure skilled health personnel at every birth',
+    domain: 'health', targetProblems: ['PROB-MAT', 'PROB-CHILD'], status: 'proven',
+    costLevel: 'medium', scalability: 'national', timeToEffect: '2–5 years', evidenceGrade: 'systematic_review',
+    effectSize: '60–80% reduction in maternal mortality', population: 'Pregnant women in LMICs',
+    sideEffects: [], implementationBarriers: ['Health worker shortages', 'Rural access'],
+  },
+  {
+    id: 'INT-G15', name: 'Progressive Taxation & Redistribution', description: 'Tax reform with social safety nets',
+    domain: 'economy', targetProblems: ['PROB-INEQ', 'PROB-POV'], status: 'proven',
+    costLevel: 'low', scalability: 'national', timeToEffect: '2–10 years', evidenceGrade: 'cohort',
+    effectSize: '5–15 point Gini reduction', population: 'National populations',
+    sideEffects: ['Capital flight risk'], implementationBarriers: ['Political opposition', 'Elite capture'],
+  },
+  {
+    id: 'INT-G16', name: 'Marine Protected Areas', description: 'Designation and enforcement of ocean conservation zones',
+    domain: 'environment', targetProblems: ['PROB-OCEAN', 'PROB-BIO'], status: 'promising',
+    costLevel: 'low', scalability: 'global', timeToEffect: '5–15 years', evidenceGrade: 'cohort',
+    effectSize: '30–50% fish biomass increase within protected areas', population: 'Coastal communities',
+    sideEffects: ['Short-term fishing restrictions'], implementationBarriers: ['Enforcement at sea', 'International cooperation'],
+  },
+  {
+    id: 'INT-G17', name: 'Forest Conservation & Reforestation', description: 'Protecting existing forests and restoring degraded land',
+    domain: 'environment', targetProblems: ['PROB-DEF', 'PROB-CC', 'PROB-BIO'], status: 'proven',
+    costLevel: 'medium', scalability: 'global', timeToEffect: '5–30 years', evidenceGrade: 'systematic_review',
+    effectSize: '2–5 GtCO₂/year absorption potential', population: 'Forest-dependent communities',
+    sideEffects: ['Land-use conflicts'], implementationBarriers: ['Economic pressures', 'Land rights'],
+  },
+  {
+    id: 'INT-G18', name: 'Anti-Corruption Institutions', description: 'Independent judiciary, transparency laws, whistleblower protection',
+    domain: 'governance', targetProblems: ['PROB-COR', 'PROB-INEQ'], status: 'promising',
+    costLevel: 'low', scalability: 'national', timeToEffect: '5–20 years', evidenceGrade: 'observational',
+    effectSize: '10–30% improvement in governance indices', population: 'National populations',
+    sideEffects: ['Political resistance'], implementationBarriers: ['Incumbent power structures'],
+  },
+  {
+    id: 'INT-G19', name: 'Decentralized Solar Energy', description: 'Off-grid solar for energy-poor communities',
+    domain: 'economy', targetProblems: ['PROB-ENERGY', 'PROB-CC', 'PROB-AP'], status: 'proven',
+    costLevel: 'low', scalability: 'global', timeToEffect: '1–3 years', evidenceGrade: 'rct',
+    effectSize: 'Electricity access for 100M+ households', population: 'Off-grid communities',
+    sideEffects: ['E-waste management'], implementationBarriers: ['Upfront financing', 'Technical maintenance'],
+  },
+  {
+    id: 'INT-G20', name: 'Girls\' Education Programs', description: 'Targeted enrollment, retention, and quality for girls',
+    domain: 'education', targetProblems: ['PROB-GENDER', 'PROB-ED', 'PROB-MAT', 'PROB-POV'], status: 'proven',
+    costLevel: 'low', scalability: 'global', timeToEffect: '5–15 years', evidenceGrade: 'meta_analysis',
+    effectSize: '12% income gain per year of schooling, reduced child marriage', population: 'Girls in LMICs',
+    sideEffects: [], implementationBarriers: ['Cultural norms', 'Safety concerns'],
+  },
 ];
+
+// ─── 20 Causal Links (including root cause chains) ───
 
 export const SEED_CAUSAL_LINKS: CausalLink[] = [
   { id: 'CL-01', fromVariable: 'Air pollution', toVariable: 'Inflammation', mechanism: 'Particulate matter triggers systemic inflammatory response', strength: 0.82, confidence: 0.91, lagMonths: 1, bidirectional: false, domains: ['environment', 'health'] },
@@ -179,6 +397,17 @@ export const SEED_CAUSAL_LINKS: CausalLink[] = [
   { id: 'CL-08', fromVariable: 'Mental health', toVariable: 'Productivity', mechanism: 'Cognitive impairment, absenteeism', strength: 0.61, confidence: 0.76, lagMonths: 6, bidirectional: false, domains: ['health', 'economy'] },
   { id: 'CL-09', fromVariable: 'Antibiotic overuse', toVariable: 'Resistance emergence', mechanism: 'Selective pressure on bacterial populations', strength: 0.88, confidence: 0.93, lagMonths: 24, bidirectional: false, domains: ['health'] },
   { id: 'CL-10', fromVariable: 'Vaccination coverage', toVariable: 'Disease burden', mechanism: 'Herd immunity threshold reduction', strength: 0.92, confidence: 0.96, lagMonths: 12, bidirectional: false, domains: ['health'] },
+  // ─── Root cause chains ───
+  { id: 'CL-11', fromVariable: 'Poverty', toVariable: 'Poor nutrition', mechanism: 'Inability to afford nutritious food', strength: 0.82, confidence: 0.90, lagMonths: 3, bidirectional: false, domains: ['economy', 'health'] },
+  { id: 'CL-12', fromVariable: 'Poor nutrition', toVariable: 'Metabolic disease', mechanism: 'Chronic calorie excess or micronutrient deficiency', strength: 0.75, confidence: 0.85, lagMonths: 60, bidirectional: false, domains: ['health'] },
+  { id: 'CL-13', fromVariable: 'Metabolic disease', toVariable: 'Healthcare burden', mechanism: 'Chronic disease treatment costs and capacity', strength: 0.70, confidence: 0.82, lagMonths: 24, bidirectional: false, domains: ['health', 'economy'] },
+  { id: 'CL-14', fromVariable: 'Education level', toVariable: 'Health literacy', mechanism: 'Understanding of preventive care and nutrition', strength: 0.65, confidence: 0.80, lagMonths: 60, bidirectional: false, domains: ['education', 'health'] },
+  { id: 'CL-15', fromVariable: 'Deforestation', toVariable: 'CO₂ emissions', mechanism: 'Carbon release from destroyed biomass', strength: 0.78, confidence: 0.91, lagMonths: 6, bidirectional: false, domains: ['environment', 'climate'] },
+  { id: 'CL-16', fromVariable: 'Corruption', toVariable: 'Poverty', mechanism: 'Diverted public resources, reduced service delivery', strength: 0.62, confidence: 0.75, lagMonths: 36, bidirectional: false, domains: ['governance', 'economy'] },
+  { id: 'CL-17', fromVariable: 'Gender inequality', toVariable: 'Education level', mechanism: 'Restricted access to schooling for girls', strength: 0.70, confidence: 0.84, lagMonths: 60, bidirectional: false, domains: ['governance', 'education'] },
+  { id: 'CL-18', fromVariable: 'Armed conflict', toVariable: 'Poverty', mechanism: 'Destruction of infrastructure, displacement, economic collapse', strength: 0.85, confidence: 0.90, lagMonths: 12, bidirectional: true, domains: ['security', 'economy'] },
+  { id: 'CL-19', fromVariable: 'Food production', toVariable: 'Food insecurity', mechanism: 'Supply shortfall relative to population need', strength: 0.80, confidence: 0.88, lagMonths: 6, bidirectional: false, domains: ['health'] },
+  { id: 'CL-20', fromVariable: 'Unsafe water', toVariable: 'Child mortality', mechanism: 'Diarrheal disease, waterborne infections', strength: 0.85, confidence: 0.92, lagMonths: 1, bidirectional: false, domains: ['health'] },
 ];
 
 export const SEED_CLAIMS: KnowledgeClaim[] = [
@@ -187,4 +416,7 @@ export const SEED_CLAIMS: KnowledgeClaim[] = [
   { id: 'CLM-G3', statement: 'Food insecurity affects ~735M people globally (2024)', domain: 'health', evidenceGrade: 'systematic_review', confidence: 0.91, replicationCount: 50, biasRisk: 'low', sourceCount: 30 },
   { id: 'CLM-G4', statement: 'Air pollution causes ~7M premature deaths annually', domain: 'environment', evidenceGrade: 'meta_analysis', confidence: 0.93, replicationCount: 200, biasRisk: 'low', sourceCount: 80 },
   { id: 'CLM-G5', statement: 'Each year of schooling increases income by 8–13%', domain: 'education', evidenceGrade: 'meta_analysis', confidence: 0.88, replicationCount: 300, biasRisk: 'medium', sourceCount: 100 },
+  { id: 'CLM-G6', statement: 'Tobacco taxation reduces smoking prevalence by 20–40%', domain: 'health', evidenceGrade: 'meta_analysis', confidence: 0.92, replicationCount: 150, biasRisk: 'low', sourceCount: 60 },
+  { id: 'CLM-G7', statement: 'Insecticide-treated bed nets reduce malaria incidence by 50%', domain: 'health', evidenceGrade: 'meta_analysis', confidence: 0.95, replicationCount: 80, biasRisk: 'low', sourceCount: 40 },
+  { id: 'CLM-G8', statement: 'Girls\' education is the single highest-return development investment', domain: 'education', evidenceGrade: 'systematic_review', confidence: 0.89, replicationCount: 120, biasRisk: 'low', sourceCount: 50 },
 ];
