@@ -114,6 +114,9 @@ import ReportPage from "./pages/Report";
 import GlobalIndex from "./pages/GlobalIndex";
 import QuestionPage from "./pages/QuestionPage";
 import OracleStressTestPage from "./pages/OracleStressTest";
+import AccountabilityPage from "./pages/Accountability";
+import CalibrationPage from "./pages/Calibration";
+import CausalDAGPage from "./pages/CausalDAG";
 
 const queryClient = new QueryClient();
 
@@ -235,6 +238,9 @@ const App = () => (
                 <Route path="/global-index" element={<GlobalIndex />} />
                 <Route path="/index/questions/:questionId" element={<QuestionPage />} />
                 <Route path="/oracle-stress-test" element={<OracleStressTestPage />} />
+                <Route path="/accountability" element={<AccountabilityPage />} />
+                <Route path="/calibration" element={<CalibrationPage />} />
+                <Route path="/causal-dag" element={<CausalDAGPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />

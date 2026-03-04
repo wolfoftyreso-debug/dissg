@@ -50,6 +50,68 @@ export type Database = {
         }
         Relationships: []
       }
+      accountability_assignments: {
+        Row: {
+          acknowledged_at: string | null
+          assigned_at: string
+          assigned_department: string
+          assigned_role: string | null
+          created_at: string
+          deadline: string | null
+          escalation_level: number | null
+          fault_code: string | null
+          id: string
+          mandate_reference: string | null
+          notes: string | null
+          observation_id: string | null
+          responsible_entity: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          assigned_at?: string
+          assigned_department: string
+          assigned_role?: string | null
+          created_at?: string
+          deadline?: string | null
+          escalation_level?: number | null
+          fault_code?: string | null
+          id?: string
+          mandate_reference?: string | null
+          notes?: string | null
+          observation_id?: string | null
+          responsible_entity: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          assigned_at?: string
+          assigned_department?: string
+          assigned_role?: string | null
+          created_at?: string
+          deadline?: string | null
+          escalation_level?: number | null
+          fault_code?: string | null
+          id?: string
+          mandate_reference?: string | null
+          notes?: string | null
+          observation_id?: string | null
+          responsible_entity?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accountability_assignments_observation_id_fkey"
+            columns: ["observation_id"]
+            isOneToOne: false
+            referencedRelation: "observations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       action_evaluations: {
         Row: {
           action_id: string
@@ -1373,6 +1435,51 @@ export type Database = {
           },
         ]
       }
+      calibration_snapshots: {
+        Row: {
+          calibration_buckets: Json
+          created_at: string
+          id: string
+          mean_brier_score: number | null
+          model_version: string
+          overconfidence_index: number | null
+          reliability_score: number | null
+          resolution_score: number | null
+          resolved_predictions: number
+          snapshot_date: string
+          total_predictions: number
+          underconfidence_index: number | null
+        }
+        Insert: {
+          calibration_buckets?: Json
+          created_at?: string
+          id?: string
+          mean_brier_score?: number | null
+          model_version: string
+          overconfidence_index?: number | null
+          reliability_score?: number | null
+          resolution_score?: number | null
+          resolved_predictions?: number
+          snapshot_date: string
+          total_predictions?: number
+          underconfidence_index?: number | null
+        }
+        Update: {
+          calibration_buckets?: Json
+          created_at?: string
+          id?: string
+          mean_brier_score?: number | null
+          model_version?: string
+          overconfidence_index?: number | null
+          reliability_score?: number | null
+          resolution_score?: number | null
+          resolved_predictions?: number
+          snapshot_date?: string
+          total_predictions?: number
+          underconfidence_index?: number | null
+        }
+        Relationships: []
+      }
       canonical_answers: {
         Row: {
           answer_blob: string
@@ -1661,6 +1768,190 @@ export type Database = {
           uncertainty_factors?: string[] | null
         }
         Relationships: []
+      }
+      causal_edges: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          edge_type: string
+          evidence_sources: string[] | null
+          evidence_summary: string | null
+          falsification_criteria: string | null
+          graph_id: string
+          id: string
+          is_falsifiable: boolean | null
+          lag_months: number | null
+          mechanism: string | null
+          source_node_id: string
+          strength: number | null
+          target_node_id: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          edge_type?: string
+          evidence_sources?: string[] | null
+          evidence_summary?: string | null
+          falsification_criteria?: string | null
+          graph_id: string
+          id?: string
+          is_falsifiable?: boolean | null
+          lag_months?: number | null
+          mechanism?: string | null
+          source_node_id: string
+          strength?: number | null
+          target_node_id: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          edge_type?: string
+          evidence_sources?: string[] | null
+          evidence_summary?: string | null
+          falsification_criteria?: string | null
+          graph_id?: string
+          id?: string
+          is_falsifiable?: boolean | null
+          lag_months?: number | null
+          mechanism?: string | null
+          source_node_id?: string
+          strength?: number | null
+          target_node_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "causal_edges_graph_id_fkey"
+            columns: ["graph_id"]
+            isOneToOne: false
+            referencedRelation: "causal_graphs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "causal_edges_source_node_id_fkey"
+            columns: ["source_node_id"]
+            isOneToOne: false
+            referencedRelation: "causal_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "causal_edges_target_node_id_fkey"
+            columns: ["target_node_id"]
+            isOneToOne: false
+            referencedRelation: "causal_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      causal_graphs: {
+        Row: {
+          code: string
+          country_code: string | null
+          created_at: string
+          description: string | null
+          domain: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          code: string
+          country_code?: string | null
+          created_at?: string
+          description?: string | null
+          domain: string
+          id?: string
+          status?: string
+          title: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          code?: string
+          country_code?: string | null
+          created_at?: string
+          description?: string | null
+          domain?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "causal_graphs_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      causal_nodes: {
+        Row: {
+          created_at: string
+          entity_ref_id: string | null
+          entity_ref_type: string | null
+          graph_id: string
+          id: string
+          kpi_id: string | null
+          label: string
+          metadata: Json | null
+          node_code: string
+          node_type: string
+          observation_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_ref_id?: string | null
+          entity_ref_type?: string | null
+          graph_id: string
+          id?: string
+          kpi_id?: string | null
+          label: string
+          metadata?: Json | null
+          node_code: string
+          node_type?: string
+          observation_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_ref_id?: string | null
+          entity_ref_type?: string | null
+          graph_id?: string
+          id?: string
+          kpi_id?: string | null
+          label?: string
+          metadata?: Json | null
+          node_code?: string
+          node_type?: string
+          observation_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "causal_nodes_graph_id_fkey"
+            columns: ["graph_id"]
+            isOneToOne: false
+            referencedRelation: "causal_graphs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "causal_nodes_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "causal_nodes_observation_id_fkey"
+            columns: ["observation_id"]
+            isOneToOne: false
+            referencedRelation: "observations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       countries: {
         Row: {
@@ -5599,6 +5890,44 @@ export type Database = {
         }
         Relationships: []
       }
+      goal_progress_log: {
+        Row: {
+          auto_calculated: boolean | null
+          goal_id: string
+          id: string
+          note: string | null
+          recorded_at: string
+          source: string
+          value: number
+        }
+        Insert: {
+          auto_calculated?: boolean | null
+          goal_id: string
+          id?: string
+          note?: string | null
+          recorded_at?: string
+          source: string
+          value: number
+        }
+        Update: {
+          auto_calculated?: boolean | null
+          goal_id?: string
+          id?: string
+          note?: string | null
+          recorded_at?: string
+          source?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_progress_log_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "smart_goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       governance_actions: {
         Row: {
           action_description: string
@@ -8828,6 +9157,57 @@ export type Database = {
         }
         Relationships: []
       }
+      prediction_log: {
+        Row: {
+          actual_outcome: boolean | null
+          brier_score: number | null
+          context: Json | null
+          created_at: string
+          id: string
+          model_version: string | null
+          predicted_at: string
+          predicted_outcome: string
+          predicted_probability: number
+          prediction_code: string
+          resolution_deadline: string | null
+          resolved_at: string | null
+          source_entity_id: string
+          source_entity_type: string
+        }
+        Insert: {
+          actual_outcome?: boolean | null
+          brier_score?: number | null
+          context?: Json | null
+          created_at?: string
+          id?: string
+          model_version?: string | null
+          predicted_at?: string
+          predicted_outcome: string
+          predicted_probability: number
+          prediction_code: string
+          resolution_deadline?: string | null
+          resolved_at?: string | null
+          source_entity_id: string
+          source_entity_type: string
+        }
+        Update: {
+          actual_outcome?: boolean | null
+          brier_score?: number | null
+          context?: Json | null
+          created_at?: string
+          id?: string
+          model_version?: string | null
+          predicted_at?: string
+          predicted_outcome?: string
+          predicted_probability?: number
+          prediction_code?: string
+          resolution_deadline?: string | null
+          resolved_at?: string | null
+          source_entity_id?: string
+          source_entity_type?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -10370,6 +10750,84 @@ export type Database = {
             columns: ["simulation_id"]
             isOneToOne: false
             referencedRelation: "simulation_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      smart_goals: {
+        Row: {
+          achievable_rationale: string | null
+          assignment_id: string
+          baseline_value: number | null
+          created_at: string
+          current_value: number | null
+          goal_code: string
+          id: string
+          measurable_kpi_id: string | null
+          measurable_target: number | null
+          measurable_unit: string | null
+          progress_percent: number | null
+          relevant_observation_ids: string[] | null
+          specific: string
+          status: string
+          time_bound_end: string
+          time_bound_start: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          achievable_rationale?: string | null
+          assignment_id: string
+          baseline_value?: number | null
+          created_at?: string
+          current_value?: number | null
+          goal_code: string
+          id?: string
+          measurable_kpi_id?: string | null
+          measurable_target?: number | null
+          measurable_unit?: string | null
+          progress_percent?: number | null
+          relevant_observation_ids?: string[] | null
+          specific: string
+          status?: string
+          time_bound_end: string
+          time_bound_start?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          achievable_rationale?: string | null
+          assignment_id?: string
+          baseline_value?: number | null
+          created_at?: string
+          current_value?: number | null
+          goal_code?: string
+          id?: string
+          measurable_kpi_id?: string | null
+          measurable_target?: number | null
+          measurable_unit?: string | null
+          progress_percent?: number | null
+          relevant_observation_ids?: string[] | null
+          specific?: string
+          status?: string
+          time_bound_end?: string
+          time_bound_start?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "smart_goals_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "accountability_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "smart_goals_measurable_kpi_id_fkey"
+            columns: ["measurable_kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_definitions"
             referencedColumns: ["id"]
           },
         ]
