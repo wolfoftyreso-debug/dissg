@@ -24,6 +24,7 @@ export function computeLambda(level: DiagnosticScopeLevel): number {
     country: 0.82,
     region: 0.85,
     municipality: 0.88,
+    city: 0.87,
   };
   return baseLambda[level] ?? 0.80;
 }
