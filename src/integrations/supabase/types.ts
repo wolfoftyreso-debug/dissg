@@ -5420,6 +5420,207 @@ export type Database = {
           },
         ]
       }
+      gdis_causal_links: {
+        Row: {
+          bidirectional: boolean | null
+          confidence: number
+          created_at: string
+          domains: string[] | null
+          from_variable: string
+          id: string
+          lag_months: number | null
+          mechanism: string | null
+          strength: number
+          to_variable: string
+        }
+        Insert: {
+          bidirectional?: boolean | null
+          confidence?: number
+          created_at?: string
+          domains?: string[] | null
+          from_variable: string
+          id: string
+          lag_months?: number | null
+          mechanism?: string | null
+          strength?: number
+          to_variable: string
+        }
+        Update: {
+          bidirectional?: boolean | null
+          confidence?: number
+          created_at?: string
+          domains?: string[] | null
+          from_variable?: string
+          id?: string
+          lag_months?: number | null
+          mechanism?: string | null
+          strength?: number
+          to_variable?: string
+        }
+        Relationships: []
+      }
+      gdis_interventions: {
+        Row: {
+          cost_level: string
+          created_at: string
+          description: string
+          domain: string
+          effect_size: string | null
+          evidence_grade: string
+          id: string
+          implementation_barriers: string[] | null
+          name: string
+          population: string | null
+          scalability: string
+          side_effects: string[] | null
+          status: string
+          target_problems: string[] | null
+          time_to_effect: string | null
+        }
+        Insert: {
+          cost_level?: string
+          created_at?: string
+          description: string
+          domain: string
+          effect_size?: string | null
+          evidence_grade: string
+          id: string
+          implementation_barriers?: string[] | null
+          name: string
+          population?: string | null
+          scalability?: string
+          side_effects?: string[] | null
+          status?: string
+          target_problems?: string[] | null
+          time_to_effect?: string | null
+        }
+        Update: {
+          cost_level?: string
+          created_at?: string
+          description?: string
+          domain?: string
+          effect_size?: string | null
+          evidence_grade?: string
+          id?: string
+          implementation_barriers?: string[] | null
+          name?: string
+          population?: string | null
+          scalability?: string
+          side_effects?: string[] | null
+          status?: string
+          target_problems?: string[] | null
+          time_to_effect?: string | null
+        }
+        Relationships: []
+      }
+      gdis_priority_scores: {
+        Row: {
+          calculated_at: string
+          cost: number
+          evidence: number
+          id: string
+          impact: number
+          intervention_id: string
+          priority_score: number
+          problem_id: string
+          rank: number
+          rationale: string | null
+          scalability: number
+        }
+        Insert: {
+          calculated_at?: string
+          cost: number
+          evidence: number
+          id?: string
+          impact: number
+          intervention_id: string
+          priority_score: number
+          problem_id: string
+          rank: number
+          rationale?: string | null
+          scalability: number
+        }
+        Update: {
+          calculated_at?: string
+          cost?: number
+          evidence?: number
+          id?: string
+          impact?: number
+          intervention_id?: string
+          priority_score?: number
+          problem_id?: string
+          rank?: number
+          rationale?: string | null
+          scalability?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gdis_priority_scores_intervention_id_fkey"
+            columns: ["intervention_id"]
+            isOneToOne: false
+            referencedRelation: "gdis_interventions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gdis_priority_scores_problem_id_fkey"
+            columns: ["problem_id"]
+            isOneToOne: false
+            referencedRelation: "gdis_problems"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gdis_problems: {
+        Row: {
+          code: string
+          created_at: string
+          dalys_or_equivalent: number
+          description: string
+          domain: string
+          geographic_scope: string | null
+          id: string
+          population_affected: number
+          related_claims: string[] | null
+          related_variables: string[] | null
+          severity: string
+          title: string
+          trend_direction: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          dalys_or_equivalent?: number
+          description: string
+          domain: string
+          geographic_scope?: string | null
+          id: string
+          population_affected?: number
+          related_claims?: string[] | null
+          related_variables?: string[] | null
+          severity?: string
+          title: string
+          trend_direction?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          dalys_or_equivalent?: number
+          description?: string
+          domain?: string
+          geographic_scope?: string | null
+          id?: string
+          population_affected?: number
+          related_claims?: string[] | null
+          related_variables?: string[] | null
+          severity?: string
+          title?: string
+          trend_direction?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       global_changelog: {
         Row: {
           affected_downstream: string[] | null

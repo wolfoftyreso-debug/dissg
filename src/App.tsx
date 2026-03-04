@@ -123,6 +123,7 @@ import MetaLayerPage from "./pages/MetaLayerPage";
 import GRMPage from "./pages/GRMPage";
 import OCAPage from "./pages/OCAPage";
 import AKBPage from "./pages/AKBPage";
+import GDISPage from "./pages/GDISPage";
 
 const queryClient = new QueryClient();
 
@@ -253,6 +254,7 @@ const App = () => (
                 <Route path="/grm" element={<GRMPage />} />
                 <Route path="/ontology-core" element={<OCAPage />} />
                 <Route path="/akb" element={<AKBPage />} />
+                <Route path="/gdis" element={<GDISPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
