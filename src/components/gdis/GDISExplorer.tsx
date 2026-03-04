@@ -18,7 +18,7 @@ import {
   SEED_SOURCES, SEED_VARIABLES, SEED_CLAIMS,
 } from '@/core/gdis';
 import { rankInterventionsForProblem, rankAllInterventions, findRootCauses, findLeveragePoints } from '@/core/gdis/engine';
-import type { GlobalProblem, VariableDomain } from '@/core/gdis';
+import type { GlobalProblem } from '@/core/gdis';
 
 // ─── Helpers ───
 
