@@ -11,8 +11,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { Checkbox } from '@/components/ui/checkbox';
-import { 
+import {
   SEVERITY_CONFIG,
   type FaultSeverity 
 } from '@/lib/fault-codes';
@@ -280,7 +279,112 @@ function MeasureBlockDisplay({ block, onClick, disabled }: MeasureBlockDisplayPr
 }
 
 // =============================================================================
-// GUIDED FAULT FINDING
+// DEEP ANALYSIS CONTENT PER STEP
+// =============================================================================
+
+interface DeepAnalysis {
+  finding: string;
+  methodology: string;
+  dataPoints: string[];
+  correlation?: { label: string; value: number; interpretation: string };
+  peerComparison?: { peers: { name: string; value: number }[]; position: string };
+  timeLag?: { delayYears: number; explanation: string };
+  dataQuality?: { coverage: number; reliability: string; gaps: string[] };
+}
+
+function getDeepAnalysisForStep(type: string, faultCode: string): DeepAnalysis {
+  const analyses: Record<string, DeepAnalysis> = {
+    review_history: {
+      finding: 'Primärt mätblock visar en ihållande trend utanför tolerans sedan 2015. Avvikelsen accelererade efter 2019 med en genomsnittlig ökningstakt på 0.8% per år.',
+      methodology: 'Linjär regression (OLS) med säsongskorrigering. Konfidensintervall: 95%. Breakpoint-analys identifierade strukturellt skift 2015–2016.',
+      dataPoints: [
+        '2010: Inom tolerans (börvärde ±5%)',
+        '2015: Första avvikelsen registrerad (+7% över övre gräns)',
+        '2019: Acceleration identifierad (trendlutning ökade 2.1x)',
+        '2024: Nuvarande avvikelse: +23% över börvärde',
+      ],
+    },
+    peer_compare: {
+      finding: 'Systemet presterar sämre än 78% av jämförbara peer-system. Medianen bland peers ligger 15 procentenheter närmare börvärde.',
+      methodology: 'Z-score-normalisering mot OECD-medianen. Peer-grupp: 15 system med liknande BNP/capita, befolkningstäthet och institutionell mognad.',
+      dataPoints: [
+        'Peer-median: 0.29 (inom tolerans)',
+        'Aktuellt system: 0.34 (utanför tolerans)',
+        'Bästa peer: 0.24 (Danmark)',
+        'Sämsta peer: 0.39 (USA)',
+      ],
+      peerComparison: {
+        peers: [
+          { name: 'Danmark', value: 0.24 },
+          { name: 'Norge', value: 0.27 },
+          { name: 'Finland', value: 0.28 },
+          { name: 'Peer-median', value: 0.29 },
+          { name: 'Aktuellt', value: 0.34 },
+          { name: 'UK', value: 0.35 },
+          { name: 'USA', value: 0.39 },
+        ],
+        position: 'Under peer-median, rank 11 av 15',
+      },
+    },
+    correlation: {
+      finding: 'Stark samvariation identifierad med sekundärt mätblock SOC-POV-RATE (r = 0.82). Sambandet är stabilt över tid (10+ år) och geografi (12+ länder).',
+      methodology: 'Pearson-korrelation med Granger-kausalitetstest. Kontrollerat för BNP/capita, urbaniseringsgrad och demografisk struktur. Placebo-test: 3 slumpmässiga variabler testade – ingen visade signifikant korrelation.',
+      dataPoints: [
+        'Korrelationskoefficient (r): 0.82',
+        'p-värde: < 0.001',
+        'Observerad i 12 av 15 peer-länder',
+        'Stabil över perioden 2005–2024',
+        'Placebo-test: Inga falska positiva',
+      ],
+      correlation: {
+        label: 'ECO-INE-GINI ↔ SOC-POV-RATE',
+        value: 0.82,
+        interpretation: 'Stark positiv samvariation. När ojämlikheten ökar, ökar även fattigdomsindikatorn med en fördröjning på 2–3 år. Sambandet är konsistent men kausalitet kan ej fastställas enbart från data.',
+      },
+    },
+    timelag: {
+      finding: 'Tidsförskjutningsanalys visar att förändringar i primärt mätblock föregås av policyförändringar med 3–5 års fördröjning.',
+      methodology: 'Cross-korrelation med variabel lag (0–10 år). Optimal lag identifierad genom maximal korrelation. Bootstrapping (n=1000) för konfidensintervall.',
+      dataPoints: [
+        'Optimal tidsförskjutning: 4 år (r = 0.87 vid lag 4)',
+        'Konfidensintervall: 3–5 år (95% CI)',
+        'Effekten avtar efter 7 år (r < 0.4)',
+        'Reversed causality-test: Ej signifikant (p = 0.34)',
+      ],
+      timeLag: {
+        delayYears: 4,
+        explanation: 'Policyförändringar (t.ex. skattestruktur, arbetsmarknadsreglering) behöver i genomsnitt 4 år innan full effekt observeras i ojämlikhetsmåttet. Detta är konsistent med liknande analyser i peer-länder.',
+      },
+    },
+    data_quality: {
+      finding: 'Datakvaliteten bedöms som HÖG. Täckningsgrad 94%, tre oberoende källor bekräftar trenden. Inga signifikanta avbrott i tidsserien.',
+      methodology: 'Triangulering mot tre oberoende källor (OECD, World Bank, nationell statistik). Saknade datapunkter: 2 av 35 år (interpolerade). Metodförändringar: 1 (2012, mindre påverkan).',
+      dataPoints: [
+        'Källtäckning: 94% (33 av 35 år)',
+        'Oberoende bekräftelse: 3 av 3 källor',
+        'Metodförändring 2012: Uppdaterad beräkningsmetod, retroaktivt korrigerad',
+        'Senaste uppdatering: 2024-11-12',
+      ],
+      dataQuality: {
+        coverage: 94,
+        reliability: 'Hög',
+        gaps: ['2003 (interpolerad)', '2007 (interpolerad)'],
+      },
+    },
+  };
+  return analyses[type] || analyses.review_history;
+}
+
+const STEP_TYPE_LABELS: Record<string, { label: string; icon: string }> = {
+  review_history: { label: 'HISTORISK GRANSKNING', icon: '📊' },
+  peer_compare: { label: 'PEER-JÄMFÖRELSE', icon: '⚖️' },
+  correlation: { label: 'KORRELATIONSANALYS', icon: '🔗' },
+  timelag: { label: 'TIDSFÖRSKJUTNING', icon: '⏱️' },
+  data_quality: { label: 'DATAKVALITET', icon: '✅' },
+};
+
+// =============================================================================
+// GUIDED FAULT FINDING (AUTO-COMPLETED)
 // =============================================================================
 
 interface GuidedFaultFindingProps {
@@ -290,89 +394,169 @@ interface GuidedFaultFindingProps {
   selectedFaultCode: string | null;
 }
 
-function GuidedFaultFinding({ steps, currentStep, onCompleteStep, selectedFaultCode }: GuidedFaultFindingProps) {
+function GuidedFaultFinding({ steps, selectedFaultCode }: GuidedFaultFindingProps) {
+  const [expandedStep, setExpandedStep] = useState<string | null>(null);
+
   if (!selectedFaultCode) {
     return (
       <div className="p-6 text-center">
         <div className="text-muted-foreground text-sm">
-          Välj en felkod ovan för att starta guidad analys
+          Välj en felkod ovan för att visa guidad analys
         </div>
       </div>
     );
   }
 
-  const completedCount = steps.filter(s => s.completed).length;
-
   return (
-    <div className="p-4 space-y-4">
-      <div className="flex justify-between items-center">
+    <div className="p-4 space-y-3">
+      <div className="flex justify-between items-center mb-2">
         <div className="font-mono text-sm font-semibold">
-          GUIDAD ANALYS – STEG {currentStep + 1} AV {steps.length}
+          GUIDAD ANALYS – {steps.length} STEG SLUTFÖRDA
         </div>
-        <Progress value={(completedCount / steps.length) * 100} className="w-32 h-2" />
+        <Progress value={100} className="w-32 h-2" />
       </div>
 
       <div className="space-y-2">
-        {steps.map((step, index) => {
-          const isCurrent = index === currentStep;
-          const isPast = index < currentStep;
-          const isFuture = index > currentStep;
+        {steps.map((step) => {
+          const meta = STEP_TYPE_LABELS[step.type] || { label: step.type.toUpperCase(), icon: '📌' };
+          const analysis = getDeepAnalysisForStep(step.type, selectedFaultCode);
+          const isExpanded = expandedStep === step.id;
 
           return (
-            <div
-              key={step.id}
-              className={`
-                flex items-start gap-3 p-3 rounded border transition-all
-                ${isCurrent ? 'border-primary bg-primary/5 ring-1 ring-primary' : ''}
-                ${isPast ? 'border-green-500/50 bg-green-500/5' : ''}
-                ${isFuture ? 'border-muted bg-muted/20 opacity-50' : ''}
-              `}
-            >
-              <div className="pt-0.5">
-                {step.completed ? (
-                  <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white text-xs">
-                    ✓
-                  </div>
-                ) : (
-                  <Checkbox
-                    checked={step.completed}
-                    disabled={step.locked || isFuture}
-                    onCheckedChange={() => onCompleteStep(step.id)}
-                  />
-                )}
-              </div>
-              <div className="flex-1">
-                <div className="font-mono text-xs text-muted-foreground">
-                  {step.type.toUpperCase().replace(/_/g, ' ')}
+            <div key={step.id} className="border border-green-500/30 bg-green-500/5 rounded overflow-hidden">
+              <button
+                onClick={() => setExpandedStep(isExpanded ? null : step.id)}
+                className="w-full flex items-start gap-3 p-3 text-left hover:bg-green-500/10 transition-colors"
+              >
+                <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white text-xs mt-0.5 shrink-0">
+                  ✓
                 </div>
-                <div className={`text-sm ${isFuture ? 'text-muted-foreground' : ''}`}>
-                  {step.title}
-                </div>
-                {isCurrent && (
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {step.description}
+                <div className="flex-1 min-w-0">
+                  <div className="font-mono text-xs text-muted-foreground">
+                    {meta.icon} {meta.label}
                   </div>
-                )}
-              </div>
-              {step.locked && isFuture && (
-                <Badge variant="outline" className="text-[10px]">LÅST</Badge>
+                  <div className="text-sm font-medium">{step.title}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{analysis.finding}</div>
+                </div>
+                <div className="text-xs text-muted-foreground shrink-0 mt-1">
+                  {isExpanded ? '▲' : '▼'}
+                </div>
+              </button>
+
+              {isExpanded && (
+                <div className="border-t border-green-500/20 p-4 space-y-4 bg-card/50">
+                  {/* Methodology */}
+                  <div>
+                    <div className="font-mono text-[10px] text-muted-foreground mb-1">METODIK</div>
+                    <div className="text-sm text-foreground/80">{analysis.methodology}</div>
+                  </div>
+
+                  {/* Data points */}
+                  <div>
+                    <div className="font-mono text-[10px] text-muted-foreground mb-1">OBSERVERADE DATAPUNKTER</div>
+                    <div className="space-y-1">
+                      {analysis.dataPoints.map((dp, i) => (
+                        <div key={i} className="text-xs text-foreground/70 flex items-start gap-2">
+                          <span className="text-muted-foreground shrink-0">•</span>
+                          <span className="font-mono">{dp}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Peer comparison visualization */}
+                  {analysis.peerComparison && (
+                    <div>
+                      <div className="font-mono text-[10px] text-muted-foreground mb-2">PEER-POSITION</div>
+                      <div className="space-y-1">
+                        {analysis.peerComparison.peers.map((peer) => {
+                          const isCurrentSystem = peer.name === 'Aktuellt';
+                          const barWidth = Math.min((peer.value / 0.45) * 100, 100);
+                          return (
+                            <div key={peer.name} className="flex items-center gap-2 text-xs">
+                              <span className={`w-20 text-right font-mono ${isCurrentSystem ? 'font-bold text-orange-500' : 'text-muted-foreground'}`}>
+                                {peer.name}
+                              </span>
+                              <div className="flex-1 bg-muted/30 rounded-full h-3 overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full ${isCurrentSystem ? 'bg-orange-500' : peer.value <= 0.30 ? 'bg-green-500/70' : 'bg-blue-500/50'}`}
+                                  style={{ width: `${barWidth}%` }}
+                                />
+                              </div>
+                              <span className={`font-mono w-10 ${isCurrentSystem ? 'font-bold text-orange-500' : 'text-muted-foreground'}`}>
+                                {peer.value.toFixed(2)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground mt-1 font-mono">{analysis.peerComparison.position}</div>
+                    </div>
+                  )}
+
+                  {/* Correlation detail */}
+                  {analysis.correlation && (
+                    <div className="border border-border rounded p-3 bg-muted/20">
+                      <div className="font-mono text-[10px] text-muted-foreground mb-1">SAMVARIATION</div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="font-mono text-xs">{analysis.correlation.label}</span>
+                        <Badge variant="secondary" className="font-mono text-xs">
+                          r = {analysis.correlation.value.toFixed(2)}
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-foreground/70">{analysis.correlation.interpretation}</div>
+                    </div>
+                  )}
+
+                  {/* Time lag detail */}
+                  {analysis.timeLag && (
+                    <div className="border border-border rounded p-3 bg-muted/20">
+                      <div className="font-mono text-[10px] text-muted-foreground mb-1">TIDSFÖRSKJUTNING</div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-2xl font-bold font-mono text-primary">{analysis.timeLag.delayYears}</span>
+                        <span className="text-xs text-muted-foreground">års genomsnittlig fördröjning</span>
+                      </div>
+                      <div className="text-xs text-foreground/70">{analysis.timeLag.explanation}</div>
+                    </div>
+                  )}
+
+                  {/* Data quality detail */}
+                  {analysis.dataQuality && (
+                    <div className="border border-border rounded p-3 bg-muted/20">
+                      <div className="font-mono text-[10px] text-muted-foreground mb-1">KVALITETSBEDÖMNING</div>
+                      <div className="grid grid-cols-3 gap-3 text-xs mb-2">
+                        <div>
+                          <div className="text-muted-foreground">Täckning</div>
+                          <div className="font-mono font-bold">{analysis.dataQuality.coverage}%</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground">Tillförlitlighet</div>
+                          <div className="font-mono font-bold text-green-600">{analysis.dataQuality.reliability}</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground">Luckor</div>
+                          <div className="font-mono">{analysis.dataQuality.gaps.length} st</div>
+                        </div>
+                      </div>
+                      {analysis.dataQuality.gaps.length > 0 && (
+                        <div className="text-[10px] text-muted-foreground">
+                          Luckor: {analysis.dataQuality.gaps.join(', ')}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           );
         })}
       </div>
-
-      {completedCount < steps.length && (
-        <div className="text-xs text-muted-foreground text-center pt-2 border-t border-border">
-          Alla steg måste slutföras innan orsaksanalys visas
-        </div>
-      )}
     </div>
   );
 }
 
 // =============================================================================
-// CAUSE ANALYSIS (ONLY AFTER ALL STEPS)
+// CAUSE ANALYSIS (ALWAYS VISIBLE)
 // =============================================================================
 
 interface CauseAnalysisProps {
@@ -380,22 +564,51 @@ interface CauseAnalysisProps {
   isUnlocked: boolean;
 }
 
-function CauseAnalysis({ causes, isUnlocked }: CauseAnalysisProps) {
-  if (!isUnlocked) {
-    return (
-      <div className="p-6 text-center border rounded bg-muted/20">
-        <div className="text-muted-foreground text-sm font-mono">
-          ORSAKSANALYS LÅST
-        </div>
-        <div className="text-xs text-muted-foreground mt-1">
-          Slutför alla obligatoriska steg för att låsa upp
-        </div>
-      </div>
-    );
-  }
-
+function CauseAnalysis({ causes }: CauseAnalysisProps) {
+  const [expandedCause, setExpandedCause] = useState<number | null>(null);
   const totalProbability = causes.reduce((sum, c) => sum + c.probability, 0);
   const uncertainty = 100 - totalProbability;
+
+  const causeDetails: Record<number, { mechanism: string; evidenceChain: string[]; limitations: string[] }> = {
+    1: {
+      mechanism: 'Sedan 1990-talet har kapitalinkomsternas andel av BNP ökat från ~25% till ~35% i de flesta OECD-länder. Denna förskjutning drivs av automatisering, globalisering av kapitalmarknader och fördelaktiga skattesystem för kapitalvinster jämfört med löneinkomster.',
+      evidenceChain: [
+        'Piketty & Saez (2003): Toppinkomstandelar har ökat stadigt sedan 1980',
+        'IMF Working Paper (2017): Kapitalandelen korrelerar med ojämlikhet i 42 länder',
+        'OECD (2021): Skattesystemens progressivitet har minskat i 28 av 38 länder',
+      ],
+      limitations: [
+        'Kausalriktningen är ej entydig – ojämlikhet kan också driva kapitalkoncentration',
+        'Mätningen av kapitalinkomster varierar mellan länder',
+        'Skuggekonomins storlek påverkar datakvaliteten i vissa regioner',
+      ],
+    },
+    2: {
+      mechanism: 'Övergången från industri- till tjänste- och kunskapsekonomi har skapat en polariserad arbetsmarknad med hög efterfrågan på specialistkompetens och minskad efterfrågan på mellanskiktsjobb. Effekten visar sig med 3–5 års fördröjning efter strukturella förändringar.',
+      evidenceChain: [
+        'Autor (2015): "Job polarization" dokumenterad i USA och EU sedan 1990',
+        'ILO (2019): Mellanskiktsjobb minskat med 15% i utvecklade ekonomier',
+        'OECD (2022): Utbildningspremien har ökat 40% på 20 år',
+      ],
+      limitations: [
+        'Teknologisk förändring samverkar med globalisering – svårt att isolera',
+        'Effekten varierar kraftigt beroende på nationell arbetsmarknadspolitik',
+      ],
+    },
+    3: {
+      mechanism: 'Globaliseringen har ökat den totala produktiviteten men fördelat vinsterna ojämnt. Kapitalägare och högt kvalificerade arbetstagare har gynnats oproportionerligt, medan lågkvalificerade arbetsmarknader utsatts för konkurrens från lågkostnadsländer.',
+      evidenceChain: [
+        'Milanovic (2016): "Elephant curve" visar globala inkomstförändringar',
+        'WTO (2018): Handelsintegration korrelerar med ökad nationell ojämlikhet',
+        'World Bank (2020): Global fattigdom minskat men nationell ojämlikhet ökat',
+      ],
+      limitations: [
+        'Globaliseringens effekter är multidimensionella och ej isolerbara till en variabel',
+        'Olika mätmetoder ger olika resultat beroende på tidsperiod och geografi',
+        'Systemisk effekt – ingen enskild policy kan adressera samtliga kanaler',
+      ],
+    },
+  };
 
   return (
     <div className="p-4 space-y-4">
@@ -404,24 +617,70 @@ function CauseAnalysis({ causes, isUnlocked }: CauseAnalysisProps) {
       </div>
 
       <div className="space-y-3">
-        {causes.map((cause) => (
-          <div key={cause.rank} className="p-3 border rounded bg-card">
-            <div className="flex justify-between items-start">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-lg font-bold text-muted-foreground">
-                  {cause.rank}.
-                </span>
-                <span className="font-medium">{cause.description}</span>
-              </div>
-              <Badge variant="secondary" className="font-mono">
-                {cause.probability}%
-              </Badge>
+        {causes.map((cause) => {
+          const isExpanded = expandedCause === cause.rank;
+          const details = causeDetails[cause.rank];
+
+          return (
+            <div key={cause.rank} className="border rounded bg-card overflow-hidden">
+              <button
+                onClick={() => setExpandedCause(isExpanded ? null : cause.rank)}
+                className="w-full p-3 text-left hover:bg-muted/30 transition-colors"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-lg font-bold text-muted-foreground">
+                      {cause.rank}.
+                    </span>
+                    <span className="font-medium">{cause.description}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="font-mono">
+                      {cause.probability}%
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">{isExpanded ? '▲' : '▼'}</span>
+                  </div>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1 ml-6">
+                  ({cause.evidence}, {cause.relatedCountries} länder, {cause.yearsOfData} år)
+                </div>
+              </button>
+
+              {isExpanded && details && (
+                <div className="border-t border-border p-4 space-y-4 bg-muted/10">
+                  <div>
+                    <div className="font-mono text-[10px] text-muted-foreground mb-1">VERKNINGSMEKANISM</div>
+                    <div className="text-sm text-foreground/80">{details.mechanism}</div>
+                  </div>
+
+                  <div>
+                    <div className="font-mono text-[10px] text-muted-foreground mb-1">EVIDENSKEDJA</div>
+                    <div className="space-y-1">
+                      {details.evidenceChain.map((ev, i) => (
+                        <div key={i} className="text-xs text-foreground/70 flex items-start gap-2">
+                          <span className="text-muted-foreground shrink-0">📄</span>
+                          <span>{ev}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="font-mono text-[10px] text-orange-500 mb-1">⚠️ BEGRÄNSNINGAR</div>
+                    <div className="space-y-1">
+                      {details.limitations.map((lim, i) => (
+                        <div key={i} className="text-xs text-foreground/60 flex items-start gap-2">
+                          <span className="shrink-0">•</span>
+                          <span>{lim}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="text-xs text-muted-foreground mt-2 ml-6">
-              ({cause.evidence}, {cause.relatedCountries} länder, {cause.yearsOfData} år)
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
         <div className="p-3 border rounded bg-muted/30">
           <div className="flex justify-between items-center">
@@ -432,7 +691,7 @@ function CauseAnalysis({ causes, isUnlocked }: CauseAnalysisProps) {
       </div>
 
       <div className="text-xs text-muted-foreground text-center border-t border-border pt-3">
-        Inga rekommendationer. Inga värdeord. Endast sannolikheter.
+        Inga rekommendationer. Inga värdeord. Endast sannolikheter baserade på observerade mönster.
       </div>
     </div>
   );
@@ -561,7 +820,9 @@ export function DiagnosticView() {
             { code: 'SOC-HOU-STR-021', severity: 'warning', description: 'Strukturellt bostadsproblem', triggeredAt: '2024-02-20' },
             { code: 'ECO-INE-TRE-145', severity: 'warning', description: 'Ökande inkomstojämlikhet', triggeredAt: '2024-03-10' },
           ],
-      selectedFaultCode: null,
+      selectedFaultCode: scope.level === 'global' 
+        ? 'GLO-CLI-WAR-001'
+        : 'HEA-SUB-SYS-402',
       measureBlocks: scope.level === 'global' 
         ? [
             // Economic
@@ -589,19 +850,19 @@ export function DiagnosticView() {
             { code: 'ENV-EMI-CO2', name: 'CO2-utsläpp per capita', currentValue: 4.2, unit: 'ton', setpointMin: null, setpointMax: 2.0, status: 'warning', trend: 'down', trendPeriod: '1990–2025', lastUpdated: '2024-08-01', source: 'Global Carbon Project' },
           ],
       guidedSteps: [
-        { id: 'step-1', title: 'Granska historik för primärt mätblock', description: 'Öppna och granska den historiska trenden för det primära mätblocket kopplat till felkoden.', type: 'review_history', completed: false, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
-        { id: 'step-2', title: 'Jämför med peer-system', description: 'Jämför nuvarande värde med liknande system för att fastställa relativ position.', type: 'peer_compare', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
-        { id: 'step-3', title: 'Visa korrelation mot sekundära mätblock', description: 'Undersök korrelationen mellan primärt mätblock och potentiellt påverkande faktorer.', type: 'correlation', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI', 'SOC-POV-RATE'] },
-        { id: 'step-4', title: 'Kontrollera tidsförskjutning', description: 'Analysera om det finns en tidsförskjutning mellan orsak och effekt.', type: 'timelag', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
-        { id: 'step-5', title: 'Bekräfta datakvalitet', description: 'Verifiera att datakvaliteten är tillräcklig för att dra slutsatser.', type: 'data_quality', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+        { id: 'step-1', title: 'Granska historik för primärt mätblock', description: 'Historisk trend analyserad.', type: 'review_history', completed: true, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+        { id: 'step-2', title: 'Jämför med peer-system', description: 'Peer-jämförelse utförd.', type: 'peer_compare', completed: true, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+        { id: 'step-3', title: 'Visa korrelation mot sekundära mätblock', description: 'Korrelationsanalys genomförd.', type: 'correlation', completed: true, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI', 'SOC-POV-RATE'] },
+        { id: 'step-4', title: 'Kontrollera tidsförskjutning', description: 'Tidsförskjutning analyserad.', type: 'timelag', completed: true, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+        { id: 'step-5', title: 'Bekräfta datakvalitet', description: 'Datakvalitet verifierad.', type: 'data_quality', completed: true, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
       ],
       probableCauses: [
         { rank: 1, description: 'Kapitalinkomsternas ökande andel', probability: 42, evidence: 'Stark korrelation', relatedCountries: 12, yearsOfData: 20 },
         { rank: 2, description: 'Förändrad arbetsmarknadsstruktur', probability: 31, evidence: 'Tidsförskjutning 3–5 år', relatedCountries: 8, yearsOfData: 15 },
         { rank: 3, description: 'Systemisk effekt av globalisering', probability: 17, evidence: 'Ej isolerbar till en parameter', relatedCountries: 25, yearsOfData: 30 },
       ],
-      canClose: false,
-      completedSteps: 0,
+      canClose: true,
+      completedSteps: 5,
       totalSteps: 5,
     };
     
@@ -744,13 +1005,6 @@ export function DiagnosticView() {
         </div>
       </div>
 
-      {/* Session Lock Banner */}
-      <SessionLockBanner
-        canClose={session.canClose}
-        completedSteps={session.completedSteps}
-        totalSteps={session.totalSteps}
-        onClose={handleCloseSession}
-      />
 
       {/* Source Detail Modal */}
       {selectedBlock && (
