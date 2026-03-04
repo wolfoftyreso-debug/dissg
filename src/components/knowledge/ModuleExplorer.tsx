@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import {
   Database, Brain, Lightbulb, Search, AlertTriangle, CheckCircle2,
-  XCircle, HelpCircle, ArrowRight, Layers, Link2, BarChart3,
-  ShieldAlert, TrendingUp, Beaker,
+  XCircle, ArrowRight, Layers, Link2, BarChart3,
+  ShieldAlert, TrendingUp,
 } from 'lucide-react';
 import {
   NUTRITION_MODULE,
@@ -19,9 +18,9 @@ import {
   NUTRITION_CROSS_MODULE,
   NUTRITION_ONTOLOGY,
 } from '@/core/knowledge-engine/modules/nutrition';
-import { evaluateEvidence, resolveClaimStatus, detectConflicts } from '@/core/knowledge-engine/claim-engine';
+import { detectConflicts } from '@/core/knowledge-engine/claim-engine';
 import { runFullMetaAnalysis } from '@/core/knowledge-engine/meta-engine';
-import type { KnowledgeModule, DomainObservation, KnowledgeClaim, EvidenceLink } from '@/core/knowledge-engine/types';
+import type { KnowledgeModule, DomainObservation, KnowledgeClaim } from '@/core/knowledge-engine/types';
 
 const CLAIM_STATUS_COLORS: Record<string, string> = {
   supported: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
@@ -42,7 +41,6 @@ const QUALITY_COLORS: Record<string, string> = {
 
 export function ModuleExplorer() {
   const [activeTab, setActiveTab] = useState('overview');
-  const module = NUTRITION_MODULE as KnowledgeModule & { id: string };
 
   // Run meta analysis on seed data
   const mockModule = { ...NUTRITION_MODULE, id: 'nutrition-v1' } as KnowledgeModule;

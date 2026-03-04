@@ -12,8 +12,6 @@ import type {
   EvidenceLink,
   ModuleMetaAnalysis,
   MetaFinding,
-  MetaAnalysisType,
-  CrossModuleVariable,
 } from './types';
 
 // ============================================================================

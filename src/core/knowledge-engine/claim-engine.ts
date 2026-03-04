@@ -11,7 +11,6 @@ import type {
   EvidenceLink,
   EvidenceQuality,
   ClaimStatus,
-  EVIDENCE_HIERARCHY,
 } from './types';
 
 // ============================================================================

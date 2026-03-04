@@ -9,7 +9,6 @@ import type {
   DomainOntology,
   DomainObservation,
   KnowledgeClaim,
-  EvidenceLink,
   InterventionRanking,
   CrossModuleVariable,
 } from '../types';
