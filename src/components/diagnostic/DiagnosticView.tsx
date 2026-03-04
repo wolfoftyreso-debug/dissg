@@ -12,7 +12,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import {
-import { 
   SEVERITY_CONFIG,
   type FaultSeverity 
 } from '@/lib/fault-codes';
