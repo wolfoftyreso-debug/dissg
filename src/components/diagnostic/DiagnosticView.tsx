@@ -36,6 +36,7 @@ interface ActiveFaultCode {
   code: string;
   severity: FaultSeverity;
   description: string;
+  explanation: string;
   triggeredAt: string;
 }
 
@@ -194,11 +195,28 @@ function FaultCodePanel({ faultCodes, selectedCode, onSelectCode }: FaultCodePan
           })
         )}
       </div>
-      {selectedCode && (
-        <div className="mt-2 text-xs text-muted-foreground">
-          Vald felkod låser vyn till guidad analys
-        </div>
-      )}
+      {selectedCode && (() => {
+        const selected = faultCodes.find(fc => fc.code === selectedCode);
+        if (!selected) return null;
+        const config = SEVERITY_CONFIG[selected.severity];
+        return (
+          <div className="mt-3 p-3 rounded border bg-muted/30" style={{ borderColor: `${config.color}30` }}>
+            <div className="flex items-start gap-2">
+              <span className="font-mono text-xs font-bold" style={{ color: config.color }}>
+                {selected.code}
+              </span>
+              <span className="text-xs text-muted-foreground">–</span>
+              <span className="text-sm font-medium">{selected.description}</span>
+            </div>
+            <p className="text-xs text-foreground/70 mt-2 leading-relaxed">
+              {selected.explanation}
+            </p>
+            <div className="text-[10px] text-muted-foreground mt-2 font-mono">
+              Triggad: {selected.triggeredAt} · Allvarlighet: {config.label}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
@@ -810,15 +828,15 @@ export function DiagnosticView() {
       },
       activeFaultCodes: scope.level === 'global' 
         ? [
-            { code: 'GLO-CLI-WAR-001', severity: 'critical', description: 'Klimatsystemavvikelse', triggeredAt: '2024-01-01' },
-            { code: 'GLO-DEM-STR-301', severity: 'critical', description: 'Strukturell demokratisk erosion globalt', triggeredAt: '2024-02-01' },
-            { code: 'GLO-INE-TRE-002', severity: 'systemic', description: 'Global ojämlikhetsacceleration', triggeredAt: '2024-02-15' },
-            { code: 'GLO-DEM-FER-003', severity: 'warning', description: 'Fertilitetskris i utvecklade länder', triggeredAt: '2024-03-01' },
+            { code: 'GLO-CLI-WAR-001', severity: 'critical', description: 'Klimatsystemavvikelse', explanation: 'Global medeltemperatur och extremväderfrekvens avviker signifikant från historiska baslinjer. Mätblock för CO₂-koncentration, havsyttemperatur och isutbredning visar ihållande trend utanför tolerans sedan 2015. Felkoden triggas när ≥3 klimatrelaterade sensorer samtidigt överstiger börvärde med >15%.', triggeredAt: '2024-01-01' },
+            { code: 'GLO-DEM-STR-301', severity: 'critical', description: 'Strukturell demokratisk erosion globalt', explanation: 'Demokratiindex, pressfrihet och institutionell tillit visar samordnad nedgång i >40% av mätta länder. Mönstret är strukturellt (ej cykliskt) baserat på 15 års trendanalys. Felkoden triggas vid ihållande nedgång i ≥3 demokratirelaterade mätblock under ≥5 år.', triggeredAt: '2024-02-01' },
+            { code: 'GLO-INE-TRE-002', severity: 'systemic', description: 'Global ojämlikhetsacceleration', explanation: 'Gini-koefficienten och topp-10%-inkomstandelen accelererar i de flesta OECD-länder. Trenden har ökat i hastighet sedan 2019. Felkoden triggas när ojämlikhetsmåttets ändringstakt överstiger det historiska genomsnittet med >2 standardavvikelser under ≥3 på varandra följande mätperioder.', triggeredAt: '2024-02-15' },
+            { code: 'GLO-DEM-FER-003', severity: 'warning', description: 'Fertilitetskris i utvecklade länder', explanation: 'Total fertilitet (TFR) ligger under reproduktionsnivån (2.1) i 75% av utvecklade ekonomier. Nedgången accelererar i Östasien och Sydeuropa. Felkoden triggas när TFR understiger 1.5 i >5 länder med BNP/capita >30 000 USD.', triggeredAt: '2024-03-01' },
           ]
         : [
-            { code: 'HEA-SUB-SYS-402', severity: 'critical', description: 'Systemiskt missbruksproblem', triggeredAt: '2024-01-15' },
-            { code: 'SOC-HOU-STR-021', severity: 'warning', description: 'Strukturellt bostadsproblem', triggeredAt: '2024-02-20' },
-            { code: 'ECO-INE-TRE-145', severity: 'warning', description: 'Ökande inkomstojämlikhet', triggeredAt: '2024-03-10' },
+            { code: 'HEA-SUB-SYS-402', severity: 'critical', description: 'Systemiskt missbruksproblem', explanation: 'Opioidrelaterade dödsfall, alkoholrelaterad sjuklighet och psykiatrisk samsjuklighet överstiger samtliga börvärden. Mönstret tyder på systemisk orsak snarare än isolerad substansproblematik. Felkoden triggas vid samtidig avvikelse i ≥3 substansrelaterade mätblock.', triggeredAt: '2024-01-15' },
+            { code: 'SOC-HOU-STR-021', severity: 'warning', description: 'Strukturellt bostadsproblem', explanation: 'Bostadsbestånd i förhållande till efterfrågan understiger börvärde (ratio <1.0). Nybyggnationstakten är otillräcklig för att kompensera befolkningstillväxt och urbanisering. Felkoden triggas vid persistent bostadsbrist (ratio <1.0) under ≥3 år.', triggeredAt: '2024-02-20' },
+            { code: 'ECO-INE-TRE-145', severity: 'warning', description: 'Ökande inkomstojämlikhet', explanation: 'Gini-koefficienten ökar stadigt och överstiger det OECD-genomsnittliga börvärdet (0.30). Ökningen drivs primärt av kapitalinkomstfördelning. Felkoden triggas vid Gini >0.32 med positiv trend under ≥5 år.', triggeredAt: '2024-03-10' },
           ],
       selectedFaultCode: scope.level === 'global' 
         ? 'GLO-CLI-WAR-001'
