@@ -6509,6 +6509,378 @@ export type Database = {
         }
         Relationships: []
       }
+      grm_causal_links: {
+        Row: {
+          claim_ids: string[] | null
+          code: string
+          confidence: string
+          confidence_score: number
+          created_at: string
+          direction: string
+          effect_delay_max_days: number | null
+          effect_delay_min_days: number | null
+          effect_duration: string
+          effect_variance: number | null
+          evidence_count: number
+          evidence_quality: string
+          falsifiable: boolean
+          falsification_criteria: string | null
+          id: string
+          is_cross_domain: boolean
+          is_persistent: boolean
+          mechanism_description: string | null
+          population_modifiers: Json | null
+          population_scope: string | null
+          source_domain: string
+          source_id: string
+          source_label: string
+          source_type: string
+          strength: number
+          target_domain: string
+          target_id: string
+          target_label: string
+          target_type: string
+          updated_at: string
+        }
+        Insert: {
+          claim_ids?: string[] | null
+          code: string
+          confidence?: string
+          confidence_score?: number
+          created_at?: string
+          direction?: string
+          effect_delay_max_days?: number | null
+          effect_delay_min_days?: number | null
+          effect_duration?: string
+          effect_variance?: number | null
+          evidence_count?: number
+          evidence_quality?: string
+          falsifiable?: boolean
+          falsification_criteria?: string | null
+          id?: string
+          is_cross_domain?: boolean
+          is_persistent?: boolean
+          mechanism_description?: string | null
+          population_modifiers?: Json | null
+          population_scope?: string | null
+          source_domain: string
+          source_id: string
+          source_label: string
+          source_type: string
+          strength?: number
+          target_domain: string
+          target_id: string
+          target_label: string
+          target_type: string
+          updated_at?: string
+        }
+        Update: {
+          claim_ids?: string[] | null
+          code?: string
+          confidence?: string
+          confidence_score?: number
+          created_at?: string
+          direction?: string
+          effect_delay_max_days?: number | null
+          effect_delay_min_days?: number | null
+          effect_duration?: string
+          effect_variance?: number | null
+          evidence_count?: number
+          evidence_quality?: string
+          falsifiable?: boolean
+          falsification_criteria?: string | null
+          id?: string
+          is_cross_domain?: boolean
+          is_persistent?: boolean
+          mechanism_description?: string | null
+          population_modifiers?: Json | null
+          population_scope?: string | null
+          source_domain?: string
+          source_id?: string
+          source_label?: string
+          source_type?: string
+          strength?: number
+          target_domain?: string
+          target_id?: string
+          target_label?: string
+          target_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      grm_discoveries: {
+        Row: {
+          chain: string[]
+          chain_labels: string[]
+          detected_at: string
+          discovery_type: string
+          domains_crossed: string[]
+          id: string
+          inferred_statement: string
+          potential_intervention_points: string[] | null
+          status: string
+          total_confidence: number
+          total_strength: number
+        }
+        Insert: {
+          chain?: string[]
+          chain_labels?: string[]
+          detected_at?: string
+          discovery_type?: string
+          domains_crossed?: string[]
+          id?: string
+          inferred_statement: string
+          potential_intervention_points?: string[] | null
+          status?: string
+          total_confidence?: number
+          total_strength?: number
+        }
+        Update: {
+          chain?: string[]
+          chain_labels?: string[]
+          detected_at?: string
+          discovery_type?: string
+          domains_crossed?: string[]
+          id?: string
+          inferred_statement?: string
+          potential_intervention_points?: string[] | null
+          status?: string
+          total_confidence?: number
+          total_strength?: number
+        }
+        Relationships: []
+      }
+      grm_entities: {
+        Row: {
+          aliases: string[] | null
+          category: string
+          code: string
+          created_at: string
+          description: string | null
+          domain: string
+          id: string
+          metadata: Json | null
+          name: string
+          parent_entity_id: string | null
+        }
+        Insert: {
+          aliases?: string[] | null
+          category?: string
+          code: string
+          created_at?: string
+          description?: string | null
+          domain: string
+          id?: string
+          metadata?: Json | null
+          name: string
+          parent_entity_id?: string | null
+        }
+        Update: {
+          aliases?: string[] | null
+          category?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          domain?: string
+          id?: string
+          metadata?: Json | null
+          name?: string
+          parent_entity_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grm_entities_parent_entity_id_fkey"
+            columns: ["parent_entity_id"]
+            isOneToOne: false
+            referencedRelation: "grm_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grm_interventions: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          domain: string
+          estimated_cost_level: string | null
+          geographic_scope: string | null
+          id: string
+          intervention_type: string
+          name: string
+          population_scope: string | null
+          reversibility: string
+          target_variable_ids: string[] | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          domain: string
+          estimated_cost_level?: string | null
+          geographic_scope?: string | null
+          id?: string
+          intervention_type?: string
+          name: string
+          population_scope?: string | null
+          reversibility?: string
+          target_variable_ids?: string[] | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          domain?: string
+          estimated_cost_level?: string | null
+          geographic_scope?: string | null
+          id?: string
+          intervention_type?: string
+          name?: string
+          population_scope?: string | null
+          reversibility?: string
+          target_variable_ids?: string[] | null
+        }
+        Relationships: []
+      }
+      grm_outcomes: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          desirability: string
+          domain: string
+          id: string
+          is_terminal: boolean
+          measurement_variable_id: string | null
+          name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          desirability?: string
+          domain: string
+          id?: string
+          is_terminal?: boolean
+          measurement_variable_id?: string | null
+          name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          desirability?: string
+          domain?: string
+          id?: string
+          is_terminal?: boolean
+          measurement_variable_id?: string | null
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grm_outcomes_measurement_variable_id_fkey"
+            columns: ["measurement_variable_id"]
+            isOneToOne: false
+            referencedRelation: "grm_variables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      grm_simulation_log: {
+        Row: {
+          domains_impacted: string[] | null
+          id: string
+          intervention_id: string
+          magnitude_change_percent: number
+          results: Json
+          run_at: string
+          target_population: string | null
+          time_horizon_months: number
+          total_nodes_affected: number
+        }
+        Insert: {
+          domains_impacted?: string[] | null
+          id?: string
+          intervention_id: string
+          magnitude_change_percent: number
+          results?: Json
+          run_at?: string
+          target_population?: string | null
+          time_horizon_months?: number
+          total_nodes_affected?: number
+        }
+        Update: {
+          domains_impacted?: string[] | null
+          id?: string
+          intervention_id?: string
+          magnitude_change_percent?: number
+          results?: Json
+          run_at?: string
+          target_population?: string | null
+          time_horizon_months?: number
+          total_nodes_affected?: number
+        }
+        Relationships: []
+      }
+      grm_variables: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          domain: string
+          geographic_scope: string | null
+          id: string
+          linked_entity_id: string | null
+          linked_kpi_code: string | null
+          max_value: number | null
+          measurement_frequency: string | null
+          min_value: number | null
+          name: string
+          unit: string | null
+          variable_type: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          domain: string
+          geographic_scope?: string | null
+          id?: string
+          linked_entity_id?: string | null
+          linked_kpi_code?: string | null
+          max_value?: number | null
+          measurement_frequency?: string | null
+          min_value?: number | null
+          name: string
+          unit?: string | null
+          variable_type?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          domain?: string
+          geographic_scope?: string | null
+          id?: string
+          linked_entity_id?: string | null
+          linked_kpi_code?: string | null
+          max_value?: number | null
+          measurement_frequency?: string | null
+          min_value?: number | null
+          name?: string
+          unit?: string | null
+          variable_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grm_variables_linked_entity_id_fkey"
+            columns: ["linked_entity_id"]
+            isOneToOne: false
+            referencedRelation: "grm_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       health_indicators: {
         Row: {
           aggregation_method: string | null
