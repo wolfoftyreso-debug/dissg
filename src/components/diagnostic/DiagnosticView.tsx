@@ -1005,13 +1005,6 @@ export function DiagnosticView() {
         </div>
       </div>
 
-      {/* Session Lock Banner */}
-      <SessionLockBanner
-        canClose={session.canClose}
-        completedSteps={session.completedSteps}
-        totalSteps={session.totalSteps}
-        onClose={handleCloseSession}
-      />
 
       {/* Source Detail Modal */}
       {selectedBlock && (
