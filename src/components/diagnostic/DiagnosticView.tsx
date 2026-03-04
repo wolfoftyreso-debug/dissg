@@ -36,6 +36,7 @@ interface ActiveFaultCode {
   code: string;
   severity: FaultSeverity;
   description: string;
+  explanation: string;
   triggeredAt: string;
 }
 
