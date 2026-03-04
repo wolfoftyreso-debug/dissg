@@ -248,6 +248,7 @@ const App = () => (
                 <Route path="/knowledge-modules" element={<KnowledgeModulesPage />} />
                 <Route path="/uce" element={<UCEPage />} />
                 <Route path="/meta-layer" element={<MetaLayerPage />} />
+                <Route path="/grm" element={<GRMPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
