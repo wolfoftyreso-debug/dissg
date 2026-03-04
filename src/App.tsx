@@ -117,6 +117,7 @@ import OracleStressTestPage from "./pages/OracleStressTest";
 import AccountabilityPage from "./pages/Accountability";
 import CalibrationPage from "./pages/Calibration";
 import CausalDAGPage from "./pages/CausalDAG";
+import KnowledgeModulesPage from "./pages/KnowledgeModules";
 
 const queryClient = new QueryClient();
 
@@ -241,6 +242,7 @@ const App = () => (
                 <Route path="/accountability" element={<AccountabilityPage />} />
                 <Route path="/calibration" element={<CalibrationPage />} />
                 <Route path="/causal-dag" element={<CausalDAGPage />} />
+                <Route path="/knowledge-modules" element={<KnowledgeModulesPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
