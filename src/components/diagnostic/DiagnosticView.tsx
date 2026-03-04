@@ -850,19 +850,19 @@ export function DiagnosticView() {
             { code: 'ENV-EMI-CO2', name: 'CO2-utsläpp per capita', currentValue: 4.2, unit: 'ton', setpointMin: null, setpointMax: 2.0, status: 'warning', trend: 'down', trendPeriod: '1990–2025', lastUpdated: '2024-08-01', source: 'Global Carbon Project' },
           ],
       guidedSteps: [
-        { id: 'step-1', title: 'Granska historik för primärt mätblock', description: 'Öppna och granska den historiska trenden för det primära mätblocket kopplat till felkoden.', type: 'review_history', completed: false, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
-        { id: 'step-2', title: 'Jämför med peer-system', description: 'Jämför nuvarande värde med liknande system för att fastställa relativ position.', type: 'peer_compare', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
-        { id: 'step-3', title: 'Visa korrelation mot sekundära mätblock', description: 'Undersök korrelationen mellan primärt mätblock och potentiellt påverkande faktorer.', type: 'correlation', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI', 'SOC-POV-RATE'] },
-        { id: 'step-4', title: 'Kontrollera tidsförskjutning', description: 'Analysera om det finns en tidsförskjutning mellan orsak och effekt.', type: 'timelag', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
-        { id: 'step-5', title: 'Bekräfta datakvalitet', description: 'Verifiera att datakvaliteten är tillräcklig för att dra slutsatser.', type: 'data_quality', completed: false, locked: true, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+        { id: 'step-1', title: 'Granska historik för primärt mätblock', description: 'Historisk trend analyserad.', type: 'review_history', completed: true, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+        { id: 'step-2', title: 'Jämför med peer-system', description: 'Peer-jämförelse utförd.', type: 'peer_compare', completed: true, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+        { id: 'step-3', title: 'Visa korrelation mot sekundära mätblock', description: 'Korrelationsanalys genomförd.', type: 'correlation', completed: true, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI', 'SOC-POV-RATE'] },
+        { id: 'step-4', title: 'Kontrollera tidsförskjutning', description: 'Tidsförskjutning analyserad.', type: 'timelag', completed: true, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
+        { id: 'step-5', title: 'Bekräfta datakvalitet', description: 'Datakvalitet verifierad.', type: 'data_quality', completed: true, locked: false, requiredMeasureBlocks: ['ECO-INE-GINI'] },
       ],
       probableCauses: [
         { rank: 1, description: 'Kapitalinkomsternas ökande andel', probability: 42, evidence: 'Stark korrelation', relatedCountries: 12, yearsOfData: 20 },
         { rank: 2, description: 'Förändrad arbetsmarknadsstruktur', probability: 31, evidence: 'Tidsförskjutning 3–5 år', relatedCountries: 8, yearsOfData: 15 },
         { rank: 3, description: 'Systemisk effekt av globalisering', probability: 17, evidence: 'Ej isolerbar till en parameter', relatedCountries: 25, yearsOfData: 30 },
       ],
-      canClose: false,
-      completedSteps: 0,
+      canClose: true,
+      completedSteps: 5,
       totalSteps: 5,
     };
     
