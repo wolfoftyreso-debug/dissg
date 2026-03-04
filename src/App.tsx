@@ -118,6 +118,7 @@ import AccountabilityPage from "./pages/Accountability";
 import CalibrationPage from "./pages/Calibration";
 import CausalDAGPage from "./pages/CausalDAG";
 import KnowledgeModulesPage from "./pages/KnowledgeModules";
+import UCEPage from "./pages/UCEPage";
 
 const queryClient = new QueryClient();
 
@@ -243,6 +244,7 @@ const App = () => (
                 <Route path="/calibration" element={<CalibrationPage />} />
                 <Route path="/causal-dag" element={<CausalDAGPage />} />
                 <Route path="/knowledge-modules" element={<KnowledgeModulesPage />} />
+                <Route path="/uce" element={<UCEPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
