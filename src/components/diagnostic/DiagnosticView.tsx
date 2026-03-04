@@ -195,11 +195,28 @@ function FaultCodePanel({ faultCodes, selectedCode, onSelectCode }: FaultCodePan
           })
         )}
       </div>
-      {selectedCode && (
-        <div className="mt-2 text-xs text-muted-foreground">
-          Vald felkod låser vyn till guidad analys
-        </div>
-      )}
+      {selectedCode && (() => {
+        const selected = faultCodes.find(fc => fc.code === selectedCode);
+        if (!selected) return null;
+        const config = SEVERITY_CONFIG[selected.severity];
+        return (
+          <div className="mt-3 p-3 rounded border bg-muted/30" style={{ borderColor: `${config.color}30` }}>
+            <div className="flex items-start gap-2">
+              <span className="font-mono text-xs font-bold" style={{ color: config.color }}>
+                {selected.code}
+              </span>
+              <span className="text-xs text-muted-foreground">–</span>
+              <span className="text-sm font-medium">{selected.description}</span>
+            </div>
+            <p className="text-xs text-foreground/70 mt-2 leading-relaxed">
+              {selected.explanation}
+            </p>
+            <div className="text-[10px] text-muted-foreground mt-2 font-mono">
+              Triggad: {selected.triggeredAt} · Allvarlighet: {config.label}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
