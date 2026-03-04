@@ -820,7 +820,9 @@ export function DiagnosticView() {
             { code: 'SOC-HOU-STR-021', severity: 'warning', description: 'Strukturellt bostadsproblem', triggeredAt: '2024-02-20' },
             { code: 'ECO-INE-TRE-145', severity: 'warning', description: 'Ökande inkomstojämlikhet', triggeredAt: '2024-03-10' },
           ],
-      selectedFaultCode: null,
+      selectedFaultCode: scope.level === 'global' 
+        ? 'GLO-CLI-WAR-001'
+        : 'HEA-SUB-SYS-402',
       measureBlocks: scope.level === 'global' 
         ? [
             // Economic
