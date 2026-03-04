@@ -123,6 +123,7 @@ import MetaLayerPage from "./pages/MetaLayerPage";
 import GRMPage from "./pages/GRMPage";
 import OCAPage from "./pages/OCAPage";
 import AKBPage from "./pages/AKBPage";
+import GDISPage from "./pages/GDISPage";
 
 const queryClient = new QueryClient();
 
