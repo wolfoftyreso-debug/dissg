@@ -8,17 +8,17 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
-  Globe, AlertTriangle, Zap, TrendingUp, BookOpen, Shield, Search,
-  ArrowRight, ChevronDown, ChevronUp, Link2, Eye, FileJson, Activity,
-  Users, Layers, Target, Brain, Heart, Leaf, GraduationCap, DollarSign,
+  Globe, AlertTriangle, Zap, TrendingUp, BookOpen, Shield,
+  ArrowRight, ChevronDown, ChevronUp, Link2, Eye, Activity,
+  Users, Target, Heart, Leaf, GraduationCap, DollarSign,
   Factory, Scale,
 } from 'lucide-react';
 import {
   SEED_PROBLEMS, SEED_INTERVENTIONS, SEED_CAUSAL_LINKS,
   SEED_SOURCES, SEED_VARIABLES, SEED_CLAIMS,
 } from '@/core/gdis';
-import { rankInterventionsForProblem, generateRecommendation } from '@/core/gdis/engine';
-import type { GlobalProblem, VariableDomain, PriorityScore } from '@/core/gdis';
+import { rankInterventionsForProblem } from '@/core/gdis/engine';
+import type { GlobalProblem, VariableDomain } from '@/core/gdis';
 
 // ─── Helpers ───
 
