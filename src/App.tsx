@@ -120,6 +120,7 @@ import CausalDAGPage from "./pages/CausalDAG";
 import KnowledgeModulesPage from "./pages/KnowledgeModules";
 import UCEPage from "./pages/UCEPage";
 import MetaLayerPage from "./pages/MetaLayerPage";
+import GRMPage from "./pages/GRMPage";
 
 const queryClient = new QueryClient();
 
@@ -247,6 +248,7 @@ const App = () => (
                 <Route path="/knowledge-modules" element={<KnowledgeModulesPage />} />
                 <Route path="/uce" element={<UCEPage />} />
                 <Route path="/meta-layer" element={<MetaLayerPage />} />
+                <Route path="/grm" element={<GRMPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
