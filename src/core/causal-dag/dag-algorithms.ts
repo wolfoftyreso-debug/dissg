@@ -17,7 +17,7 @@ export function detectCycle(nodes: CausalNode[], edges: CausalEdge[]): string[] 
     adj.get(e.sourceId)?.push(e.targetId);
   }
 
-  const WHITE = 0, GRAY = 1, BLACK = 2;
+  const WHITE = 0, _GRAY = 1, _BLACK = 2;
   const color = new Map<string, number>();
   const parent = new Map<string, string | null>();
   for (const n of nodes) {

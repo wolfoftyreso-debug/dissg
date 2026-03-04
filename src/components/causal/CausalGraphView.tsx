@@ -7,9 +7,8 @@
 import React, { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { CausalDAG, createCausalDAG } from '@/core/causal-dag';
-import type { CausalGraph, CausalNode, CausalEdge } from '@/core/causal-dag';
+import { createCausalDAG } from '@/core/causal-dag';
+import type { CausalGraph } from '@/core/causal-dag';
 
 // =============================================================================
 // DEMO GRAPH
