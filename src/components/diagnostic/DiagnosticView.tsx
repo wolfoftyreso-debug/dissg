@@ -21,7 +21,6 @@ import {
   type DiagnosticSession,
   type DiagnosticResult,
   type MeasureBlock,
-  type CauseDetails,
 } from '@/core/diagnostic-engine';
 import type { DiagnosticScope } from '@/core/diagnostic-engine';
 

@@ -6,7 +6,7 @@
 
 import type { FaultSeverity } from '@/lib/fault-codes';
 
-export type DiagnosticScopeLevel = 'global' | 'continent' | 'country' | 'region' | 'municipality';
+export type DiagnosticScopeLevel = 'global' | 'continent' | 'country' | 'region' | 'municipality' | 'city';
 
 export interface DiagnosticScope {
   level: DiagnosticScopeLevel;
