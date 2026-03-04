@@ -446,6 +446,260 @@ export type Database = {
         }
         Relationships: []
       }
+      akb_generated_questions: {
+        Row: {
+          category: string
+          claim_id: string
+          created_at: string
+          difficulty: string
+          id: string
+          language_code: string
+          parent_question_id: string | null
+          question_text: string
+          search_vol_estimate: number | null
+          semantic_hash: string
+          universe_id: string
+        }
+        Insert: {
+          category: string
+          claim_id: string
+          created_at?: string
+          difficulty: string
+          id: string
+          language_code?: string
+          parent_question_id?: string | null
+          question_text: string
+          search_vol_estimate?: number | null
+          semantic_hash: string
+          universe_id: string
+        }
+        Update: {
+          category?: string
+          claim_id?: string
+          created_at?: string
+          difficulty?: string
+          id?: string
+          language_code?: string
+          parent_question_id?: string | null
+          question_text?: string
+          search_vol_estimate?: number | null
+          semantic_hash?: string
+          universe_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "akb_generated_questions_universe_id_fkey"
+            columns: ["universe_id"]
+            isOneToOne: false
+            referencedRelation: "akb_question_universes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      akb_graph_nodes: {
+        Row: {
+          child_count: number
+          created_at: string
+          id: string
+          label: string
+          node_type: string
+          parent_id: string | null
+          search_relevance: number
+          url: string | null
+        }
+        Insert: {
+          child_count?: number
+          created_at?: string
+          id: string
+          label: string
+          node_type: string
+          parent_id?: string | null
+          search_relevance?: number
+          url?: string | null
+        }
+        Update: {
+          child_count?: number
+          created_at?: string
+          id?: string
+          label?: string
+          node_type?: string
+          parent_id?: string | null
+          search_relevance?: number
+          url?: string | null
+        }
+        Relationships: []
+      }
+      akb_intervention_scores: {
+        Row: {
+          confidence: number
+          created_at: string
+          domain: string
+          effort: number
+          evidence_count: number
+          id: string
+          impact: number
+          intervention_name: string
+          population_scope: string | null
+          priority_score: number
+          rank: number
+          related_claims: string[] | null
+          time_to_effect: string | null
+        }
+        Insert: {
+          confidence: number
+          created_at?: string
+          domain: string
+          effort: number
+          evidence_count?: number
+          id: string
+          impact: number
+          intervention_name: string
+          population_scope?: string | null
+          priority_score: number
+          rank: number
+          related_claims?: string[] | null
+          time_to_effect?: string | null
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          domain?: string
+          effort?: number
+          evidence_count?: number
+          id?: string
+          impact?: number
+          intervention_name?: string
+          population_scope?: string | null
+          priority_score?: number
+          rank?: number
+          related_claims?: string[] | null
+          time_to_effect?: string | null
+        }
+        Relationships: []
+      }
+      akb_knowledge_objects: {
+        Row: {
+          claim: string
+          confidence: number
+          created_at: string
+          effect_size: string | null
+          evidence_level: string
+          geographic_scope: string | null
+          id: string
+          last_verified: string
+          machine_formats: string[] | null
+          population: string | null
+          related_variables: string[] | null
+          sources: string[] | null
+          temporal_scope: Json | null
+        }
+        Insert: {
+          claim: string
+          confidence: number
+          created_at?: string
+          effect_size?: string | null
+          evidence_level: string
+          geographic_scope?: string | null
+          id: string
+          last_verified?: string
+          machine_formats?: string[] | null
+          population?: string | null
+          related_variables?: string[] | null
+          sources?: string[] | null
+          temporal_scope?: Json | null
+        }
+        Update: {
+          claim?: string
+          confidence?: number
+          created_at?: string
+          effect_size?: string | null
+          evidence_level?: string
+          geographic_scope?: string | null
+          id?: string
+          last_verified?: string
+          machine_formats?: string[] | null
+          population?: string | null
+          related_variables?: string[] | null
+          sources?: string[] | null
+          temporal_scope?: Json | null
+        }
+        Relationships: []
+      }
+      akb_publishable_content: {
+        Row: {
+          claim_id: string | null
+          content_type: string
+          created_at: string
+          id: string
+          last_published: string | null
+          machine_readable: boolean | null
+          question_ids: string[] | null
+          seo_score: number | null
+          slug: string
+          status: string
+          title: string
+        }
+        Insert: {
+          claim_id?: string | null
+          content_type: string
+          created_at?: string
+          id?: string
+          last_published?: string | null
+          machine_readable?: boolean | null
+          question_ids?: string[] | null
+          seo_score?: number | null
+          slug: string
+          status?: string
+          title: string
+        }
+        Update: {
+          claim_id?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          last_published?: string | null
+          machine_readable?: boolean | null
+          question_ids?: string[] | null
+          seo_score?: number | null
+          slug?: string
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      akb_question_universes: {
+        Row: {
+          claim_id: string
+          claim_statement: string
+          coverage_score: number
+          created_at: string
+          domain: string
+          generated_at: string
+          id: string
+          total_questions: number
+        }
+        Insert: {
+          claim_id: string
+          claim_statement: string
+          coverage_score?: number
+          created_at?: string
+          domain: string
+          generated_at?: string
+          id?: string
+          total_questions?: number
+        }
+        Update: {
+          claim_id?: string
+          claim_statement?: string
+          coverage_score?: number
+          created_at?: string
+          domain?: string
+          generated_at?: string
+          id?: string
+          total_questions?: number
+        }
+        Relationships: []
+      }
       analysis_audit_log: {
         Row: {
           action: string
