@@ -120,6 +120,7 @@ import CausalDAGPage from "./pages/CausalDAG";
 import KnowledgeModulesPage from "./pages/KnowledgeModules";
 import UCEPage from "./pages/UCEPage";
 import MetaLayerPage from "./pages/MetaLayerPage";
+import GRMPage from "./pages/GRMPage";
 
 const queryClient = new QueryClient();
 
