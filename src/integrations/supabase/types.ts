@@ -2577,6 +2577,54 @@ export type Database = {
           },
         ]
       }
+      cross_module_variables: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          relationship_type: string
+          source_module_id: string
+          strength: number | null
+          target_module_id: string
+          variable_name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          relationship_type: string
+          source_module_id: string
+          strength?: number | null
+          target_module_id: string
+          variable_name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          relationship_type?: string
+          source_module_id?: string
+          strength?: number | null
+          target_module_id?: string
+          variable_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cross_module_variables_source_module_id_fkey"
+            columns: ["source_module_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_module_variables_target_module_id_fkey"
+            columns: ["target_module_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_learnings: {
         Row: {
           countries_with_updates: string[] | null
@@ -3381,6 +3429,101 @@ export type Database = {
         }
         Relationships: []
       }
+      domain_observations: {
+        Row: {
+          confidence_interval_lower: number | null
+          confidence_interval_upper: number | null
+          created_at: string
+          effect_size: number | null
+          geo_code: string | null
+          geo_scope: string | null
+          id: string
+          is_replicated: boolean | null
+          measurement_type: string
+          measurement_unit: string | null
+          measurement_value: number | null
+          methodology: string | null
+          module_id: string
+          observation_code: string
+          p_value: number | null
+          population_descriptor: string | null
+          population_size: number | null
+          raw_metadata: Json | null
+          replication_count: number | null
+          source_organization: string | null
+          source_reference: string
+          source_type: string
+          source_url: string | null
+          time_observed: string | null
+          time_period_end: string | null
+          time_period_start: string | null
+        }
+        Insert: {
+          confidence_interval_lower?: number | null
+          confidence_interval_upper?: number | null
+          created_at?: string
+          effect_size?: number | null
+          geo_code?: string | null
+          geo_scope?: string | null
+          id?: string
+          is_replicated?: boolean | null
+          measurement_type: string
+          measurement_unit?: string | null
+          measurement_value?: number | null
+          methodology?: string | null
+          module_id: string
+          observation_code: string
+          p_value?: number | null
+          population_descriptor?: string | null
+          population_size?: number | null
+          raw_metadata?: Json | null
+          replication_count?: number | null
+          source_organization?: string | null
+          source_reference: string
+          source_type: string
+          source_url?: string | null
+          time_observed?: string | null
+          time_period_end?: string | null
+          time_period_start?: string | null
+        }
+        Update: {
+          confidence_interval_lower?: number | null
+          confidence_interval_upper?: number | null
+          created_at?: string
+          effect_size?: number | null
+          geo_code?: string | null
+          geo_scope?: string | null
+          id?: string
+          is_replicated?: boolean | null
+          measurement_type?: string
+          measurement_unit?: string | null
+          measurement_value?: number | null
+          methodology?: string | null
+          module_id?: string
+          observation_code?: string
+          p_value?: number | null
+          population_descriptor?: string | null
+          population_size?: number | null
+          raw_metadata?: Json | null
+          replication_count?: number | null
+          source_organization?: string | null
+          source_reference?: string
+          source_type?: string
+          source_url?: string | null
+          time_observed?: string | null
+          time_period_end?: string | null
+          time_period_start?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "domain_observations_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ethics_constraints: {
         Row: {
           constraint_code: string
@@ -3938,6 +4081,57 @@ export type Database = {
             columns: ["parent_event_id"]
             isOneToOne: false
             referencedRelation: "event_taxonomy"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evidence_links: {
+        Row: {
+          bias_flags: string[] | null
+          claim_id: string
+          created_at: string
+          id: string
+          link_type: string
+          notes: string | null
+          observation_id: string
+          replication_weight: number | null
+          strength: number
+        }
+        Insert: {
+          bias_flags?: string[] | null
+          claim_id: string
+          created_at?: string
+          id?: string
+          link_type: string
+          notes?: string | null
+          observation_id: string
+          replication_weight?: number | null
+          strength?: number
+        }
+        Update: {
+          bias_flags?: string[] | null
+          claim_id?: string
+          created_at?: string
+          id?: string
+          link_type?: string
+          notes?: string | null
+          observation_id?: string
+          replication_weight?: number | null
+          strength?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_links_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evidence_links_observation_id_fkey"
+            columns: ["observation_id"]
+            isOneToOne: false
+            referencedRelation: "domain_observations"
             referencedColumns: ["id"]
           },
         ]
@@ -7065,6 +7259,68 @@ export type Database = {
         }
         Relationships: []
       }
+      intervention_rankings: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          id: string
+          interventions: Json
+          limitations: string[] | null
+          methodology: string
+          module_id: string
+          question: string
+          question_sv: string | null
+          ranking_code: string
+          ranking_criteria: Json
+          updated_at: string
+          valid_for_population: string | null
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          interventions?: Json
+          limitations?: string[] | null
+          methodology: string
+          module_id: string
+          question: string
+          question_sv?: string | null
+          ranking_code: string
+          ranking_criteria?: Json
+          updated_at?: string
+          valid_for_population?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          interventions?: Json
+          limitations?: string[] | null
+          methodology?: string
+          module_id?: string
+          question?: string
+          question_sv?: string | null
+          ranking_code?: string
+          ranking_criteria?: Json
+          updated_at?: string
+          valid_for_population?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "intervention_rankings_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       knowledge_boundaries: {
         Row: {
           assessed_at: string | null
@@ -7121,6 +7377,90 @@ export type Database = {
           unknown_aspects?: string[] | null
         }
         Relationships: []
+      }
+      knowledge_claims: {
+        Row: {
+          claim_code: string
+          claim_type: string
+          confidence_score: number
+          created_at: string
+          effect_size: number | null
+          effect_size_unit: string | null
+          evidence_quality: Database["public"]["Enums"]["evidence_quality"]
+          geographic_scope: string | null
+          id: string
+          limitations: string[] | null
+          module_id: string
+          population_scope: string | null
+          statement: string
+          statement_sv: string | null
+          status: Database["public"]["Enums"]["claim_status"]
+          superseded_by: string | null
+          temporal_scope: string | null
+          uncertainty_description: string | null
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          claim_code: string
+          claim_type: string
+          confidence_score?: number
+          created_at?: string
+          effect_size?: number | null
+          effect_size_unit?: string | null
+          evidence_quality?: Database["public"]["Enums"]["evidence_quality"]
+          geographic_scope?: string | null
+          id?: string
+          limitations?: string[] | null
+          module_id: string
+          population_scope?: string | null
+          statement: string
+          statement_sv?: string | null
+          status?: Database["public"]["Enums"]["claim_status"]
+          superseded_by?: string | null
+          temporal_scope?: string | null
+          uncertainty_description?: string | null
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          claim_code?: string
+          claim_type?: string
+          confidence_score?: number
+          created_at?: string
+          effect_size?: number | null
+          effect_size_unit?: string | null
+          evidence_quality?: Database["public"]["Enums"]["evidence_quality"]
+          geographic_scope?: string | null
+          id?: string
+          limitations?: string[] | null
+          module_id?: string
+          population_scope?: string | null
+          statement?: string
+          statement_sv?: string | null
+          status?: Database["public"]["Enums"]["claim_status"]
+          superseded_by?: string | null
+          temporal_scope?: string | null
+          uncertainty_description?: string | null
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_claims_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_claims_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "knowledge_claims"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       knowledge_graph_edges: {
         Row: {
@@ -7209,6 +7549,48 @@ export type Database = {
           node_type?: string
           properties?: Json | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      knowledge_modules: {
+        Row: {
+          created_at: string
+          cross_module_links: string[] | null
+          description: string | null
+          domain: string
+          id: string
+          module_code: string
+          name: string
+          ontology_schema: Json
+          status: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          cross_module_links?: string[] | null
+          description?: string | null
+          domain: string
+          id?: string
+          module_code: string
+          name: string
+          ontology_schema?: Json
+          status?: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          cross_module_links?: string[] | null
+          description?: string | null
+          domain?: string
+          id?: string
+          module_code?: string
+          name?: string
+          ontology_schema?: Json
+          status?: string
+          updated_at?: string
+          version?: number
         }
         Relationships: []
       }
@@ -8625,6 +9007,50 @@ export type Database = {
           violation_type?: string
         }
         Relationships: []
+      }
+      module_meta_analysis: {
+        Row: {
+          analysis_type: string
+          auto_generated: boolean | null
+          created_at: string
+          findings: Json
+          id: string
+          module_id: string
+          resolved: boolean | null
+          resolved_at: string | null
+          severity: string
+        }
+        Insert: {
+          analysis_type: string
+          auto_generated?: boolean | null
+          created_at?: string
+          findings?: Json
+          id?: string
+          module_id: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string
+        }
+        Update: {
+          analysis_type?: string
+          auto_generated?: boolean | null
+          created_at?: string
+          findings?: Json
+          id?: string
+          module_id?: string
+          resolved?: boolean | null
+          resolved_at?: string | null
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_meta_analysis_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       nuts_regions: {
         Row: {
@@ -12488,11 +12914,19 @@ export type Database = {
         | "statsminister"
         | "departementsansvarig"
         | "operativ"
+      claim_status:
+        | "proposed"
+        | "under_review"
+        | "supported"
+        | "contested"
+        | "refuted"
+        | "superseded"
       comparability_level: "full" | "partial" | "limited" | "none"
       data_depth_level: "global_baseline" | "regional_bloc" | "national_deep"
       data_quality_grade: "A" | "B" | "C" | "D" | "unverified"
       data_source_type: "api" | "file_feed" | "manual" | "calculated"
       delivery_method: "api" | "webhook" | "sse" | "kafka"
+      evidence_quality: "very_low" | "low" | "moderate" | "high" | "very_high"
       feed_severity: "low" | "medium" | "high" | "critical"
       feed_tier: "open" | "plus" | "pro"
       governance_role:
@@ -12811,11 +13245,20 @@ export const Constants = {
         "departementsansvarig",
         "operativ",
       ],
+      claim_status: [
+        "proposed",
+        "under_review",
+        "supported",
+        "contested",
+        "refuted",
+        "superseded",
+      ],
       comparability_level: ["full", "partial", "limited", "none"],
       data_depth_level: ["global_baseline", "regional_bloc", "national_deep"],
       data_quality_grade: ["A", "B", "C", "D", "unverified"],
       data_source_type: ["api", "file_feed", "manual", "calculated"],
       delivery_method: ["api", "webhook", "sse", "kafka"],
+      evidence_quality: ["very_low", "low", "moderate", "high", "very_high"],
       feed_severity: ["low", "medium", "high", "critical"],
       feed_tier: ["open", "plus", "pro"],
       governance_role: [
