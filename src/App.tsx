@@ -124,6 +124,7 @@ import GRMPage from "./pages/GRMPage";
 import OCAPage from "./pages/OCAPage";
 import AKBPage from "./pages/AKBPage";
 import GDISPage from "./pages/GDISPage";
+import GSSEPage from "./pages/GSSEPage";
 
 const queryClient = new QueryClient();
 
