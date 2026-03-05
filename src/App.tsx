@@ -124,6 +124,7 @@ import GRMPage from "./pages/GRMPage";
 import OCAPage from "./pages/OCAPage";
 import AKBPage from "./pages/AKBPage";
 import GDISPage from "./pages/GDISPage";
+import GSSEPage from "./pages/GSSEPage";
 
 const queryClient = new QueryClient();
 
@@ -255,6 +256,7 @@ const App = () => (
                 <Route path="/ontology-core" element={<OCAPage />} />
                 <Route path="/akb" element={<AKBPage />} />
                 <Route path="/gdis" element={<GDISPage />} />
+                <Route path="/gsse" element={<GSSEPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
