@@ -256,6 +256,7 @@ const App = () => (
                 <Route path="/ontology-core" element={<OCAPage />} />
                 <Route path="/akb" element={<AKBPage />} />
                 <Route path="/gdis" element={<GDISPage />} />
+                <Route path="/gsse" element={<GSSEPage />} />
                 
                 {/* Huvudsidan */}
                 <Route path="/" element={<Index />} />
