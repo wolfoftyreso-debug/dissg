@@ -15,6 +15,9 @@ interface RegionalIndex {
   flag: string;
   alpha3: string;
   position: { top: string; left: string };
+  fullName: string;
+  value: number;
+  domains: { name: string; score: number; trend: 'up' | 'down' | 'flat' }[];
 }
 
 const REGIONAL_INDICES: RegionalIndex[] = [
