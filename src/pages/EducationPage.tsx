@@ -18,20 +18,30 @@
  // EDUCATION INDICES
  // =============================================================================
  
- interface EducationIndex {
-   code: string;
-   name: string;
-   fullName: string;
-   description: string;
-   source: string;
-   sourceUrl: string;
-   methodology: string;
-   updateFrequency: string;
-   coverage: number;
-   yearRange: string;
-   scale: string;
-   categories?: string[];
- }
+interface BenchmarkData {
+  sweden: number | null;
+  oecdAvg: number | null;
+  best: { country: string; value: number };
+  worst: { country: string; value: number };
+  unit: string;
+  higherIsBetter: boolean;
+}
+
+interface EducationIndex {
+  code: string;
+  name: string;
+  fullName: string;
+  description: string;
+  source: string;
+  sourceUrl: string;
+  methodology: string;
+  updateFrequency: string;
+  coverage: number;
+  yearRange: string;
+  scale: string;
+  categories?: string[];
+  benchmark: BenchmarkData;
+}
  
  const EDUCATION_INDICES: EducationIndex[] = [
    {
