@@ -3,6 +3,7 @@
  * 
  * Supports multiple map modes: satellite (photorealistic), 3D globe, 2D flat.
  * Hierarchical markers: Countries (flags), States, Cities with 3D styling.
+ * Choropleth fill layer for country landmass coloring by active index.
  */
 
 import React, { useRef, useEffect, useState } from 'react';
@@ -25,6 +26,72 @@ import { getEconomicColor } from './EconomicIndicator';
 import { getMilitaryColor } from './MilitaryIndicator';
 import { getEnergyColor, getCountryEnergy } from './EnergyIndicator';
 import type { MapMode } from './types';
+
+// =============================================================================
+// COUNTRY SCORE DATA PER INDEX
+// =============================================================================
+
+/** Domain scores per country (0-100, higher = better) */
+const COUNTRY_DOMAIN_SCORES: Record<string, Record<string, number>> = {
+  SE: { lambda: 85, health: 90, labor: 78, climate: 72, education: 88, iq: 99 },
+  NO: { lambda: 88, health: 92, labor: 80, climate: 68, education: 86, iq: 100 },
+  FI: { lambda: 83, health: 88, labor: 72, climate: 70, education: 92, iq: 101 },
+  DK: { lambda: 86, health: 89, labor: 79, climate: 65, education: 87, iq: 98 },
+  DE: { lambda: 72, health: 82, labor: 74, climate: 55, education: 80, iq: 99 },
+  FR: { lambda: 68, health: 84, labor: 62, climate: 58, education: 76, iq: 98 },
+  GB: { lambda: 65, health: 78, labor: 70, climate: 52, education: 74, iq: 100 },
+  US: { lambda: 55, health: 58, labor: 72, climate: 35, education: 68, iq: 98 },
+  CA: { lambda: 78, health: 85, labor: 75, climate: 48, education: 82, iq: 99 },
+  JP: { lambda: 70, health: 94, labor: 68, climate: 50, education: 85, iq: 105 },
+  KR: { lambda: 74, health: 86, labor: 65, climate: 42, education: 90, iq: 106 },
+  CN: { lambda: 58, health: 72, labor: 70, climate: 30, education: 65, iq: 104 },
+  IN: { lambda: 42, health: 48, labor: 45, climate: 40, education: 38, iq: 82 },
+  AU: { lambda: 80, health: 87, labor: 76, climate: 38, education: 84, iq: 99 },
+  BR: { lambda: 45, health: 55, labor: 42, climate: 52, education: 40, iq: 87 },
+  ZA: { lambda: 35, health: 38, labor: 28, climate: 45, education: 32, iq: 77 },
+  NG: { lambda: 28, health: 30, labor: 35, climate: 48, education: 22, iq: 71 },
+  EG: { lambda: 40, health: 55, labor: 42, climate: 38, education: 45, iq: 81 },
+  RU: { lambda: 48, health: 58, labor: 55, climate: 32, education: 72, iq: 97 },
+  MX: { lambda: 50, health: 62, labor: 48, climate: 45, education: 42, iq: 88 },
+};
+
+/**
+ * Get a two-tone color for a score: green shades for good, red shades for bad.
+ * Returns an rgba string with opacity for fill layers.
+ */
+function getChoroplethColor(score: number): string {
+  // Smooth gradient: red (bad) → yellow (mid) → green (good)
+  if (score >= 75) {
+    // Good: green tones
+    const intensity = Math.min(1, (score - 75) / 25);
+    const g = Math.round(140 + intensity * 60);
+    return `rgba(40, ${g}, 80, 0.45)`;
+  } else if (score >= 50) {
+    // Mid: yellow/amber tones
+    const t = (score - 50) / 25;
+    const r = Math.round(200 - t * 80);
+    const g = Math.round(140 + t * 40);
+    return `rgba(${r}, ${g}, 40, 0.40)`;
+  } else {
+    // Bad: red tones
+    const intensity = Math.min(1, (50 - score) / 50);
+    const r = Math.round(160 + intensity * 60);
+    return `rgba(${r}, 50, 50, 0.45)`;
+  }
+}
+
+/** Get the active index key for domain score lookup */
+function getActiveIndexKey(activeLayer: string): string {
+  switch (activeLayer) {
+    case 'lambda': return 'lambda';
+    case 'health': return 'health';
+    case 'labor': return 'labor';
+    case 'climate': return 'climate';
+    case 'education': return 'education';
+    case 'iq': return 'iq';
+    default: return 'lambda';
+  }
+}
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2VydGlmaWVkMTIiLCJhIjoiY21sOG9hNnlvMDhtZTNmc2Rsa2t4c25hNiJ9._mlFk7T05_QzjW1kC79lfw';
 
@@ -157,6 +224,36 @@ export function MapContainer({
 
     map.current.on('load', () => {
       setIsLoaded(true);
+      
+      // Add choropleth fill layer for country coloring
+      if (map.current) {
+        // Use Mapbox's built-in country boundaries
+        map.current.addSource('country-boundaries', {
+          type: 'vector',
+          url: 'mapbox://mapbox.country-boundaries-v1',
+        });
+
+        // Find the first label/symbol layer to insert fill below it
+        const layers = map.current.getStyle().layers || [];
+        let beforeLayer: string | undefined;
+        for (const layer of layers) {
+          if (layer.type === 'symbol' || layer.id.includes('label') || layer.id.includes('boundary')) {
+            beforeLayer = layer.id;
+            break;
+          }
+        }
+
+        map.current.addLayer({
+          id: 'country-fills',
+          type: 'fill',
+          source: 'country-boundaries',
+          'source-layer': 'country_boundaries',
+          paint: {
+            'fill-color': 'rgba(128, 128, 128, 0)',
+            'fill-opacity': 0.6,
+          },
+        }, beforeLayer);
+      }
     });
 
     // Track zoom level for marker visibility
@@ -374,6 +471,33 @@ export function MapContainer({
       }
     });
   }, [currentZoom, isLoaded, COUNTRY_HIDE_ZOOM, STATE_MIN_ZOOM, STATE_HIDE_ZOOM, CITY_MIN_ZOOM]);
+
+  // =============================================================================
+  // CHOROPLETH: Update country fill colors based on active index
+  // =============================================================================
+  useEffect(() => {
+    if (!map.current || !isLoaded) return;
+    
+    // Check if the layer exists
+    if (!map.current.getLayer('country-fills')) return;
+
+    const indexKey = getActiveIndexKey(activeLayer);
+    
+    // Build a match expression for fill-color based on ISO 3166-1 alpha-2 codes
+    // Mapbox country-boundaries uses iso_3166_1 property
+    const matchExpression: any[] = ['match', ['get', 'iso_3166_1']];
+    
+    // Add color for each country we have data for
+    Object.entries(COUNTRY_DOMAIN_SCORES).forEach(([code, scores]) => {
+      const score = scores[indexKey] ?? scores['lambda'] ?? 50;
+      matchExpression.push(code, getChoroplethColor(score));
+    });
+    
+    // Default: transparent for countries without data
+    matchExpression.push('rgba(128, 128, 128, 0.08)');
+
+    map.current.setPaintProperty('country-fills', 'fill-color', matchExpression as any);
+  }, [isLoaded, activeLayer, activeRegionType, activeLegalTopic, activeThematicLayer]);
 
   // Add city markers when enabled (use hierarchical 3D style)
   useEffect(() => {
