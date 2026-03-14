@@ -233,6 +233,16 @@ export function MapContainer({
           url: 'mapbox://mapbox.country-boundaries-v1',
         });
 
+        // Find the first label/symbol layer to insert fill below it
+        const layers = map.current.getStyle().layers || [];
+        let beforeLayer: string | undefined;
+        for (const layer of layers) {
+          if (layer.type === 'symbol' || layer.id.includes('label') || layer.id.includes('boundary')) {
+            beforeLayer = layer.id;
+            break;
+          }
+        }
+
         map.current.addLayer({
           id: 'country-fills',
           type: 'fill',
@@ -242,7 +252,7 @@ export function MapContainer({
             'fill-color': 'rgba(128, 128, 128, 0)',
             'fill-opacity': 0.6,
           },
-        }, 'admin-0-boundary'); // Insert below boundary lines if they exist
+        }, beforeLayer);
       }
     });
 
