@@ -462,6 +462,33 @@ export function MapContainer({
     });
   }, [currentZoom, isLoaded, COUNTRY_HIDE_ZOOM, STATE_MIN_ZOOM, STATE_HIDE_ZOOM, CITY_MIN_ZOOM]);
 
+  // =============================================================================
+  // CHOROPLETH: Update country fill colors based on active index
+  // =============================================================================
+  useEffect(() => {
+    if (!map.current || !isLoaded) return;
+    
+    // Check if the layer exists
+    if (!map.current.getLayer('country-fills')) return;
+
+    const indexKey = getActiveIndexKey(activeLayer);
+    
+    // Build a match expression for fill-color based on ISO 3166-1 alpha-2 codes
+    // Mapbox country-boundaries uses iso_3166_1 property
+    const matchExpression: any[] = ['match', ['get', 'iso_3166_1']];
+    
+    // Add color for each country we have data for
+    Object.entries(COUNTRY_DOMAIN_SCORES).forEach(([code, scores]) => {
+      const score = scores[indexKey] ?? scores['lambda'] ?? 50;
+      matchExpression.push(code, getChoroplethColor(score));
+    });
+    
+    // Default: transparent for countries without data
+    matchExpression.push('rgba(128, 128, 128, 0.08)');
+
+    map.current.setPaintProperty('country-fills', 'fill-color', matchExpression);
+  }, [isLoaded, activeLayer, activeRegionType, activeLegalTopic, activeThematicLayer]);
+
   // Add city markers when enabled (use hierarchical 3D style)
   useEffect(() => {
     if (!map.current || !isLoaded) return;
