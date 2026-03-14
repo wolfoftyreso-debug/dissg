@@ -5,14 +5,15 @@
   * All education-related indices, metrics and tools in one place.
   */
  
- import React, { useState } from 'react';
- import { Badge } from '@/components/ui/badge';
- import { Button } from '@/components/ui/button';
- import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
- import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
- import { Progress } from '@/components/ui/progress';
- import { ScrollArea } from '@/components/ui/scroll-area';
- import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SubIndexDetail } from '@/components/education/SubIndexDetail';
  
  // =============================================================================
  // EDUCATION INDICES
@@ -407,7 +408,20 @@ interface IndexDetailProps {
 }
 
 function IndexDetail({ index, onClose, onShowData, onCompare }: IndexDetailProps) {
+  const [activeSubIndex, setActiveSubIndex] = useState<string | null>(null);
+
   if (!index) return null;
+
+  if (activeSubIndex) {
+    return (
+      <SubIndexDetail
+        parentCode={index.code}
+        categoryName={activeSubIndex}
+        onClose={onClose}
+        onBack={() => setActiveSubIndex(null)}
+      />
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
@@ -463,10 +477,16 @@ function IndexDetail({ index, onClose, onShowData, onCompare }: IndexDetailProps
 
           {index.categories && (
             <div className="p-3 rounded border bg-muted/30">
-              <div className="text-xs text-muted-foreground font-mono mb-2">DELINDEX</div>
+              <div className="text-xs text-muted-foreground font-mono mb-2">DELINDEX — klicka för att utforska</div>
               <div className="flex flex-wrap gap-2">
                 {index.categories.map((cat) => (
-                  <Badge key={cat} variant="outline">{cat}</Badge>
+                  <button
+                    key={cat}
+                    onClick={() => setActiveSubIndex(cat)}
+                    className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors hover:bg-primary hover:text-primary-foreground hover:border-primary cursor-pointer"
+                  >
+                    {cat} →
+                  </button>
                 ))}
               </div>
             </div>
