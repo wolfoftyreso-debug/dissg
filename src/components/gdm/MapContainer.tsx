@@ -486,7 +486,7 @@ export function MapContainer({
     // Default: transparent for countries without data
     matchExpression.push('rgba(128, 128, 128, 0.08)');
 
-    map.current.setPaintProperty('country-fills', 'fill-color', matchExpression);
+    map.current.setPaintProperty('country-fills', 'fill-color', matchExpression as any);
   }, [isLoaded, activeLayer, activeRegionType, activeLegalTopic, activeThematicLayer]);
 
   // Add city markers when enabled (use hierarchical 3D style)
