@@ -6,7 +6,7 @@
  * Choropleth fill layer for country landmass coloring by active index.
  */
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { COUNTRIES, LAMBDA_OVERLAYS } from './mockData';
