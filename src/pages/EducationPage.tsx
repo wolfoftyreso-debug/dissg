@@ -399,90 +399,92 @@ function IndexCard({ index, onSelect }: IndexCardProps) {
  // INDEX DETAIL MODAL
  // =============================================================================
  
- interface IndexDetailProps {
-   index: EducationIndex | null;
-   onClose: () => void;
- }
- 
- function IndexDetail({ index, onClose }: IndexDetailProps) {
-   if (!index) return null;
- 
-   return (
-     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-       <div className="bg-card border rounded-lg max-w-2xl w-full max-h-[80vh] overflow-auto">
-         <div className="p-4 border-b flex justify-between items-start">
-           <div>
-             <Badge variant="secondary" className="font-mono mb-2">{index.code}</Badge>
-             <h2 className="text-lg font-bold">{index.fullName}</h2>
-             <p className="text-sm text-muted-foreground">{index.description}</p>
-           </div>
-           <Button variant="ghost" size="sm" onClick={onClose}>×</Button>
-         </div>
-         
-         <div className="p-4 space-y-4">
-           <div className="grid grid-cols-2 gap-4">
-             <div className="p-3 rounded border bg-muted/30">
-               <div className="text-xs text-muted-foreground font-mono">KÄLLA</div>
-               <div className="font-medium">{index.source}</div>
-               <a 
-                 href={index.sourceUrl} 
-                 target="_blank" 
-                 rel="noopener noreferrer"
-                 className="text-xs text-primary hover:underline"
-               >
-                 {index.sourceUrl}
-               </a>
-             </div>
-             <div className="p-3 rounded border bg-muted/30">
-               <div className="text-xs text-muted-foreground font-mono">SKALA</div>
-               <div className="font-medium font-mono">{index.scale}</div>
-             </div>
-           </div>
- 
-           <div className="p-3 rounded border bg-muted/30">
-             <div className="text-xs text-muted-foreground font-mono mb-1">METODIK</div>
-             <div className="text-sm">{index.methodology}</div>
-           </div>
- 
-           <div className="grid grid-cols-3 gap-3">
-             <div className="p-3 rounded border bg-muted/30 text-center">
-               <div className="text-xl font-bold font-mono">{index.coverage}%</div>
-               <div className="text-xs text-muted-foreground">TÄCKNING</div>
-             </div>
-             <div className="p-3 rounded border bg-muted/30 text-center">
-               <div className="text-sm font-bold font-mono">{index.yearRange}</div>
-               <div className="text-xs text-muted-foreground">PERIOD</div>
-             </div>
-             <div className="p-3 rounded border bg-muted/30 text-center">
-               <div className="text-sm font-bold">{index.updateFrequency}</div>
-               <div className="text-xs text-muted-foreground">UPPDATERING</div>
-             </div>
-           </div>
- 
-           {index.categories && (
-             <div className="p-3 rounded border bg-muted/30">
-               <div className="text-xs text-muted-foreground font-mono mb-2">DELINDEX</div>
-               <div className="flex flex-wrap gap-2">
-                 {index.categories.map((cat) => (
-                   <Badge key={cat} variant="outline">{cat}</Badge>
-                 ))}
-               </div>
-             </div>
-           )}
- 
-           <div className="flex gap-2">
-             <Button className="flex-1 font-mono" size="sm">
-               VISA DATA →
-             </Button>
-             <Button variant="outline" className="font-mono" size="sm">
-               JÄMFÖR LÄNDER
-             </Button>
-           </div>
-         </div>
-       </div>
-     </div>
-   );
- }
+interface IndexDetailProps {
+  index: EducationIndex | null;
+  onClose: () => void;
+  onShowData: () => void;
+  onCompare: () => void;
+}
+
+function IndexDetail({ index, onClose, onShowData, onCompare }: IndexDetailProps) {
+  if (!index) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-card border rounded-lg max-w-2xl w-full max-h-[80vh] overflow-auto" onClick={e => e.stopPropagation()}>
+        <div className="p-4 border-b flex justify-between items-start">
+          <div>
+            <Badge variant="secondary" className="font-mono mb-2">{index.code}</Badge>
+            <h2 className="text-lg font-bold">{index.fullName}</h2>
+            <p className="text-sm text-muted-foreground">{index.description}</p>
+          </div>
+          <Button variant="ghost" size="sm" onClick={onClose}>×</Button>
+        </div>
+        
+        <div className="p-4 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-3 rounded border bg-muted/30">
+              <div className="text-xs text-muted-foreground font-mono">KÄLLA</div>
+              <div className="font-medium">{index.source}</div>
+              <a 
+                href={index.sourceUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-primary hover:underline"
+              >
+                {index.sourceUrl}
+              </a>
+            </div>
+            <div className="p-3 rounded border bg-muted/30">
+              <div className="text-xs text-muted-foreground font-mono">SKALA</div>
+              <div className="font-medium font-mono">{index.scale}</div>
+            </div>
+          </div>
+
+          <div className="p-3 rounded border bg-muted/30">
+            <div className="text-xs text-muted-foreground font-mono mb-1">METODIK</div>
+            <div className="text-sm">{index.methodology}</div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="p-3 rounded border bg-muted/30 text-center">
+              <div className="text-xl font-bold font-mono">{index.coverage}%</div>
+              <div className="text-xs text-muted-foreground">TÄCKNING</div>
+            </div>
+            <div className="p-3 rounded border bg-muted/30 text-center">
+              <div className="text-sm font-bold font-mono">{index.yearRange}</div>
+              <div className="text-xs text-muted-foreground">PERIOD</div>
+            </div>
+            <div className="p-3 rounded border bg-muted/30 text-center">
+              <div className="text-sm font-bold">{index.updateFrequency}</div>
+              <div className="text-xs text-muted-foreground">UPPDATERING</div>
+            </div>
+          </div>
+
+          {index.categories && (
+            <div className="p-3 rounded border bg-muted/30">
+              <div className="text-xs text-muted-foreground font-mono mb-2">DELINDEX</div>
+              <div className="flex flex-wrap gap-2">
+                {index.categories.map((cat) => (
+                  <Badge key={cat} variant="outline">{cat}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <Button className="flex-1 font-mono" size="sm" onClick={onShowData}>
+              VISA DATA →
+            </Button>
+            <Button variant="outline" className="font-mono" size="sm" onClick={onCompare}>
+              JÄMFÖR LÄNDER
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
  
  // =============================================================================
  // COUNTRY COMPARISON TABLE
@@ -1003,10 +1005,19 @@ function IndexCard({ index, onSelect }: IndexCardProps) {
        </Tabs>
  
        {/* Index Detail Modal */}
-       <IndexDetail 
-         index={selectedIndex} 
-         onClose={() => setSelectedIndex(null)} 
-       />
+        <IndexDetail 
+          index={selectedIndex} 
+          onClose={() => setSelectedIndex(null)}
+          onShowData={() => {
+            if (selectedIndex) {
+              window.open(selectedIndex.sourceUrl, '_blank', 'noopener,noreferrer');
+            }
+          }}
+          onCompare={() => {
+            setSelectedIndex(null);
+            setActiveTab('compare');
+          }}
+        />
      </div>
    );
  }
