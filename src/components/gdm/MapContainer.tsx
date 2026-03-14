@@ -224,6 +224,26 @@ export function MapContainer({
 
     map.current.on('load', () => {
       setIsLoaded(true);
+      
+      // Add choropleth fill layer for country coloring
+      if (map.current) {
+        // Use Mapbox's built-in country boundaries
+        map.current.addSource('country-boundaries', {
+          type: 'vector',
+          url: 'mapbox://mapbox.country-boundaries-v1',
+        });
+
+        map.current.addLayer({
+          id: 'country-fills',
+          type: 'fill',
+          source: 'country-boundaries',
+          'source-layer': 'country_boundaries',
+          paint: {
+            'fill-color': 'rgba(128, 128, 128, 0)',
+            'fill-opacity': 0.6,
+          },
+        }, 'admin-0-boundary'); // Insert below boundary lines if they exist
+      }
     });
 
     // Track zoom level for marker visibility
