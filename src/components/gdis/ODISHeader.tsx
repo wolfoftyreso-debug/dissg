@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import { UserMenu } from '@/components/auth/UserMenu';
+
 import { GeoScopeNavigator } from './GeoScopeNavigator';
 import { useGeo } from '@/contexts/GeoContext';
 
