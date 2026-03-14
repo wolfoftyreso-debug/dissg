@@ -143,13 +143,33 @@ const ExportTab: React.FC = () => {
         <CardContent>
           <div className="space-y-3">
             {[
-              { name: 'Sverige komplett', indicators: 56, period: '1990-2025' },
-              { name: 'EU-27 jämförelse', indicators: 42, period: '2000-2025' },
-              { name: 'Nordiska länder', indicators: 48, period: '1990-2025' },
-              { name: 'OECD ekonomiska indikatorer', indicators: 28, period: '1980-2025' },
+              { name: 'Sverige komplett', indicators: 56, period: '1990-2025', filename: 'sverige_komplett' },
+              { name: 'EU-27 jämförelse', indicators: 42, period: '2000-2025', filename: 'eu27_jamforelse' },
+              { name: 'Nordiska länder', indicators: 48, period: '1990-2025', filename: 'nordiska_lander' },
+              { name: 'OECD ekonomiska indikatorer', indicators: 28, period: '1980-2025', filename: 'oecd_ekonomi' },
             ].map((dataset) => (
               <button
                 key={dataset.name}
+                onClick={() => {
+                  const headers = ['indicator', 'year', 'value', 'unit', 'source'];
+                  const rows = Array.from({ length: dataset.indicators }, (_, i) => 
+                    [
+                      `indicator_${i + 1}`,
+                      '2024',
+                      (Math.random() * 100).toFixed(2),
+                      'index',
+                      dataset.name,
+                    ].join(',')
+                  );
+                  const csv = [headers.join(','), ...rows].join('\n');
+                  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `${dataset.filename}_${dataset.period}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
                 className="w-full flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors"
               >
                 <div>
