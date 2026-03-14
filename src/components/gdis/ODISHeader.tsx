@@ -59,13 +59,10 @@ export const ODISHeader: React.FC<ODISHeaderProps> = ({
   return (
     <header className="border-b-2 border-border bg-muted/30">
       {/* Title bar */}
-      <div className="bg-primary/10 border-b border-primary/20 px-3 py-1.5 flex items-center justify-between">
+      <div className="bg-primary/10 border-b border-primary/20 px-3 py-1.5 flex items-center">
         <span className="font-mono text-xs font-semibold tracking-wide text-primary">
           {systemName}
         </span>
-        <div className="flex items-center gap-2">
-          <UserMenu />
-        </div>
       </div>
 
       {/* Info grid */}
