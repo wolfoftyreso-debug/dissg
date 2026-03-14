@@ -243,10 +243,27 @@ const SourcesTabContent: React.FC = () => {
   });
 
   const sourceCategories = [
-    { code: 'official', name: 'Officiella statistikbyråer', sources: ['SCB', 'Eurostat', 'OECD', 'UN Statistics'] },
-    { code: 'realtime', name: 'Realtidsflöden', sources: ['Nord Pool', 'ECB', 'Trading APIs'] },
-    { code: 'research', name: 'Forskningsdatabaser', sources: ['Our World in Data', 'World Bank', 'IMF'] },
-    { code: 'documents', name: 'Dokumentextraktion', sources: ['Regeringskansliet', 'Riksdagen', 'EU-kommissionen'] },
+    { code: 'official', name: 'Officiella statistikbyråer', sources: [
+      { name: 'SCB', url: 'https://www.scb.se/hitta-statistik/statistik-efter-amne/' },
+      { name: 'Eurostat', url: 'https://ec.europa.eu/eurostat/web/main/data/database' },
+      { name: 'OECD', url: 'https://data.oecd.org/' },
+      { name: 'UN Statistics', url: 'https://unstats.un.org/UNSDWebsite/' },
+    ]},
+    { code: 'realtime', name: 'Realtidsflöden', sources: [
+      { name: 'Nord Pool', url: 'https://www.nordpoolgroup.com/en/Market-data1/' },
+      { name: 'ECB', url: 'https://data.ecb.europa.eu/' },
+      { name: 'Trading APIs', url: 'https://www.tradingview.com/' },
+    ]},
+    { code: 'research', name: 'Forskningsdatabaser', sources: [
+      { name: 'Our World in Data', url: 'https://ourworldindata.org/' },
+      { name: 'World Bank', url: 'https://data.worldbank.org/' },
+      { name: 'IMF', url: 'https://www.imf.org/en/Data' },
+    ]},
+    { code: 'documents', name: 'Dokumentextraktion', sources: [
+      { name: 'Regeringskansliet', url: 'https://www.regeringen.se/rapporter/' },
+      { name: 'Riksdagen', url: 'https://www.riksdagen.se/sv/dokument-och-lagar/' },
+      { name: 'EU-kommissionen', url: 'https://commission.europa.eu/publications_en' },
+    ]},
   ];
 
   return (
@@ -260,13 +277,16 @@ const SourcesTabContent: React.FC = () => {
             <CardContent>
               <div className="space-y-2">
                 {cat.sources.map((source) => (
-                  <button
-                    key={source}
-                    className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                  <a
+                    key={source.name}
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors text-left group"
                   >
-                    <span className="text-sm">{source}</span>
+                    <span className="text-sm text-primary group-hover:underline">{source.name}</span>
                     <span className="text-xs text-muted-foreground">[→]</span>
-                  </button>
+                  </a>
                 ))}
               </div>
             </CardContent>
