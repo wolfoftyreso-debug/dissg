@@ -1,12 +1,17 @@
 /**
- * INDEX WORLD MAP - Avanza-inspired, but with a real map
- * 
- * Proper SVG world map with country outlines and index ticker overlays.
+ * INDEX WORLD MAP - Avanza-inspired, with click-to-inspect index info
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
+
+interface DomainScore {
+  name: string;
+  score: number;
+  trend: 'up' | 'down' | 'flat';
+}
 
 interface RegionalIndex {
   code: string;
@@ -15,45 +20,41 @@ interface RegionalIndex {
   flag: string;
   alpha3: string;
   position: { top: string; left: string };
+  fullName: string;
+  value: number;
+  domains: DomainScore[];
 }
 
+const makeDomains = (h: number, e: number, ed: number, env: number, s: number): DomainScore[] => [
+  { name: 'Hälsa', score: h, trend: h > 70 ? 'up' : h < 60 ? 'down' : 'flat' },
+  { name: 'Ekonomi', score: e, trend: e > 70 ? 'up' : e < 60 ? 'down' : 'flat' },
+  { name: 'Utbildning', score: ed, trend: ed > 70 ? 'up' : ed < 60 ? 'down' : 'flat' },
+  { name: 'Miljö', score: env, trend: env > 70 ? 'up' : env < 60 ? 'down' : 'flat' },
+  { name: 'Social', score: s, trend: s > 70 ? 'up' : s < 60 ? 'down' : 'flat' },
+];
+
 const REGIONAL_INDICES: RegionalIndex[] = [
-  // Nordics
-  { code: 'SWE_RI', label: 'SWE', change: 0.31, flag: 'SE', alpha3: 'SWE', position: { top: '16%', left: '54%' } },
-  { code: 'NOR_RI', label: 'NOR', change: 0.19, flag: 'NO', alpha3: 'NOR', position: { top: '12%', left: '51%' } },
-  
-  // Europe
-  { code: 'GBR_RI', label: 'GBR', change: 0.21, flag: 'GB', alpha3: 'GBR', position: { top: '24%', left: '46%' } },
-  { code: 'DEU_RI', label: 'DEU', change: -0.52, flag: 'DE', alpha3: 'DEU', position: { top: '24%', left: '51%' } },
-  { code: 'FRA_RI', label: 'FRA', change: 0.18, flag: 'FR', alpha3: 'FRA', position: { top: '28%', left: '47%' } },
-
-  // North America
-  { code: 'CAN_RI', label: 'CAN', change: 0.15, flag: 'CA', alpha3: 'CAN', position: { top: '18%', left: '22%' } },
-  { code: 'USA_RI', label: 'USA', change: -0.67, flag: 'US', alpha3: 'USA', position: { top: '30%', left: '19%' } },
-  { code: 'MEX_RI', label: 'MEX', change: -1.23, flag: 'MX', alpha3: 'MEX', position: { top: '40%', left: '15%' } },
-
-  // South America
-  { code: 'BRA_RI', label: 'BRA', change: -2.84, flag: 'BR', alpha3: 'BRA', position: { top: '58%', left: '30%' } },
-  { code: 'ARG_RI', label: 'ARG', change: -0.91, flag: 'AR', alpha3: 'ARG', position: { top: '72%', left: '28%' } },
-
-  // Africa
-  { code: 'ZAF_RI', label: 'ZAF', change: -0.45, flag: 'ZA', alpha3: 'ZAF', position: { top: '66%', left: '54%' } },
-  { code: 'NGA_RI', label: 'NGA', change: -1.12, flag: 'NG', alpha3: 'NGA', position: { top: '47%', left: '49%' } },
-  { code: 'EGY_RI', label: 'EGY', change: 0.34, flag: 'EG', alpha3: 'EGY', position: { top: '36%', left: '56%' } },
-
-  // Asia
-  { code: 'CHN_RI', label: 'CHN', change: -0.89, flag: 'CN', alpha3: 'CHN', position: { top: '32%', left: '76%' } },
-  { code: 'IND_RI', label: 'IND', change: 0.56, flag: 'IN', alpha3: 'IND', position: { top: '40%', left: '70%' } },
-  { code: 'JPN_RI', label: 'JPN', change: -0.34, flag: 'JP', alpha3: 'JPN', position: { top: '28%', left: '87%' } },
-  { code: 'KOR_RI', label: 'KOR', change: 0.42, flag: 'KR', alpha3: 'KOR', position: { top: '32%', left: '84%' } },
-  { code: 'SAU_RI', label: 'SAU', change: 0.11, flag: 'SA', alpha3: 'SAU', position: { top: '38%', left: '61%' } },
-  { code: 'IDN_RI', label: 'IDN', change: -0.28, flag: 'ID', alpha3: 'IDN', position: { top: '52%', left: '80%' } },
-
-  // Oceania
-  { code: 'AUS_RI', label: 'AUS', change: 0.89, flag: 'AU', alpha3: 'AUS', position: { top: '70%', left: '85%' } },
-
-  // Russia
-  { code: 'RUS_RI', label: 'RUS', change: -1.45, flag: 'RU', alpha3: 'RUS', position: { top: '16%', left: '70%' } },
+  { code: 'SWE_RI', label: 'SWE', change: 0.31, flag: 'SE', alpha3: 'SWE', position: { top: '16%', left: '54%' }, fullName: 'Sweden Reality Index', value: 72.45, domains: makeDomains(78, 74, 82, 68, 62) },
+  { code: 'NOR_RI', label: 'NOR', change: 0.19, flag: 'NO', alpha3: 'NOR', position: { top: '12%', left: '51%' }, fullName: 'Norway Reality Index', value: 74.12, domains: makeDomains(80, 76, 79, 72, 66) },
+  { code: 'GBR_RI', label: 'GBR', change: 0.21, flag: 'GB', alpha3: 'GBR', position: { top: '24%', left: '46%' }, fullName: 'UK Reality Index', value: 66.78, domains: makeDomains(72, 64, 70, 58, 67) },
+  { code: 'DEU_RI', label: 'DEU', change: -0.52, flag: 'DE', alpha3: 'DEU', position: { top: '24%', left: '51%' }, fullName: 'Germany Reality Index', value: 69.23, domains: makeDomains(75, 71, 74, 62, 63) },
+  { code: 'FRA_RI', label: 'FRA', change: 0.18, flag: 'FR', alpha3: 'FRA', position: { top: '28%', left: '47%' }, fullName: 'France Reality Index', value: 67.45, domains: makeDomains(74, 65, 72, 60, 64) },
+  { code: 'CAN_RI', label: 'CAN', change: 0.15, flag: 'CA', alpha3: 'CAN', position: { top: '18%', left: '22%' }, fullName: 'Canada Reality Index', value: 71.34, domains: makeDomains(77, 72, 76, 70, 60) },
+  { code: 'USA_RI', label: 'USA', change: -0.67, flag: 'US', alpha3: 'USA', position: { top: '30%', left: '19%' }, fullName: 'US Reality Index', value: 65.34, domains: makeDomains(68, 73, 66, 52, 57) },
+  { code: 'MEX_RI', label: 'MEX', change: -1.23, flag: 'MX', alpha3: 'MEX', position: { top: '40%', left: '15%' }, fullName: 'Mexico Reality Index', value: 54.12, domains: makeDomains(58, 52, 55, 48, 53) },
+  { code: 'BRA_RI', label: 'BRA', change: -2.84, flag: 'BR', alpha3: 'BRA', position: { top: '58%', left: '30%' }, fullName: 'Brazil Reality Index', value: 48.67, domains: makeDomains(52, 45, 50, 55, 42) },
+  { code: 'ARG_RI', label: 'ARG', change: -0.91, flag: 'AR', alpha3: 'ARG', position: { top: '72%', left: '28%' }, fullName: 'Argentina Reality Index', value: 55.23, domains: makeDomains(60, 48, 62, 56, 50) },
+  { code: 'ZAF_RI', label: 'ZAF', change: -0.45, flag: 'ZA', alpha3: 'ZAF', position: { top: '66%', left: '54%' }, fullName: 'South Africa Reality Index', value: 49.89, domains: makeDomains(45, 48, 52, 55, 42) },
+  { code: 'NGA_RI', label: 'NGA', change: -1.12, flag: 'NG', alpha3: 'NGA', position: { top: '47%', left: '49%' }, fullName: 'Nigeria Reality Index', value: 38.45, domains: makeDomains(35, 32, 40, 42, 38) },
+  { code: 'EGY_RI', label: 'EGY', change: 0.34, flag: 'EG', alpha3: 'EGY', position: { top: '36%', left: '56%' }, fullName: 'Egypt Reality Index', value: 52.78, domains: makeDomains(55, 48, 58, 50, 52) },
+  { code: 'CHN_RI', label: 'CHN', change: -0.89, flag: 'CN', alpha3: 'CHN', position: { top: '32%', left: '76%' }, fullName: 'China Reality Index', value: 58.92, domains: makeDomains(62, 68, 60, 42, 48) },
+  { code: 'IND_RI', label: 'IND', change: 0.56, flag: 'IN', alpha3: 'IND', position: { top: '40%', left: '70%' }, fullName: 'India Reality Index', value: 46.34, domains: makeDomains(42, 45, 48, 40, 44) },
+  { code: 'JPN_RI', label: 'JPN', change: -0.34, flag: 'JP', alpha3: 'JPN', position: { top: '28%', left: '87%' }, fullName: 'Japan Reality Index', value: 68.45, domains: makeDomains(82, 65, 78, 58, 60) },
+  { code: 'KOR_RI', label: 'KOR', change: 0.42, flag: 'KR', alpha3: 'KOR', position: { top: '32%', left: '84%' }, fullName: 'South Korea Reality Index', value: 70.12, domains: makeDomains(80, 72, 82, 54, 56) },
+  { code: 'SAU_RI', label: 'SAU', change: 0.11, flag: 'SA', alpha3: 'SAU', position: { top: '38%', left: '61%' }, fullName: 'Saudi Arabia Reality Index', value: 56.78, domains: makeDomains(62, 68, 55, 35, 50) },
+  { code: 'IDN_RI', label: 'IDN', change: -0.28, flag: 'ID', alpha3: 'IDN', position: { top: '52%', left: '80%' }, fullName: 'Indonesia Reality Index', value: 50.45, domains: makeDomains(52, 48, 54, 46, 50) },
+  { code: 'AUS_RI', label: 'AUS', change: 0.89, flag: 'AU', alpha3: 'AUS', position: { top: '70%', left: '85%' }, fullName: 'Australia Reality Index', value: 70.12, domains: makeDomains(78, 72, 76, 62, 64) },
+  { code: 'RUS_RI', label: 'RUS', change: -1.45, flag: 'RU', alpha3: 'RUS', position: { top: '16%', left: '70%' }, fullName: 'Russia Reality Index', value: 52.34, domains: makeDomains(55, 50, 62, 45, 42) },
 ];
 
 // Compact sparkline
@@ -71,6 +72,26 @@ const Sparkline: React.FC<{ trend: 'up' | 'down' | 'flat'; className?: string }>
   );
 };
 
+// Score bar
+const ScoreBar: React.FC<{ label: string; score: number; trend: 'up' | 'down' | 'flat' }> = ({ label, score, trend }) => (
+  <div className="flex items-center gap-2 text-xs">
+    <span className="w-16 text-muted-foreground truncate">{label}</span>
+    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+      <div
+        className={cn(
+          "h-full rounded-full transition-all",
+          score >= 70 ? "bg-trend-up" : score >= 50 ? "bg-status-warning" : "bg-trend-down"
+        )}
+        style={{ width: `${score}%` }}
+      />
+    </div>
+    <span className="w-7 text-right font-mono text-muted-foreground">{score}</span>
+    <span className={cn("text-[10px]", trend === 'up' ? 'text-trend-up' : trend === 'down' ? 'text-trend-down' : 'text-muted-foreground')}>
+      {trend === 'up' ? '▲' : trend === 'down' ? '▼' : '–'}
+    </span>
+  </div>
+);
+
 interface IndexWorldMapProps {
   className?: string;
   onSelectIndex?: (code: string) => void;
@@ -79,13 +100,49 @@ interface IndexWorldMapProps {
 export function IndexWorldMap({ className, onSelectIndex }: IndexWorldMapProps) {
   const navigate = useNavigate();
   const [hoveredIndex, setHoveredIndex] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<RegionalIndex | null>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
 
-  const handleClick = (code: string) => {
+  // Close popup on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
+        setSelectedIndex(null);
+      }
+    };
+    if (selectedIndex) document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [selectedIndex]);
+
+  const handleClick = (index: RegionalIndex) => {
+    setSelectedIndex(index);
+  };
+
+  const handleNavigate = (code: string) => {
     if (onSelectIndex) {
       onSelectIndex(code);
     } else {
       navigate(`/index/${code}`);
     }
+  };
+
+  // Calculate popup position to stay within bounds
+  const getPopupStyle = (pos: { top: string; left: string }) => {
+    const left = parseFloat(pos.left);
+    const top = parseFloat(pos.top);
+    const style: React.CSSProperties = { position: 'absolute', zIndex: 30 };
+    
+    // Horizontal: show to right unless too far right
+    if (left > 65) {
+      style.right = `${100 - left + 2}%`;
+    } else {
+      style.left = `${left + 3}%`;
+    }
+    // Vertical: center on ticker, clamp
+    const clampedTop = Math.max(5, Math.min(top - 10, 55));
+    style.top = `${clampedTop}%`;
+    
+    return style;
   };
 
   return (
@@ -106,67 +163,35 @@ export function IndexWorldMap({ className, onSelectIndex }: IndexWorldMapProps) 
             <stop offset="100%" stopColor="hsl(var(--muted-foreground))" stopOpacity="0.08" />
           </linearGradient>
         </defs>
-
-        {/* Ocean background */}
         <rect x="0" y="0" width="1200" height="600" fill="url(#oceanGradient)" />
-        
-        {/* Grid lines for professional look */}
         <g stroke="hsl(var(--border))" strokeWidth="0.3" strokeOpacity="0.3">
-          {[100,200,300,400,500].map(y => (
-            <line key={`h${y}`} x1="0" y1={y} x2="1200" y2={y} />
-          ))}
-          {[200,400,600,800,1000].map(x => (
-            <line key={`v${x}`} x1={x} y1="0" x2={x} y2="600" />
-          ))}
+          {[100,200,300,400,500].map(y => <line key={`h${y}`} x1="0" y1={y} x2="1200" y2={y} />)}
+          {[200,400,600,800,1000].map(x => <line key={`v${x}`} x1={x} y1="0" x2={x} y2="600" />)}
         </g>
-
-        {/* Proper continent shapes using polygon paths */}
         <g fill="url(#landFill)" stroke="hsl(var(--border))" strokeWidth="0.6" strokeOpacity="0.4">
-          {/* North America */}
           <path d="M120,60 L180,50 L240,55 L280,70 L310,100 L320,130 L310,160 L290,190 L270,210 L260,230 L240,250 L220,260 L200,270 L180,265 L170,280 L155,285 L150,270 L140,250 L130,230 L115,220 L100,200 L90,180 L85,150 L90,120 L100,90 L110,70 Z" />
-          {/* Greenland */}
           <path d="M280,30 L320,25 L350,35 L360,55 L350,80 L330,85 L310,80 L290,65 L275,45 Z" />
-          {/* Central America */}
           <path d="M155,285 L170,280 L180,290 L185,300 L180,310 L170,315 L160,320 L155,315 L150,305 L148,295 Z" />
-          
-          {/* South America */}
           <path d="M220,320 L250,310 L280,315 L310,330 L330,350 L340,380 L345,410 L340,440 L330,465 L315,485 L300,495 L285,500 L270,490 L260,475 L250,455 L240,430 L235,400 L230,380 L225,360 L220,340 Z" />
-          
-          {/* Europe */}
           <path d="M470,65 L490,60 L510,55 L530,58 L555,65 L570,75 L575,90 L580,105 L575,120 L565,135 L555,145 L540,155 L530,165 L520,170 L510,175 L495,170 L480,165 L470,155 L465,140 L460,125 L455,110 L458,90 L462,75 Z" />
-          {/* UK & Ireland */}
           <path d="M445,90 L455,85 L460,95 L458,108 L450,115 L442,110 L440,100 Z" />
-          {/* Scandinavia */}
           <path d="M510,30 L520,25 L535,30 L540,45 L545,60 L540,75 L530,55 L520,50 L515,40 Z" />
-          
-          {/* Africa */}
           <path d="M470,185 L500,180 L530,185 L560,195 L580,210 L600,240 L610,270 L615,300 L610,335 L600,365 L585,390 L570,410 L555,420 L540,425 L520,420 L500,410 L485,395 L475,375 L465,350 L455,320 L450,290 L448,260 L452,230 L458,210 L465,195 Z" />
-          
-          {/* Asia - main mass */}
           <path d="M580,50 L620,40 L680,35 L740,40 L800,50 L860,55 L920,60 L960,70 L980,85 L990,100 L985,120 L975,140 L960,160 L940,180 L920,195 L895,205 L870,210 L840,215 L810,220 L780,225 L750,230 L720,225 L690,215 L670,200 L650,185 L635,170 L620,155 L610,135 L600,115 L590,95 L582,75 Z" />
-          {/* India */}
           <path d="M720,225 L740,230 L760,245 L770,265 L775,290 L770,310 L760,320 L745,325 L730,320 L720,305 L715,280 L710,260 L712,240 Z" />
-          {/* Arabian Peninsula */}
           <path d="M610,195 L640,185 L665,195 L680,210 L685,230 L675,245 L660,250 L640,245 L625,235 L615,220 L610,205 Z" />
-          {/* Southeast Asia */}
           <path d="M810,220 L830,225 L850,240 L860,260 L865,275 L855,285 L840,280 L825,270 L815,255 L808,240 Z" />
-          {/* Japan */}
           <path d="M960,100 L975,95 L985,105 L988,120 L982,135 L972,140 L965,130 L958,115 Z" />
-          {/* Korean Peninsula */}
           <path d="M940,110 L950,105 L958,112 L955,125 L948,132 L940,128 L938,118 Z" />
-          {/* Indonesia archipelago */}
           <path d="M840,310 L860,308 L880,312 L900,310 L915,315 L910,325 L890,328 L870,325 L850,322 L838,318 Z" />
-          
-          {/* Australia */}
           <path d="M880,370 L920,360 L960,365 L990,380 L1010,400 L1015,425 L1005,450 L985,465 L960,470 L935,465 L910,455 L895,440 L885,420 L878,400 L876,385 Z" />
-          {/* New Zealand */}
           <path d="M1040,445 L1048,440 L1055,450 L1052,465 L1045,470 L1038,462 Z" />
         </g>
       </svg>
 
       {/* Global Index Badge */}
       <button
-        onClick={() => handleClick('GLOBAL_RI')}
+        onClick={() => handleNavigate('GLOBAL_RI')}
         className="absolute bottom-4 left-4 flex items-center gap-2 bg-background/95 backdrop-blur-sm px-3 py-2 rounded border shadow-sm hover:shadow-md transition-shadow z-10"
       >
         <span className="font-mono text-xs text-muted-foreground">[G]</span>
@@ -187,7 +212,7 @@ export function IndexWorldMap({ className, onSelectIndex }: IndexWorldMapProps) 
       {REGIONAL_INDICES.map((index) => (
         <button
           key={index.code}
-          onClick={() => handleClick(index.code)}
+          onClick={() => handleClick(index)}
           onMouseEnter={() => setHoveredIndex(index.code)}
           onMouseLeave={() => setHoveredIndex(null)}
           className={cn(
@@ -196,7 +221,8 @@ export function IndexWorldMap({ className, onSelectIndex }: IndexWorldMapProps) 
             "bg-background/90 backdrop-blur-sm border",
             "hover:bg-background hover:shadow-md hover:z-20 transition-all",
             "text-[11px] whitespace-nowrap",
-            hoveredIndex === index.code && "ring-1 ring-primary/50 shadow-md z-20"
+            hoveredIndex === index.code && "ring-1 ring-primary/50 shadow-md z-20",
+            selectedIndex?.code === index.code && "ring-2 ring-primary shadow-lg z-20 bg-background"
           )}
           style={{ top: index.position.top, left: index.position.left }}
         >
@@ -214,6 +240,65 @@ export function IndexWorldMap({ className, onSelectIndex }: IndexWorldMapProps) 
           />
         </button>
       ))}
+
+      {/* Info Popup */}
+      {selectedIndex && (
+        <div
+          ref={popupRef}
+          style={getPopupStyle(selectedIndex.position)}
+          className="w-64 bg-background border rounded-lg shadow-xl animate-in fade-in zoom-in-95 duration-150"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-3 border-b">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-semibold text-foreground">{selectedIndex.fullName}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-lg font-bold font-mono text-foreground">
+                  {selectedIndex.value.toFixed(2)}
+                </span>
+                <span className={cn(
+                  "text-sm font-mono font-medium",
+                  selectedIndex.change >= 0 ? "text-trend-up" : "text-trend-down"
+                )}>
+                  {selectedIndex.change >= 0 ? '+' : ''}{selectedIndex.change.toFixed(2).replace('.', ',')}%
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); setSelectedIndex(null); }}
+              className="p-1 rounded hover:bg-muted transition-colors"
+            >
+              <X className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+          </div>
+
+          {/* Domain scores */}
+          <div className="p-3 space-y-1.5">
+            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Domänpoäng</span>
+            {selectedIndex.domains.map((d) => (
+              <ScoreBar key={d.name} label={d.name} score={d.score} trend={d.trend} />
+            ))}
+          </div>
+
+          {/* Actions */}
+          <div className="p-3 pt-0 flex gap-2">
+            <button
+              onClick={() => handleNavigate(selectedIndex.code)}
+              className="flex-1 text-xs font-medium py-1.5 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Utforska index →
+            </button>
+            <button
+              onClick={() => navigate(`/country/${selectedIndex.flag}`)}
+              className="flex-1 text-xs font-medium py-1.5 rounded border hover:bg-muted transition-colors text-foreground"
+            >
+              Landprofil
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
