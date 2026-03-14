@@ -18,184 +18,206 @@
  // EDUCATION INDICES
  // =============================================================================
  
- interface EducationIndex {
-   code: string;
-   name: string;
-   fullName: string;
-   description: string;
-   source: string;
-   sourceUrl: string;
-   methodology: string;
-   updateFrequency: string;
-   coverage: number;
-   yearRange: string;
-   scale: string;
-   categories?: string[];
- }
+interface BenchmarkData {
+  sweden: number | null;
+  oecdAvg: number | null;
+  best: { country: string; value: number };
+  worst: { country: string; value: number };
+  unit: string;
+  higherIsBetter: boolean;
+}
+
+interface EducationIndex {
+  code: string;
+  name: string;
+  fullName: string;
+  description: string;
+  source: string;
+  sourceUrl: string;
+  methodology: string;
+  updateFrequency: string;
+  coverage: number;
+  yearRange: string;
+  scale: string;
+  categories?: string[];
+  benchmark: BenchmarkData;
+}
  
  const EDUCATION_INDICES: EducationIndex[] = [
-   {
-     code: 'PISA',
-     name: 'PISA-poäng',
-     fullName: 'Programme for International Student Assessment',
-     description: 'Mäter 15-åringars kunskaper i läsförståelse, matematik och naturvetenskap',
-     source: 'OECD',
-     sourceUrl: 'https://www.oecd.org/pisa/',
-     methodology: 'Standardiserade tester på representativa urval av elever',
-     updateFrequency: 'Var 3:e år',
-     coverage: 82,
-     yearRange: '2000–2022',
-     scale: '0–1000 (snitt 500)',
-     categories: ['Läsförståelse', 'Matematik', 'Naturvetenskap'],
-   },
-   {
-     code: 'HDI-EDU',
-     name: 'HDI Utbildningsindex',
-     fullName: 'Human Development Index - Education Component',
-     description: 'Kombinerar förväntad och genomsnittlig skolår',
-     source: 'UNDP',
-     sourceUrl: 'https://hdr.undp.org/',
-     methodology: 'Normaliserat index baserat på utbildningsdata',
-     updateFrequency: 'Årligen',
-     coverage: 95,
-     yearRange: '1990–2024',
-     scale: '0–1.0',
-   },
-   {
-     code: 'LITERACY',
-     name: 'Läskunnighet',
-     fullName: 'Adult Literacy Rate',
-     description: 'Andel av befolkningen 15+ som kan läsa och skriva',
-     source: 'UNESCO',
-     sourceUrl: 'https://uis.unesco.org/',
-     methodology: 'Folkräkningar och hushållsundersökningar',
-     updateFrequency: 'Var 5:e år',
-     coverage: 88,
-     yearRange: '1970–2024',
-     scale: '0–100%',
-   },
-   {
-     code: 'ENROLLMENT',
-     name: 'Inskrivningsgrad',
-     fullName: 'Gross Enrollment Ratio',
-     description: 'Andel av relevant åldersgrupp som är inskrivna i utbildning',
-     source: 'UNESCO UIS',
-     sourceUrl: 'https://uis.unesco.org/',
-     methodology: 'Administrativa data från nationella utbildningssystem',
-     updateFrequency: 'Årligen',
-     coverage: 92,
-     yearRange: '1970–2024',
-     scale: '0–100%+',
-     categories: ['Förskola', 'Grundskola', 'Gymnasium', 'Högre utbildning'],
-   },
-   {
-     code: 'COMPLETION',
-     name: 'Avslutad utbildning',
-     fullName: 'Educational Attainment Rate',
-     description: 'Andel som avslutat respektive utbildningsnivå',
-     source: 'UNESCO/Barro-Lee',
-     sourceUrl: 'https://barrolee.github.io/BarroLeeDataSet/',
-     methodology: 'Folkräkningsdata och utbildningsregister',
-     updateFrequency: 'Var 5:e år',
-     coverage: 78,
-     yearRange: '1950–2024',
-     scale: '0–100%',
-     categories: ['Grundskola', 'Gymnasium', 'Universitet'],
-   },
-   {
-     code: 'TIMSS',
-     name: 'TIMSS-poäng',
-     fullName: 'Trends in International Mathematics and Science Study',
-     description: 'Internationell mätning av matematik- och NO-kunskaper',
-     source: 'IEA',
-     sourceUrl: 'https://timssandpirls.bc.edu/',
-     methodology: 'Standardiserade tester för årskurs 4 och 8',
-     updateFrequency: 'Var 4:e år',
-     coverage: 65,
-     yearRange: '1995–2023',
-     scale: '0–1000 (snitt 500)',
-     categories: ['Matematik', 'Naturvetenskap'],
-   },
-   {
-     code: 'PIRLS',
-     name: 'PIRLS-poäng',
-     fullName: 'Progress in International Reading Literacy Study',
-     description: 'Internationell mätning av läsförmåga i årskurs 4',
-     source: 'IEA',
-     sourceUrl: 'https://timssandpirls.bc.edu/',
-     methodology: 'Standardiserade lästester',
-     updateFrequency: 'Var 5:e år',
-     coverage: 58,
-     yearRange: '2001–2021',
-     scale: '0–1000 (snitt 500)',
-   },
-   {
-     code: 'SPEND-EDU',
-     name: 'Utbildningsutgifter',
-     fullName: 'Government Expenditure on Education',
-     description: 'Offentliga utgifter för utbildning som andel av BNP',
-     source: 'World Bank / UNESCO',
-     sourceUrl: 'https://data.worldbank.org/',
-     methodology: 'Nationella budgetdata',
-     updateFrequency: 'Årligen',
-     coverage: 85,
-     yearRange: '1970–2024',
-     scale: '% av BNP',
-   },
-   {
-     code: 'TEACHER-RATIO',
-     name: 'Elev-lärare-kvot',
-     fullName: 'Pupil-Teacher Ratio',
-     description: 'Antal elever per lärare på olika utbildningsnivåer',
-     source: 'UNESCO UIS',
-     sourceUrl: 'https://uis.unesco.org/',
-     methodology: 'Administrativa utbildningsdata',
-     updateFrequency: 'Årligen',
-     coverage: 88,
-     yearRange: '1970–2024',
-     scale: 'Ratio',
-     categories: ['Grundskola', 'Gymnasium', 'Högre utbildning'],
-   },
-   {
-     code: 'SKILLS-ADULT',
-     name: 'Vuxenkompetens',
-     fullName: 'PIAAC Adult Skills',
-     description: 'Vuxnas kunskaper i läsning, räkning och problemlösning',
-     source: 'OECD PIAAC',
-     sourceUrl: 'https://www.oecd.org/skills/piaac/',
-     methodology: 'Standardiserade tester på vuxen befolkning 16–65',
-     updateFrequency: 'Var 10:e år',
-     coverage: 42,
-     yearRange: '2012–2023',
-     scale: '0–500',
-     categories: ['Läsning', 'Räkning', 'Problemlösning'],
-   },
-   {
-     code: 'DIGITAL-SKILLS',
-     name: 'Digitala färdigheter',
-     fullName: 'Digital Skills Index',
-     description: 'Befolkningens digitala kompetens och internetanvändning',
-     source: 'ITU / Eurostat',
-     sourceUrl: 'https://www.itu.int/',
-     methodology: 'Hushållsundersökningar om digital kompetens',
-     updateFrequency: 'Årligen',
-     coverage: 72,
-     yearRange: '2015–2024',
-     scale: '0–100',
-   },
-   {
-     code: 'NEET',
-     name: 'NEET-andel',
-     fullName: 'Not in Employment, Education or Training',
-     description: 'Unga (15–29) som varken arbetar, studerar eller praktiserar',
-     source: 'OECD / ILO',
-     sourceUrl: 'https://data.oecd.org/',
-     methodology: 'Arbetskraftsundersökningar',
-     updateFrequency: 'Årligen',
-     coverage: 78,
-     yearRange: '2000–2024',
-     scale: '% av åldersgrupp',
-   },
+    {
+      code: 'PISA',
+      name: 'PISA-poäng',
+      fullName: 'Programme for International Student Assessment',
+      description: 'Mäter 15-åringars kunskaper i läsförståelse, matematik och naturvetenskap',
+      source: 'OECD',
+      sourceUrl: 'https://www.oecd.org/pisa/',
+      methodology: 'Standardiserade tester på representativa urval av elever',
+      updateFrequency: 'Var 3:e år',
+      coverage: 82,
+      yearRange: '2000–2022',
+      scale: '0–1000 (snitt 500)',
+      categories: ['Läsförståelse', 'Matematik', 'Naturvetenskap'],
+      benchmark: { sweden: 502, oecdAvg: 489, best: { country: 'Singapore', value: 569 }, worst: { country: 'Dominikanska rep.', value: 339 }, unit: 'poäng', higherIsBetter: true },
+    },
+    {
+      code: 'HDI-EDU',
+      name: 'HDI Utbildningsindex',
+      fullName: 'Human Development Index - Education Component',
+      description: 'Kombinerar förväntad och genomsnittlig skolår',
+      source: 'UNDP',
+      sourceUrl: 'https://hdr.undp.org/',
+      methodology: 'Normaliserat index baserat på utbildningsdata',
+      updateFrequency: 'Årligen',
+      coverage: 95,
+      yearRange: '1990–2024',
+      scale: '0–1.0',
+      benchmark: { sweden: 0.911, oecdAvg: 0.870, best: { country: 'Norge', value: 0.953 }, worst: { country: 'Niger', value: 0.209 }, unit: 'index', higherIsBetter: true },
+    },
+    {
+      code: 'LITERACY',
+      name: 'Läskunnighet',
+      fullName: 'Adult Literacy Rate',
+      description: 'Andel av befolkningen 15+ som kan läsa och skriva',
+      source: 'UNESCO',
+      sourceUrl: 'https://uis.unesco.org/',
+      methodology: 'Folkräkningar och hushållsundersökningar',
+      updateFrequency: 'Var 5:e år',
+      coverage: 88,
+      yearRange: '1970–2024',
+      scale: '0–100%',
+      benchmark: { sweden: 99, oecdAvg: 99, best: { country: 'Finland', value: 100 }, worst: { country: 'Niger', value: 19 }, unit: '%', higherIsBetter: true },
+    },
+    {
+      code: 'ENROLLMENT',
+      name: 'Inskrivningsgrad',
+      fullName: 'Gross Enrollment Ratio',
+      description: 'Andel av relevant åldersgrupp som är inskrivna i utbildning',
+      source: 'UNESCO UIS',
+      sourceUrl: 'https://uis.unesco.org/',
+      methodology: 'Administrativa data från nationella utbildningssystem',
+      updateFrequency: 'Årligen',
+      coverage: 92,
+      yearRange: '1970–2024',
+      scale: '0–100%+',
+      categories: ['Förskola', 'Grundskola', 'Gymnasium', 'Högre utbildning'],
+      benchmark: { sweden: 67, oecdAvg: 75, best: { country: 'Sydkorea', value: 95 }, worst: { country: 'Eritrea', value: 2 }, unit: '% (högre utb.)', higherIsBetter: true },
+    },
+    {
+      code: 'COMPLETION',
+      name: 'Avslutad utbildning',
+      fullName: 'Educational Attainment Rate',
+      description: 'Andel som avslutat respektive utbildningsnivå',
+      source: 'UNESCO/Barro-Lee',
+      sourceUrl: 'https://barrolee.github.io/BarroLeeDataSet/',
+      methodology: 'Folkräkningsdata och utbildningsregister',
+      updateFrequency: 'Var 5:e år',
+      coverage: 78,
+      yearRange: '1950–2024',
+      scale: '0–100%',
+      categories: ['Grundskola', 'Gymnasium', 'Universitet'],
+      benchmark: { sweden: 88, oecdAvg: 80, best: { country: 'Kanada', value: 94 }, worst: { country: 'Moçambique', value: 7 }, unit: '% (gymn.+)', higherIsBetter: true },
+    },
+    {
+      code: 'TIMSS',
+      name: 'TIMSS-poäng',
+      fullName: 'Trends in International Mathematics and Science Study',
+      description: 'Internationell mätning av matematik- och NO-kunskaper',
+      source: 'IEA',
+      sourceUrl: 'https://timssandpirls.bc.edu/',
+      methodology: 'Standardiserade tester för årskurs 4 och 8',
+      updateFrequency: 'Var 4:e år',
+      coverage: 65,
+      yearRange: '1995–2023',
+      scale: '0–1000 (snitt 500)',
+      categories: ['Matematik', 'Naturvetenskap'],
+      benchmark: { sweden: 521, oecdAvg: 503, best: { country: 'Singapore', value: 611 }, worst: { country: 'Sydafrika', value: 372 }, unit: 'poäng', higherIsBetter: true },
+    },
+    {
+      code: 'PIRLS',
+      name: 'PIRLS-poäng',
+      fullName: 'Progress in International Reading Literacy Study',
+      description: 'Internationell mätning av läsförmåga i årskurs 4',
+      source: 'IEA',
+      sourceUrl: 'https://timssandpirls.bc.edu/',
+      methodology: 'Standardiserade lästester',
+      updateFrequency: 'Var 5:e år',
+      coverage: 58,
+      yearRange: '2001–2021',
+      scale: '0–1000 (snitt 500)',
+      benchmark: { sweden: 544, oecdAvg: 511, best: { country: 'Singapore', value: 576 }, worst: { country: 'Sydafrika', value: 288 }, unit: 'poäng', higherIsBetter: true },
+    },
+    {
+      code: 'SPEND-EDU',
+      name: 'Utbildningsutgifter',
+      fullName: 'Government Expenditure on Education',
+      description: 'Offentliga utgifter för utbildning som andel av BNP',
+      source: 'World Bank / UNESCO',
+      sourceUrl: 'https://data.worldbank.org/',
+      methodology: 'Nationella budgetdata',
+      updateFrequency: 'Årligen',
+      coverage: 85,
+      yearRange: '1970–2024',
+      scale: '% av BNP',
+      benchmark: { sweden: 7.6, oecdAvg: 4.9, best: { country: 'Norge', value: 7.9 }, worst: { country: 'Bangladesh', value: 1.3 }, unit: '% av BNP', higherIsBetter: true },
+    },
+    {
+      code: 'TEACHER-RATIO',
+      name: 'Elev-lärare-kvot',
+      fullName: 'Pupil-Teacher Ratio',
+      description: 'Antal elever per lärare på olika utbildningsnivåer',
+      source: 'UNESCO UIS',
+      sourceUrl: 'https://uis.unesco.org/',
+      methodology: 'Administrativa utbildningsdata',
+      updateFrequency: 'Årligen',
+      coverage: 88,
+      yearRange: '1970–2024',
+      scale: 'Ratio',
+      categories: ['Grundskola', 'Gymnasium', 'Högre utbildning'],
+      benchmark: { sweden: 12, oecdAvg: 15, best: { country: 'Norge', value: 10 }, worst: { country: 'Centralafrikanska rep.', value: 80 }, unit: 'elever/lärare', higherIsBetter: false },
+    },
+    {
+      code: 'SKILLS-ADULT',
+      name: 'Vuxenkompetens',
+      fullName: 'PIAAC Adult Skills',
+      description: 'Vuxnas kunskaper i läsning, räkning och problemlösning',
+      source: 'OECD PIAAC',
+      sourceUrl: 'https://www.oecd.org/skills/piaac/',
+      methodology: 'Standardiserade tester på vuxen befolkning 16–65',
+      updateFrequency: 'Var 10:e år',
+      coverage: 42,
+      yearRange: '2012–2023',
+      scale: '0–500',
+      categories: ['Läsning', 'Räkning', 'Problemlösning'],
+      benchmark: { sweden: 279, oecdAvg: 263, best: { country: 'Japan', value: 296 }, worst: { country: 'Ecuador', value: 196 }, unit: 'poäng', higherIsBetter: true },
+    },
+    {
+      code: 'DIGITAL-SKILLS',
+      name: 'Digitala färdigheter',
+      fullName: 'Digital Skills Index',
+      description: 'Befolkningens digitala kompetens och internetanvändning',
+      source: 'ITU / Eurostat',
+      sourceUrl: 'https://www.itu.int/',
+      methodology: 'Hushållsundersökningar om digital kompetens',
+      updateFrequency: 'Årligen',
+      coverage: 72,
+      yearRange: '2015–2024',
+      scale: '0–100',
+      benchmark: { sweden: 72, oecdAvg: 58, best: { country: 'Finland', value: 79 }, worst: { country: 'Rumänien', value: 28 }, unit: '/100', higherIsBetter: true },
+    },
+    {
+      code: 'NEET',
+      name: 'NEET-andel',
+      fullName: 'Not in Employment, Education or Training',
+      description: 'Unga (15–29) som varken arbetar, studerar eller praktiserar',
+      source: 'OECD / ILO',
+      sourceUrl: 'https://data.oecd.org/',
+      methodology: 'Arbetskraftsundersökningar',
+      updateFrequency: 'Årligen',
+      coverage: 78,
+      yearRange: '2000–2024',
+      scale: '% av åldersgrupp',
+      benchmark: { sweden: 6.5, oecdAvg: 12.1, best: { country: 'Japan', value: 3.1 }, worst: { country: 'Sydafrika', value: 32.4 }, unit: '%', higherIsBetter: false },
+    },
  ];
  
  // =============================================================================
@@ -245,33 +267,76 @@
    onSelect: () => void;
  }
  
- function IndexCard({ index, onSelect }: IndexCardProps) {
-   return (
-     <button
-       onClick={onSelect}
-       className="p-4 rounded-lg border bg-card hover:border-primary hover:bg-primary/5 transition-all text-left w-full"
-     >
-       <div className="flex items-start justify-between mb-2">
-         <Badge variant="outline" className="font-mono text-xs">
-           {index.code}
-         </Badge>
-         <span className="text-[10px] text-muted-foreground">{index.source}</span>
-       </div>
-       <div className="font-semibold text-sm mb-1">{index.name}</div>
-       <div className="text-xs text-muted-foreground line-clamp-2 mb-3">
-         {index.description}
-       </div>
-       <div className="flex items-center gap-2 text-[10px]">
-         <span className="text-muted-foreground">TÄCKNING:</span>
-         <Progress value={index.coverage} className="h-1.5 flex-1" />
-         <span className="font-mono">{index.coverage}%</span>
-       </div>
-       <div className="text-[10px] text-muted-foreground mt-1">
-         {index.yearRange} · {index.updateFrequency}
-       </div>
-     </button>
-   );
- }
+function IndexCard({ index, onSelect }: IndexCardProps) {
+  const { benchmark: b } = index;
+  const swedenIsGood = b.sweden !== null && (
+    b.higherIsBetter ? b.sweden >= (b.oecdAvg ?? 0) : b.sweden <= (b.oecdAvg ?? Infinity)
+  );
+
+  return (
+    <button
+      onClick={onSelect}
+      className="p-4 rounded-lg border bg-card hover:border-primary hover:bg-primary/5 transition-all text-left w-full"
+    >
+      <div className="flex items-start justify-between mb-2">
+        <Badge variant="outline" className="font-mono text-xs">
+          {index.code}
+        </Badge>
+        <span className="text-[10px] text-muted-foreground">{index.source}</span>
+      </div>
+      <div className="font-semibold text-sm mb-1">{index.name}</div>
+      <div className="text-xs text-muted-foreground line-clamp-2 mb-3">
+        {index.description}
+      </div>
+
+      {/* BENCHMARK BAR */}
+      <div className="mb-3 p-2 rounded border bg-muted/30">
+        <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
+          <span className="text-muted-foreground">BENCHMARK</span>
+          {b.sweden !== null && (
+            <span className={swedenIsGood ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}>
+              SE: {b.sweden} {b.unit}
+            </span>
+          )}
+        </div>
+        <div className="relative h-2 rounded-full bg-muted overflow-hidden mb-1.5">
+          {/* Range bar from worst to best */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-destructive/30 via-muted-foreground/20 to-emerald-500/30" />
+          {/* OECD average marker */}
+          {b.oecdAvg !== null && (
+            <div
+              className="absolute top-0 h-full w-0.5 bg-muted-foreground/60"
+              style={{ left: `${((b.oecdAvg - b.worst.value) / (b.best.value - b.worst.value)) * 100}%` }}
+              title={`OECD snitt: ${b.oecdAvg}`}
+            />
+          )}
+          {/* Sweden marker */}
+          {b.sweden !== null && (
+            <div
+              className="absolute top-[-1px] h-[10px] w-[10px] rounded-full border-2 border-primary bg-primary-foreground"
+              style={{ left: `calc(${((b.sweden - b.worst.value) / (b.best.value - b.worst.value)) * 100}% - 5px)` }}
+              title={`Sverige: ${b.sweden}`}
+            />
+          )}
+        </div>
+        <div className="flex justify-between text-[9px] text-muted-foreground font-mono">
+          <span>{b.worst.country} ({b.worst.value})</span>
+          {b.oecdAvg !== null && <span className="text-muted-foreground/80">OECD: {b.oecdAvg}</span>}
+          <span>{b.best.country} ({b.best.value})</span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 text-[10px]">
+        <span className="text-muted-foreground">TÄCKNING:</span>
+        <Progress value={index.coverage} className="h-1.5 flex-1" />
+        <span className="font-mono">{index.coverage}%</span>
+      </div>
+      <div className="text-[10px] text-muted-foreground mt-1">
+        {index.yearRange} · {index.updateFrequency}
+      </div>
+    </button>
+  );
+}
  
  // =============================================================================
  // INDEX DETAIL MODAL
