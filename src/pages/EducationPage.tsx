@@ -267,33 +267,76 @@ interface EducationIndex {
    onSelect: () => void;
  }
  
- function IndexCard({ index, onSelect }: IndexCardProps) {
-   return (
-     <button
-       onClick={onSelect}
-       className="p-4 rounded-lg border bg-card hover:border-primary hover:bg-primary/5 transition-all text-left w-full"
-     >
-       <div className="flex items-start justify-between mb-2">
-         <Badge variant="outline" className="font-mono text-xs">
-           {index.code}
-         </Badge>
-         <span className="text-[10px] text-muted-foreground">{index.source}</span>
-       </div>
-       <div className="font-semibold text-sm mb-1">{index.name}</div>
-       <div className="text-xs text-muted-foreground line-clamp-2 mb-3">
-         {index.description}
-       </div>
-       <div className="flex items-center gap-2 text-[10px]">
-         <span className="text-muted-foreground">TÄCKNING:</span>
-         <Progress value={index.coverage} className="h-1.5 flex-1" />
-         <span className="font-mono">{index.coverage}%</span>
-       </div>
-       <div className="text-[10px] text-muted-foreground mt-1">
-         {index.yearRange} · {index.updateFrequency}
-       </div>
-     </button>
-   );
- }
+function IndexCard({ index, onSelect }: IndexCardProps) {
+  const { benchmark: b } = index;
+  const swedenIsGood = b.sweden !== null && (
+    b.higherIsBetter ? b.sweden >= (b.oecdAvg ?? 0) : b.sweden <= (b.oecdAvg ?? Infinity)
+  );
+
+  return (
+    <button
+      onClick={onSelect}
+      className="p-4 rounded-lg border bg-card hover:border-primary hover:bg-primary/5 transition-all text-left w-full"
+    >
+      <div className="flex items-start justify-between mb-2">
+        <Badge variant="outline" className="font-mono text-xs">
+          {index.code}
+        </Badge>
+        <span className="text-[10px] text-muted-foreground">{index.source}</span>
+      </div>
+      <div className="font-semibold text-sm mb-1">{index.name}</div>
+      <div className="text-xs text-muted-foreground line-clamp-2 mb-3">
+        {index.description}
+      </div>
+
+      {/* BENCHMARK BAR */}
+      <div className="mb-3 p-2 rounded border bg-muted/30">
+        <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
+          <span className="text-muted-foreground">BENCHMARK</span>
+          {b.sweden !== null && (
+            <span className={swedenIsGood ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}>
+              SE: {b.sweden} {b.unit}
+            </span>
+          )}
+        </div>
+        <div className="relative h-2 rounded-full bg-muted overflow-hidden mb-1.5">
+          {/* Range bar from worst to best */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-destructive/30 via-muted-foreground/20 to-emerald-500/30" />
+          {/* OECD average marker */}
+          {b.oecdAvg !== null && (
+            <div
+              className="absolute top-0 h-full w-0.5 bg-muted-foreground/60"
+              style={{ left: `${((b.oecdAvg - b.worst.value) / (b.best.value - b.worst.value)) * 100}%` }}
+              title={`OECD snitt: ${b.oecdAvg}`}
+            />
+          )}
+          {/* Sweden marker */}
+          {b.sweden !== null && (
+            <div
+              className="absolute top-[-1px] h-[10px] w-[10px] rounded-full border-2 border-primary bg-primary-foreground"
+              style={{ left: `calc(${((b.sweden - b.worst.value) / (b.best.value - b.worst.value)) * 100}% - 5px)` }}
+              title={`Sverige: ${b.sweden}`}
+            />
+          )}
+        </div>
+        <div className="flex justify-between text-[9px] text-muted-foreground font-mono">
+          <span>{b.worst.country} ({b.worst.value})</span>
+          {b.oecdAvg !== null && <span className="text-muted-foreground/80">OECD: {b.oecdAvg}</span>}
+          <span>{b.best.country} ({b.best.value})</span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 text-[10px]">
+        <span className="text-muted-foreground">TÄCKNING:</span>
+        <Progress value={index.coverage} className="h-1.5 flex-1" />
+        <span className="font-mono">{index.coverage}%</span>
+      </div>
+      <div className="text-[10px] text-muted-foreground mt-1">
+        {index.yearRange} · {index.updateFrequency}
+      </div>
+    </button>
+  );
+}
  
  // =============================================================================
  // INDEX DETAIL MODAL
