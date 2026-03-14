@@ -1005,10 +1005,19 @@ function IndexDetail({ index, onClose, onShowData, onCompare }: IndexDetailProps
        </Tabs>
  
        {/* Index Detail Modal */}
-       <IndexDetail 
-         index={selectedIndex} 
-         onClose={() => setSelectedIndex(null)} 
-       />
+        <IndexDetail 
+          index={selectedIndex} 
+          onClose={() => setSelectedIndex(null)}
+          onShowData={() => {
+            if (selectedIndex) {
+              window.open(selectedIndex.sourceUrl, '_blank', 'noopener,noreferrer');
+            }
+          }}
+          onCompare={() => {
+            setSelectedIndex(null);
+            setActiveTab('compare');
+          }}
+        />
      </div>
    );
  }
