@@ -1,179 +1,222 @@
 /**
- * WHAT IS DISSG SECTION
+ * SYSTEM EXPLANATION SECTION
  * 
- * Pedagogisk sektion som förklarar vad systemet gör.
- * Korten är klickbara och leder till fördjupning via dialog.
+ * Tydlig, pedagogisk förklaring av vad DISSG är och hur det fungerar.
+ * Designad så en 12-åring förstår.
  */
 
 import React, { useState } from 'react';
-import { Activity, TrendingUp, MapPin, Search, ChevronRight } from 'lucide-react';
+import { 
+  Activity, TrendingUp, MapPin, Search, ChevronRight, 
+  ArrowDown, CheckCircle2, AlertTriangle, Eye, 
+  Database, BarChart3, Globe2, Lightbulb, ShieldCheck
+} from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-interface FeatureCard {
-  icon: React.ReactNode;
-  iconBg: string;
+// ── Steg-för-steg förklaring ──────────────────────────────────────────
+
+interface Step {
+  number: number;
+  emoji: string;
   title: string;
-  description: string;
-  deepDive: {
-    title: string;
-    sections: { heading: string; text: string }[];
-    examples?: string[];
-    link?: { label: string; href: string };
+  simple: string;
+  analogy: string;
+  icon: React.ReactNode;
+  color: string;
+  bg: string;
+  details: {
+    whatHappens: string;
+    example: string;
+    whyItMatters: string;
   };
 }
 
-const FEATURE_CARDS: FeatureCard[] = [
+const STEPS: Step[] = [
   {
-    icon: <Activity className="h-5 w-5 text-primary" />,
-    iconBg: 'bg-primary/10',
-    title: 'Vi samlar in data',
-    description: 'Officiell statistik från myndigheter om ekonomi, hälsa, utbildning, brottslighet och miljö – allt på samma ställe.',
-    deepDive: {
-      title: 'Datainsamling',
-      sections: [
-        { heading: 'Varifrån kommer datan?', text: 'DISSG samlar data från officiella statistikbyråer som SCB, Eurostat, WHO, Världsbanken och OECD. Varje datakälla klassificeras efter tillförlitlighet och uppdateringsfrekvens.' },
-        { heading: 'Hur säkerställs kvalitet?', text: 'All data genomgår automatisk validering med anomalidetektion, checksummor och korsreferenser mot oberoende källor. Avvikelser flaggas och granskas innan de blir tillgängliga.' },
-        { heading: 'Vad täcks?', text: 'Systemet integrerar 200+ indikatorer inom ekonomi, hälsa, utbildning, trygghet, miljö och demokrati – med data från 190+ länder.' },
-      ],
-      examples: ['BNP per capita', 'Medellivslängd', 'Arbetslöshet', 'CO₂-utsläpp', 'Utbildningsnivå'],
-      link: { label: 'Utforska datakällor', href: '/data' },
+    number: 1,
+    emoji: '📊',
+    title: 'Vi samlar in fakta',
+    simple: 'Vi hämtar siffror från myndigheter i hela världen – arbetslöshet, hälsa, utbildning, trygghet, ekonomi.',
+    analogy: 'Som att samla alla provresultat från alla skolor i världen i en enda mapp.',
+    icon: <Database className="h-5 w-5" />,
+    color: 'text-primary',
+    bg: 'bg-primary/10',
+    details: {
+      whatHappens: 'Varje dag hämtar systemet ny statistik från SCB, Eurostat, WHO, Världsbanken och OECD. Datan kontrolleras automatiskt så att fel inte smyger sig in.',
+      example: 'T.ex. "Arbetslösheten i Sverige var 7.4% i mars 2025 (källa: SCB)"',
+      whyItMatters: 'Utan tillförlitlig data kan vi inte veta hur samhället faktiskt mår.',
     },
   },
   {
-    icon: <TrendingUp className="h-5 w-5 text-emerald-600" />,
-    iconBg: 'bg-emerald-500/10',
+    number: 2,
+    emoji: '📈',
     title: 'Vi visar trender',
-    description: 'Går det uppåt eller nedåt? Hur ser Sverige ut jämfört med andra länder? Du får svar utan att behöva leta själv.',
-    deepDive: {
-      title: 'Trendanalys',
-      sections: [
-        { heading: 'Hur beräknas trender?', text: 'Systemet analyserar tidsserier med minst 5 datapunkter och beräknar riktning, acceleration och statistisk signifikans. Varje trend visas med konfidensintervall.' },
-        { heading: 'Jämförelser', text: 'Du kan jämföra länder, regioner och kommuner sida vid sida. Systemet normaliserar automatiskt för befolkningsstorlek och köpkraft där det är relevant.' },
-        { heading: 'Historiska banor', text: '10-åriga sparklines ger omedelbar kontext. Du ser inte bara nuläget – utan var vi var, var vi är, och vart det ser ut att vara på väg.' },
-      ],
-      link: { label: 'Se global dashboard', href: '/dashboard' },
+    simple: 'Blir det bättre eller sämre? Vi visar riktningen med enkla grafer – uppåt, nedåt eller platt.',
+    analogy: 'Som att se din längdkurva hos skolsköterskan – fast för hela landet.',
+    icon: <BarChart3 className="h-5 w-5" />,
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-500/10',
+    details: {
+      whatHappens: 'Vi analyserar hur siffror förändras över tid. Om arbetslösheten var 8% förra året och 7% i år – visar vi en grön pil nedåt (bra!).',
+      example: 'Medellivslängden i Sverige: 78.2 (2000) → 83.1 (2024) = uppåttrend ↑',
+      whyItMatters: 'En enskild siffra säger lite. Men riktningen visar om vi är på rätt väg.',
     },
   },
   {
-    icon: <MapPin className="h-5 w-5 text-blue-600" />,
-    iconBg: 'bg-blue-500/10',
-    title: 'Från global till lokal',
-    description: 'Zooma från hela världen ner till din region. Se hur din kommun står sig jämfört med resten av landet.',
-    deepDive: {
-      title: 'Geografisk fördjupning',
-      sections: [
-        { heading: 'Hierarkisk navigation', text: 'Navigera från global nivå → kontinent → land → region → kommun. Varje nivå visar relevanta indikatorer och jämförelser med snittet på nivån ovanför.' },
-        { heading: 'Kommundata', text: 'För svenska kommuner visas data i relation till länssnittet (t.ex. "+2.1 vs snitt") med specifik metadata för källhänvisning (SCB/Kolada).' },
-        { heading: 'Datatäckning', text: 'Varje geografisk enhet klassificeras med Data Tier A–D, där Tier A ("Full täckning") kräver 95% indikatortäckning.' },
-      ],
-      link: { label: 'Öppna Geo Explorer', href: '/geo' },
+    number: 3,
+    emoji: '🌍',
+    title: 'Vi jämför länder',
+    simple: 'Hur ligger Sverige till jämfört med Finland, Danmark eller Japan? Vi rangordnar utan att döma.',
+    analogy: 'Som en resultattavla i sportens värld – vi visar poängen, inte vem som "borde" vinna.',
+    icon: <Globe2 className="h-5 w-5" />,
+    color: 'text-blue-600',
+    bg: 'bg-blue-500/10',
+    details: {
+      whatHappens: 'Vi lägger ländernas siffror bredvid varandra och visar vem som har högst/lägst. Vi tar hänsyn till saker som befolkningsstorlek.',
+      example: 'Utbildningspoäng: Finland 92 | Sverige 84 | OECD-snitt 78',
+      whyItMatters: 'Utan jämförelse vet vi inte om en siffra är bra eller dålig. Kontext är allt.',
     },
   },
   {
-    icon: <Search className="h-5 w-5 text-amber-600" />,
-    iconBg: 'bg-amber-500/10',
-    title: 'Du upptäcker mönster',
-    description: 'Vilka områden behöver uppmärksamhet? Vilka saker hänger ihop? Systemet hjälper dig se helheten.',
-    deepDive: {
-      title: 'Mönsterigenkänning',
-      sections: [
-        { heading: 'Kausala kedjor', text: 'Systemets Global Reality Model (GRM) kopplar samman entiteter, variabler, interventioner och utfall i ett nätverk. Det kan visa att t.ex. ekonomisk stress → sämre sömn → metabol ohälsa.' },
-        { heading: 'Automatisk upptäckt', text: 'Claim Discovery-motorn hittar nya samband genom att analysera universella kunskapspåståenden och korskoppla domäner.' },
-        { heading: 'Osäkerhetshantering', text: 'Varje identifierat mönster visar konfidensnivå, evidensstyrka och potentiella confounders – systemet låtsas aldrig vara säkrare än det är.' },
-      ],
-      link: { label: 'Utforska GRM', href: '/grm' },
+    number: 4,
+    emoji: '🔍',
+    title: 'Du drar egna slutsatser',
+    simple: 'Vi berättar aldrig vad du SKA tycka. Vi visar datan – du bestämmer vad den betyder.',
+    analogy: 'Som att ge dig en karta och en kompass. Vart du går bestämmer du själv.',
+    icon: <Lightbulb className="h-5 w-5" />,
+    color: 'text-amber-600',
+    bg: 'bg-amber-500/10',
+    details: {
+      whatHappens: 'Systemet visar mönster och samband, men säger aldrig "detta borde ni göra". Det visar vad som händer, inte vad som borde hända.',
+      example: 'Vi kan visa att länder med hög utbildning ofta har lägre brottslighet – men vi säger inte att det ena orsakar det andra.',
+      whyItMatters: 'Ett neutralt system som ingen äger och ingen styr ger dig friheten att tänka själv.',
     },
   },
 ];
 
+// ── Principkort ───────────────────────────────────────────────────────
+
+const PRINCIPLES = [
+  { icon: <Eye className="h-4 w-4" />, label: 'Observation först', desc: 'Vi visar vad som händer, inte vad som borde hända' },
+  { icon: <ShieldCheck className="h-4 w-4" />, label: 'Ingen dold agenda', desc: 'Ingen äger systemet. Ingen styr resultaten.' },
+  { icon: <AlertTriangle className="h-4 w-4" />, label: 'Öppen osäkerhet', desc: 'Vi visar alltid när vi INTE vet tillräckligt' },
+  { icon: <CheckCircle2 className="h-4 w-4" />, label: 'Spårbart till källan', desc: 'Varje siffra går att klicka tillbaka till originalet' },
+];
+
 export const InsightCalculator: React.FC = () => {
-  const [selectedCard, setSelectedCard] = useState<FeatureCard | null>(null);
+  const [expandedStep, setExpandedStep] = useState<number | null>(null);
 
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-20 bg-muted/30">
       <div className="max-w-4xl mx-auto px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight mb-4">
+        
+        {/* Rubrik */}
+        <div className="text-center mb-16">
+          <p className="text-sm font-mono text-muted-foreground tracking-widest uppercase mb-3">
+            Systemförklaring
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-5">
             Vad är DISSG?
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Tänk dig en hälsoapp – men för hela samhället. Istället för att mäta 
-            din puls och sömn, mäter vi arbetslöshet, utbildningsnivå och trygghet.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Tänk dig en <strong className="text-foreground">hälsoapp – men för hela samhället</strong>. 
+            Istället för att mäta din puls och sömn, mäter vi arbetslöshet, utbildningsnivå och trygghet 
+            för 195 länder.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 max-w-3xl mx-auto">
-          {FEATURE_CARDS.map((card, i) => (
-            <button
-              key={i}
-              onClick={() => setSelectedCard(card)}
-              className="bg-card border rounded-lg p-6 text-left transition-all hover:shadow-md hover:border-primary/30 hover:-translate-y-0.5 group cursor-pointer"
-            >
-              <div className="flex items-start gap-4">
-                <div className={`p-2 rounded-lg ${card.iconBg}`}>
-                  {card.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold mb-2">{card.title}</h3>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+        {/* Steg-för-steg */}
+        <div className="space-y-4 mb-16">
+          {STEPS.map((step, i) => (
+            <div key={step.number}>
+              <button
+                onClick={() => setExpandedStep(expandedStep === step.number ? null : step.number)}
+                className="w-full bg-card border rounded-xl p-5 md:p-6 text-left transition-all hover:shadow-md hover:border-primary/20 group"
+              >
+                <div className="flex items-start gap-4">
+                  {/* Stegnummer */}
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full ${step.bg} flex items-center justify-center font-bold text-lg ${step.color}`}>
+                    {step.number}
                   </div>
-                  <p className="text-sm text-muted-foreground">{card.description}</p>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-3 bg-card border rounded-full px-6 py-3">
-            <span className="text-2xl">📱</span>
-            <span className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Kort sagt:</strong> En röntgenbild av samhället – 
-              så du kan se vad som fungerar och vad som behöver åtgärdas.
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <Dialog open={!!selectedCard} onOpenChange={(open) => !open && setSelectedCard(null)}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-          {selectedCard && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-xl">{selectedCard.deepDive.title}</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-5 mt-2">
-                {selectedCard.deepDive.sections.map((section, i) => (
-                  <div key={i}>
-                    <h4 className="font-semibold text-sm mb-1">{section.heading}</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{section.text}</p>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <h3 className="font-semibold text-lg">
+                        <span className="mr-2">{step.emoji}</span>
+                        {step.title}
+                      </h3>
+                      <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform flex-shrink-0 ${expandedStep === step.number ? 'rotate-90' : ''}`} />
+                    </div>
+                    <p className="text-muted-foreground">{step.simple}</p>
+                    <p className="text-sm text-muted-foreground/70 mt-1 italic">
+                      💡 {step.analogy}
+                    </p>
                   </div>
-                ))}
-                {selectedCard.deepDive.examples && (
-                  <div>
-                    <h4 className="font-semibold text-sm mb-2">Exempel på indikatorer</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCard.deepDive.examples.map((ex, i) => (
-                        <span key={i} className="text-xs bg-muted px-2.5 py-1 rounded-full">{ex}</span>
-                      ))}
+                </div>
+                
+                {/* Expanderad detalj */}
+                {expandedStep === step.number && (
+                  <div className="mt-5 ml-14 space-y-4 border-t pt-5" onClick={(e) => e.stopPropagation()}>
+                    <div>
+                      <h4 className="text-sm font-semibold mb-1">🔧 Vad händer under huven?</h4>
+                      <p className="text-sm text-muted-foreground">{step.details.whatHappens}</p>
+                    </div>
+                    <div className="bg-muted/50 rounded-lg p-3">
+                      <h4 className="text-sm font-semibold mb-1">📋 Exempel</h4>
+                      <p className="text-sm text-muted-foreground font-mono">{step.details.example}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold mb-1">❓ Varför är detta viktigt?</h4>
+                      <p className="text-sm text-muted-foreground">{step.details.whyItMatters}</p>
                     </div>
                   </div>
                 )}
-                {selectedCard.deepDive.link && (
-                  <a
-                    href={selectedCard.deepDive.link.href}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline mt-2"
-                  >
-                    {selectedCard.deepDive.link.label}
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </a>
-                )}
+              </button>
+              
+              {/* Pil mellan steg */}
+              {i < STEPS.length - 1 && (
+                <div className="flex justify-center py-1">
+                  <ArrowDown className="h-4 w-4 text-muted-foreground/40" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Principer */}
+        <div className="mb-12">
+          <h3 className="text-center text-sm font-mono text-muted-foreground tracking-widest uppercase mb-6">
+            Grundprinciper
+          </h3>
+          <div className="grid gap-3 md:grid-cols-2">
+            {PRINCIPLES.map((p, i) => (
+              <div key={i} className="flex items-start gap-3 bg-card border rounded-lg p-4">
+                <div className="p-1.5 rounded bg-muted text-muted-foreground">
+                  {p.icon}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">{p.label}</p>
+                  <p className="text-xs text-muted-foreground">{p.desc}</p>
+                </div>
               </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+            ))}
+          </div>
+        </div>
+
+        {/* Sammanfattning */}
+        <div className="text-center">
+          <div className="inline-flex flex-col items-center gap-3 bg-card border-2 border-primary/20 rounded-2xl px-8 py-6 max-w-lg">
+            <span className="text-3xl">🔬</span>
+            <p className="text-base text-muted-foreground leading-relaxed">
+              <strong className="text-foreground">Kort sagt:</strong> DISSG är en röntgenbild av samhället. 
+              Vi visar vad som händer – du bestämmer vad det betyder.
+            </p>
+            <p className="text-xs text-muted-foreground/60 font-mono">
+              Inga rekommendationer. Inga dolda algoritmer. All data öppen och spårbar.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
   );
 };
