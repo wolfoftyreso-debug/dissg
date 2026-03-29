@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   LogIn, LayoutDashboard, TrendingUp, AlertTriangle, 
@@ -371,15 +371,28 @@ function DashboardStep() {
 }
 
 function ExploreStep() {
-  const mockData = [
-    { period: "2023-Q1", value: 18.2 },
-    { period: "2023-Q2", value: 19.1 },
-    { period: "2023-Q3", value: 20.4 },
-    { period: "2023-Q4", value: 21.8 },
-    { period: "2024-Q1", value: 22.9 },
-    { period: "2024-Q2", value: 23.5 },
-    { period: "2024-Q3", value: 24.3 },
-  ];
+  // Real data: World Bank — Youth unemployment Sweden (SL.UEM.1524.ZS)
+  const [chartData, setChartData] = useState<{ period: string; value: number }[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(
+      "https://api.worldbank.org/v2/country/SE/indicator/SL.UEM.1524.ZS?format=json&mrv=8&per_page=8"
+    )
+      .then((r) => r.json())
+      .then(([, data]) => {
+        if (data && data.length > 0) {
+          const sorted = [...data]
+            .filter((d: { value: number | null }) => d.value !== null)
+            .sort((a: { date: string }, b: { date: string }) => Number(a.date) - Number(b.date));
+          setChartData(sorted.map((d: { date: string; value: number }) => ({ period: d.date, value: d.value })));
+        }
+      })
+      .catch(() => {/* silent — show empty state below */})
+      .finally(() => setDataLoading(false));
+  }, []);
+
+  const mockData = chartData;
 
   return (
     <motion.div
@@ -438,38 +451,38 @@ function ExploreStep() {
                   </linearGradient>
                 </defs>
                 
-                {/* Area */}
-                <path
-                  d={`M 0 ${200 - mockData[0].value * 6} ${mockData.map((d, i) => `L ${i * 66} ${200 - d.value * 6}`).join(' ')} L ${(mockData.length - 1) * 66} 200 L 0 200 Z`}
-                  fill="url(#areaGradient)"
-                />
-                
-                {/* Line */}
-                <path
-                  d={`M 0 ${200 - mockData[0].value * 6} ${mockData.map((d, i) => `L ${i * 66} ${200 - d.value * 6}`).join(' ')}`}
-                  fill="none"
-                  stroke="hsl(var(--destructive))"
-                  strokeWidth="2"
-                />
-                
-                {/* Points */}
-                {mockData.map((d, i) => (
-                  <circle
-                    key={i}
-                    cx={i * 66}
-                    cy={200 - d.value * 6}
-                    r="4"
-                    fill="hsl(var(--destructive))"
-                  />
-                ))}
+                {/* Area & Line — only render if data loaded */}
+                {mockData.length > 1 && (() => {
+                  const max = Math.max(...mockData.map(d => d.value));
+                  const min = Math.min(...mockData.map(d => d.value));
+                  const range = max - min || 1;
+                  const xStep = 380 / (mockData.length - 1);
+                  const toY = (v: number) => 190 - ((v - min) / range) * 170;
+                  const points = mockData.map((d, i) => `${i * xStep},${toY(d.value)}`).join(' ');
+                  return (
+                    <>
+                      <path
+                        d={`M ${points.split(' ').map((p, i) => (i === 0 ? `M ${p}` : `L ${p}`)).join(' ')} L ${(mockData.length - 1) * xStep} 200 L 0 200 Z`.replace(/M M/, 'M')}
+                        fill="url(#areaGradient)"
+                      />
+                      <polyline points={points} fill="none" stroke="hsl(var(--destructive))" strokeWidth="2" />
+                      {mockData.map((d, i) => (
+                        <circle key={i} cx={i * xStep} cy={toY(d.value)} r="4" fill="hsl(var(--destructive))" />
+                      ))}
+                    </>
+                  );
+                })()}
+                {(dataLoading || mockData.length === 0) && (
+                  <text x="200" y="100" textAnchor="middle" fill="currentColor" opacity="0.4" fontSize="14">
+                    {dataLoading ? "Laddar data..." : "Ingen data tillgänglig"}
+                  </text>
+                )}
               </svg>
               
               {/* Y-axis labels */}
               <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-xs text-muted-foreground py-2">
-                <span>30%</span>
-                <span>20%</span>
-                <span>10%</span>
-                <span>0%</span>
+                <span>{mockData.length > 0 ? `${Math.max(...mockData.map(d => d.value)).toFixed(1)}%` : '—'}</span>
+                <span>{mockData.length > 0 ? `${Math.min(...mockData.map(d => d.value)).toFixed(1)}%` : '—'}</span>
               </div>
             </div>
             
@@ -489,22 +502,35 @@ function ExploreStep() {
               <CardTitle className="text-base">Nyckeltal</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Nuvarande</span>
-                <span className="font-bold text-destructive">24.3%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Förändring YoY</span>
-                <span className="font-medium text-destructive">+6.1 pp</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">EU-snitt</span>
-                <span className="font-medium">14.8%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Trend</span>
-                <Badge variant="destructive">Försämras</Badge>
-              </div>
+              {dataLoading ? (
+                <p className="text-sm text-muted-foreground">Laddar...</p>
+              ) : mockData.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Ingen data tillgänglig</p>
+              ) : (() => {
+                const latest = mockData[mockData.length - 1]?.value;
+                const prev = mockData[mockData.length - 2]?.value;
+                const yoy = prev != null ? latest - prev : null;
+                return (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Senaste</span>
+                      <span className="font-bold text-destructive">{latest?.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Förändring YoY</span>
+                      <span className={`font-medium ${yoy != null && yoy > 0 ? 'text-destructive' : 'text-green-500'}`}>
+                        {yoy != null ? `${yoy > 0 ? '+' : ''}${yoy.toFixed(1)} pp` : '—'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Trend</span>
+                      <Badge variant={yoy != null && yoy > 0 ? "destructive" : "default"}>
+                        {yoy == null ? '—' : yoy > 0 ? 'Försämras' : 'Förbättras'}
+                      </Badge>
+                    </div>
+                  </>
+                );
+              })()}
             </CardContent>
           </Card>
 

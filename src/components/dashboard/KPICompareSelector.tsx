@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { KPI, CATEGORIES } from '@/types/kpi';
-import { mockKPIs } from '@/data/mockKPIs';
 import { useKPIOverview } from '@/hooks/useKPIData';
 import { Search, GitCompare, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -18,13 +17,8 @@ export function KPICompareSelector({ currentKPI, onSelect, onCancel }: KPICompar
   
   const { data: dbKPIs } = useKPIOverview();
   
-  // Use database KPIs if available, otherwise fall back to mock
-  const allKPIs = useMemo(() => {
-    if (dbKPIs && dbKPIs.length > 0 && dbKPIs.some(k => k.value !== 0)) {
-      return dbKPIs;
-    }
-    return mockKPIs;
-  }, [dbKPIs]);
+  // Only use real database KPIs — no mock fallback
+  const allKPIs = useMemo(() => dbKPIs || [], [dbKPIs]);
   
   // Filter out current KPI and apply search/category filters
   const filteredKPIs = useMemo(() => {

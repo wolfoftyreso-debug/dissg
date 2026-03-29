@@ -12,7 +12,7 @@ export default function Index() {
   return (
     <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', background: '#F8F9FA', minHeight: '100vh' }}>
       {/* Nav */}
-      <nav style={{ background: '#fff', borderBottom: '1px solid #E5E7EB', padding: '16px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 }}>
+      <nav style={{ background: '#fff', borderBottom: '1px solid #E5E7EB', padding: '16px clamp(16px, 4vw, 48px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ fontSize: 20, fontWeight: 800, color: '#1C1C1E', letterSpacing: '-0.5px' }}>DISSG</div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
           <a href="/about" style={{ fontSize: 14, color: '#6B7280', textDecoration: 'none' }}>Om systemet</a>
@@ -24,14 +24,14 @@ export default function Index() {
       </nav>
 
       {/* Hero */}
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '100px 48px 60px', textAlign: 'center' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: 'clamp(48px, 8vw, 100px) clamp(16px, 5vw, 48px) 60px', textAlign: 'center' }}>
         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#6B7280', marginBottom: 20 }}>
           Digital Intelligence &amp; Signal System for Governance
         </div>
-        <h1 style={{ fontSize: 56, fontWeight: 800, color: '#1C1C1E', lineHeight: 1.1, letterSpacing: '-2px', marginBottom: 24, margin: '0 0 24px' }}>
+        <h1 style={{ fontSize: 'clamp(32px, 6vw, 56px)', fontWeight: 800, color: '#1C1C1E', lineHeight: 1.1, letterSpacing: '-2px', marginBottom: 24, margin: '0 0 24px' }}>
           Världen förklarad.<br />Beslut förstärkta.
         </h1>
-        <p style={{ fontSize: 20, color: '#6B7280', maxWidth: 600, margin: '0 auto 48px', lineHeight: 1.7 }}>
+        <p style={{ fontSize: 'clamp(16px, 2.5vw, 20px)', color: '#6B7280', maxWidth: 600, margin: '0 auto 48px', lineHeight: 1.7 }}>
           DISSG ger politiker, journalister och analytiker realtidsintelligens om globala skeenden — strukturerad, källbelagd och möjlig att agera på.
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -61,7 +61,7 @@ export default function Index() {
             Inte bara data. Kausal förståelse och strukturerat beslutsunderlag.
           </p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24 }}>
           {[
             {
               icon: '🌍',
@@ -111,7 +111,7 @@ export default function Index() {
               Vem använder DISSG?
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 32 }}>
             {[
               {
                 role: 'Politiker & tjänstemän',
@@ -136,7 +136,7 @@ export default function Index() {
       </div>
 
       {/* Pricing */}
-      <div style={{ background: '#F8F9FA', borderTop: '1px solid #E5E7EB', padding: '80px 48px' }}>
+      <div style={{ background: '#F8F9FA', borderTop: '1px solid #E5E7EB', padding: 'clamp(40px, 6vw, 80px) clamp(16px, 4vw, 48px)' }}>
         <div style={{ maxWidth: 960, margin: '0 auto', textAlign: 'center' }}>
           <h2 style={{ fontSize: 36, fontWeight: 800, color: '#1C1C1E', letterSpacing: '-1px', marginBottom: 12, margin: '0 0 12px' }}>
             Enkel prissättning
@@ -144,7 +144,7 @@ export default function Index() {
           <p style={{ fontSize: 16, color: '#6B7280', marginBottom: 48, margin: '0 0 48px' }}>
             Börja gratis. Uppgradera när du behöver mer.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, textAlign: 'left' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24, textAlign: 'left' }}>
             {[
               {
                 tier: 'Gratis',
@@ -240,7 +240,7 @@ export default function Index() {
       </div>
 
       {/* Footer */}
-      <footer style={{ borderTop: '1px solid #E5E7EB', padding: '32px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8F9FA', flexWrap: 'wrap', gap: 16 }}>
+      <footer style={{ borderTop: '1px solid #E5E7EB', padding: '24px clamp(16px, 4vw, 48px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8F9FA', flexWrap: 'wrap', gap: 16 }}>
         <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>© 2026 DISSG · Wavult Group FZCO · Dubai, UAE</p>
         <div style={{ display: 'flex', gap: 0 }}>
           <a href="/about" style={{ fontSize: 12, color: '#9CA3AF', textDecoration: 'none', marginLeft: 24 }}>Om systemet</a>

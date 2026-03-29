@@ -1,96 +1,122 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session, AuthError } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import {
+  login as icLogin,
+  register as icRegister,
+  logout as icLogout,
+  getCurrentUser,
+  resetPassword as icResetPassword,
+  ICUser,
+} from '@/lib/auth'
 
+// ─────────────────────────────────────────────────────────────
+// Types — compatible with existing codebase consumer patterns
+// ─────────────────────────────────────────────────────────────
 
-interface AuthContextValue {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
-  signUp: (email: string, password: string, displayName?: string) => Promise<{ error: AuthError | null }>;
-  signInWithGoogle: () => Promise<{ error: Error | null }>;
-  signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
+export interface AuthUser {
+  id: string
+  email: string
+  name?: string
+  role?: string
+  // Legacy Supabase compat fields
+  user_metadata?: { display_name?: string; avatar_url?: string }
 }
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+export interface AuthContextValue {
+  user: AuthUser | null
+  loading: boolean
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>
+  signUp: (
+    email: string,
+    password: string,
+    displayName?: string,
+  ) => Promise<{ error: Error | null }>
+  signInWithGoogle: () => Promise<{ error: Error | null }>
+  signOut: () => Promise<void>
+  resetPassword: (email: string) => Promise<{ error: Error | null }>
+}
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined)
+
+// Map ICUser JWT payload → AuthUser shape used across the app
+function mapUser(ic: ICUser): AuthUser {
+  return {
+    id: ic.sub,
+    email: ic.email,
+    name: ic.name,
+    role: ic.role,
+    user_metadata: {
+      display_name: ic.name,
+    },
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Provider
+// ─────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<AuthUser | null>(null)
+  const [loading, setLoading] = useState(true)
 
+  // On mount: restore session from localStorage if valid JWT exists
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('[Auth] State change:', event);
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
+    const ic = getCurrentUser()
+    setUser(ic ? mapUser(ic) : null)
+    setLoading(false)
+  }, [])
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+  const signIn = async (
+    email: string,
+    password: string,
+  ): Promise<{ error: Error | null }> => {
+    try {
+      const ic = await icLogin(email, password)
+      setUser(mapUser(ic))
+      return { error: null }
+    } catch (err) {
+      return { error: err instanceof Error ? err : new Error('Login failed') }
+    }
+  }
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  const signUp = async (
+    email: string,
+    password: string,
+    displayName?: string,
+  ): Promise<{ error: Error | null }> => {
+    try {
+      const ic = await icRegister(email, password, displayName)
+      setUser(mapUser(ic))
+      return { error: null }
+    } catch (err) {
+      return { error: err instanceof Error ? err : new Error('Registration failed') }
+    }
+  }
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
-  };
+  const signOut = async (): Promise<void> => {
+    icLogout()
+    setUser(null)
+  }
 
-  const signUp = async (email: string, password: string, displayName?: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: {
-          display_name: displayName || email.split('@')[0],
-        },
-      },
-    });
-    return { error };
-  };
+  // Google OAuth not supported in Identity Core v1 — graceful error
+  const signInWithGoogle = async (): Promise<{ error: Error | null }> => {
+    return {
+      error: new Error('Google OAuth inte tillgängligt. Använd e-post och lösenord.'),
+    }
+  }
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
-
-  const signInWithGoogle = async () => {
-    // Use Lovable Cloud managed OAuth
-    const { lovable } = await import('@/integrations/lovable');
-    const { error } = await lovable.auth.signInWithOAuth('google', {
-      redirect_uri: window.location.origin,
-    });
-    return { error: error || null };
-  };
-
-  const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    return { error };
-  };
+  const resetPassword = async (email: string): Promise<{ error: Error | null }> => {
+    try {
+      await icResetPassword(email)
+      return { error: null }
+    } catch (err) {
+      return { error: err instanceof Error ? err : new Error('Reset failed') }
+    }
+  }
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        session,
         loading,
         signIn,
         signUp,
@@ -101,13 +127,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     >
       {children}
     </AuthContext.Provider>
-  );
+  )
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider')
   }
-  return context;
+  return context
 }

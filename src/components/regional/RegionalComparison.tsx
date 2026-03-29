@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { formatRegionName, REGION_GROUPS, REGION_GROUP_LABELS } from '@/config/regionsConfig';
 import { useRegionalKPIData, type RegionalKPIValue } from '@/hooks/useRegionalKPIData';
-import { mockKPIs } from '@/data/mockKPIs';
+// No mock data — KPI list comes from API via useRegionalKPIData
 
 // =====================================================
 // REGION RANKING BAR
@@ -220,7 +220,7 @@ interface RegionalComparisonProps {
 }
 
 export function RegionalComparison({ className, initialKpiId, onRegionSelect }: RegionalComparisonProps) {
-  const [selectedKpiId, setSelectedKpiId] = useState(initialKpiId || mockKPIs[0]?.id);
+  const [selectedKpiId, setSelectedKpiId] = useState<string | undefined>(initialKpiId);
   const [selectedRegionGroup, setSelectedRegionGroup] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'ranking' | 'table'>('ranking');
   
@@ -301,11 +301,12 @@ export function RegionalComparison({ className, initialKpiId, onRegionSelect }: 
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {mockKPIs.map(kpi => (
-                  <SelectItem key={kpi.id} value={kpi.id}>
-                    {kpi.index}. {kpi.name}
+                {/* KPI list populated from real data via useRegionalKPIData */}
+                {!selectedKpiId && (
+                  <SelectItem value="" disabled>
+                    Ingen indikatordata tillgänglig
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
           </div>
