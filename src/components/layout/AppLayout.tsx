@@ -152,10 +152,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       {/* Sidebar - alltid synlig på desktop, slide-in på mobil */}
       <div className={cn(
         "z-50",
-        isMobile && cn(
-          "fixed inset-y-0 left-0 transition-transform duration-200",
-          mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        )
+        isMobile
+          ? cn("fixed inset-y-0 left-0 w-64 transition-transform duration-300",
+               mobileMenuOpen ? "translate-x-0" : "-translate-x-full")
+          : "relative flex-shrink-0"
       )}>
         <DiagnosticSidebar
           collapsed={isMobile ? false : sidebarCollapsed}

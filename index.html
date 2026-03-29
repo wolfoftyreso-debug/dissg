@@ -30,24 +30,24 @@
 
     <!-- Mobile responsiveness -->
     <style>
+      * { box-sizing: border-box; }
+      body { overflow-x: hidden; }
+      table { max-width: 100%; }
+      img { max-width: 100%; }
+
       @media (max-width: 768px) {
-        /* Header */
-        header { padding: 0 16px !important; }
-        header nav a:not(:last-child) { display: none !important; }
+        .desktop-nav { display: none !important; }
+        .mobile-menu-btn { display: block !important; }
 
-        /* Main content */
-        main { padding: 32px 16px !important; }
+        /* Prevent horizontal overflow */
+        .overflow-x-auto { -webkit-overflow-scrolling: touch; }
 
-        /* Two-column table → single column */
-        .dissg-two-col td { display: block !important; width: 100% !important; padding-right: 0 !important; }
+        /* Better tap targets */
+        button, a { min-height: 44px; }
 
-        /* Tables scroll on mobile */
-        table { overflow-x: auto; display: block; }
-
-        /* Spec box */
-        td[style*="background: #F4F4F4"] {
-          margin-top: 24px;
-        }
+        /* Text sizing */
+        h1 { font-size: clamp(24px, 6vw, 36px) !important; }
+        h2 { font-size: clamp(20px, 4vw, 28px) !important; }
       }
     </style>
 
