@@ -163,6 +163,9 @@ const App = () => (
                           <Route path="/login" element={<Login />} />
                           <Route path="/register" element={<Register />} />
 
+                          {/* Landningssida - ingen sidebar */}
+                          <Route path="/" element={<Index />} />
+
                           {/* Routes med global layout (sidebar + breadcrumbs) */}
                           <Route element={<AppLayout />}>
                             {/* GDM - Global Diagnostic Map */}
@@ -273,9 +276,6 @@ const App = () => (
                             <Route path="/akb" element={<AKBPage />} />
                             <Route path="/gdis" element={<GDISPage />} />
                             <Route path="/gsse" element={<GSSEPage />} />
-
-                            {/* Huvudsidan */}
-                            <Route path="/" element={<Index />} />
 
                             {/* Skyddade routes - kräver inloggning */}
                             <Route

@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { getCurrentUser, getToken } from '@/lib/auth';
 
-export type AppRole = 
-  | 'public' 
-  | 'researcher' 
-  | 'department_lead' 
-  | 'minister' 
-  | 'prime_minister' 
+export type AppRole =
+  | 'public'
+  | 'researcher'
+  | 'department_lead'
+  | 'minister'
+  | 'prime_minister'
   | 'system_admin'
   | 'statsminister'
   | 'departementsansvarig'
@@ -22,53 +22,64 @@ export interface KPIResponsibility {
   responsibility_level: 'primary' | 'secondary' | 'observer';
 }
 
+const ROLE_HIERARCHY: AppRole[] = [
+  'public',
+  'researcher',
+  'operativ',
+  'department_lead',
+  'departementsansvarig',
+  'minister',
+  'prime_minister',
+  'statsminister',
+  'system_admin',
+];
+
+async function apiFetch(path: string) {
+  const token = getToken();
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const res = await fetch(`https://api.wavult.com/v1/dissg${path}`, { headers });
+  if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
+  return res.json();
+}
+
 export function useUserRoles() {
   return useQuery({
     queryKey: ['user-roles'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        return { roles: [] as UserRole[], highestRole: 'public' as AppRole };
-      }
+      const user = getCurrentUser();
+      if (!user) return { roles: [] as UserRole[], highestRole: 'public' as AppRole };
 
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role, assigned_at')
-        .eq('user_id', user.id);
+      try {
+        const data = await apiFetch(`/users/${user.sub}/roles`);
+        const roles = (data.roles || []) as UserRole[];
 
-      if (error) {
-        console.error('Error fetching user roles:', error);
-        return { roles: [] as UserRole[], highestRole: 'public' as AppRole };
-      }
+        // Role from JWT payload takes precedence
+        const jwtRole = user.role as AppRole | undefined;
+        let highestRole: AppRole = 'public';
 
-      const roles = (data || []) as UserRole[];
-      
-      // Determine highest role
-      const roleHierarchy: AppRole[] = [
-        'public',
-        'researcher', 
-        'operativ',
-        'department_lead',
-        'departementsansvarig',
-        'minister',
-        'prime_minister',
-        'statsminister',
-        'system_admin'
-      ];
-      
-      let highestRole: AppRole = 'public';
-      for (const r of roles) {
-        const currentIndex = roleHierarchy.indexOf(highestRole);
-        const newIndex = roleHierarchy.indexOf(r.role);
-        if (newIndex > currentIndex) {
-          highestRole = r.role;
+        const allRoles = [
+          ...roles.map((r) => r.role),
+          ...(jwtRole ? [jwtRole] : []),
+        ];
+
+        for (const r of allRoles) {
+          const currentIndex = ROLE_HIERARCHY.indexOf(highestRole);
+          const newIndex = ROLE_HIERARCHY.indexOf(r);
+          if (newIndex > currentIndex) highestRole = r;
         }
-      }
 
-      return { roles, highestRole };
+        return { roles, highestRole };
+      } catch {
+        // Fallback: derive role from JWT claim only
+        const jwtRole = (user.role as AppRole) || 'public';
+        return {
+          roles: [{ role: jwtRole, assigned_at: '' }] as UserRole[],
+          highestRole: jwtRole,
+        };
+      }
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 }
 
@@ -76,23 +87,15 @@ export function useKPIResponsibilities() {
   return useQuery({
     queryKey: ['kpi-responsibilities'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
+      const user = getCurrentUser();
+      if (!user) return [] as KPIResponsibility[];
+
+      try {
+        const data = await apiFetch(`/users/${user.sub}/responsibilities`);
+        return (data.responsibilities || []) as KPIResponsibility[];
+      } catch {
         return [] as KPIResponsibility[];
       }
-
-      const { data, error } = await supabase
-        .from('role_responsibilities')
-        .select('kpi_id, responsibility_level')
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Error fetching KPI responsibilities:', error);
-        return [] as KPIResponsibility[];
-      }
-
-      return (data || []) as KPIResponsibility[];
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -100,31 +103,14 @@ export function useKPIResponsibilities() {
 
 export function useHasRole(requiredRole: AppRole) {
   const { data } = useUserRoles();
-  
   if (!data) return false;
-  
-  const roleHierarchy: AppRole[] = [
-    'public',
-    'researcher', 
-    'operativ',
-    'department_lead',
-    'departementsansvarig',
-    'minister',
-    'prime_minister',
-    'statsminister',
-    'system_admin'
-  ];
-  
-  const requiredIndex = roleHierarchy.indexOf(requiredRole);
-  const currentIndex = roleHierarchy.indexOf(data.highestRole);
-  
+  const requiredIndex = ROLE_HIERARCHY.indexOf(requiredRole);
+  const currentIndex = ROLE_HIERARCHY.indexOf(data.highestRole);
   return currentIndex >= requiredIndex;
 }
 
 export function useIsResponsibleFor(kpiId: string) {
   const { data: responsibilities } = useKPIResponsibilities();
-  
   if (!responsibilities) return false;
-  
-  return responsibilities.some(r => r.kpi_id === kpiId);
+  return responsibilities.some((r) => r.kpi_id === kpiId);
 }
