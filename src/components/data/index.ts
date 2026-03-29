@@ -59,6 +59,9 @@ export {
    INDEX_DEPTH_DATA 
  } from './ClickableIndexCard';
 
+// Live WorldBank data widget
+export { LiveDataWidget } from './LiveDataWidget';
+
 // Utility: Create a simple data point with basic depth
 export function createDataPoint(params: {
   id: string;

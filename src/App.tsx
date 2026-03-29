@@ -37,7 +37,7 @@ const ApiLicensingPage = lazy(() => import("./pages/ApiLicensing"));
 const RegionalView = lazy(() => import("./pages/RegionalView"));
 const DecisionTimeline = lazy(() => import("./pages/DecisionTimeline"));
 const Settings = lazy(() => import("./pages/Settings"));
-const ConceptDemo = lazy(() => import("./pages/ConceptDemo"));
+// ConceptDemo removed — was demo-only mockdata (see produktionslås)
 const CanvasDemo = lazy(() => import("./pages/CanvasDemo"));
 const LearningPaths = lazy(() => import("./pages/LearningPaths"));
 const StoriesDemo = lazy(() => import("./pages/StoriesDemo"));
@@ -182,7 +182,7 @@ const App = () => (
                             <Route path="/eu" element={<EuDashboardPage />} />
                             <Route path="/om" element={<AboutSystem />} />
                             <Route path="/settings" element={<Settings />} />
-                            <Route path="/demo" element={<ConceptDemo />} />
+                            {/* /demo route removed — ConceptDemo was demo-only mockdata */}
                             <Route path="/canvas" element={<CanvasDemo />} />
                             <Route path="/learn" element={<LearningPaths />} />
                             <Route path="/stories" element={<StoriesDemo />} />

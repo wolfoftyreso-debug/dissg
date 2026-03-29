@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { LiveDataWidget } from '@/components/data/LiveDataWidget';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -194,6 +195,11 @@ export default function GlobalIndex() {
           </div>
         </div>
       </header>
+
+      {/* Live global WorldBank stats */}
+      <div style={{ padding: '12px 24px', borderBottom: '1px solid #E5E7EB', background: '#F9FAFB' }}>
+        <LiveDataWidget countryCode="WLD" showTitle={true} />
+      </div>
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-[280px_1fr] gap-8">
