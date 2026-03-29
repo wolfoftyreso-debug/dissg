@@ -24,6 +24,33 @@
     <meta name="twitter:title" content="DISSG – Diagnostic Infrastructure for Societal Governance" />
     <meta name="twitter:description" content="Structured access to 184 standardized indicators across 195 jurisdictions." />
     
+    <!-- IBM Plex fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Mobile responsiveness -->
+    <style>
+      @media (max-width: 768px) {
+        /* Header */
+        header { padding: 0 16px !important; }
+        header nav a:not(:last-child) { display: none !important; }
+
+        /* Main content */
+        main { padding: 32px 16px !important; }
+
+        /* Two-column table → single column */
+        .dissg-two-col td { display: block !important; width: 100% !important; padding-right: 0 !important; }
+
+        /* Tables scroll on mobile */
+        table { overflow-x: auto; display: block; }
+
+        /* Spec box */
+        td[style*="background: #F4F4F4"] {
+          margin-top: 24px;
+        }
+      }
+    </style>
+
     <!-- Schema.org -->
     <script type="application/ld+json">
     {
