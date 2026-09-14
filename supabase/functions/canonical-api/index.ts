@@ -13,7 +13,10 @@ const corsHeaders = {
   'Cache-Control': 'public, max-age=300', // 5 min cache
 };
 
-const BASE_URL = Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovable.app') || 'https://systemet.lovable.app';
+const BASE_URL =
+  Deno.env.get('PUBLIC_APP_URL') ||
+  Deno.env.get('CANONICAL_BASE_URL') ||
+  'http://localhost:8080';
 
 interface CanonicalResponse<T> {
   data: T;

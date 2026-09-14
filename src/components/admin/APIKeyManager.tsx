@@ -118,7 +118,7 @@ export function APIKeyManager() {
           <Alert>
             <AlertDescription>
               <strong>Säkerhetsinfo:</strong> API-nycklar visas aldrig i klartext efter att de sparats.
-              Kontakta systemadministratör för att uppdatera nycklar via Lovable Cloud.
+              Kontakta systemadministratör för att uppdatera nycklar via er drift-/deploymiljö.
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -213,24 +213,10 @@ export function APIKeyManager() {
             För att lägga till eller uppdatera en API-nyckel:
           </p>
           <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-            <li>Öppna Lovable Cloud Console</li>
-            <li>Gå till Settings → Secrets</li>
+            <li>Öppna er miljö-/deploykonfiguration för hemligheter (secrets)</li>
             <li>Lägg till nyckeln med rätt miljövariabelnamn (t.ex. ENTSOE_API_KEY)</li>
             <li>Deploya om edge functions för att aktivera</li>
           </ol>
-          <div className="pt-4">
-            <Button variant="outline" asChild>
-              <a 
-                href="https://lovable.dev/projects" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Öppna Lovable Cloud
-              </a>
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </div>

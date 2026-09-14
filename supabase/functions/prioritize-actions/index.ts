@@ -87,9 +87,10 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const AI_API_KEY = Deno.env.get("AI_API_KEY");
+    const AI_CHAT_COMPLETIONS_URL = Deno.env.get("AI_CHAT_COMPLETIONS_URL");
+    if (!AI_API_KEY || !AI_CHAT_COMPLETIONS_URL) {
+      throw new Error("AI service is not configured");
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -216,11 +217,11 @@ Returnera ett JSON-objekt med exakt denna struktur:
   ]
 }`;
 
-      // Anropa Lovable AI
-      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      // Anropa AI-tjänst
+      const aiResponse = await fetch(AI_CHAT_COMPLETIONS_URL, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          Authorization: `Bearer ${AI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -242,7 +243,7 @@ Returnera ett JSON-objekt med exakt denna struktur:
         }
         if (aiResponse.status === 402) {
           return new Response(
-            JSON.stringify({ error: "Krediter slut. Fyll på i Lovable-inställningar." }),
+            JSON.stringify({ error: "Krediter slut. Kontakta administratör." }),
             { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
