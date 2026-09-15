@@ -208,10 +208,11 @@ serve(async (req) => {
 
   try {
     const body: ExplainRequest = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const AI_API_KEY = Deno.env.get("AI_API_KEY");
+    const AI_CHAT_COMPLETIONS_URL = Deno.env.get("AI_CHAT_COMPLETIONS_URL");
 
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!AI_API_KEY || !AI_CHAT_COMPLETIONS_URL) {
+      throw new Error("AI service is not configured");
     }
 
     // ETLIH mode: streaming response
@@ -219,10 +220,10 @@ serve(async (req) => {
       const systemPrompt = getETLIHSystemPrompt(body.level, body.language || 'sv');
       const userPrompt = buildETLIHUserPrompt(body.context, body.language || 'sv', body.question);
 
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const response = await fetch(AI_CHAT_COMPLETIONS_URL, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          Authorization: `Bearer ${AI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -285,11 +286,10 @@ serve(async (req) => {
       prompt += '\n\nGe en detaljerad förklaring med alla relevanta nyanser.';
     }
 
-    // Call Lovable AI Gateway
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(AI_CHAT_COMPLETIONS_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${AI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

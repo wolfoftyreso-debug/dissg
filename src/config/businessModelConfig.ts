@@ -156,7 +156,7 @@ export const LICENSE_TIERS: LicenseTierDefinition[] = [
 // ============================================================
 
 export const RESPONSIBILITY_MODEL = {
-  title: { en: 'Responsibility Distribution', sv: 'Ansvarsfördelning' },
+  title: { en: 'Responsibility Model', sv: 'Ansvarsmodell' },
   platformResponsibleFor: {
     label: { en: 'Platform is responsible for', sv: 'Plattformen ansvarar för' },
     items: [
@@ -177,7 +177,7 @@ export const RESPONSIBILITY_MODEL = {
     ],
   },
   legalStatement: {
-    en: 'The platform provides tools and data. All interpretations, scenarios and decisions remain the sole responsibility of the user.',
+    en: 'The platform provides tools and data. The platform provides data aggregation and analytical tools. All interpretations, scenarios and decisions remain the sole responsibility of the user.',
     sv: 'Plattformen tillhandahåller verktyg och data. Alla tolkningar, scenarier och beslut förblir användarens eget ansvar.',
   },
   industryStandard: {
@@ -188,18 +188,18 @@ export const RESPONSIBILITY_MODEL = {
   platformProvides: {
     label: { en: 'Platform Provides', sv: 'Plattformen tillhandahåller' },
     items: [
-      { en: 'Data integrity', sv: 'Dataintegritet' },
+      { en: 'Data aggregation', sv: 'Dataaggregering' },
+      { en: 'Analytical tools', sv: 'Analysverktyg' },
       { en: 'Methodology transparency', sv: 'Metodtransparens' },
-      { en: 'Calculation correctness', sv: 'Beräkningskorrekthet' },
       { en: 'Traceability', sv: 'Spårbarhet' },
     ],
   },
   platformDoesNot: {
     label: { en: 'Platform Does Not', sv: 'Plattformen ansvarar inte för' },
     items: [
-      { en: 'User assumptions', sv: 'Användarens antaganden' },
+      { en: 'Interpret results', sv: 'Tolka resultat' },
+      { en: 'Recommend actions', sv: 'Rekommendera åtgärder' },
       { en: 'User conclusions', sv: 'Användarens slutsatser' },
-      { en: 'User decisions', sv: 'Användarens beslut' },
       { en: 'External consequences', sv: 'Externa konsekvenser' },
     ],
   },

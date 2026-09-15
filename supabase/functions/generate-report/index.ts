@@ -2,7 +2,7 @@
  * GENERATE REPORT
  * ============================================================================
  * 
- * Edge function that generates analysis reports using Lovable AI.
+ * Edge function that generates analysis reports using an AI service.
  * Follows the A2F (Always-Answer Format) structure with 6 mandatory parts.
  */
 
@@ -47,10 +47,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Get Lovable API key
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    if (!lovableApiKey) {
-      console.error('LOVABLE_API_KEY not configured');
+    const aiApiKey = Deno.env.get('AI_API_KEY');
+    const aiChatCompletionsUrl = Deno.env.get('AI_CHAT_COMPLETIONS_URL');
+    if (!aiApiKey || !aiChatCompletionsUrl) {
+      console.error('AI service not configured');
       return new Response(
         JSON.stringify({ success: false, error: 'AI service not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -123,11 +123,10 @@ Remember:
 - State limitations clearly
 - Write in Swedish for a Swedish audience`;
 
-    // Call Lovable AI
-    const aiResponse = await fetch('https://api.lovable.dev/v1/chat/completions', {
+    const aiResponse = await fetch(aiChatCompletionsUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
+        'Authorization': `Bearer ${aiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

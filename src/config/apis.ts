@@ -146,12 +146,12 @@ export const externalApis: Record<string, ApiConfig> = {
     status: 'active',
   },
   
-  // AI Services (Lovable AI - no key required)
-  lovableAi: {
-    id: 'lovable-ai',
-    name: 'Lovable AI',
+  // AI Services
+  platformAi: {
+    id: 'platform-ai',
+    name: 'Platform AI',
     category: 'ai',
-    description: 'Built-in AI capabilities without API key',
+    description: 'AI capabilities (provider configured via backend environment)',
     baseUrl: 'internal',
     version: '1.0',
     authType: 'none',

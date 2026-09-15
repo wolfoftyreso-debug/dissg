@@ -1,7 +1,7 @@
  # TRUTH ENGINE - Python Reference Implementation
  
  This is the Python reference implementation for standalone deployment.
- The TypeScript version in `../core/` is functionally identical and runs in Lovable.
+The TypeScript version in `../core/` is functionally identical and runs in the main application runtime.
  
  ## Structure
  

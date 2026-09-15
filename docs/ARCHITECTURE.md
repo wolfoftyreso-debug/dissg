@@ -32,8 +32,8 @@
 ┌─────────────────────┐ ┌─────────────────────┐ ┌─────────────────────┐
 │     AI LAYER        │ │    DATA LAYER       │ │  EXTERNAL SOURCES   │
 │  ┌───────────────┐  │ │  ┌───────────────┐  │ │  ┌───────────────┐  │
-│  │ Lovable AI    │  │ │  │  PostgreSQL   │  │ │  │     SCB       │  │
-│  │ Gateway       │  │ │  │  (Supabase)   │  │ │  │   Kolada      │  │
+│  │ AI Gateway    │  │ │  │  PostgreSQL   │  │ │  │     SCB       │  │
+│  │               │  │ │  │  (Supabase)   │  │ │  │   Kolada      │  │
 │  │               │  │ │  │               │  │ │  │   BRÅ m.fl.   │  │
 │  │ • Gemini 3    │  │ │  │ • KPI Data    │  │ │  │               │  │
 │  │ • GPT-5       │  │ │  │ • Actions     │  │ │  │   17 källor   │  │
@@ -204,12 +204,12 @@ serve(async (req) => {
 
 ## 3. AI Layer
 
-### 3.1 Lovable AI Gateway
+### 3.1 AI Gateway
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     LOVABLE AI GATEWAY                           │
-│              https://ai.gateway.lovable.dev/v1                   │
+│                         AI GATEWAY                               │
+│              (configured via environment variables)              │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │   GOOGLE GEMINI                    OPENAI GPT                   │
@@ -222,7 +222,7 @@ serve(async (req) => {
 │                                                                  │
 │   ★ = Standardmodell (balans hastighet/kvalitet)                │
 │                                                                  │
-│   Autentisering: LOVABLE_API_KEY (auto-provisioned)             │
+│   Autentisering: AI_API_KEY                                     │
 │   Felhantering: 429 = Rate limit, 402 = Krediter slut           │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -410,7 +410,7 @@ SCHEDULE → FETCH → TRANSFORM → VALIDATE → STORE → NOTIFY
 
 | Miljö | URL | Syfte |
 |-------|-----|-------|
-| Preview | `*.lovable.app` | Utveckling |
+| Preview | `<preview-url>` | Utveckling |
 | Production | Publicerad | Live |
 
 ### 7.2 Deploy-flöde

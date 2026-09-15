@@ -17,7 +17,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
   LineChart,
   Line,
@@ -258,6 +257,9 @@ const categoryLabels: Record<string, string> = {
 export const CorrelationSandbox: React.FC = () => {
   const [indicatorA, setIndicatorA] = useState<Indicator | null>(null);
   const [indicatorB, setIndicatorB] = useState<Indicator | null>(null);
+  const currentYear = new Date().getFullYear();
+  const [yearStart, setYearStart] = useState<number>(2000);
+  const [yearEnd, setYearEnd] = useState<number>(currentYear);
 
   // Fetch available indicators from database
   const { data: indicators, isLoading: loadingIndicators, error: indicatorsError } = useQuery({
@@ -271,6 +273,26 @@ export const CorrelationSandbox: React.FC = () => {
     queryFn: () => fetchTimeSeriesData(indicatorA!.id, indicatorB!.id),
     enabled: !!indicatorA && !!indicatorB,
   });
+
+  const { minYear, maxYear } = useMemo(() => {
+    const fallback = { minYear: 2000, maxYear: currentYear };
+    if (!timeSeriesData) return fallback;
+    const years: number[] = [];
+    for (const row of timeSeriesData.dataA) years.push(new Date(row.period).getFullYear());
+    for (const row of timeSeriesData.dataB) years.push(new Date(row.period).getFullYear());
+    const filtered = years.filter((y) => Number.isFinite(y));
+    if (filtered.length === 0) return fallback;
+    return { minYear: Math.min(...filtered), maxYear: Math.max(...filtered) };
+  }, [timeSeriesData, currentYear]);
+
+  useEffect(() => {
+    setYearStart((prev) => Math.min(Math.max(prev, minYear), maxYear));
+    setYearEnd((prev) => Math.max(Math.min(prev, maxYear), minYear));
+  }, [minYear, maxYear]);
+
+  useEffect(() => {
+    if (yearStart > yearEnd) setYearStart(yearEnd);
+  }, [yearStart, yearEnd]);
 
   // Calculate correlation result
   const { chartData, result, warnings, otherFactors } = useMemo(() => {
@@ -302,8 +324,9 @@ export const CorrelationSandbox: React.FC = () => {
 
     // Sort by period
     merged.sort((a, b) => a.period.localeCompare(b.period));
+    const filteredByYear = merged.filter((row) => row.year >= yearStart && row.year <= yearEnd);
 
-    if (merged.length === 0) {
+    if (filteredByYear.length === 0) {
       return { 
         chartData: [], 
         result: null, 
@@ -317,11 +340,11 @@ export const CorrelationSandbox: React.FC = () => {
       };
     }
 
-    const values1 = merged.map(d => d[indicatorA.code] as number);
-    const values2 = merged.map(d => d[indicatorB.code] as number);
+    const values1 = filteredByYear.map(d => d[indicatorA.code] as number);
+    const values2 = filteredByYear.map(d => d[indicatorB.code] as number);
 
     const corr = calculateCorrelation(values1, values2);
-    const warns = generateWarnings(corr, merged.length);
+    const warns = generateWarnings(corr, filteredByYear.length);
 
     // Suggest other factors
     const others = (indicators || [])
@@ -329,8 +352,8 @@ export const CorrelationSandbox: React.FC = () => {
       .slice(0, 3)
       .map(i => i.name);
 
-    return { chartData: merged, result: corr, warnings: warns, otherFactors: others };
-  }, [indicatorA, indicatorB, timeSeriesData, indicators]);
+    return { chartData: filteredByYear, result: corr, warnings: warns, otherFactors: others };
+  }, [indicatorA, indicatorB, timeSeriesData, indicators, yearStart, yearEnd]);
 
   const strengthLabels = {
     none: { sv: 'Ingen', color: 'text-muted-foreground' },
@@ -394,74 +417,110 @@ export const CorrelationSandbox: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {loadingIndicators ? (
-            <div className="space-y-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : (
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="flex-1 min-w-48">
-                <label className="text-xs text-muted-foreground mb-1 block">Indikator A</label>
-                <Select 
-                  value={indicatorA?.id || ''} 
-                  onValueChange={(v) => setIndicatorA(indicators?.find(i => i.id === v) || null)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Välj indikator..." />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-80">
-                    {Object.entries(groupedIndicators).map(([category, items]) => (
-                      <div key={category}>
-                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
-                          {categoryLabels[category] || category}
-                        </div>
-                        {items.map(ind => (
-                          <SelectItem key={ind.id} value={ind.id}>
-                            <span className="flex items-center gap-2">
-                              {ind.name}
-                              <span className="text-xs text-muted-foreground">({ind.unit})</span>
-                            </span>
-                          </SelectItem>
-                        ))}
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex-1 min-w-48">
+              <label className="text-xs text-muted-foreground mb-1 block">Indikator A</label>
+              <Select
+                value={indicatorA?.id || ''}
+                onValueChange={(v) => setIndicatorA(indicators?.find(i => i.id === v) || null)}
+              >
+                <SelectTrigger disabled={loadingIndicators || !!indicatorsError}>
+                  <SelectValue placeholder={loadingIndicators ? "Laddar indikatorer..." : "Välj indikator..."} />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  {Object.entries(groupedIndicators).map(([category, items]) => (
+                    <div key={category}>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
+                        {categoryLabels[category] || category}
                       </div>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <ArrowRight className="h-5 w-5 text-muted-foreground hidden sm:block" />
-
-              <div className="flex-1 min-w-48">
-                <label className="text-xs text-muted-foreground mb-1 block">Indikator B</label>
-                <Select 
-                  value={indicatorB?.id || ''} 
-                  onValueChange={(v) => setIndicatorB(indicators?.find(i => i.id === v) || null)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Välj indikator..." />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-80">
-                    {Object.entries(groupedIndicators).map(([category, items]) => (
-                      <div key={category}>
-                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
-                          {categoryLabels[category] || category}
-                        </div>
-                        {items.filter(i => i.id !== indicatorA?.id).map(ind => (
-                          <SelectItem key={ind.id} value={ind.id}>
-                            <span className="flex items-center gap-2">
-                              {ind.name}
-                              <span className="text-xs text-muted-foreground">({ind.unit})</span>
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </div>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                      {items.map(ind => (
+                        <SelectItem key={ind.id} value={ind.id}>
+                          <span className="flex items-center gap-2">
+                            {ind.name}
+                            <span className="text-xs text-muted-foreground">({ind.unit})</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </div>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          )}
+
+            <ArrowRight className="h-5 w-5 text-muted-foreground hidden sm:block" />
+
+            <div className="flex-1 min-w-48">
+              <label className="text-xs text-muted-foreground mb-1 block">Indikator B</label>
+              <Select
+                value={indicatorB?.id || ''}
+                onValueChange={(v) => setIndicatorB(indicators?.find(i => i.id === v) || null)}
+              >
+                <SelectTrigger disabled={loadingIndicators || !!indicatorsError}>
+                  <SelectValue placeholder={loadingIndicators ? "Laddar indikatorer..." : "Välj indikator..."} />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  {Object.entries(groupedIndicators).map(([category, items]) => (
+                    <div key={category}>
+                      <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
+                        {categoryLabels[category] || category}
+                      </div>
+                      {items.filter(i => i.id !== indicatorA?.id).map(ind => (
+                        <SelectItem key={ind.id} value={ind.id}>
+                          <span className="flex items-center gap-2">
+                            {ind.name}
+                            <span className="text-xs text-muted-foreground">({ind.unit})</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </div>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Time range */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Tidsperiod
+          </CardTitle>
+          <CardDescription>
+            Filtrerar beräkningar och visualisering till valt årsspann
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Startår</span>
+              <span className="font-mono">{yearStart}</span>
+            </div>
+            <Slider
+              min={minYear}
+              max={maxYear}
+              step={1}
+              value={[yearStart]}
+              onValueChange={([v]) => setYearStart(Math.min(v, yearEnd))}
+              aria-label="Startår"
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Slutår</span>
+              <span className="font-mono">{yearEnd}</span>
+            </div>
+            <Slider
+              min={minYear}
+              max={maxYear}
+              step={1}
+              value={[yearEnd]}
+              onValueChange={([v]) => setYearEnd(Math.max(v, yearStart))}
+              aria-label="Slutår"
+            />
+          </div>
         </CardContent>
       </Card>
 
